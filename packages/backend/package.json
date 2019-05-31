@@ -1,0 +1,24 @@
+{
+    "name": "@magnit/backend",
+    "private": true,
+    "version": "0.1.0",
+    "dependencies": {
+        "sails": "^1.2.2",
+        "grunt": "1.0.4",
+        "sails-hook-grunt": "^4.0.0",
+        "sails-hook-orm": "^2.1.1",
+        "sails-hook-sockets": "^2.0.0",
+        "@sailshq/connect-redis": "^3.2.1",
+        "@sailshq/socket.io-redis": "^5.2.0",
+        "@sailshq/lodash": "^3.10.3"
+    },
+    "scripts": {
+        "start": "cross-env NODE_ENV=production node app.js",
+        "test": "npm run custom-tests && echo 'Done.'",
+        "custom-tests": "echo \"(No other custom tests yet.)\" && echo"
+    },
+    "main": "app.js",
+    "engines": {
+        "node": "^10.15"
+    }
+}

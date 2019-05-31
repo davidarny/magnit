@@ -1,0 +1,35 @@
+{
+    "name": "@magnit/core",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "commit": "git-cz"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^7.6.1",
+        "@commitlint/config-conventional": "^7.6.0",
+        "commitizen": "^3.1.1",
+        "cross-env": "^5.2.0",
+        "cz-conventional-changelog": "^2.1.0",
+        "eslint": "^5.16.0",
+        "eslint-config-prettier": "^4.3.0",
+        "eslint-plugin-prettier": "^3.1.0",
+        "husky": "^2.3.0",
+        "lerna": "^3.14.1",
+        "lint-staged": "^8.1.7",
+        "prettier": "^1.17.1",
+        "pretty-quick": "^1.11.0"
+    },
+    "dependencies": {
+        "@magnit/backend": "file:packages\\backend",
+        "@magnit/frontend": "file:packages\\frontend"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    },
+    "workspaces": [
+        "packages/*"
+    ]
+}

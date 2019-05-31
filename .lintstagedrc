@@ -1,0 +1,6 @@
+{
+    "linters": {
+        "*.js": ["eslint . --fix", "git add ."]
+    },
+    "ignore": ["node_modules", "public", "build", "dependencies"]
+}

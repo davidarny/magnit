@@ -1,0 +1,30 @@
+{
+    "presets": ["react-app"],
+    "plugins": [
+        "emotion",
+        [
+            "import",
+            {
+                "libraryName": "@material-ui/core",
+                "libraryDirectory": "components",
+                "camel2DashComponentName": false
+            }
+        ],
+        [
+            "import",
+            {
+                "libraryName": "@material-ui/icons",
+                "libraryDirectory": "",
+                "camel2DashComponentName": false
+            }
+        ],
+        [
+            "import",
+            {
+                "libraryName": "lodash",
+                "libraryDirectory": "",
+                "camel2DashComponentName": false
+            }
+        ]
+    ]
+}

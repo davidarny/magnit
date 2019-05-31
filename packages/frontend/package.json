@@ -1,0 +1,51 @@
+{
+    "name": "@magnit/frontend",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@emotion/core": "^10.0.10",
+        "@material-ui/core": "^4.0.1",
+        "@material-ui/icons": "^4.0.1",
+        "@material-ui/styles": "^4.0.1",
+        "@types/jest": "24.0.13",
+        "@types/node": "12.0.4",
+        "@types/react": "16.8.19",
+        "@types/react-dom": "16.8.4",
+        "@types/react-jss": "^8.6.3",
+        "emotion-theming": "^10.0.10",
+        "jss": "^9.8.7",
+        "mobx": "^5.9.4",
+        "mobx-react-lite": "^1.4.0",
+        "mobx-state-tree": "^3.14.0",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
+        "react-jss": "^8.6.1",
+        "react-router-dom": "^5.0.0",
+        "react-scripts": "3.0.1",
+        "typescript": "3.5.1"
+    },
+    "devDependencies": {
+        "source-map-explorer": "^1.8.0",
+        "babel-plugin-emotion": "^10.0.9",
+        "babel-plugin-import": "^1.11.2"
+    },
+    "scripts": {
+        "analyze": "source-map-explorer build/static/js/*.js",
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --passWithNoTests",
+        "eject": "react-scripts eject"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}
