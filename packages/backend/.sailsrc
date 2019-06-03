@@ -5,5 +5,11 @@
   "_generatedWith": {
     "sails": "1.2.2",
     "sails-generate": "1.16.12"
+  },
+  "hooks": {
+    "grunt": false
+  },
+  "paths": {
+    "public": "assets"
   }
 }
