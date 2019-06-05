@@ -9,8 +9,15 @@ import { JssProvider } from "components/jss-provider";
 (global as typeof global & { React: typeof React }).React = React;
 
 const theme = {
+    fontSize: {
+        small: "0.5rem",
+        smaller: "0.75rem",
+        normal: "1rem",
+        larger: "1.5rem",
+        large: "2rem",
+    },
     spacing(times: number = 1) {
-        return times * 10 + "px";
+        return times * 8 + "px";
     },
 };
 
