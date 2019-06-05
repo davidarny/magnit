@@ -45,7 +45,17 @@ module.exports.datastores = {
          *    (See https://sailsjs.com/config/datastores for help.)                 *
          *                                                                          *
          ***************************************************************************/
-        // adapter: 'sails-mysql',
-        // url: 'mysql://user:password@host:port/database',
+        adapter: "sails-postgresql",
+        url:
+            "postgresql://" +
+            JSON.parse(require("fs").readFileSync("config.json"), "utf8").postgresql_user +
+            ":" +
+            JSON.parse(require("fs").readFileSync("config.json"), "utf8").postgresql_password +
+            "@" +
+            JSON.parse(require("fs").readFileSync("config.json"), "utf8").postgresql_host +
+            ":" +
+            JSON.parse(require("fs").readFileSync("config.json"), "utf8").postgresql_port +
+            "/" +
+            JSON.parse(require("fs").readFileSync("config.json"), "utf8").postgresql_db,
     },
 };
