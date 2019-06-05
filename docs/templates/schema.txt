@@ -1,0 +1,75 @@
+Table templates {
+ id int [pk]
+ name varchar
+ description text
+ created_at timestamp
+}
+
+Table sections {
+ id int [pk]
+ template_id int [ref: > templates.id]
+ name varchar
+ description text
+ created_at timestamp
+}
+
+Table sections_x_puzzle {
+ section_id int [ref: > sections.id]
+ puzzle_id int [ref: > puzzle.id]
+}
+
+Table puzzle {
+ id int [pk]
+ title varchar
+ puzzle_type puzzle_type
+ created_at timestamp
+}
+
+Table validation {
+ id int [pk]
+ operator operator_type
+ value varchar
+ unit_type unit_types
+}
+
+Table puzzle_x_validation {
+ puzzle_id int [ref: > puzzle.id]
+ validation_id int [ref: > validation.id]
+}
+
+Table puzzle_x_puzzle {
+ parent_id int [ref: > puzzle.id]
+ child_id int [ref: > puzzle.id]
+}
+
+Table condition {
+ puzzle_id int [ref: > puzzle.id]
+ actions action_type
+}
+
+enum puzzle_type {
+ question
+ numeric_answer
+ string_answer
+ radio_answer
+ group
+}
+
+enum action_type {
+ one_answer
+ yes_or_no
+}
+
+enum operator_type {
+ less
+ more
+ equal
+ less_or_equal
+ more_or_equal
+}
+
+enum unit_types {
+ km
+ m
+ sm
+}
