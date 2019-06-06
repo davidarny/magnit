@@ -77,8 +77,8 @@ enum input_type {
 }
 
 enum operator_type {
- less
- more
+ less_than
+ more_than
  equal
  less_or_equal
  more_or_equal

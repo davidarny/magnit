@@ -17,6 +17,8 @@ const theme = {
         large: "2rem",
     },
 
+    maxTemplateWidth: "1280px",
+
     spacing(times: number = 1) {
         return times * 8 + "px";
     },

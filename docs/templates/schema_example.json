@@ -134,7 +134,7 @@
                                 {
                                     "order": 0,
                                     "left_hand_puzzle": "Введите площадь объекта",
-                                    "operator_type": "more_then",
+                                    "operator_type": "more_than",
                                     "validation_type": "compare_with_answer",
                                     "right_hand_puzzle": "Введите площадь торгового зала",
                                     "value": null,

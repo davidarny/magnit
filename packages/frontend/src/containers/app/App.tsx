@@ -17,6 +17,10 @@ const AsyncTemplates = Loadable(({
     loader: () => import("containers/templates").then(module => module.Templates),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+const AsyncCreateTemplate = Loadable(({
+    loader: () => import("containers/templates").then(module => module.CreateTemplate),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
 const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
@@ -80,6 +84,7 @@ const App: React.FC = () => {
                     <Router>
                         <AsyncTasks path="tasks/*" />
                         <AsyncTemplates path="templates" />
+                        <AsyncCreateTemplate path="templates/create" />
                     </Router>
                 </Grid>
             </Grid>

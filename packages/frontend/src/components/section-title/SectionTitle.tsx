@@ -8,7 +8,7 @@ interface ISectionTitleProps {
     title: string;
 }
 
-export const SectionTitle: React.FC<ISectionTitleProps> = ({ title }) => {
+export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) => {
     return (
         <Grid
             item
@@ -24,12 +24,24 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title }) => {
                     align-items: center;
                 `}
             >
-                <Grid container css={theme => ({ paddingLeft: theme.spacing(4) })}>
-                    <Grid item>
+                <Grid
+                    container
+                    css={theme => ({
+                        paddingLeft: theme.spacing(4),
+                        paddingRight: theme.spacing(4),
+                    })}
+                >
+                    <Grid
+                        item
+                        css={css`
+                            flex-grow: 1;
+                        `}
+                    >
                         <Typography variant="h4" component="div">
                             <span>{title}</span>
                         </Typography>
                     </Grid>
+                    {children}
                 </Grid>
             </Paper>
         </Grid>
