@@ -8,7 +8,7 @@ CREATE TYPE "puzzle_type" AS ENUM (
 );
 
 CREATE TYPE "condition_action_type" AS ENUM (
-  'choosen_answer'
+  'chosen_answer'
 );
 
 CREATE TYPE "validation_action_type" AS ENUM (
@@ -22,8 +22,8 @@ CREATE TYPE "input_type" AS ENUM (
 );
 
 CREATE TYPE "operator_type" AS ENUM (
-  'less',
-  'more',
+  'less_than',
+  'more_than',
   'equal',
   'less_or_equal',
   'more_or_equal'

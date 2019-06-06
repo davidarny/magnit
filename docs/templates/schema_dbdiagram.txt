@@ -63,7 +63,7 @@ enum puzzle_type {
 }
 
 enum condition_action_type {
- choosen_answer
+ chosen_answer
 }
 
 enum validation_action_type {
