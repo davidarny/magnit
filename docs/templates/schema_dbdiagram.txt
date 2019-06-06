@@ -1,0 +1,95 @@
+Table template {
+ id int [pk]
+ title varchar
+}
+
+Table section {
+ id int [pk]
+ template_id int [ref: > template.id]
+ title varchar
+ order int
+}
+
+Table sections_x_puzzle {
+ section_id int [ref: > section.id]
+ puzzle_id int [ref: > puzzle.id]
+}
+
+Table puzzle {
+ id int [pk]
+ title varchar
+ puzzle_type puzzle_type
+ order int
+ answer_type input_type
+}
+
+Table puzzle_x_puzzle {
+  parent_id int [ref: > puzzle.id]
+  child_id int [ref: > puzzle.id]
+}
+
+Table puzzle_x_condition {
+  puzzle_id int [ref: > puzzle.id]
+  condition_id int [ref: > condition.id]
+}
+
+Table condition {
+  id int [pk]
+  order int
+  question_puzzle int [ref: > puzzle.id]
+  action_type condition_action_type
+  answer_puzzle int [ref: > puzzle.id]
+}
+
+Table validation {
+  id id [pk]
+  order int
+  operator_type operator_type
+  validation_type validation_action_type
+  left_hand_puzzle int [ref: > puzzle.id]
+  right_hand_puzzle int [ref: > puzzle.id]
+  value int
+  error_message varchar
+}
+
+Table puzzle_x_validation {
+  puzzle_id int [ref: > puzzle.id]
+  validation_id int [ref: > validation.id]
+}
+
+enum puzzle_type {
+ question
+ numeric_answer
+ string_answer
+ radio_answer
+ input_answer
+ group
+}
+
+enum condition_action_type {
+ choosen_answer
+}
+
+enum validation_action_type {
+ compare_with_answer
+ set_value
+}
+
+enum input_type {
+  string
+  number
+}
+
+enum operator_type {
+ less
+ more
+ equal
+ less_or_equal
+ more_or_equal
+}
+
+enum unit_type {
+ km
+ m
+ sm
+}
