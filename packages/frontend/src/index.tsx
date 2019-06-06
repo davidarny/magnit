@@ -16,6 +16,7 @@ const theme = {
         larger: "1.5rem",
         large: "2rem",
     },
+
     spacing(times: number = 1) {
         return times * 8 + "px";
     },

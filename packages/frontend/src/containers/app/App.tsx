@@ -13,9 +13,14 @@ const AsyncTasks = Loadable(({
     loader: () => import("containers/tasks").then(module => module.Tasks),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+const AsyncTemplates = Loadable(({
+    loader: () => import("containers/templates").then(module => module.Templates),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
 const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
+    const [logoHeight, setLogoHeight] = useState(0);
 
     useEffect(() => {
         const isNotNil = R.compose(
@@ -25,6 +30,7 @@ const App: React.FC = () => {
 
         const getChildren = R.prop("children") as () => HTMLCollection;
         const getClientWidth = R.prop("clientWidth") as () => number;
+        const getClientHeight = R.prop("clientHeight") as () => number;
 
         const getFirstChild = R.compose<HTMLCollection, HTMLElement[], HTMLElement>(
             array => R.head(array)!,
@@ -32,7 +38,7 @@ const App: React.FC = () => {
             getChildren
         );
 
-        const setWidthWhenNotNil = R.when<HTMLElement, void>(
+        const setDrawerWidthWhenNotNil = R.when<HTMLElement, void>(
             isNotNil,
             R.pipe(
                 getFirstChild,
@@ -40,13 +46,26 @@ const App: React.FC = () => {
                 setDrawerWidth
             )
         );
+        const setLogoHeightWhenNotNil = R.when<HTMLElement, void>(
+            isNotNil,
+            R.pipe(
+                getClientHeight,
+                setLogoHeight
+            )
+        );
 
-        setWidthWhenNotNil(document.getElementById("drawer")!);
+        setDrawerWidthWhenNotNil(document.getElementById("drawer")!);
+        setLogoHeightWhenNotNil(document.getElementById("logo")!);
     }, []);
 
     return (
         <>
-            <GlobalStyles />
+            <GlobalStyles
+                section={{
+                    titleHeight: logoHeight,
+                    leftMargin: drawerWidth,
+                }}
+            />
             <Grid container>
                 <Grid item>
                     <Sidebar />
@@ -54,12 +73,13 @@ const App: React.FC = () => {
                 <Grid
                     item
                     css={css`
-                        margin-left: ${drawerWidth}px;
+                        margin-left: var(--section-left-margin);
                         width: 100%;
                     `}
                 >
                     <Router>
                         <AsyncTasks path="tasks/*" />
+                        <AsyncTemplates path="templates" />
                     </Router>
                 </Grid>
             </Grid>
@@ -67,10 +87,22 @@ const App: React.FC = () => {
     );
 };
 
-const GlobalStyles: React.FC = () => {
+interface IGlobalStyleProps {
+    section: {
+        titleHeight: number;
+        leftMargin: number;
+    };
+}
+
+const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
     return (
         <Global
             styles={css`
+                :root {
+                    --section-title-height: ${props.section.titleHeight}px;
+                    --section-left-margin: ${props.section.leftMargin}px;
+                }
+
                 body {
                     font-family: "Roboto", sans-serif;
                 }

@@ -1,11 +1,13 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Typography, Grid, AppBar, Tabs, Tab } from "@material-ui/core";
+import { Grid, AppBar, Tabs, Tab } from "@material-ui/core";
 import * as React from "react";
 import { Link, RouteComponentProps } from "@reach/router";
 import { useState } from "react";
 import { RouteMatcher } from "components/route-matcher";
+import { SectionLayout } from "../../components/section-layout";
+import { SectionTitle } from "../../components/section-title";
 
 enum ETabIndex {
     ALL = 0,
@@ -43,11 +45,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
     };
 
     return (
-        <Grid
-            container
-            direction="column"
-            css={theme => ({ width: "100%", paddingTop: theme.spacing(2) })}
-        >
+        <SectionLayout>
             <RouteMatcher
                 routes={[
                     {
@@ -84,14 +82,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     },
                 ]}
             />
-            <Grid
-                item
-                css={theme => ({ paddingLeft: theme.spacing(4), paddingBottom: theme.spacing(2) })}
-            >
-                <Typography variant="h4" component="div">
-                    <span>Список заданий</span>
-                </Typography>
-            </Grid>
+            <SectionTitle title="Список заданий" />
             <Grid item>
                 <AppBar position="static">
                     <Tabs value={tabIndex} css={theme => ({ paddingLeft: theme.spacing(4) })}>
@@ -138,6 +129,6 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     </Tabs>
                 </AppBar>
             </Grid>
-        </Grid>
+        </SectionLayout>
     );
 };

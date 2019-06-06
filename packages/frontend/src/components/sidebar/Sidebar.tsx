@@ -14,7 +14,7 @@ import { Link } from "@reach/router";
 export const Sidebar: React.FC = () => {
     return (
         <Drawer variant="permanent" open={true} id="drawer">
-            <Grid container justify="center" alignItems="center">
+            <Grid container justify="center" alignItems="center" id="logo">
                 <Grid item css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}>
                     <Link to="/">
                         <img
