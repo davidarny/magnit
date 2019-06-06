@@ -136,7 +136,7 @@
                                     "left_hand_puzzle": "Введите площадь объекта",
                                     "operator_type": "more_then",
                                     "validation_type": "compare_with_answer",
-                                    "right_hand_size": "Введите площадь торгового зала",
+                                    "right_hand_puzzle": "Введите площадь торгового зала",
                                     "value": null,
                                     "error_message": "Ошибка! Площадь объекта не может быть больше площади торгового зала"
                                 },
@@ -146,7 +146,7 @@
                                     "operator_type": "less_then",
                                     "validation_type": "set_value",
                                     "value": 100,
-                                    "right_hand_size": null,
+                                    "right_hand_puzzle": null,
                                     "error_message": "Ошибка! Площадь объекта не может быть больше 100м*м"
                                 }
                             ]
