@@ -54,15 +54,11 @@ CREATE TABLE "sections_x_puzzle" (
 
 CREATE TABLE "puzzle" (
   "id" int PRIMARY KEY,
+  "parent_id" int,
   "title" varchar,
   "puzzle_type" "puzzle_type",
   "order" int,
   "answer_type" "input_type"
-);
-
-CREATE TABLE "puzzle_x_puzzle" (
-  "parent_id" int,
-  "child_id" int
 );
 
 CREATE TABLE "puzzle_x_condition" (
@@ -100,9 +96,7 @@ ALTER TABLE "sections_x_puzzle" ADD FOREIGN KEY ("section_id") REFERENCES "secti
 
 ALTER TABLE "sections_x_puzzle" ADD FOREIGN KEY ("puzzle_id") REFERENCES "puzzle" ("id");
 
-ALTER TABLE "puzzle_x_puzzle" ADD FOREIGN KEY ("parent_id") REFERENCES "puzzle" ("id");
-
-ALTER TABLE "puzzle_x_puzzle" ADD FOREIGN KEY ("child_id") REFERENCES "puzzle" ("id");
+ALTER TABLE "puzzle" ADD FOREIGN KEY ("parent_id") REFERENCES "puzzle" ("id");
 
 ALTER TABLE "puzzle_x_condition" ADD FOREIGN KEY ("puzzle_id") REFERENCES "puzzle" ("id");
 

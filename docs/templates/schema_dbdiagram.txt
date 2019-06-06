@@ -17,15 +17,11 @@ Table sections_x_puzzle {
 
 Table puzzle {
  id int [pk]
+ parent_id int [ref: > puzzle.id]
  title varchar
  puzzle_type puzzle_type
  order int
  answer_type input_type
-}
-
-Table puzzle_x_puzzle {
-  parent_id int [ref: > puzzle.id]
-  child_id int [ref: > puzzle.id]
 }
 
 Table puzzle_x_condition {
