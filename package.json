@@ -1,5 +1,5 @@
 {
-    "name": "@magnit/core",
+    "name": "magnit",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -15,7 +15,6 @@
         "eslint-config-prettier": "^4.3.0",
         "eslint-plugin-prettier": "^3.1.0",
         "husky": "^2.3.0",
-        "lerna": "^3.14.1",
         "lint-staged": "^8.1.7",
         "prettier": "^1.17.1",
         "pretty-quick": "^1.11.0"

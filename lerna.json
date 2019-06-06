@@ -1,7 +1,0 @@
-{
-    "private": true,
-    "npmClient": "yarn",
-    "useWorkspaces": true,
-    "workspaces": ["packages/*"],
-    "version": "0.1.0"
-}
