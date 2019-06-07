@@ -21,8 +21,5 @@ describe("Constructor", () => {
         exec(`sudo -u postgres psql --quiet ${postgresDb} < stuff/magnit.sql`);
     });
 
-    require("./parts/signup.js")(options);
-    // require('./parts/restore-password.js')(options);
-    // require('./parts/login.js')(options);
-    // require('./parts/private-office.js')(options);
+    require("./parts/construct.js")(options);
 });

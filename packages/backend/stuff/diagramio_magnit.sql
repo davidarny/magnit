@@ -35,6 +35,11 @@ CREATE TYPE "unit_type" AS ENUM (
   'sm'
 );
 
+CREATE TYPE "condition_type" AS ENUM (
+  'or',
+  'and'
+);
+
 CREATE TABLE "templates" (
   "id" SERIAL PRIMARY KEY,
   "title" text,
@@ -78,7 +83,8 @@ CREATE TABLE "conditions" (
   "order" int,
   "question_puzzle" int,
   "action_type" "condition_action_type",
-  "answer_puzzle" int
+  "answer_puzzle" int,
+	"condition_type" "condition_type"
 );
 
 CREATE TABLE "validations" (

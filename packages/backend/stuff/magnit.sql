@@ -93,6 +93,7 @@ DROP TYPE public.puzzle_type;
 DROP TYPE public.operator_type;
 DROP TYPE public.input_type;
 DROP TYPE public.condition_action_type;
+DROP TYPE public.condition_type;
 DROP EXTENSION plpgsql;
 DROP SCHEMA public;
 --
@@ -135,6 +136,19 @@ CREATE TYPE public.condition_action_type AS ENUM (
 
 
 ALTER TYPE public.condition_action_type OWNER TO postgres;
+
+
+--
+-- Name: condition_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.condition_type AS ENUM (
+    'or',
+    'and'
+);
+
+
+ALTER TYPE public.condition_type OWNER TO postgres;
 
 --
 -- Name: input_type; Type: TYPE; Schema: public; Owner: postgres
@@ -253,7 +267,8 @@ CREATE TABLE public.conditions (
     "order" integer,
     question_puzzle integer,
     action_type public.condition_action_type,
-    answer_puzzle integer
+    answer_puzzle integer,
+		condition_type public.condition_type
 );
 
 
@@ -1245,3 +1260,5 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to magnit;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to magnit;
