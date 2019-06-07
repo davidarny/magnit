@@ -35,6 +35,7 @@ Table condition {
   question_puzzle int [ref: > puzzle.id]
   action_type condition_action_type
   answer_puzzle int [ref: > puzzle.id]
+  condition_type condition_type
 }
 
 Table validation {
@@ -82,6 +83,11 @@ enum operator_type {
  equal
  less_or_equal
  more_or_equal
+}
+
+enum condition_type {
+  or
+  and
 }
 
 enum unit_type {

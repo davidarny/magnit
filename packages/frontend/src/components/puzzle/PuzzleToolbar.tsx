@@ -2,43 +2,31 @@
 
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import {
-    Add as AddIcon,
+    Add as AddQuestionIcon,
     AddPhotoAlternate as AddPhotoIcon,
-    Title as TitleIcon,
-    FileCopy as CopyToClipboard,
-    AttachFile as AddFileIcon,
+    Title as AddSectionIcon,
+    FileCopy as CopyToClipboardIcon,
+    NoteAdd as AddGroupIcon,
     Delete as DeleteIcon,
 } from "@material-ui/icons";
 
 interface IPuzzleToolbarProps {
     right?: number;
+    top?: number;
 }
 
-export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0 }) => {
+export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0 }) => {
     return (
         <Paper
-            css={css`
-                position: absolute;
-                right: calc(-100px + ${right}px);
-                top: 0;
-                z-index: 9999;
-
-                &:before {
-                    content: "";
-                    position: absolute;
-                    display: block;
-                    right: 100%;
-                    top: 0;
-                    height: 100%;
-                    width: 100%;
-                }
-
-                :hover {
-                    display: block;
-                }
-            `}
+            css={theme => ({
+                position: "absolute",
+                right: `calc(-${theme.spacing(10)} + ${right}px)`,
+                transform: `translateY(${top}px)`,
+                willChange: "transform",
+                transition: "transform 0.3s ease-in-out",
+            })}
             className="toolbar"
         >
             <Grid
@@ -49,22 +37,22 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0 }) => {
             >
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Добавить элемент">
-                        <AddIcon />
+                        <AddQuestionIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Добавить файл">
-                        <AddFileIcon />
+                        <AddGroupIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Добавить текстовое поле">
-                        <TitleIcon />
+                        <AddSectionIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Скопировать">
-                        <CopyToClipboard />
+                        <CopyToClipboardIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>

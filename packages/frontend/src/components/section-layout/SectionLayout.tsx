@@ -10,10 +10,9 @@ export const SectionLayout: React.FC = ({ children }) => {
             container
             direction="column"
             css={theme => ({
-                paddingBottom: theme.spacing(30),
+                paddingBottom: theme.spacing(15),
                 width: "100%",
                 minHeight: "100vh",
-                overflow: "hidden",
             })}
         >
             {children}

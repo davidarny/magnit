@@ -87,23 +87,23 @@
                             "conditions": [
                                 {
                                     "order": 0,
-                                    "parent_puzzle": "Введите длину покрытия парковки",
+                                    "question_puzzle": "Введите длину покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "child_puzzle": "Асфальт в один слой",
+                                    "answer_puzzle": "Асфальт в один слой",
                                     "condition_type": "or"
                                 },
                                 {
                                     "order": 1,
-                                    "parent_puzzle": "Введите длину покрытия парковки",
+                                    "question_puzzle": "Введите длину покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "child_puzzle": "Асфальт в два слоя",
+                                    "answer_puzzle": "Асфальт в два слоя",
                                     "condition_type": "or"
                                 },
                                 {
                                     "order": 2,
-                                    "parent_puzzle": "Введите длину покрытия парковки",
+                                    "question_puzzle": "Введите длину покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "child_puzzle": "Бортовой камень"
+                                    "answer_puzzle": "Бортовой камень"
                                 }
                             ]
                         },
@@ -156,9 +156,9 @@
                         {
                             "order": 0,
                             "expression": {
-                                "parent_puzzle": "Нужна парковка?",
+                                "question_puzzle": "Нужна парковка?",
                                 "action_type": "chosen_answer",
-                                "child_puzzle": "Да"
+                                "answer_puzzle": "Да"
                             }
                         }
                     ]

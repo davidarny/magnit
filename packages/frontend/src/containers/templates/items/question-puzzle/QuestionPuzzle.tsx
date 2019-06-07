@@ -9,7 +9,7 @@ export const QuestionPuzzle: React.FC<ISpecificPuzzleProps> = props => {
     return (
         <>
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
-                <Typography variant="subtitle2">{props.index + 1}.</Typography>
+                <Typography variant="body1">{props.index + 1}.</Typography>
             </Grid>
             <Grid
                 item

@@ -5,21 +5,12 @@ import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 
 interface IPuzzleWrapperProps {
-    id: string;
     index: number;
 }
 
-export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, ...props }) => {
+export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, index }) => {
     return (
-        <Grid
-            container
-            direction="column"
-            key={props.id}
-            css={theme => ({
-                marginBottom: theme.spacing(2),
-                marginTop: theme.spacing(props.index ? 6 : 0),
-            })}
-        >
+        <Grid container direction="column">
             <Grid item>
                 <Grid container alignItems="flex-end">
                     {children}
