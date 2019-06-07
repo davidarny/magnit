@@ -115,7 +115,7 @@ export const CreateTemplate: React.FC = () => {
         <SectionLayout>
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button disabled variant="contained" color="primary">
+                    <Button variant="contained" color="primary">
                         <CheckIcon
                             css={theme => ({ marginRight: theme.spacing() })}
                             alignmentBaseline="middle"

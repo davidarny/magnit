@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx, css } from "@emotion/core";
-import { PuzzleToolbar } from "../puzzle";
+import { PuzzleToolbar } from "components/puzzle";
 import * as React from "react";
 
 interface IWithToolbarProps {

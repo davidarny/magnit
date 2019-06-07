@@ -3,7 +3,14 @@
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { Add as AddIcon, AddPhotoAlternate as AddPhotoIcon } from "@material-ui/icons";
+import {
+    Add as AddIcon,
+    AddPhotoAlternate as AddPhotoIcon,
+    Title as TitleIcon,
+    FileCopy as CopyToClipboard,
+    AttachFile as AddFileIcon,
+    Delete as DeleteIcon,
+} from "@material-ui/icons";
 
 interface IPuzzleToolbarProps {
     right?: number;
@@ -46,8 +53,28 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0 }) => {
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
+                    <IconButton color="primary" aria-label="Добавить файл">
+                        <AddFileIcon />
+                    </IconButton>
+                </Grid>
+                <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
+                    <IconButton color="primary" aria-label="Добавить текстовое поле">
+                        <TitleIcon />
+                    </IconButton>
+                </Grid>
+                <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
+                    <IconButton color="primary" aria-label="Скопировать">
+                        <CopyToClipboard />
+                    </IconButton>
+                </Grid>
+                <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Добавить фото">
                         <AddPhotoIcon />
+                    </IconButton>
+                </Grid>
+                <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
+                    <IconButton color="primary" aria-label="Удалить элемент">
+                        <DeleteIcon />
                     </IconButton>
                 </Grid>
             </Grid>
