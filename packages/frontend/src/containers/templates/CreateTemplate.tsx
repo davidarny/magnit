@@ -2,16 +2,16 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
+import { useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Button, Grid, Paper, TextField } from "@material-ui/core";
 import { Check as CheckIcon } from "@material-ui/icons";
-import { useState } from "react";
 import uuid from "uuid/v4";
 import { Puzzle } from "components/puzzle";
-import { ITemplate } from "entities/template";
+import { EPuzzleType, ITemplate } from "entities/template";
 import { WithToolbar } from "components/with-toolbar";
-import { SectionPuzzle, GroupPuzzle, QuestionPuzzle } from "./items";
+import { GroupPuzzle, QuestionPuzzle, SectionPuzzle } from "./items";
 
 export const CreateTemplate: React.FC = () => {
     const [template] = useState<ITemplate>({
@@ -26,11 +26,11 @@ export const CreateTemplate: React.FC = () => {
                         id: uuid(),
                         title: "",
                         order: 0,
-                        puzzleType: "group",
+                        puzzleType: EPuzzleType.GROUP,
                         puzzles: [
                             {
                                 id: uuid(),
-                                puzzleType: "question",
+                                puzzleType: EPuzzleType.QUESTION,
                                 title: "",
                                 order: 0,
                                 puzzles: [],
@@ -45,11 +45,11 @@ export const CreateTemplate: React.FC = () => {
                         id: uuid(),
                         title: "",
                         order: 0,
-                        puzzleType: "group",
+                        puzzleType: EPuzzleType.GROUP,
                         puzzles: [
                             {
                                 id: uuid(),
-                                puzzleType: "question",
+                                puzzleType: EPuzzleType.QUESTION,
                                 title: "",
                                 order: 0,
                                 puzzles: [],
@@ -58,7 +58,7 @@ export const CreateTemplate: React.FC = () => {
                             },
                             {
                                 id: uuid(),
-                                puzzleType: "question",
+                                puzzleType: EPuzzleType.QUESTION,
                                 title: "",
                                 order: 0,
                                 puzzles: [],
@@ -73,7 +73,7 @@ export const CreateTemplate: React.FC = () => {
                         id: uuid(),
                         title: "",
                         order: 0,
-                        puzzleType: "group",
+                        puzzleType: EPuzzleType.GROUP,
                         puzzles: [],
                         conditions: [],
                         validations: [],
@@ -89,11 +89,11 @@ export const CreateTemplate: React.FC = () => {
                         id: uuid(),
                         title: "",
                         order: 0,
-                        puzzleType: "group",
+                        puzzleType: EPuzzleType.GROUP,
                         puzzles: [
                             {
                                 id: uuid(),
-                                puzzleType: "question",
+                                puzzleType: EPuzzleType.QUESTION,
                                 title: "",
                                 order: 0,
                                 puzzles: [],
