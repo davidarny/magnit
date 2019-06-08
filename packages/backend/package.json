@@ -17,8 +17,5 @@
         "test": "npm run custom-tests && echo 'Done.'",
         "custom-tests": "echo \"(No other custom tests yet.)\" && echo"
     },
-    "main": "app.js",
-    "engines": {
-        "node": "^10.15"
-    }
+    "main": "app.js"
 }
