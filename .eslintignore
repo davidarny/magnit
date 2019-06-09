@@ -7,3 +7,6 @@ packages/backend/node_modules
 packages/frontend/node_modules/
 packages/frontend/pubilc/
 packages/frontend/build/
+
+packages/template-editor/node_modules/
+packages/template-editor/lib/

@@ -1,12 +1,11 @@
-import React from "react";
+/** @jsx jsx */
+
+import { jsx } from "@emotion/core";
 import ReactDOM from "react-dom";
 import { App } from "containers/app";
 import * as ServiceWorker from "./ServiceWorker";
 import { ThemeProvider } from "emotion-theming";
 import { JssProvider } from "components/jss-provider";
-
-// Allows <></> to be used
-(global as typeof global & { React: typeof React }).React = React;
 
 const theme = {
     fontSize: {

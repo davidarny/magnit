@@ -2,8 +2,9 @@
     "compilerOptions": {
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],
+        "outDir": "build",
         "baseUrl": "src",
-        "allowJs": true,
+        "removeComments": true,
         "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -12,13 +13,12 @@
         "module": "esnext",
         "moduleResolution": "node",
         "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "jsx": "preserve",
         "sourceMap": true,
+        "declaration": true,
+        "jsx": "react",
         "jsxFactory": "jsx",
         "incremental": true
     },
     "include": ["src"],
-    "exclude": ["node_modules", "build", "dist", "public"]
+    "exclude": ["node_modules", "build", "dist", "rollup.config.js"]
 }

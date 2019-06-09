@@ -1,3 +1,6 @@
+/** @jsx jsx */
+
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { Match } from "@reach/router";
 
@@ -11,7 +14,7 @@ interface IRouteMatcherProps {
 
 export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
     return (
-        <>
+        <React.Fragment>
             {routes.map(route => {
                 if (typeof route.paths !== "undefined") {
                     return route.paths.map(path => {
@@ -47,6 +50,6 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                 }
                 return null;
             })}
-        </>
+        </React.Fragment>
     );
 };

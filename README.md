@@ -19,39 +19,40 @@
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-  - [Requirements](#requirements)
-  - [Project structure](#project-structure)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Running](#running)
-      - [Frontend](#frontend)
-      - [Backend](#backend)
-    - [Testing](#testing)
-    - [Contributing](#contributing)
-    - [Documentation](#documentation)
+-   [Table of Contents](#table-of-contents)
+    -   [Requirements](#requirements)
+    -   [Project structure](#project-structure)
+    -   [Usage](#usage)
+        -   [Installation](#installation)
+        -   [Running](#running)
+            -   [Frontend](#frontend)
+            -   [Backend](#backend)
+        -   [Testing](#testing)
+        -   [Contributing](#contributing)
+        -   [Documentation](#documentation)
 
 ### Requirements
 
-* [Node.js](https://nodejs.org/en/) - runtime for backend & tooling
-* [Yarn](https://yarnpkg.com/lang/en/) - package management
+-   [Node.js](https://nodejs.org/en/) - runtime for backend & tooling
+-   [Yarn](https://yarnpkg.com/lang/en/) - package management
+-   [Lerna](https://github.com/lerna/lerna) - a tool for managing projects with multiple packages
 
 ### Project structure
 
 This project consists of 2 main parts
 
-* [@magnit/backend](./packages/backend) - REST API server built on top of [sails.js](https://sailsjs.com/)
-* [@magnit/frontend](./packages/frontend) - SPA application build on top of [React](https://reactjs.org/)
+-   [@magnit/backend](./packages/backend) - REST API server built on top of [sails.js](https://sailsjs.com/)
+-   [@magnit/frontend](./packages/frontend) - SPA application build on top of [React](https://reactjs.org/)
 
 ### Usage
 
 #### Installation
 
 ```bash
-$ yarn install
+$ lerna bootstrap
 ```
 
-This project is build on top of [yarn workspaces](https://yarnpkg.com/en/docs/workspaces)
+This will install all packages using `yarn install` command
 
 You can check all packages using
 
@@ -81,7 +82,6 @@ Done in 0.11s.
 
 More info about `yarn workspaces` can be found [here](https://yarnpkg.com/en/docs/cli/workspaces)
 
-
 #### Running
 
 ##### Frontend
@@ -89,7 +89,7 @@ More info about `yarn workspaces` can be found [here](https://yarnpkg.com/en/doc
 To start frontend just run this command
 
 ```bash
-$ yarn workspace @magnit/frontend start
+$ yarn start:frontend
 ```
 
 ##### Backend
@@ -97,19 +97,16 @@ $ yarn workspace @magnit/frontend start
 To start backend just run this command
 
 ```bash
-$ yarn workspace @magnit/backend start
+$ yarn start:backend
 ```
-
-More info about `yarn workspace` can be found [here](https://yarnpkg.com/en/docs/cli/workspace)
 
 #### Testing
 
 ```bash
-$ yarn workspaces run test
+$ lerna run test
 ```
 
 This will run tests in all packages that have `test` script in `package.json`
-
 
 #### Contributing
 

@@ -4,7 +4,7 @@ import * as React from "react";
 import { ReactNode } from "react";
 import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
-import { EPuzzleType, IPuzzle } from "entities/template";
+import { EPuzzleType, IPuzzle } from "entities";
 import { Paper } from "@material-ui/core";
 
 interface IPuzzleProps {
@@ -23,7 +23,7 @@ interface IPuzzleProps {
 
 export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
     return (
-        <>
+        <React.Fragment>
             {puzzles.map((puzzle, index) => {
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
@@ -50,7 +50,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 square={true}
                                 elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}
                             >
-                                <PuzzleWrapper index={index}>
+                                <PuzzleWrapper>
                                     {props.components[EPuzzleType.GROUP](index)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
@@ -66,7 +66,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginBottom: theme.spacing(2),
                                 })}
                             >
-                                <PuzzleWrapper index={index}>
+                                <PuzzleWrapper>
                                     {props.components[EPuzzleType.QUESTION](index)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
@@ -82,7 +82,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginBottom: theme.spacing(2),
                                 })}
                             >
-                                <PuzzleWrapper index={index}>
+                                <PuzzleWrapper>
                                     {props.components[EPuzzleType.INPUT_ANSWER](index)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
@@ -92,6 +92,6 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                         return null;
                 }
             })}
-        </>
+        </React.Fragment>
     );
 };

@@ -4,11 +4,7 @@ import * as React from "react";
 import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 
-interface IPuzzleWrapperProps {
-    index: number;
-}
-
-export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, index }) => {
+export const PuzzleWrapper: React.FC = ({ children }) => {
     return (
         <Grid container direction="column">
             <Grid item>

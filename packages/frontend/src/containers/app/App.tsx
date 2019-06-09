@@ -18,7 +18,7 @@ const AsyncTemplates = Loadable(({
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncCreateTemplate = Loadable(({
-    loader: () => import("containers/templates").then(module => module.CreateTemplate),
+    loader: () => import("containers/create-template").then(module => module.CreateTemplate),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
@@ -63,7 +63,7 @@ const App: React.FC = () => {
     }, []);
 
     return (
-        <>
+        <React.Fragment>
             <GlobalStyles
                 section={{
                     titleHeight: logoHeight,
@@ -88,7 +88,7 @@ const App: React.FC = () => {
                     </Router>
                 </Grid>
             </Grid>
-        </>
+        </React.Fragment>
     );
 };
 
