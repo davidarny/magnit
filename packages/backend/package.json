@@ -14,7 +14,7 @@
     },
     "scripts": {
         "start": "cross-env NODE_ENV=production node app.js",
-        "test": "mocha --timeout 30s tests/bootstrap.test.js tests/constructor/test.js"
+        "test": "mocha --timeout 30s tests/bootstrap.test.js tests/admin/test.js"
     },
     "main": "app.js",
     "engines": {

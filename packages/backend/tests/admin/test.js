@@ -6,7 +6,7 @@ let options = {
     request: require("request"),
 };
 
-describe("Constructor", () => {
+describe("Admin", () => {
     before(async () => {
         if (process.env.NODE_ENV !== "development") {
             throw new Error("Not development environment! Aborting!");
@@ -21,5 +21,5 @@ describe("Constructor", () => {
         exec(`sudo -u postgres psql --quiet ${postgresDb} < stuff/magnit.sql`);
     });
 
-    require("./parts/construct.js")(options);
+    require("./parts/create-template.js")(options);
 });
