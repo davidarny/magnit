@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],
-        "outDir": "build",
+        "outDir": "dist",
         "baseUrl": "src",
         "removeComments": true,
         "skipLibCheck": true,
@@ -20,5 +20,5 @@
         "incremental": true
     },
     "include": ["src"],
-    "exclude": ["node_modules", "build", "dist", "rollup.config.js"]
+    "exclude": ["node_modules", "dist", "rollup.config.js"]
 }

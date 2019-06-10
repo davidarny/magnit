@@ -3,10 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "clean": "lerna run clean",
         "start:frontend": "lerna run --scope @magnit/frontend start --stream",
-        "build:frontend": "lerna run --scope @magnit/frontend build --stream",
         "start:backend": "lerna run --scope @magnit/frontend start --stream",
-        "start:all": "lerna run start",
+        "build:frontend": "lerna run --scope @magnit/frontend build --stream",
         "commit": "git-cz"
     },
     "devDependencies": {
@@ -23,7 +23,8 @@
         "lerna": "^3.14.1",
         "lint-staged": "^8.1.7",
         "prettier": "^1.17.1",
-        "pretty-quick": "^1.11.0"
+        "pretty-quick": "^1.11.0",
+        "rimraf": "^2.6.3"
     },
     "config": {
         "commitizen": {

@@ -1,12 +1,12 @@
 node_modules/
 
+packages/backend/node_modules/
 packages/backend/assets/dependencies/**/*.js
-packages/backendviews/**/*.ejs
-packages/backend/node_modules
+packages/backend/views/**/*.ejs
 
 packages/frontend/node_modules/
 packages/frontend/pubilc/
 packages/frontend/build/
 
 packages/template-editor/node_modules/
-packages/template-editor/lib/
+packages/template-editor/dist/

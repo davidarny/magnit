@@ -1,3 +1,5 @@
+node_modules/
+
 packages/backend/node_modules/
 packages/backend/assets/dependencies/**/*.js
 packages/backend/views/**/*.ejs
@@ -5,3 +7,6 @@ packages/backend/views/**/*.ejs
 packages/frontend/node_modules/
 packages/frontend/pubilc/
 packages/frontend/build/
+
+packages/template-editor/node_modules/
+packages/template-editor/dist/

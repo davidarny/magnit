@@ -37,8 +37,9 @@
         "source-map-explorer": "^1.8.0"
     },
     "scripts": {
+        "clean": "rimraf build",
         "analyze": "source-map-explorer build/static/js/*.js",
-        "start": "lerna run build:lib --stream && concurrently -n magnit,libs \"react-scripts start\" \"lerna run watch:lib\"",
+        "start": "lerna run build:lib --stream && react-scripts start",
         "build": "lerna run build:lib --stream && react-scripts build",
         "test": "react-scripts test --passWithNoTests",
         "eject": "react-scripts eject"
