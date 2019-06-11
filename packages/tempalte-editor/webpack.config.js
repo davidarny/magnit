@@ -40,40 +40,48 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"],
     },
     optimization: {
-        minimize: false,
+        minimize: isProduction,
+        removeAvailableModules: isProduction,
+        removeEmptyChunks: isProduction,
+        splitChunks: isProduction && {},
     },
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/,
+                include: path.resolve(__dirname, "src"),
                 exclude: /node_modules/,
                 use: [
-                    isDevelopment && {
+                    {
                         loader: "thread-loader",
                         options: {
                             workers: os.cpus().length - 1,
                             poolTime: Infinity,
                         },
                     },
-                    isDevelopment && {
+                    {
                         loader: "babel-loader",
                     },
-                    isProduction && {
+                    {
                         loader: "ts-loader",
+                        options: {
+                            transpileOnly: true,
+                            happyPackMode: true,
+                            experimentalWatchApi: true,
+                        },
                     },
-                ].filter(Boolean),
+                ],
             },
         ],
     },
     plugins: [
-        isDevelopment && new HardSourceWebpackPlugin(),
+        new HardSourceWebpackPlugin(),
         new PeerDepsExternalsPlugin(),
         new webpack.DefinePlugin(env.stringified),
-        isDevelopment &&
-            new ForkTsCheckerWebpackPlugin({
-                watch: "./src",
-                checkSyntacticErrors: true,
-            }),
+        new ForkTsCheckerWebpackPlugin({
+            watch: isDevelopment && "./src",
+            checkSyntacticErrors: true,
+        }),
     ].filter(Boolean),
     node: {
         dgram: "empty",
