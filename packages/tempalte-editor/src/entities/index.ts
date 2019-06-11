@@ -1,8 +1,8 @@
-import { EPuzzleType } from "./EPuzzleType";
 import { EValidationType } from "./EValidationType";
 import { EOperatorType } from "./EOperatorType";
 import { EConditionType } from "./EConditionType";
 import { EActionType } from "./EActionType";
+import { EPuzzleType } from "components/puzzle";
 
 interface ITitled {
     title: string;
@@ -67,7 +67,6 @@ export interface ISpecificPuzzleProps {
     index: number;
 }
 
-export * from "./EPuzzleType";
 export * from "./EValidationType";
 export * from "./EOperatorType";
 export * from "./EConditionType";

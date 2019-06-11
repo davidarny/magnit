@@ -10,7 +10,7 @@
         "allowSyntheticDefaultImports": true,
         "strict": true,
         "forceConsistentCasingInFileNames": true,
-        "module": "esnext",
+        "module": "commonjs",
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "sourceMap": true,
@@ -20,5 +20,5 @@
         "incremental": true
     },
     "include": ["src"],
-    "exclude": ["node_modules", "dist", "rollup.config.js"]
+    "exclude": ["node_modules", "dist"]
 }

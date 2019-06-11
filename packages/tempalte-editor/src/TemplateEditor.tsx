@@ -1,17 +1,16 @@
 /** @jsx jsx */
 
-import { jsx, css } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
-import { Puzzle, PuzzleToolbar } from "./components/puzzle";
+import { useEffect, useState } from "react";
+import { ITemplate } from "./entities";
 import { Grid, Paper, TextField } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
-import { EPuzzleType, ITemplate } from "./entities";
 import { GroupPuzzle } from "./items/group-puzzle";
 import { QuestionPuzzle } from "./items/question-puzzle";
+import { Puzzle, EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import { InputAnswerPuzzle } from "./items/input-answer-puzzle";
-import { useState } from "react";
 import uuid from "uuid/v4";
-import { useEffect } from "react";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;

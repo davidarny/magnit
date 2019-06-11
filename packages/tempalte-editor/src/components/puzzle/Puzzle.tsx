@@ -4,8 +4,9 @@ import * as React from "react";
 import { ReactNode } from "react";
 import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
-import { EPuzzleType, IPuzzle } from "entities";
+import { IPuzzle } from "entities";
 import { Paper } from "@material-ui/core";
+import { EPuzzleType } from "./EPuzzleType";
 
 interface IPuzzleProps {
     puzzles: IPuzzle[];
