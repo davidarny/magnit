@@ -21,14 +21,37 @@ module.exports = {
 
     fn: async function(inputs, exits) {
         try {
-            if (typeof inputs.template === "string") {
-                let valid = await sails.helpers.isJsonValid(inputs.template);
+            let template = inputs.template;
+
+            if (typeof template === "string") {
+                let valid = await sails.helpers.isJsonValid(template);
 
                 if (!valid) {
                     return exits.badRequest({ success: 0, message: "Not valid JSON" });
                 }
 
-                inputs.template = JSON.parse(inputs.template);
+                template = JSON.parse(template);
+            }
+
+            if (template.sections) {
+                const newTemplate = await Template.create({
+                    title: template.title,
+                    description: template.description,
+                }).fetch();
+
+                for (let i = 0; i < template.sections.length; i++) {
+                    let section = template.sections[i];
+
+                    let newSection = await Section.create({
+                        template_id: newTemplate.id,
+                        title: section.title,
+                        description: section.description,
+                        order: section.order,
+                    }).fetch();
+
+                    await sails.helpers.savePuzzles(section.puzzles, newSection.id, null);
+                }
+            } else if (template.puzzles) {
             }
 
             return exits.success({ success: 1, message: "Ok" });

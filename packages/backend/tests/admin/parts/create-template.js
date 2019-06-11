@@ -7,6 +7,12 @@ module.exports = function(options) {
 
     let json = require("./data.json");
 
+    async function onTemplateCreate(httpResponse, body) {
+        assert.equal(httpResponse.statusCode, 200);
+        assert.equal(body.success, 1);
+        assert.equal(body.message, "Ok");
+    }
+
     describe("#create-template", () => {
         let options = {
             uri: `${host}/v1/templates`,
@@ -42,9 +48,9 @@ module.exports = function(options) {
                         throw err;
                     }
 
-                    assert.equal(httpResponse.statusCode, 200);
-                    assert.equal(body.success, 1);
-                    assert.equal(body.message, "Ok");
+                    await onTemplateCreate(httpResponse, body);
+
+                    options.json = { template: json };
 
                     return done();
                 } catch (err) {
@@ -53,22 +59,20 @@ module.exports = function(options) {
             });
         });
 
-        it("valid json", done => {
-            request(options, async (err, httpResponse, body) => {
-                try {
-                    if (err) {
-                        throw err;
-                    }
-
-                    assert.equal(httpResponse.statusCode, 200);
-                    assert.equal(body.success, 1);
-                    assert.equal(body.message, "Ok");
-
-                    return done();
-                } catch (err) {
-                    return done(err);
-                }
-            });
-        });
+        // it("valid json", done => {
+        //     request(options, async (err, httpResponse, body) => {
+        //         try {
+        //             if (err) {
+        //                 throw err;
+        //             }
+        //
+        //             await onTemplateCreate(httpResponse, body);
+        //
+        //             return done();
+        //         } catch (err) {
+        //             return done(err);
+        //         }
+        //     });
+        // });
     });
 };

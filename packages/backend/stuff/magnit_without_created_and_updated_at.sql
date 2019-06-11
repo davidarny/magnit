@@ -92,8 +92,8 @@ DROP TYPE public.unit_type;
 DROP TYPE public.puzzle_type;
 DROP TYPE public.operator_type;
 DROP TYPE public.input_type;
-DROP TYPE public.condition_type;
 DROP TYPE public.condition_action_type;
+DROP TYPE public.condition_type;
 DROP EXTENSION plpgsql;
 DROP SCHEMA public;
 --
@@ -136,6 +136,7 @@ CREATE TYPE public.condition_action_type AS ENUM (
 
 
 ALTER TYPE public.condition_action_type OWNER TO postgres;
+
 
 --
 -- Name: condition_type; Type: TYPE; Schema: public; Owner: postgres
@@ -186,7 +187,6 @@ CREATE TYPE public.puzzle_type AS ENUM (
     'string_answer',
     'radio_answer',
     'input_answer',
-    'dropdown_answer',
     'group'
 );
 
@@ -230,9 +230,7 @@ CREATE TABLE public.answers (
     id integer NOT NULL,
     puzzle_id integer,
     answer text,
-    answer_type public.input_type,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    answer_type public.input_type
 );
 
 
@@ -270,9 +268,7 @@ CREATE TABLE public.conditions (
     question_puzzle integer,
     action_type public.condition_action_type,
     answer_puzzle integer,
-    condition_type public.condition_type,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    condition_type public.condition_type
 );
 
 
@@ -310,9 +306,7 @@ CREATE TABLE public.objects (
     region integer,
     branch text,
     address text,
-    format text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    format text
 );
 
 
@@ -346,9 +340,7 @@ ALTER SEQUENCE public.objects_id_seq OWNED BY public.objects.id;
 
 CREATE TABLE public.puzzle_conditions (
     puzzle_id integer,
-    condition_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    condition_id integer
 );
 
 
@@ -360,9 +352,7 @@ ALTER TABLE public.puzzle_conditions OWNER TO postgres;
 
 CREATE TABLE public.puzzle_validations (
     puzzle_id integer,
-    validation_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    validation_id integer
 );
 
 
@@ -378,9 +368,7 @@ CREATE TABLE public.puzzles (
     title text,
     puzzle_type public.puzzle_type,
     "order" integer,
-    answer_type public.input_type,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    answer_type public.input_type
 );
 
 
@@ -414,9 +402,7 @@ ALTER SEQUENCE public.puzzles_id_seq OWNED BY public.puzzles.id;
 
 CREATE TABLE public.regions (
     id integer NOT NULL,
-    name text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    name text
 );
 
 
@@ -450,9 +436,7 @@ ALTER SEQUENCE public.regions_id_seq OWNED BY public.regions.id;
 
 CREATE TABLE public.section_puzzles (
     section_id integer,
-    puzzle_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    puzzle_id integer
 );
 
 
@@ -467,9 +451,7 @@ CREATE TABLE public.sections (
     template_id integer,
     title text,
     description text,
-    "order" integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    "order" integer
 );
 
 
@@ -506,9 +488,7 @@ CREATE TABLE public.tariffs (
     name text,
     toir_id integer,
     toir_name text,
-    toir_type text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    toir_type text
 );
 
 
@@ -542,9 +522,7 @@ ALTER SEQUENCE public.tariffs_id_seq OWNED BY public.tariffs.id;
 
 CREATE TABLE public.task_templates (
     task_id integer,
-    template_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    template_id integer
 );
 
 
@@ -557,9 +535,7 @@ ALTER TABLE public.task_templates OWNER TO postgres;
 CREATE TABLE public.task_users (
     task_id integer,
     users_id integer,
-    taken boolean,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    taken boolean
 );
 
 
@@ -575,9 +551,7 @@ CREATE TABLE public.tasks (
     description text,
     departure_date timestamp without time zone,
     deadline_date timestamp without time zone,
-    object_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    object_id integer
 );
 
 
@@ -611,9 +585,7 @@ ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
 
 CREATE TABLE public.template_puzzles (
     template_id integer,
-    puzzle_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    puzzle_id integer
 );
 
 
@@ -626,9 +598,7 @@ ALTER TABLE public.template_puzzles OWNER TO postgres;
 CREATE TABLE public.templates (
     id integer NOT NULL,
     title text,
-    description text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    description text
 );
 
 
@@ -665,9 +635,7 @@ CREATE TABLE public.users (
     login text,
     name text,
     "position" text,
-    object_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    object_id integer
 );
 
 
@@ -707,9 +675,7 @@ CREATE TABLE public.validations (
     left_hand_puzzle integer,
     right_hand_puzzle integer,
     value integer,
-    error_message text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    error_message text
 );
 
 
@@ -818,7 +784,7 @@ ALTER TABLE ONLY public.validations ALTER COLUMN id SET DEFAULT nextval('public.
 -- Data for Name: answers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.answers (id, puzzle_id, answer, answer_type, created_at, updated_at) FROM stdin;
+COPY public.answers (id, puzzle_id, answer, answer_type) FROM stdin;
 \.
 
 
@@ -826,7 +792,7 @@ COPY public.answers (id, puzzle_id, answer, answer_type, created_at, updated_at)
 -- Data for Name: conditions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.conditions (id, "order", question_puzzle, action_type, answer_puzzle, condition_type, created_at, updated_at) FROM stdin;
+COPY public.conditions (id, "order", question_puzzle, action_type, answer_puzzle, condition_type) FROM stdin;
 \.
 
 
@@ -834,7 +800,7 @@ COPY public.conditions (id, "order", question_puzzle, action_type, answer_puzzle
 -- Data for Name: objects; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.objects (id, name, region, branch, address, format, created_at, updated_at) FROM stdin;
+COPY public.objects (id, name, region, branch, address, format) FROM stdin;
 \.
 
 
@@ -842,7 +808,7 @@ COPY public.objects (id, name, region, branch, address, format, created_at, upda
 -- Data for Name: puzzle_conditions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.puzzle_conditions (puzzle_id, condition_id, created_at, updated_at) FROM stdin;
+COPY public.puzzle_conditions (puzzle_id, condition_id) FROM stdin;
 \.
 
 
@@ -850,7 +816,7 @@ COPY public.puzzle_conditions (puzzle_id, condition_id, created_at, updated_at) 
 -- Data for Name: puzzle_validations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.puzzle_validations (puzzle_id, validation_id, created_at, updated_at) FROM stdin;
+COPY public.puzzle_validations (puzzle_id, validation_id) FROM stdin;
 \.
 
 
@@ -858,7 +824,7 @@ COPY public.puzzle_validations (puzzle_id, validation_id, created_at, updated_at
 -- Data for Name: puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.puzzles (id, parent_id, title, puzzle_type, "order", answer_type, created_at, updated_at) FROM stdin;
+COPY public.puzzles (id, parent_id, title, puzzle_type, "order", answer_type) FROM stdin;
 \.
 
 
@@ -866,7 +832,7 @@ COPY public.puzzles (id, parent_id, title, puzzle_type, "order", answer_type, cr
 -- Data for Name: regions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.regions (id, name, created_at, updated_at) FROM stdin;
+COPY public.regions (id, name) FROM stdin;
 \.
 
 
@@ -874,7 +840,7 @@ COPY public.regions (id, name, created_at, updated_at) FROM stdin;
 -- Data for Name: section_puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.section_puzzles (section_id, puzzle_id, created_at, updated_at) FROM stdin;
+COPY public.section_puzzles (section_id, puzzle_id) FROM stdin;
 \.
 
 
@@ -882,7 +848,7 @@ COPY public.section_puzzles (section_id, puzzle_id, created_at, updated_at) FROM
 -- Data for Name: sections; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.sections (id, template_id, title, description, "order", created_at, updated_at) FROM stdin;
+COPY public.sections (id, template_id, title, description, "order") FROM stdin;
 \.
 
 
@@ -890,7 +856,7 @@ COPY public.sections (id, template_id, title, description, "order", created_at, 
 -- Data for Name: tariffs; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tariffs (id, name, toir_id, toir_name, toir_type, created_at, updated_at) FROM stdin;
+COPY public.tariffs (id, name, toir_id, toir_name, toir_type) FROM stdin;
 \.
 
 
@@ -898,7 +864,7 @@ COPY public.tariffs (id, name, toir_id, toir_name, toir_type, created_at, update
 -- Data for Name: task_templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.task_templates (task_id, template_id, created_at, updated_at) FROM stdin;
+COPY public.task_templates (task_id, template_id) FROM stdin;
 \.
 
 
@@ -906,7 +872,7 @@ COPY public.task_templates (task_id, template_id, created_at, updated_at) FROM s
 -- Data for Name: task_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.task_users (task_id, users_id, taken, created_at, updated_at) FROM stdin;
+COPY public.task_users (task_id, users_id, taken) FROM stdin;
 \.
 
 
@@ -914,7 +880,7 @@ COPY public.task_users (task_id, users_id, taken, created_at, updated_at) FROM s
 -- Data for Name: tasks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tasks (id, name, description, departure_date, deadline_date, object_id, created_at, updated_at) FROM stdin;
+COPY public.tasks (id, name, description, departure_date, deadline_date, object_id) FROM stdin;
 \.
 
 
@@ -922,7 +888,7 @@ COPY public.tasks (id, name, description, departure_date, deadline_date, object_
 -- Data for Name: template_puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.template_puzzles (template_id, puzzle_id, created_at, updated_at) FROM stdin;
+COPY public.template_puzzles (template_id, puzzle_id) FROM stdin;
 \.
 
 
@@ -930,7 +896,7 @@ COPY public.template_puzzles (template_id, puzzle_id, created_at, updated_at) FR
 -- Data for Name: templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.templates (id, title, description, created_at, updated_at) FROM stdin;
+COPY public.templates (id, title, description) FROM stdin;
 \.
 
 
@@ -938,7 +904,7 @@ COPY public.templates (id, title, description, created_at, updated_at) FROM stdi
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, login, name, "position", object_id, created_at, updated_at) FROM stdin;
+COPY public.users (id, login, name, "position", object_id) FROM stdin;
 \.
 
 
@@ -946,7 +912,7 @@ COPY public.users (id, login, name, "position", object_id, created_at, updated_a
 -- Data for Name: validations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.validations (id, "order", operator_type, validation_type, left_hand_puzzle, right_hand_puzzle, value, error_message, created_at, updated_at) FROM stdin;
+COPY public.validations (id, "order", operator_type, validation_type, left_hand_puzzle, right_hand_puzzle, value, error_message) FROM stdin;
 \.
 
 
@@ -1291,202 +1257,8 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
--- Name: TABLE answers; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.answers TO magnit;
-
-
---
--- Name: SEQUENCE answers_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.answers_id_seq TO magnit;
-
-
---
--- Name: TABLE conditions; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.conditions TO magnit;
-
-
---
--- Name: SEQUENCE conditions_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.conditions_id_seq TO magnit;
-
-
---
--- Name: TABLE objects; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.objects TO magnit;
-
-
---
--- Name: SEQUENCE objects_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.objects_id_seq TO magnit;
-
-
---
--- Name: TABLE puzzle_conditions; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.puzzle_conditions TO magnit;
-
-
---
--- Name: TABLE puzzle_validations; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.puzzle_validations TO magnit;
-
-
---
--- Name: TABLE puzzles; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.puzzles TO magnit;
-
-
---
--- Name: SEQUENCE puzzles_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.puzzles_id_seq TO magnit;
-
-
---
--- Name: TABLE regions; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.regions TO magnit;
-
-
---
--- Name: SEQUENCE regions_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.regions_id_seq TO magnit;
-
-
---
--- Name: TABLE section_puzzles; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.section_puzzles TO magnit;
-
-
---
--- Name: TABLE sections; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.sections TO magnit;
-
-
---
--- Name: SEQUENCE sections_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.sections_id_seq TO magnit;
-
-
---
--- Name: TABLE tariffs; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.tariffs TO magnit;
-
-
---
--- Name: SEQUENCE tariffs_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.tariffs_id_seq TO magnit;
-
-
---
--- Name: TABLE task_templates; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.task_templates TO magnit;
-
-
---
--- Name: TABLE task_users; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.task_users TO magnit;
-
-
---
--- Name: TABLE tasks; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.tasks TO magnit;
-
-
---
--- Name: SEQUENCE tasks_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.tasks_id_seq TO magnit;
-
-
---
--- Name: TABLE template_puzzles; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.template_puzzles TO magnit;
-
-
---
--- Name: TABLE templates; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.templates TO magnit;
-
-
---
--- Name: SEQUENCE templates_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.templates_id_seq TO magnit;
-
-
---
--- Name: TABLE users; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.users TO magnit;
-
-
---
--- Name: SEQUENCE users_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.users_id_seq TO magnit;
-
-
---
--- Name: TABLE validations; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.validations TO magnit;
-
-
---
--- Name: SEQUENCE validations_id_seq; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON SEQUENCE public.validations_id_seq TO magnit;
-
-
---
 -- PostgreSQL database dump complete
 --
 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public to magnit;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public to magnit;

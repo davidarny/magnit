@@ -50,7 +50,7 @@ module.exports.models = {
      *                                                                          *
      ***************************************************************************/
 
-    // migrate: 'alter',
+    migrate: "safe",
 
     /***************************************************************************
      *                                                                          *
@@ -65,8 +65,18 @@ module.exports.models = {
      ***************************************************************************/
 
     attributes: {
-        createdAt: { type: "number", autoCreatedAt: true },
-        updatedAt: { type: "number", autoUpdatedAt: true },
+        createdAt: {
+            type: "ref",
+            autoCreatedAt: true,
+            columnType: "timestamp",
+            columnName: "created_at",
+        },
+        updatedAt: {
+            type: "ref",
+            autoUpdatedAt: true,
+            columnType: "timestamp",
+            columnName: "updated_at",
+        },
         id: { type: "number", autoIncrement: true },
         //--------------------------------------------------------------------------
         //  /\   Using MongoDB?
