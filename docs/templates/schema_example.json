@@ -155,11 +155,9 @@
                     "conditions": [
                         {
                             "order": 0,
-                            "expression": {
-                                "question_puzzle": "Нужна парковка?",
-                                "action_type": "chosen_answer",
-                                "answer_puzzle": "Да"
-                            }
+                            "question_puzzle": "Нужна парковка?",
+                            "action_type": "chosen_answer",
+                            "answer_puzzle": "Да"
                         }
                     ]
                 }

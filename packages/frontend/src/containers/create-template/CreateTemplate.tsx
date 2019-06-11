@@ -6,8 +6,8 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Button, Grid } from "@material-ui/core";
 import { Check as CheckIcon } from "@material-ui/icons";
-import { EPuzzleType, TemplateEditor } from "@magnit/template-editor";
-import uuid from "uuid/v4";
+import { TemplateEditor } from "@magnit/template-editor";
+import template from "./template";
 
 export const CreateTemplate: React.FC = () => {
     return (
@@ -31,135 +31,7 @@ export const CreateTemplate: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TemplateEditor
-                    initialState={{
-                        id: uuid(),
-                        sections: [
-                            {
-                                id: uuid(),
-                                title: "",
-                                order: 0,
-                                puzzles: [
-                                    {
-                                        id: uuid(),
-                                        title: "",
-                                        order: 0,
-                                        puzzleType: EPuzzleType.GROUP,
-                                        puzzles: [
-                                            {
-                                                id: uuid(),
-                                                puzzleType: EPuzzleType.QUESTION,
-                                                title: "",
-                                                order: 0,
-                                                puzzles: [
-                                                    {
-                                                        id: uuid(),
-                                                        puzzleType: EPuzzleType.INPUT_ANSWER,
-                                                        title: "",
-                                                        order: 0,
-                                                        puzzles: [],
-                                                        conditions: [],
-                                                        validations: [],
-                                                    },
-                                                ],
-                                                conditions: [],
-                                                validations: [],
-                                            },
-                                        ],
-                                        conditions: [],
-                                        validations: [],
-                                    },
-                                    {
-                                        id: uuid(),
-                                        title: "",
-                                        order: 1,
-                                        puzzleType: EPuzzleType.GROUP,
-                                        puzzles: [
-                                            {
-                                                id: uuid(),
-                                                puzzleType: EPuzzleType.QUESTION,
-                                                title: "",
-                                                order: 0,
-                                                puzzles: [
-                                                    {
-                                                        id: uuid(),
-                                                        puzzleType: EPuzzleType.INPUT_ANSWER,
-                                                        title: "",
-                                                        order: 0,
-                                                        puzzles: [],
-                                                        conditions: [],
-                                                        validations: [],
-                                                    },
-                                                ],
-                                                conditions: [],
-                                                validations: [],
-                                            },
-                                            {
-                                                id: uuid(),
-                                                puzzleType: EPuzzleType.QUESTION,
-                                                title: "",
-                                                order: 1,
-                                                puzzles: [
-                                                    {
-                                                        id: uuid(),
-                                                        puzzleType: EPuzzleType.INPUT_ANSWER,
-                                                        title: "",
-                                                        order: 0,
-                                                        puzzles: [],
-                                                        conditions: [],
-                                                        validations: [],
-                                                    },
-                                                ],
-                                                conditions: [],
-                                                validations: [],
-                                            },
-                                        ],
-                                        conditions: [],
-                                        validations: [],
-                                    },
-                                ],
-                            },
-                            {
-                                id: uuid(),
-                                title: "",
-                                order: 1,
-                                puzzles: [
-                                    {
-                                        id: uuid(),
-                                        title: "",
-                                        order: 0,
-                                        puzzleType: EPuzzleType.GROUP,
-                                        puzzles: [
-                                            {
-                                                id: uuid(),
-                                                puzzleType: EPuzzleType.QUESTION,
-                                                title: "",
-                                                order: 0,
-                                                puzzles: [
-                                                    {
-                                                        id: uuid(),
-                                                        puzzleType: EPuzzleType.INPUT_ANSWER,
-                                                        title: "",
-                                                        order: 0,
-                                                        puzzles: [],
-                                                        conditions: [],
-                                                        validations: [],
-                                                    },
-                                                ],
-                                                conditions: [],
-                                                validations: [],
-                                            },
-                                        ],
-                                        conditions: [],
-                                        validations: [],
-                                    },
-                                ],
-                            },
-                        ],
-                        title: "",
-                        description: "",
-                    }}
-                />
+                <TemplateEditor initialState={template} />
             </Grid>
         </SectionLayout>
     );

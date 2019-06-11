@@ -19,7 +19,11 @@ interface IPuzzleProps {
 
     shouldElevatePuzzle(id: string): boolean;
 
+    isInFocusedChain(id: string): boolean;
+
     onFocus(id: string): void;
+
+    onBlur(event: React.SyntheticEvent): void;
 }
 
 export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
@@ -32,10 +36,8 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                             <Paper
                                 key={puzzle.id}
                                 id={puzzle.id}
-                                onFocus={event => {
-                                    event.stopPropagation();
-                                    props.onFocus(puzzle.id);
-                                }}
+                                onFocus={() => props.onFocus(puzzle.id)}
+                                onBlur={props.onBlur}
                                 css={theme => ({
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
@@ -45,7 +47,11 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     ),
                                     paddingLeft: theme.spacing(4),
                                     paddingRight: theme.spacing(4),
-                                    zIndex: props.shouldElevatePuzzle(puzzle.id) ? 1300 : 0,
+                                    zIndex: props.shouldElevatePuzzle(puzzle.id)
+                                        ? 1300
+                                        : props.isInFocusedChain(puzzle.id)
+                                        ? 1200
+                                        : 0,
                                     position: "relative",
                                 })}
                                 square={true}
@@ -60,18 +66,33 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                     }
                     case EPuzzleType.QUESTION: {
                         return (
-                            <div
+                            <Paper
                                 key={puzzle.id}
+                                id={puzzle.id}
                                 css={theme => ({
-                                    marginTop: theme.spacing(2),
-                                    marginBottom: theme.spacing(2),
+                                    position: "relative",
+                                    paddingTop: theme.spacing(2),
+                                    marginTop: theme.spacing(index === 0 ? 2 : 0),
+                                    paddingBottom: theme.spacing(2),
+                                    marginBottom: theme.spacing(
+                                        index === puzzles.length - 1 ? 0 : 2
+                                    ),
+                                    marginLeft: theme.spacing(-4),
+                                    paddingLeft: theme.spacing(4),
+                                    marginRight: theme.spacing(-4),
+                                    paddingRight: theme.spacing(4),
+                                    zIndex: props.shouldElevatePuzzle(puzzle.id) ? 1300 : 0,
                                 })}
+                                onFocus={() => props.onFocus(puzzle.id)}
+                                onBlur={props.onBlur}
+                                square={true}
+                                elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.QUESTION](index)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
-                            </div>
+                            </Paper>
                         );
                     }
                     case EPuzzleType.INPUT_ANSWER:
