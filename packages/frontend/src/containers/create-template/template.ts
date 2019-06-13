@@ -7,11 +7,13 @@ export default {
         {
             id: uuid(),
             title: "",
+            description: "",
             order: 1,
             puzzles: [
                 {
                     id: uuid(),
                     title: "",
+                    description: "",
                     order: 0,
                     puzzleType: EPuzzleType.GROUP,
                     puzzles: [
@@ -19,12 +21,15 @@ export default {
                             id: uuid(),
                             puzzleType: EPuzzleType.QUESTION,
                             title: "",
+                            description: "",
+
                             order: 0,
                             puzzles: [
                                 {
                                     id: uuid(),
                                     puzzleType: EPuzzleType.INPUT_ANSWER,
                                     title: "",
+                                    description: "",
                                     order: 0,
                                     puzzles: [],
                                     conditions: [],

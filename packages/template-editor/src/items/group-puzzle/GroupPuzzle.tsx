@@ -7,7 +7,7 @@ import { css, jsx } from "@emotion/core";
 
 export const GroupPuzzle: React.FC<ISpecificPuzzleProps> = props => {
     return (
-        <React.Fragment>
+        <Grid container direction="column">
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
                 <Typography variant="subtitle2">Группа {props.index + 1}.</Typography>
             </Grid>
@@ -19,6 +19,14 @@ export const GroupPuzzle: React.FC<ISpecificPuzzleProps> = props => {
             >
                 <TextField fullWidth label="Название группы" />
             </Grid>
-        </React.Fragment>
+            <Grid
+                item
+                css={css`
+                    flex-grow: 1;
+                `}
+            >
+                <TextField fullWidth label="Описание группы (необязательно)" />
+            </Grid>
+        </Grid>
     );
 };

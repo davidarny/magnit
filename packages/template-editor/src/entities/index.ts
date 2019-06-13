@@ -28,6 +28,10 @@ interface IWithValidation<T> {
     validations: T[];
 }
 
+interface IWithDescription {
+    description: string;
+}
+
 interface ICondition extends IOrdered {
     parentPuzzle: IPuzzle["id"];
     childPuzzle: IPuzzle["id"];
@@ -44,14 +48,11 @@ interface IValidation extends IOrdered {
     errorMessage: string;
 }
 
-export interface ITemplate extends ITitled, IWithId, IWithPuzzles<IPuzzle> {
-    description: string;
+export interface ITemplate extends ITitled, IWithId, IWithPuzzles<IPuzzle>, IWithDescription {
     sections: ISection[];
 }
 
-export interface ISection extends IOrdered, ITitled, IWithPuzzles<IPuzzle>, IWithId {
-    puzzles: IPuzzle[];
-}
+export interface ISection extends IOrdered, ITitled, IWithPuzzles<IPuzzle>, IWithId {}
 
 export interface IPuzzle
     extends IOrdered,
@@ -59,7 +60,8 @@ export interface IPuzzle
         IWithPuzzles<IPuzzle>,
         IWithId,
         IWithConditions<ICondition>,
-        IWithValidation<IValidation> {
+        IWithValidation<IValidation>,
+        IWithDescription {
     puzzleType: EPuzzleType;
 }
 

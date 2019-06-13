@@ -16,6 +16,7 @@ Table puzzle {
  section_id int [ref: > section.id]
  parent_id int [ref: > puzzle.id]
  title varchar
+ description varchar
  puzzle_type puzzle_type
  order int
  answer_type input_type

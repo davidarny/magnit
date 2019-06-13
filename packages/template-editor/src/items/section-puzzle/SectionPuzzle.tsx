@@ -7,7 +7,7 @@ import { css, jsx } from "@emotion/core";
 
 export const SectionPuzzle: React.FC<ISpecificPuzzleProps> = props => {
     return (
-        <React.Fragment>
+        <Grid container alignItems="flex-end">
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
                 <Typography variant="subtitle2">Раздел {props.index + 1}.</Typography>
             </Grid>
@@ -19,6 +19,6 @@ export const SectionPuzzle: React.FC<ISpecificPuzzleProps> = props => {
             >
                 <TextField fullWidth label="Название раздела" />
             </Grid>
-        </React.Fragment>
+        </Grid>
     );
 };

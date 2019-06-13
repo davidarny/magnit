@@ -30,7 +30,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
-    const [isFocusOnSection, setFocusOnSectionState] = useState(false);
 
     useEffect(() => {
         // set toolbar offset top
@@ -56,30 +55,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         toolbar.style.willChange = "transform";
         const timeout = 300;
         setTimeout(() => (toolbar.style.willChange = "initial"), timeout);
-
-        setFocusOnSectionState(false);
-        setTimeout(() => {
-            traverse(template, (value: any) => {
-                if (!focusedPuzzleChain.length) {
-                    return;
-                }
-                if (typeof value !== "object" || !("id" in value)) {
-                    return;
-                }
-                const focusedPuzzleId = R.head(focusedPuzzleChain);
-                if (value.id !== focusedPuzzleId) {
-                    return;
-                }
-                const isSectionItem =
-                    "puzzles" in value && !("puzzleType" in value) && !("sections" in value);
-                if (isSectionItem) {
-                    setFocusOnSectionState(true);
-                }
-            });
-        });
     }, [focusedPuzzleChain]);
 
-    function onToolbarAddQuestion() {
+    function onToolbarAddQuestion(): void {
+        const whitelist = [EPuzzleType.GROUP];
         traverse(template, (value: any) => {
             if (!focusedPuzzleChain.length) {
                 return;
@@ -91,24 +70,65 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
                 return;
             }
-            const isTemplateItem = "puzzles" in value && "sections" in value;
-            const isGroupItem =
-                "puzzles" in value &&
-                "puzzleType" in value &&
-                value.puzzleType === EPuzzleType.GROUP;
-            if (isTemplateItem || isGroupItem) {
-                const puzzle = value as IPuzzle;
-                const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
-                puzzle.puzzles.push({
-                    id: uuid(),
-                    puzzles: [],
-                    validations: [],
-                    conditions: [],
-                    title: "",
-                    puzzleType: EPuzzleType.QUESTION,
-                    order: (prevPuzzle || { order: -1 }).order + 1,
-                });
+            // do not allow to add question in question, answer, etc...
+            if ("puzzleType" in value && !whitelist.includes(value.puzzleType)) {
+                return;
             }
+            const puzzle = value as IPuzzle;
+            const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
+            puzzle.puzzles.push({
+                id: uuid(),
+                puzzles: [
+                    {
+                        id: uuid(),
+                        puzzleType: EPuzzleType.INPUT_ANSWER,
+                        title: "",
+                        description: "",
+                        order: 0,
+                        puzzles: [],
+                        conditions: [],
+                        validations: [],
+                    },
+                ],
+                validations: [],
+                conditions: [],
+                title: "",
+                description: "",
+                puzzleType: EPuzzleType.QUESTION,
+                order: (prevPuzzle || { order: -1 }).order + 1,
+            });
+        });
+        setTemplate({ ...template });
+    }
+
+    function onToolbarAddGroup(): void {
+        traverse(template, (value: any) => {
+            if (!focusedPuzzleChain.length) {
+                return;
+            }
+            if (typeof value !== "object" || !("id" in value)) {
+                return;
+            }
+            const focusedPuzzleId = R.head(focusedPuzzleChain);
+            if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
+                return;
+            }
+            // do not allow to add group in group, question, etc...
+            if ("puzzleType" in value) {
+                return;
+            }
+            const puzzle = value as IPuzzle;
+            const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
+            puzzle.puzzles.push({
+                id: uuid(),
+                puzzles: [],
+                validations: [],
+                conditions: [],
+                description: "",
+                title: "",
+                puzzleType: EPuzzleType.GROUP,
+                order: (prevPuzzle || { order: -1 }).order + 1,
+            });
         });
         setTemplate({ ...template });
     }
@@ -139,10 +159,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             <PuzzleToolbar
                 top={toolbarTopPosition}
                 onAddClick={onToolbarAddQuestion}
-                addQuestionDisabled={isFocusOnSection}
+                onAddGroup={onToolbarAddGroup}
             />
             <Paper
-                css={theme => ({ padding: theme.spacing(4) })}
+                css={theme => ({ paddingTop: theme.spacing(4), paddingBottom: theme.spacing(4) })}
                 id={template.id}
                 onFocus={onPuzzleFocus.bind(null, template.id)}
                 onBlur={onPuzzleBlur}
@@ -150,10 +170,22 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
                 <Grid container direction="column">
-                    <Grid item>
+                    <Grid
+                        item
+                        css={theme => ({
+                            paddingLeft: theme.spacing(4),
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <TextField fullWidth label="Название шаблона" />
                     </Grid>
-                    <Grid item>
+                    <Grid
+                        item
+                        css={theme => ({
+                            paddingLeft: theme.spacing(4),
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <TextField fullWidth label="Описание шаблона (необязательно)" />
                     </Grid>
                     <Grid item>

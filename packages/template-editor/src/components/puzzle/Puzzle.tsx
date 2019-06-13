@@ -46,20 +46,18 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 onBlur={props.onBlur}
                                 onMouseDown={props.onMouseDown}
                                 css={theme => ({
+                                    position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
                                     paddingBottom: theme.spacing(2),
                                     marginBottom: theme.spacing(
                                         index === puzzles.length - 1 ? 4 : 0
                                     ),
-                                    paddingLeft: theme.spacing(4),
-                                    paddingRight: theme.spacing(4),
                                     zIndex: props.shouldElevatePuzzle(puzzle.id)
                                         ? 1300
                                         : props.isInFocusedChain(puzzle.id)
                                         ? 1200
                                         : 0,
-                                    position: "relative",
                                 })}
                                 square={true}
                                 elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}
@@ -84,10 +82,6 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginBottom: theme.spacing(
                                         index === puzzles.length - 1 ? 0 : 2
                                     ),
-                                    marginLeft: theme.spacing(-4),
-                                    paddingLeft: theme.spacing(4),
-                                    marginRight: theme.spacing(-4),
-                                    paddingRight: theme.spacing(4),
                                     zIndex: props.shouldElevatePuzzle(puzzle.id) ? 1300 : 0,
                                 })}
                                 onMouseDown={props.onMouseDown}
