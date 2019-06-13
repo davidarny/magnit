@@ -70,8 +70,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
                 return;
             }
-            // do not allow to add question in question, answer, etc...
-            if ("puzzleType" in value && !whitelist.includes(value.puzzleType)) {
+            // do not allow to add question in section, question, answer, etc...
+            if (
+                !("puzzles" in value && "sections" in value) &&
+                !whitelist.includes(value.puzzleType)
+            ) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -137,7 +140,18 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         const prevSection = template.sections[template.sections.length - 1];
         template.sections.push({
             id: uuid(),
-            puzzles: [],
+            puzzles: [
+                {
+                    id: uuid(),
+                    puzzles: [],
+                    validations: [],
+                    conditions: [],
+                    description: "",
+                    title: "",
+                    puzzleType: EPuzzleType.GROUP,
+                    order: 0,
+                },
+            ],
             title: "",
             order: (prevSection || { order: -1 }).order + 1,
         });
