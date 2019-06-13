@@ -23,6 +23,8 @@ interface IPuzzleProps {
 
     onFocus(id: string): void;
 
+    onMouseDown(event: React.SyntheticEvent): void;
+
     onBlur(event: React.SyntheticEvent): void;
 }
 
@@ -30,14 +32,19 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
     return (
         <React.Fragment>
             {puzzles.map((puzzle, index) => {
+                function onFocus(): void {
+                    props.onFocus(puzzle.id);
+                }
+
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
                         return (
                             <Paper
                                 key={puzzle.id}
                                 id={puzzle.id}
-                                onFocus={() => props.onFocus(puzzle.id)}
+                                onFocus={onFocus}
                                 onBlur={props.onBlur}
+                                onMouseDown={props.onMouseDown}
                                 css={theme => ({
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
@@ -83,7 +90,8 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     paddingRight: theme.spacing(4),
                                     zIndex: props.shouldElevatePuzzle(puzzle.id) ? 1300 : 0,
                                 })}
-                                onFocus={() => props.onFocus(puzzle.id)}
+                                onMouseDown={props.onMouseDown}
+                                onFocus={onFocus}
                                 onBlur={props.onBlur}
                                 square={true}
                                 elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}

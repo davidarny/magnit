@@ -28,8 +28,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         }
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
-    const [isOverToolbar, setOverToolbarState] = useState(false);
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
 
     useEffect(() => {
         // set toolbar offset top
@@ -96,35 +95,36 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
+    function onPuzzleBlur(event: React.SyntheticEvent): void {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    function onPuzzleFocus(id: string): void {
+        if (focusedPuzzleChain.includes(id)) {
+            setFocusedPuzzleChain([...focusedPuzzleChain]);
+            return;
+        }
+        focusedPuzzleChain.push(id);
+        setFocusedPuzzleChain([...focusedPuzzleChain]);
+    }
+
+    function onPuzzleMouseDown(event: React.SyntheticEvent): void {
+        event.stopPropagation();
+        setFocusedPuzzleChain([]);
+    }
+
     const focusedPuzzleId = R.head(focusedPuzzleChain);
 
     return (
         <React.Fragment>
-            <PuzzleToolbar
-                top={toolbarTopPosition}
-                onAddClick={onToolbarAdd}
-                onMouseOver={() => setOverToolbarState(true)}
-                onMouseOut={() => setOverToolbarState(false)}
-            />
+            <PuzzleToolbar top={toolbarTopPosition} onAddClick={onToolbarAdd} />
             <Paper
                 css={theme => ({ padding: theme.spacing(4) })}
                 id={template.id}
-                onFocus={() => {
-                    if (focusedPuzzleChain.includes(template.id)) {
-                        setFocusedPuzzleChain([...focusedPuzzleChain]);
-                        return;
-                    }
-                    focusedPuzzleChain.push(template.id);
-                    setFocusedPuzzleChain([...focusedPuzzleChain]);
-                }}
-                onBlur={event => {
-                    if (isOverToolbar) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    } else {
-                        setFocusedPuzzleChain([]);
-                    }
-                }}
+                onFocus={onPuzzleFocus.bind(null, template.id)}
+                onBlur={onPuzzleBlur}
+                onMouseDown={onPuzzleMouseDown}
                 elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
                 <Grid container direction="column">
@@ -141,22 +141,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     <div
                         key={section.id}
                         id={section.id}
-                        onFocus={() => {
-                            if (focusedPuzzleChain.includes(section.id)) {
-                                setFocusedPuzzleChain([...focusedPuzzleChain]);
-                                return;
-                            }
-                            focusedPuzzleChain.push(section.id);
-                            setFocusedPuzzleChain([...focusedPuzzleChain]);
-                        }}
-                        onBlur={event => {
-                            if (isOverToolbar) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                            } else {
-                                setFocusedPuzzleChain([]);
-                            }
-                        }}
+                        onFocus={onPuzzleFocus.bind(null, section.id)}
+                        onBlur={onPuzzleBlur}
+                        onMouseDown={onPuzzleMouseDown}
                     >
                         <div css={theme => ({ margin: theme.spacing(4) })} />
                         <Grid
@@ -187,22 +174,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                         ),
                                         [EPuzzleType.INPUT_ANSWER]: () => <InputAnswerPuzzle />,
                                     }}
-                                    onFocus={id => {
-                                        if (focusedPuzzleChain.includes(id)) {
-                                            setFocusedPuzzleChain([...focusedPuzzleChain]);
-                                            return;
-                                        }
-                                        focusedPuzzleChain.push(id);
-                                        setFocusedPuzzleChain([...focusedPuzzleChain]);
-                                    }}
-                                    onBlur={event => {
-                                        if (isOverToolbar) {
-                                            event.preventDefault();
-                                            event.stopPropagation();
-                                        } else {
-                                            setFocusedPuzzleChain([]);
-                                        }
-                                    }}
+                                    onFocus={onPuzzleFocus}
+                                    onMouseDown={onPuzzleMouseDown}
+                                    onBlur={onPuzzleBlur}
                                     shouldElevatePuzzle={id => id === focusedPuzzleId}
                                     isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                                 />

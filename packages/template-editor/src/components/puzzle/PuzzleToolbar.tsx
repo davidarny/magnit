@@ -17,10 +17,6 @@ interface IPuzzleToolbarProps {
     top?: number;
 
     onAddClick(): void;
-
-    onMouseOver(): void;
-
-    onMouseOut(): void;
 }
 
 export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0, ...props }) => {
@@ -35,8 +31,6 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 transition: "transform 0.3s ease-in-out",
             })}
             className="toolbar"
-            onMouseOver={props.onMouseOver}
-            onMouseOut={props.onMouseOut}
         >
             <Grid
                 container
