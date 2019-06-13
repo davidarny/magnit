@@ -19,6 +19,8 @@ interface IPuzzleToolbarProps {
     onAddClick?(): void;
 
     onAddGroup?(): void;
+
+    onAddSection?(): void;
 }
 
 export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0, ...props }) => {
@@ -27,6 +29,7 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
             css={theme => ({
                 position: "absolute",
                 right: `calc(-${theme.spacing(10)} + ${right}px)`,
+                marginBottom: theme.spacing(4),
                 top: 0,
                 transform: `translateY(${top}px)`,
                 willChange: "transform",
@@ -59,7 +62,11 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Добавить раздел">
+                    <IconButton
+                        color="primary"
+                        onClick={props.onAddSection}
+                        aria-label="Добавить раздел"
+                    >
                         <AddSectionIcon />
                     </IconButton>
                 </Grid>

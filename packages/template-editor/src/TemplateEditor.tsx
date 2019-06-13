@@ -133,6 +133,17 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
+    function onToolbarAddSection(): void {
+        const prevSection = template.sections[template.sections.length - 1];
+        template.sections.push({
+            id: uuid(),
+            puzzles: [],
+            title: "",
+            order: (prevSection || { order: -1 }).order + 1,
+        });
+        setTemplate({ ...template });
+    }
+
     function onPuzzleBlur(event: React.SyntheticEvent): void {
         event.preventDefault();
         event.stopPropagation();
@@ -160,6 +171,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 top={toolbarTopPosition}
                 onAddClick={onToolbarAddQuestion}
                 onAddGroup={onToolbarAddGroup}
+                onAddSection={onToolbarAddSection}
             />
             <Paper
                 css={theme => ({ paddingTop: theme.spacing(4), paddingBottom: theme.spacing(4) })}
