@@ -121,10 +121,21 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return;
             }
             const puzzle = value as IPuzzle;
+            const nearPuzzlesToGroup: IPuzzle[] = [];
+            if (
+                "puzzles" in value &&
+                "sections" in value &&
+                !template.puzzles.some(puzzle => puzzle.puzzleType === EPuzzleType.GROUP)
+            ) {
+                nearPuzzlesToGroup.push(
+                    ...puzzle.puzzles.filter(puzzle => puzzle.puzzleType === EPuzzleType.QUESTION)
+                );
+                puzzle.puzzles = [];
+            }
             const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
             puzzle.puzzles.push({
                 id: uuid(),
-                puzzles: [],
+                puzzles: [...nearPuzzlesToGroup],
                 validations: [],
                 conditions: [],
                 description: "",
@@ -188,7 +199,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onAddSection={onToolbarAddSection}
             />
             <Paper
-                css={theme => ({ paddingTop: theme.spacing(4), paddingBottom: theme.spacing(4) })}
+                css={theme => ({
+                    paddingTop: theme.spacing(4),
+                    paddingBottom: template.puzzles.some(
+                        puzzle => puzzle.puzzleType === EPuzzleType.GROUP
+                    )
+                        ? theme.spacing(0)
+                        : theme.spacing(4),
+                })}
                 id={template.id}
                 onFocus={onPuzzleFocus.bind(null, template.id)}
                 onBlur={onPuzzleBlur}
