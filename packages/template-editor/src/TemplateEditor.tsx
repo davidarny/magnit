@@ -23,12 +23,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         props.initialState || {
             id: uuid(),
             sections: [],
+            puzzles: [],
             title: "",
             description: "",
         }
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
+    const [isFocusOnSection, setFocusOnSectionState] = useState(false);
 
     useEffect(() => {
         // set toolbar offset top
@@ -54,9 +56,30 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         toolbar.style.willChange = "transform";
         const timeout = 300;
         setTimeout(() => (toolbar.style.willChange = "initial"), timeout);
+
+        setFocusOnSectionState(false);
+        setTimeout(() => {
+            traverse(template, (value: any) => {
+                if (!focusedPuzzleChain.length) {
+                    return;
+                }
+                if (typeof value !== "object" || !("id" in value)) {
+                    return;
+                }
+                const focusedPuzzleId = R.head(focusedPuzzleChain);
+                if (value.id !== focusedPuzzleId) {
+                    return;
+                }
+                const isSectionItem =
+                    "puzzles" in value && !("puzzleType" in value) && !("sections" in value);
+                if (isSectionItem) {
+                    setFocusOnSectionState(true);
+                }
+            });
+        });
     }, [focusedPuzzleChain]);
 
-    function onToolbarAdd() {
+    function onToolbarAddQuestion() {
         traverse(template, (value: any) => {
             if (!focusedPuzzleChain.length) {
                 return;
@@ -65,31 +88,26 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return;
             }
             const focusedPuzzleId = R.head(focusedPuzzleChain);
-            if (value.id !== focusedPuzzleId) {
+            if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
                 return;
             }
-            if ("puzzles" in value) {
+            const isTemplateItem = "puzzles" in value && "sections" in value;
+            const isGroupItem =
+                "puzzles" in value &&
+                "puzzleType" in value &&
+                value.puzzleType === EPuzzleType.GROUP;
+            if (isTemplateItem || isGroupItem) {
                 const puzzle = value as IPuzzle;
                 const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
-                let nextPuzzleType: EPuzzleType | undefined;
-                if (puzzle.puzzleType === EPuzzleType.GROUP) {
-                    nextPuzzleType = EPuzzleType.QUESTION;
-                } else if (typeof puzzle.puzzleType === "undefined") {
-                    nextPuzzleType = EPuzzleType.GROUP;
-                }
-                if (nextPuzzleType) {
-                    puzzle.puzzles.push({
-                        id: uuid(),
-                        puzzles: [],
-                        validations: [],
-                        conditions: [],
-                        title: "",
-                        puzzleType: nextPuzzleType,
-                        order: (prevPuzzle || { order: -1 }).order + 1,
-                    });
-                }
-            } else if ("sections" in value) {
-                // TODO: add section
+                puzzle.puzzles.push({
+                    id: uuid(),
+                    puzzles: [],
+                    validations: [],
+                    conditions: [],
+                    title: "",
+                    puzzleType: EPuzzleType.QUESTION,
+                    order: (prevPuzzle || { order: -1 }).order + 1,
+                });
             }
         });
         setTemplate({ ...template });
@@ -118,7 +136,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     return (
         <React.Fragment>
-            <PuzzleToolbar top={toolbarTopPosition} onAddClick={onToolbarAdd} />
+            <PuzzleToolbar
+                top={toolbarTopPosition}
+                onAddClick={onToolbarAddQuestion}
+                addQuestionDisabled={isFocusOnSection}
+            />
             <Paper
                 css={theme => ({ padding: theme.spacing(4) })}
                 id={template.id}
@@ -133,6 +155,22 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     </Grid>
                     <Grid item>
                         <TextField fullWidth label="Описание шаблона (необязательно)" />
+                    </Grid>
+                    <Grid item>
+                        <Puzzle
+                            puzzles={template.puzzles}
+                            index={0}
+                            components={{
+                                [EPuzzleType.GROUP]: index => <GroupPuzzle index={index} />,
+                                [EPuzzleType.QUESTION]: index => <QuestionPuzzle index={index} />,
+                                [EPuzzleType.INPUT_ANSWER]: () => <InputAnswerPuzzle />,
+                            }}
+                            onFocus={onPuzzleFocus}
+                            onMouseDown={onPuzzleMouseDown}
+                            onBlur={onPuzzleBlur}
+                            shouldElevatePuzzle={id => id === focusedPuzzleId}
+                            isInFocusedChain={id => focusedPuzzleChain.includes(id)}
+                        />
                     </Grid>
                 </Grid>
             </Paper>

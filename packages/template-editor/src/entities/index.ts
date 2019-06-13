@@ -44,7 +44,7 @@ interface IValidation extends IOrdered {
     errorMessage: string;
 }
 
-export interface ITemplate extends ITitled, IWithId {
+export interface ITemplate extends ITitled, IWithId, IWithPuzzles<IPuzzle> {
     description: string;
     sections: ISection[];
 }

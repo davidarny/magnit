@@ -41,6 +41,7 @@ export default {
             ],
         },
     ],
+    puzzles: [],
     title: "",
     description: "",
 };

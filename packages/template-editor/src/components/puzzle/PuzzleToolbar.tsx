@@ -16,6 +16,8 @@ interface IPuzzleToolbarProps {
     right?: number;
     top?: number;
 
+    addQuestionDisabled?: boolean;
+
     onAddClick(): void;
 }
 
@@ -41,19 +43,20 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton
                         color="primary"
-                        aria-label="Добавить элемент"
+                        aria-label="Добавить вопрос"
+                        disabled={props.addQuestionDisabled}
                         onClick={props.onAddClick}
                     >
                         <AddQuestionIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Добавить файл">
+                    <IconButton color="primary" aria-label="Добавить группу">
                         <AddGroupIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Добавить текстовое поле">
+                    <IconButton color="primary" aria-label="Добавить раздел">
                         <AddSectionIcon />
                     </IconButton>
                 </Grid>
