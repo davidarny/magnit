@@ -49,7 +49,12 @@ module.exports = {
                         order: section.order,
                     }).fetch();
 
-                    await sails.helpers.savePuzzles(section.puzzles, newSection.id, null);
+                    await sails.helpers.savePuzzles(
+                        section.puzzles,
+                        newTemplate.id,
+                        newSection.id,
+                        null
+                    );
                 }
             } else if (template.puzzles) {
             }

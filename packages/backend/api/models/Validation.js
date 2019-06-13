@@ -6,6 +6,10 @@ module.exports = {
             type: "number",
         },
 
+        puzzle_id: {
+            type: "number",
+        },
+
         operator_type: {
             type: "string",
         },

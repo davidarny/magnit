@@ -7,6 +7,16 @@ module.exports = {
             columnType: "text",
         },
 
+        template_id: {
+            type: "number",
+            allowNull: true,
+        },
+
+        section_id: {
+            type: "number",
+            allowNull: true,
+        },
+
         parent_id: {
             type: "number",
             allowNull: true,

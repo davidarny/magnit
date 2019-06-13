@@ -17,24 +17,21 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_right_hand_puzzle_fkey;
+ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_left_hand_puzzle_fkey;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_object_id_fkey;
-ALTER TABLE ONLY public.template_puzzles DROP CONSTRAINT template_puzzles_template_id_fkey;
-ALTER TABLE ONLY public.template_puzzles DROP CONSTRAINT template_puzzles_puzzle_id_fkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_template_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_task_id_fkey;
 ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_template_id_fkey;
-ALTER TABLE ONLY public.section_puzzles DROP CONSTRAINT section_puzzles_section_id_fkey;
-ALTER TABLE ONLY public.section_puzzles DROP CONSTRAINT section_puzzles_puzzle_id_fkey;
-ALTER TABLE ONLY public.puzzle_validations DROP CONSTRAINT puzzle_validations_validation_id_fkey;
-ALTER TABLE ONLY public.puzzle_validations DROP CONSTRAINT puzzle_validations_puzzle_id_fkey;
-ALTER TABLE ONLY public.puzzle_conditions DROP CONSTRAINT puzzle_conditions_puzzle_id_fkey;
-ALTER TABLE ONLY public.puzzle_conditions DROP CONSTRAINT puzzle_conditions_condition_id_fkey;
+ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_template_id_fkey;
+ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_section_id_fkey;
 ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_region_fkey;
+ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_task_id_fkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_question_puzzle_fkey;
+ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_puzzle_id_fkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_answer_puzzle_fkey;
 ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_pkey;
@@ -46,6 +43,7 @@ ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_pkey;
 ALTER TABLE ONLY public.regions DROP CONSTRAINT regions_pkey;
 ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_pkey;
 ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_pkey;
+ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_pkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_pkey;
 ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_pkey;
 ALTER TABLE public.validations ALTER COLUMN id DROP DEFAULT;
@@ -57,6 +55,7 @@ ALTER TABLE public.sections ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.regions ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.puzzles ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.objects ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.notifications ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.conditions ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.answers ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE public.validations_id_seq;
@@ -65,7 +64,6 @@ DROP SEQUENCE public.users_id_seq;
 DROP TABLE public.users;
 DROP SEQUENCE public.templates_id_seq;
 DROP TABLE public.templates;
-DROP TABLE public.template_puzzles;
 DROP SEQUENCE public.tasks_id_seq;
 DROP TABLE public.tasks;
 DROP TABLE public.task_users;
@@ -74,15 +72,14 @@ DROP SEQUENCE public.tariffs_id_seq;
 DROP TABLE public.tariffs;
 DROP SEQUENCE public.sections_id_seq;
 DROP TABLE public.sections;
-DROP TABLE public.section_puzzles;
 DROP SEQUENCE public.regions_id_seq;
 DROP TABLE public.regions;
 DROP SEQUENCE public.puzzles_id_seq;
 DROP TABLE public.puzzles;
-DROP TABLE public.puzzle_validations;
-DROP TABLE public.puzzle_conditions;
 DROP SEQUENCE public.objects_id_seq;
 DROP TABLE public.objects;
+DROP SEQUENCE public.notifications_id_seq;
+DROP TABLE public.notifications;
 DROP SEQUENCE public.conditions_id_seq;
 DROP TABLE public.conditions;
 DROP SEQUENCE public.answers_id_seq;
@@ -113,14 +110,14 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
@@ -266,6 +263,7 @@ ALTER SEQUENCE public.answers_id_seq OWNED BY public.answers.id;
 
 CREATE TABLE public.conditions (
     id integer NOT NULL,
+    puzzle_id integer,
     "order" integer,
     question_puzzle integer,
     action_type public.condition_action_type,
@@ -298,6 +296,41 @@ ALTER TABLE public.conditions_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE public.conditions_id_seq OWNED BY public.conditions.id;
+
+
+--
+-- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notifications (
+    id integer NOT NULL,
+    task_id integer,
+    message text
+);
+
+
+ALTER TABLE public.notifications OWNER TO postgres;
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notifications_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.notifications_id_seq OWNER TO postgres;
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 
 
 --
@@ -341,41 +374,16 @@ ALTER SEQUENCE public.objects_id_seq OWNED BY public.objects.id;
 
 
 --
--- Name: puzzle_conditions; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.puzzle_conditions (
-    puzzle_id integer,
-    condition_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
-ALTER TABLE public.puzzle_conditions OWNER TO postgres;
-
---
--- Name: puzzle_validations; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.puzzle_validations (
-    puzzle_id integer,
-    validation_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
-ALTER TABLE public.puzzle_validations OWNER TO postgres;
-
---
 -- Name: puzzles; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.puzzles (
     id integer NOT NULL,
+    template_id integer,
+    section_id integer,
     parent_id integer,
     title text,
+    description text,
     puzzle_type public.puzzle_type,
     "order" integer,
     answer_type public.input_type,
@@ -443,20 +451,6 @@ ALTER TABLE public.regions_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.regions_id_seq OWNED BY public.regions.id;
 
-
---
--- Name: section_puzzles; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.section_puzzles (
-    section_id integer,
-    puzzle_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
-ALTER TABLE public.section_puzzles OWNER TO postgres;
 
 --
 -- Name: sections; Type: TABLE; Schema: public; Owner: postgres
@@ -606,20 +600,6 @@ ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
 
 
 --
--- Name: template_puzzles; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.template_puzzles (
-    template_id integer,
-    puzzle_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
-ALTER TABLE public.template_puzzles OWNER TO postgres;
-
---
 -- Name: templates; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -701,6 +681,7 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 CREATE TABLE public.validations (
     id integer NOT NULL,
+    puzzle_id integer,
     "order" integer,
     operator_type public.operator_type,
     validation_type public.validation_action_type,
@@ -749,6 +730,13 @@ ALTER TABLE ONLY public.answers ALTER COLUMN id SET DEFAULT nextval('public.answ
 --
 
 ALTER TABLE ONLY public.conditions ALTER COLUMN id SET DEFAULT nextval('public.conditions_id_seq'::regclass);
+
+
+--
+-- Name: notifications id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
 
 
 --
@@ -826,7 +814,15 @@ COPY public.answers (id, puzzle_id, answer, answer_type, created_at, updated_at)
 -- Data for Name: conditions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.conditions (id, "order", question_puzzle, action_type, answer_puzzle, condition_type, created_at, updated_at) FROM stdin;
+COPY public.conditions (id, puzzle_id, "order", question_puzzle, action_type, answer_puzzle, condition_type, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notifications (id, task_id, message) FROM stdin;
 \.
 
 
@@ -839,26 +835,10 @@ COPY public.objects (id, name, region, branch, address, format, created_at, upda
 
 
 --
--- Data for Name: puzzle_conditions; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.puzzle_conditions (puzzle_id, condition_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: puzzle_validations; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.puzzle_validations (puzzle_id, validation_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
 -- Data for Name: puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.puzzles (id, parent_id, title, puzzle_type, "order", answer_type, created_at, updated_at) FROM stdin;
+COPY public.puzzles (id, template_id, section_id, parent_id, title, description, puzzle_type, "order", answer_type, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -867,14 +847,6 @@ COPY public.puzzles (id, parent_id, title, puzzle_type, "order", answer_type, cr
 --
 
 COPY public.regions (id, name, created_at, updated_at) FROM stdin;
-\.
-
-
---
--- Data for Name: section_puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.section_puzzles (section_id, puzzle_id, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -919,14 +891,6 @@ COPY public.tasks (id, name, description, departure_date, deadline_date, object_
 
 
 --
--- Data for Name: template_puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.template_puzzles (template_id, puzzle_id, created_at, updated_at) FROM stdin;
-\.
-
-
---
 -- Data for Name: templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -946,7 +910,7 @@ COPY public.users (id, login, name, "position", object_id, created_at, updated_a
 -- Data for Name: validations; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.validations (id, "order", operator_type, validation_type, left_hand_puzzle, right_hand_puzzle, value, error_message, created_at, updated_at) FROM stdin;
+COPY public.validations (id, puzzle_id, "order", operator_type, validation_type, left_hand_puzzle, right_hand_puzzle, value, error_message, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -962,6 +926,13 @@ SELECT pg_catalog.setval('public.answers_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.conditions_id_seq', 1, false);
+
+
+--
+-- Name: notifications_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notifications_id_seq', 1, false);
 
 
 --
@@ -1041,6 +1012,14 @@ ALTER TABLE ONLY public.answers
 
 ALTER TABLE ONLY public.conditions
     ADD CONSTRAINT conditions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1132,11 +1111,27 @@ ALTER TABLE ONLY public.conditions
 
 
 --
+-- Name: conditions conditions_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.conditions
+    ADD CONSTRAINT conditions_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
+
+
+--
 -- Name: conditions conditions_question_puzzle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.conditions
     ADD CONSTRAINT conditions_question_puzzle_fkey FOREIGN KEY (question_puzzle) REFERENCES public.puzzles(id);
+
+
+--
+-- Name: notifications notifications_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
 
 
 --
@@ -1148,51 +1143,19 @@ ALTER TABLE ONLY public.objects
 
 
 --
--- Name: puzzle_conditions puzzle_conditions_condition_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: puzzles puzzles_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.puzzle_conditions
-    ADD CONSTRAINT puzzle_conditions_condition_id_fkey FOREIGN KEY (condition_id) REFERENCES public.conditions(id);
-
-
---
--- Name: puzzle_conditions puzzle_conditions_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.puzzle_conditions
-    ADD CONSTRAINT puzzle_conditions_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
+ALTER TABLE ONLY public.puzzles
+    ADD CONSTRAINT puzzles_section_id_fkey FOREIGN KEY (section_id) REFERENCES public.sections(id);
 
 
 --
--- Name: puzzle_validations puzzle_validations_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: puzzles puzzles_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.puzzle_validations
-    ADD CONSTRAINT puzzle_validations_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
-
-
---
--- Name: puzzle_validations puzzle_validations_validation_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.puzzle_validations
-    ADD CONSTRAINT puzzle_validations_validation_id_fkey FOREIGN KEY (validation_id) REFERENCES public.validations(id);
-
-
---
--- Name: section_puzzles section_puzzles_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.section_puzzles
-    ADD CONSTRAINT section_puzzles_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
-
-
---
--- Name: section_puzzles section_puzzles_section_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.section_puzzles
-    ADD CONSTRAINT section_puzzles_section_id_fkey FOREIGN KEY (section_id) REFERENCES public.sections(id);
+ALTER TABLE ONLY public.puzzles
+    ADD CONSTRAINT puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id);
 
 
 --
@@ -1244,22 +1207,6 @@ ALTER TABLE ONLY public.tasks
 
 
 --
--- Name: template_puzzles template_puzzles_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.template_puzzles
-    ADD CONSTRAINT template_puzzles_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
-
-
---
--- Name: template_puzzles template_puzzles_template_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.template_puzzles
-    ADD CONSTRAINT template_puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id);
-
-
---
 -- Name: users users_object_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1273,6 +1220,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.validations
     ADD CONSTRAINT validations_left_hand_puzzle_fkey FOREIGN KEY (left_hand_puzzle) REFERENCES public.puzzles(id);
+
+
+--
+-- Name: validations validations_puzzle_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.validations
+    ADD CONSTRAINT validations_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
 
 
 --
@@ -1319,6 +1274,20 @@ GRANT ALL ON SEQUENCE public.conditions_id_seq TO magnit;
 
 
 --
+-- Name: TABLE notifications; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.notifications TO magnit;
+
+
+--
+-- Name: SEQUENCE notifications_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.notifications_id_seq TO magnit;
+
+
+--
 -- Name: TABLE objects; Type: ACL; Schema: public; Owner: postgres
 --
 
@@ -1330,20 +1299,6 @@ GRANT ALL ON TABLE public.objects TO magnit;
 --
 
 GRANT ALL ON SEQUENCE public.objects_id_seq TO magnit;
-
-
---
--- Name: TABLE puzzle_conditions; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.puzzle_conditions TO magnit;
-
-
---
--- Name: TABLE puzzle_validations; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.puzzle_validations TO magnit;
 
 
 --
@@ -1372,13 +1327,6 @@ GRANT ALL ON TABLE public.regions TO magnit;
 --
 
 GRANT ALL ON SEQUENCE public.regions_id_seq TO magnit;
-
-
---
--- Name: TABLE section_puzzles; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.section_puzzles TO magnit;
 
 
 --
@@ -1435,13 +1383,6 @@ GRANT ALL ON TABLE public.tasks TO magnit;
 --
 
 GRANT ALL ON SEQUENCE public.tasks_id_seq TO magnit;
-
-
---
--- Name: TABLE template_puzzles; Type: ACL; Schema: public; Owner: postgres
---
-
-GRANT ALL ON TABLE public.template_puzzles TO magnit;
 
 
 --
