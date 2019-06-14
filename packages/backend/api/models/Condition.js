@@ -11,8 +11,8 @@ module.exports = {
         },
 
         question_puzzle: {
-            type: "number",
-            allowNull: true,
+            type: "string",
+            isUUID: true,
         },
 
         action_type: {
@@ -20,6 +20,12 @@ module.exports = {
         },
 
         answer_puzzle: {
+            type: "string",
+            isUUID: true,
+            allowNull: true,
+        },
+
+        value: {
             type: "number",
             allowNull: true,
         },

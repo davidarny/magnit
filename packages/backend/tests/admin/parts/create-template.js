@@ -73,6 +73,7 @@ module.exports = function(options) {
         assert.equal(puzzles[13].puzzle_type, "input_answer");
         assert.equal(puzzles[13].order, 0);
         assert.equal(puzzles[13].answer_type, "number");
+        assert.equal(puzzles[13].uuid, "c047a25f-6d09-498a-b674-019c99c224f8");
         assert.equal(puzzles[14].parent_id, 8);
         assert.equal(puzzles[14].title, "Введите площадь объекта");
         assert.equal(puzzles[14].puzzle_type, "question");
@@ -91,6 +92,63 @@ module.exports = function(options) {
         assert.equal(puzzles[17].puzzle_type, "input_answer");
         assert.equal(puzzles[17].order, 0);
         assert.equal(puzzles[17].answer_type, "number");
+        assert.equal(puzzles[17].uuid, "f1c77dcd-95a1-4cea-982f-ba3269365b2d");
+
+        const conditions = await Condition.find();
+        assert.equal(conditions.length, 4);
+        assert.equal(conditions[0].puzzle_id, 8);
+        assert.equal(conditions[0].order, 0);
+        assert.equal(conditions[0].question_puzzle, "19972a9f-c592-4b7f-a64f-7a8034392586");
+        assert.equal(conditions[0].action_type, "chosen_answer");
+        assert.equal(conditions[0].answer_puzzle, "cea351b9-53cc-4325-8c22-a8448a451f54");
+        assert.equal(conditions[0].value, null);
+        assert.equal(conditions[0].condition_type, null);
+        assert.equal(conditions[1].puzzle_id, 13);
+        assert.equal(conditions[1].order, 0);
+        assert.equal(conditions[1].question_puzzle, "21db1fb4-732a-423e-b4da-86ee1bc06d8f");
+        assert.equal(conditions[1].action_type, "chosen_answer");
+        assert.equal(conditions[1].answer_puzzle, "1a141ec2-ce6d-450d-9b66-f41da8ad041e");
+        assert.equal(conditions[1].value, null);
+        assert.equal(conditions[1].condition_type, "or");
+        assert.equal(conditions[2].puzzle_id, 13);
+        assert.equal(conditions[2].order, 1);
+        assert.equal(conditions[2].question_puzzle, "21db1fb4-732a-423e-b4da-86ee1bc06d8f");
+        assert.equal(conditions[2].action_type, "chosen_answer");
+        assert.equal(conditions[2].answer_puzzle, "93cfa0af-0783-483a-8063-947296f36ee6");
+        assert.equal(conditions[2].value, null);
+        assert.equal(conditions[2].condition_type, "or");
+        assert.equal(conditions[3].puzzle_id, 13);
+        assert.equal(conditions[3].order, 2);
+        assert.equal(conditions[3].question_puzzle, "21db1fb4-732a-423e-b4da-86ee1bc06d8f");
+        assert.equal(conditions[3].action_type, "chosen_answer");
+        assert.equal(conditions[3].answer_puzzle, "c34f2e08-39f4-4ec8-b879-8e3f5ca4ee5a");
+        assert.equal(conditions[3].value, null);
+        assert.equal(conditions[3].condition_type, null);
+
+        const validations = await Validation.find();
+        assert.equal(validations.length, 2);
+        assert.equal(validations[0].puzzle_id, 17);
+        assert.equal(validations[0].order, 0);
+        assert.equal(validations[0].operator_type, "more");
+        assert.equal(validations[0].validation_type, "compare_with_answer");
+        assert.equal(validations[0].left_hand_puzzle, "09cf0415-57ec-4efb-a33e-a7da68faaba6");
+        assert.equal(validations[0].right_hand_puzzle, "b0828257-4687-45de-8863-1aff3d1d0b50");
+        assert.equal(validations[0].value, null);
+        assert.equal(
+            validations[0].error_message,
+            "Ошибка! Площадь объекта не может быть больше площади торгового зала"
+        );
+        assert.equal(validations[1].puzzle_id, 17);
+        assert.equal(validations[1].order, 1);
+        assert.equal(validations[1].operator_type, "less");
+        assert.equal(validations[1].validation_type, "set_value");
+        assert.equal(validations[1].left_hand_puzzle, "b0828257-4687-45de-8863-1aff3d1d0b50");
+        assert.equal(validations[1].right_hand_puzzle, null);
+        assert.equal(validations[1].value, 100);
+        assert.equal(
+            validations[1].error_message,
+            "Ошибка! Площадь объекта не может быть больше 100м*м"
+        );
     }
 
     describe("#create-template", () => {

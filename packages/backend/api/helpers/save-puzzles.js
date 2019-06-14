@@ -29,6 +29,7 @@ module.exports = {
             let puzzle = puzzles[i];
 
             let newPuzzle = await Puzzle.create({
+                uuid: puzzle.id,
                 title: puzzle.title,
                 description: puzzle.description,
                 puzzle_type: puzzle.puzzle_type,
@@ -48,6 +49,26 @@ module.exports = {
                         order: condition.order,
                         action_type: condition.action_type,
                         condition_type: condition.condition_type,
+                        question_puzzle: condition.question_puzzle,
+                        answer_puzzle: condition.answer_puzzle,
+                        value: condition.value,
+                    });
+                }
+            }
+
+            if (puzzle.validations) {
+                for (let i = 0; i < puzzle.validations.length; i++) {
+                    let validation = puzzle.validations[i];
+
+                    await Validation.create({
+                        puzzle_id: newPuzzle.id,
+                        order: validation.order,
+                        operator_type: validation.operator_type,
+                        validation_type: validation.validation_type,
+                        left_hand_puzzle: validation.left_hand_puzzle,
+                        right_hand_puzzle: validation.right_hand_puzzle,
+                        value: validation.value,
+                        error_message: validation.error_message,
                     });
                 }
             }

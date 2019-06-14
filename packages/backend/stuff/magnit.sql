@@ -91,6 +91,7 @@ DROP TYPE public.operator_type;
 DROP TYPE public.input_type;
 DROP TYPE public.condition_type;
 DROP TYPE public.condition_action_type;
+DROP EXTENSION "uuid-ossp";
 DROP EXTENSION plpgsql;
 DROP SCHEMA public;
 --
@@ -110,17 +111,31 @@ COMMENT ON SCHEMA public IS 'standard public schema';
 
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner:
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner:
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
@@ -265,9 +280,10 @@ CREATE TABLE public.conditions (
     id integer NOT NULL,
     puzzle_id integer,
     "order" integer,
-    question_puzzle integer,
+    question_puzzle uuid,
     action_type public.condition_action_type,
-    answer_puzzle integer,
+    answer_puzzle uuid,
+    value integer,
     condition_type public.condition_type,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -379,6 +395,7 @@ ALTER SEQUENCE public.objects_id_seq OWNED BY public.objects.id;
 
 CREATE TABLE public.puzzles (
     id integer NOT NULL,
+    uuid uuid UNIQUE,
     template_id integer,
     section_id integer,
     parent_id integer,
@@ -685,8 +702,8 @@ CREATE TABLE public.validations (
     "order" integer,
     operator_type public.operator_type,
     validation_type public.validation_action_type,
-    left_hand_puzzle integer,
-    right_hand_puzzle integer,
+    left_hand_puzzle uuid,
+    right_hand_puzzle uuid,
     value integer,
     error_message text,
     created_at timestamp without time zone,
@@ -814,7 +831,7 @@ COPY public.answers (id, puzzle_id, answer, answer_type, created_at, updated_at)
 -- Data for Name: conditions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.conditions (id, puzzle_id, "order", question_puzzle, action_type, answer_puzzle, condition_type, created_at, updated_at) FROM stdin;
+COPY public.conditions (id, puzzle_id, "order", question_puzzle, action_type, answer_puzzle, value, condition_type, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -838,7 +855,7 @@ COPY public.objects (id, name, region, branch, address, format, created_at, upda
 -- Data for Name: puzzles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.puzzles (id, template_id, section_id, parent_id, title, description, puzzle_type, "order", answer_type, created_at, updated_at) FROM stdin;
+COPY public.puzzles (id, uuid, template_id, section_id, parent_id, title, description, puzzle_type, "order", answer_type, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -1107,7 +1124,7 @@ ALTER TABLE ONLY public.answers
 --
 
 ALTER TABLE ONLY public.conditions
-    ADD CONSTRAINT conditions_answer_puzzle_fkey FOREIGN KEY (answer_puzzle) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT conditions_answer_puzzle_fkey FOREIGN KEY (answer_puzzle) REFERENCES public.puzzles(uuid);
 
 
 --
@@ -1123,7 +1140,7 @@ ALTER TABLE ONLY public.conditions
 --
 
 ALTER TABLE ONLY public.conditions
-    ADD CONSTRAINT conditions_question_puzzle_fkey FOREIGN KEY (question_puzzle) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT conditions_question_puzzle_fkey FOREIGN KEY (question_puzzle) REFERENCES public.puzzles(uuid);
 
 
 --
@@ -1219,7 +1236,7 @@ ALTER TABLE ONLY public.users
 --
 
 ALTER TABLE ONLY public.validations
-    ADD CONSTRAINT validations_left_hand_puzzle_fkey FOREIGN KEY (left_hand_puzzle) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT validations_left_hand_puzzle_fkey FOREIGN KEY (left_hand_puzzle) REFERENCES public.puzzles(uuid);
 
 
 --
@@ -1235,7 +1252,7 @@ ALTER TABLE ONLY public.validations
 --
 
 ALTER TABLE ONLY public.validations
-    ADD CONSTRAINT validations_right_hand_puzzle_fkey FOREIGN KEY (right_hand_puzzle) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT validations_right_hand_puzzle_fkey FOREIGN KEY (right_hand_puzzle) REFERENCES public.puzzles(uuid);
 
 
 --

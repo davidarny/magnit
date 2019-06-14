@@ -19,15 +19,19 @@ module.exports = {
         },
 
         left_hand_puzzle: {
-            type: "number",
+            type: "string",
+            isUUID: true,
         },
 
         right_hand_puzzle: {
-            type: "number",
+            type: "string",
+            isUUID: true,
+            allowNull: true,
         },
 
         value: {
             type: "number",
+            allowNull: true,
         },
 
         error_message: {

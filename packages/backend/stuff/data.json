@@ -6,25 +6,21 @@
             "title": "Благоустройство",
             "puzzles": [
                 {
-                    "id": "eeda3a44-a95e-4730-bed5-c48a8b2121fe",
                     "order": 0,
                     "puzzle_type": "group",
                     "title": "Основная группа вопросов",
                     "puzzles": [
                         {
-                            "id": "19972a9f-c592-4b7f-a64f-7a8034392586",
                             "order": 0,
                             "title": "Нужна парковка?",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "cea351b9-53cc-4325-8c22-a8448a451f54",
                                     "order": 0,
                                     "title": "Да",
                                     "puzzle_type": "radio_answer"
                                 },
                                 {
-                                    "id": "59ec0a39-e3ff-4cc0-a326-8c5b1836a1a1",
                                     "order": 1,
                                     "title": "Нет",
                                     "puzzle_type": "radio_answer"
@@ -32,19 +28,16 @@
                             ]
                         },
                         {
-                            "id": "58ee9ffd-cdbf-4a52-a43d-4c5f7142057e",
                             "order": 1,
                             "title": "Нужен тротуар?",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "e498d8f5-f156-4134-b5a5-d74d18a06c7a",
                                     "order": 0,
                                     "title": "Да",
                                     "puzzle_type": "radio_answer"
                                 },
                                 {
-                                    "id": "d358086d-8340-49b0-922e-81476d6c6147",
                                     "order": 1,
                                     "title": "Нет",
                                     "puzzle_type": "radio_answer"
@@ -54,31 +47,26 @@
                     ]
                 },
                 {
-                    "id": "faf6cea0-05e1-4577-b09e-3c2b00ff4319",
                     "order": 1,
                     "puzzle_type": "group",
                     "title": "Необходимость парковки",
                     "puzzles": [
                         {
-                            "id": "21db1fb4-732a-423e-b4da-86ee1bc06d8f",
                             "order": 0,
                             "title": "Выберите тип покрытия парковки",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "1a141ec2-ce6d-450d-9b66-f41da8ad041e",
                                     "order": 0,
                                     "title": "Асфальт в один слой",
                                     "puzzle_type": "dropdown_answer"
                                 },
                                 {
-                                    "id": "93cfa0af-0783-483a-8063-947296f36ee6",
                                     "order": 1,
                                     "title": "Асфальт в два слоя",
                                     "puzzle_type": "dropdown_answer"
                                 },
                                 {
-                                    "id": "c34f2e08-39f4-4ec8-b879-8e3f5ca4ee5a",
                                     "order": 2,
                                     "title": "Бортовой камень",
                                     "puzzle_type": "dropdown_answer"
@@ -86,13 +74,11 @@
                             ]
                         },
                         {
-                            "id": "5f22a757-b949-48e8-9989-b698b8ddef74",
                             "order": 1,
                             "title": "Введите длину покрытия парковки",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "c047a25f-6d09-498a-b674-019c99c224f8",
                                     "order": 0,
                                     "puzzle_type": "input_answer",
                                     "answer_type": "number"
@@ -101,34 +87,32 @@
                             "conditions": [
                                 {
                                     "order": 0,
-                                    "question_puzzle": "21db1fb4-732a-423e-b4da-86ee1bc06d8f",
+                                    "question_puzzle": "Выберите тип покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "answer_puzzle": "1a141ec2-ce6d-450d-9b66-f41da8ad041e",
+                                    "answer_puzzle": "Асфальт в один слой",
                                     "condition_type": "or"
                                 },
                                 {
                                     "order": 1,
-                                    "question_puzzle": "21db1fb4-732a-423e-b4da-86ee1bc06d8f",
+                                    "question_puzzle": "Выберите тип покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "answer_puzzle": "93cfa0af-0783-483a-8063-947296f36ee6",
+                                    "answer_puzzle": "Асфальт в два слоя",
                                     "condition_type": "or"
                                 },
                                 {
                                     "order": 2,
-                                    "question_puzzle": "21db1fb4-732a-423e-b4da-86ee1bc06d8f",
+                                    "question_puzzle": "Выберите тип покрытия парковки",
                                     "action_type": "chosen_answer",
-                                    "answer_puzzle": "c34f2e08-39f4-4ec8-b879-8e3f5ca4ee5a"
+                                    "answer_puzzle": "Бортовой камень"
                                 }
                             ]
                         },
                         {
-                            "id": "09cf0415-57ec-4efb-a33e-a7da68faaba6",
                             "order": 2,
                             "title": "Введите площадь объекта",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "f6ad1dd8-8c56-46bd-833d-a8325beb0e0a",
                                     "order": 0,
                                     "puzzle_type": "input_answer",
                                     "answer_type": "number"
@@ -136,13 +120,11 @@
                             ]
                         },
                         {
-                            "id": "b0828257-4687-45de-8863-1aff3d1d0b50",
                             "order": 3,
                             "title": "Введите площадь торгового зала",
                             "puzzle_type": "question",
                             "puzzles": [
                                 {
-                                    "id": "f1c77dcd-95a1-4cea-982f-ba3269365b2d",
                                     "order": 0,
                                     "puzzle_type": "input_answer",
                                     "answer_type": "number"
@@ -151,17 +133,17 @@
                             "validations": [
                                 {
                                     "order": 0,
-                                    "left_hand_puzzle": "09cf0415-57ec-4efb-a33e-a7da68faaba6",
-                                    "operator_type": "more",
+                                    "left_hand_puzzle": "Введите площадь объекта",
+                                    "operator_type": "more_than",
                                     "validation_type": "compare_with_answer",
-                                    "right_hand_puzzle": "b0828257-4687-45de-8863-1aff3d1d0b50",
+                                    "right_hand_puzzle": "Введите площадь торгового зала",
                                     "value": null,
                                     "error_message": "Ошибка! Площадь объекта не может быть больше площади торгового зала"
                                 },
                                 {
                                     "order": 1,
-                                    "left_hand_puzzle": "b0828257-4687-45de-8863-1aff3d1d0b50",
-                                    "operator_type": "less",
+                                    "left_hand_puzzle": "Введите площадь торгового зала",
+                                    "operator_type": "less_then",
                                     "validation_type": "set_value",
                                     "value": 100,
                                     "right_hand_puzzle": null,
@@ -173,9 +155,9 @@
                     "conditions": [
                         {
                             "order": 0,
-                            "question_puzzle": "19972a9f-c592-4b7f-a64f-7a8034392586",
+                            "question_puzzle": "Нужна парковка?",
                             "action_type": "chosen_answer",
-                            "answer_puzzle": "cea351b9-53cc-4325-8c22-a8448a451f54"
+                            "answer_puzzle": "Да"
                         }
                     ]
                 }

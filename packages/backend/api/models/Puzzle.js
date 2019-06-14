@@ -2,6 +2,10 @@ module.exports = {
     tableName: "puzzles",
 
     attributes: {
+        uuid: {
+            type: "string",
+        },
+
         title: {
             type: "string",
             columnType: "text",
