@@ -29,6 +29,7 @@ Table condition {
   question_puzzle int [ref: > puzzle.id]
   action_type condition_action_type
   answer_puzzle int [ref: > puzzle.id]
+  value int
   condition_type condition_type
 }
 
@@ -55,6 +56,11 @@ enum puzzle_type {
 
 enum condition_action_type {
  chosen_answer
+ given_answer
+ equal
+ not_equal
+ more_than
+ less_than
 }
 
 enum validation_action_type {

@@ -38,6 +38,7 @@ module.exports = {
     externals: [externals()],
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
+        modules: ["node_modules", "src"],
     },
     optimization: {
         minimize: isProduction,

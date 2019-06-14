@@ -6,13 +6,13 @@ export default {
     sections: [
         {
             id: uuid(),
-            title: "",
+            title: "Благоустройство",
             description: "",
             order: 1,
             puzzles: [
                 {
                     id: uuid(),
-                    title: "",
+                    title: "Основная группа вопросов",
                     description: "",
                     order: 0,
                     puzzleType: EPuzzleType.GROUP,
@@ -20,9 +20,8 @@ export default {
                         {
                             id: uuid(),
                             puzzleType: EPuzzleType.QUESTION,
-                            title: "",
+                            title: "Нужна парковка?",
                             description: "",
-
                             order: 0,
                             puzzles: [
                                 {
@@ -47,6 +46,6 @@ export default {
         },
     ],
     puzzles: [],
-    title: "",
-    description: "",
+    title: "Ведомость работ",
+    description: "Описание недостатков, которые необходимо устранить",
 };

@@ -183,8 +183,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setFocusedPuzzleChain([...focusedPuzzleChain]);
     }
 
-    function onPuzzleMouseDown(event: React.SyntheticEvent): void {
+    function onPuzzleMouseDown(event: React.SyntheticEvent, id: string): void {
         event.stopPropagation();
+        const focusedPuzzleId = R.head(focusedPuzzleChain);
+        if (id === focusedPuzzleId) {
+            return;
+        }
         setFocusedPuzzleChain([]);
     }
 
@@ -210,7 +214,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 id={template.id}
                 onFocus={onPuzzleFocus.bind(null, template.id)}
                 onBlur={onPuzzleBlur}
-                onMouseDown={onPuzzleMouseDown}
+                onMouseDown={event => onPuzzleMouseDown(event, template.id)}
                 elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
                 <Grid container direction="column">
@@ -221,7 +225,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingRight: theme.spacing(4),
                         })}
                     >
-                        <TextField fullWidth label="Название шаблона" />
+                        <TextField
+                            fullWidth
+                            label="Название шаблона"
+                            defaultValue={template.title}
+                        />
                     </Grid>
                     <Grid
                         item
@@ -230,21 +238,42 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingRight: theme.spacing(4),
                         })}
                     >
-                        <TextField fullWidth label="Описание шаблона (необязательно)" />
+                        <TextField
+                            fullWidth
+                            label="Описание шаблона (необязательно)"
+                            defaultValue={template.description}
+                        />
                     </Grid>
                     <Grid item>
                         <Puzzle
                             puzzles={template.puzzles}
                             index={0}
                             components={{
-                                [EPuzzleType.GROUP]: index => <GroupPuzzle index={index} />,
-                                [EPuzzleType.QUESTION]: index => <QuestionPuzzle index={index} />,
-                                [EPuzzleType.INPUT_ANSWER]: () => <InputAnswerPuzzle />,
+                                [EPuzzleType.GROUP]: index => (
+                                    <GroupPuzzle
+                                        template={template}
+                                        title={template.title}
+                                        description={template.description}
+                                        isFocused={id => id === focusedPuzzleId}
+                                        id={template.id}
+                                        index={index}
+                                    />
+                                ),
+                                [EPuzzleType.QUESTION]: index => (
+                                    <QuestionPuzzle
+                                        title={template.title}
+                                        id={template.id}
+                                        index={index}
+                                    />
+                                ),
+                                [EPuzzleType.INPUT_ANSWER]: index => (
+                                    <InputAnswerPuzzle id={template.id} index={index} />
+                                ),
                             }}
                             onFocus={onPuzzleFocus}
-                            onMouseDown={onPuzzleMouseDown}
+                            onMouseDown={event => onPuzzleMouseDown(event, template.id)}
                             onBlur={onPuzzleBlur}
-                            shouldElevatePuzzle={id => id === focusedPuzzleId}
+                            isFocused={id => id === focusedPuzzleId}
                             isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                         />
                     </Grid>
@@ -257,7 +286,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         id={section.id}
                         onFocus={onPuzzleFocus.bind(null, section.id)}
                         onBlur={onPuzzleBlur}
-                        onMouseDown={onPuzzleMouseDown}
+                        onMouseDown={event => onPuzzleMouseDown(event, section.id)}
                     >
                         <div css={theme => ({ margin: theme.spacing(4) })} />
                         <Grid
@@ -267,7 +296,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         >
                             <Grid item>
                                 <Grid container alignItems="flex-end">
-                                    <SectionPuzzle index={index} />
+                                    <SectionPuzzle
+                                        title={section.title}
+                                        id={section.id}
+                                        index={index}
+                                    />
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -282,16 +315,27 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                     puzzles={section.puzzles}
                                     index={index}
                                     components={{
-                                        [EPuzzleType.GROUP]: index => <GroupPuzzle index={index} />,
-                                        [EPuzzleType.QUESTION]: index => (
-                                            <QuestionPuzzle index={index} />
+                                        [EPuzzleType.GROUP]: (index, id, title, description) => (
+                                            <GroupPuzzle
+                                                template={template}
+                                                title={title}
+                                                description={description}
+                                                isFocused={id => id === focusedPuzzleId}
+                                                id={id}
+                                                index={index}
+                                            />
                                         ),
-                                        [EPuzzleType.INPUT_ANSWER]: () => <InputAnswerPuzzle />,
+                                        [EPuzzleType.QUESTION]: (index, id, title) => (
+                                            <QuestionPuzzle title={title} index={index} id={id} />
+                                        ),
+                                        [EPuzzleType.INPUT_ANSWER]: (index, id) => (
+                                            <InputAnswerPuzzle index={index} id={id} />
+                                        ),
                                     }}
                                     onFocus={onPuzzleFocus}
-                                    onMouseDown={onPuzzleMouseDown}
+                                    onMouseDown={(event, id) => onPuzzleMouseDown(event, id)}
                                     onBlur={onPuzzleBlur}
-                                    shouldElevatePuzzle={id => id === focusedPuzzleId}
+                                    isFocused={id => id === focusedPuzzleId}
                                     isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                                 />
                             </Paper>

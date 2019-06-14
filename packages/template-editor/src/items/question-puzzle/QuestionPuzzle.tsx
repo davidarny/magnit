@@ -5,11 +5,15 @@ import { ISpecificPuzzleProps } from "entities";
 import { Grid, TextField, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 
-export const QuestionPuzzle: React.FC<ISpecificPuzzleProps> = props => {
+interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
+    title: string;
+}
+
+export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index }) => {
     return (
         <Grid container alignItems="flex-end">
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
-                <Typography variant="body1">{props.index + 1}.</Typography>
+                <Typography variant="body1">{index + 1}.</Typography>
             </Grid>
             <Grid
                 item
@@ -17,7 +21,7 @@ export const QuestionPuzzle: React.FC<ISpecificPuzzleProps> = props => {
                     flex-grow: 1;
                 `}
             >
-                <TextField fullWidth label="Название вопроса" />
+                <TextField fullWidth label="Название вопроса" defaultValue={title} />
             </Grid>
         </Grid>
     );

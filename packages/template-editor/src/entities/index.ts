@@ -32,9 +32,10 @@ interface IWithDescription {
     description: string;
 }
 
-interface ICondition extends IOrdered {
-    parentPuzzle: IPuzzle["id"];
-    childPuzzle: IPuzzle["id"];
+export interface ICondition extends IOrdered, IWithId {
+    questionPuzzle: IPuzzle["id"];
+    answerPuzzle: IPuzzle["id"];
+    value: string;
     actionType: EActionType;
     conditionType: EConditionType;
 }
@@ -66,6 +67,7 @@ export interface IPuzzle
 }
 
 export interface ISpecificPuzzleProps {
+    id: string;
     index: number;
 }
 

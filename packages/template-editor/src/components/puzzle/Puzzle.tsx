@@ -12,18 +12,23 @@ interface IPuzzleProps {
     puzzles: IPuzzle[];
     index: number;
     components: {
-        [EPuzzleType.GROUP](index: number): ReactNode;
-        [EPuzzleType.QUESTION](index: number): ReactNode;
-        [EPuzzleType.INPUT_ANSWER](index: number): ReactNode;
+        [EPuzzleType.GROUP](
+            index: number,
+            id: string,
+            title: string,
+            description: string
+        ): ReactNode;
+        [EPuzzleType.QUESTION](index: number, id: string, title: string): ReactNode;
+        [EPuzzleType.INPUT_ANSWER](index: number, id: string): ReactNode;
     };
 
-    shouldElevatePuzzle(id: string): boolean;
+    isFocused(id: string): boolean;
 
     isInFocusedChain(id: string): boolean;
 
     onFocus(id: string): void;
 
-    onMouseDown(event: React.SyntheticEvent): void;
+    onMouseDown(event: React.SyntheticEvent, id: string): void;
 
     onBlur(event: React.SyntheticEvent): void;
 }
@@ -44,7 +49,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 id={puzzle.id}
                                 onFocus={onFocus}
                                 onBlur={props.onBlur}
-                                onMouseDown={props.onMouseDown}
+                                onMouseDown={event => props.onMouseDown(event, puzzle.id)}
                                 css={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
@@ -53,17 +58,22 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginBottom: theme.spacing(
                                         index === puzzles.length - 1 ? 4 : 0
                                     ),
-                                    zIndex: props.shouldElevatePuzzle(puzzle.id)
+                                    zIndex: props.isFocused(puzzle.id)
                                         ? 1300
                                         : props.isInFocusedChain(puzzle.id)
                                         ? 1200
                                         : 0,
                                 })}
                                 square={true}
-                                elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}
+                                elevation={props.isFocused(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.GROUP](index)}
+                                    {props.components[EPuzzleType.GROUP](
+                                        index,
+                                        puzzle.id,
+                                        puzzle.title,
+                                        puzzle.description
+                                    )}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </Paper>
@@ -82,16 +92,20 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginBottom: theme.spacing(
                                         index === puzzles.length - 1 ? 0 : 2
                                     ),
-                                    zIndex: props.shouldElevatePuzzle(puzzle.id) ? 1300 : 0,
+                                    zIndex: props.isFocused(puzzle.id) ? 1300 : 0,
                                 })}
-                                onMouseDown={props.onMouseDown}
+                                onMouseDown={event => props.onMouseDown(event, puzzle.id)}
                                 onFocus={onFocus}
                                 onBlur={props.onBlur}
                                 square={true}
-                                elevation={props.shouldElevatePuzzle(puzzle.id) ? 16 : 0}
+                                elevation={props.isFocused(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.QUESTION](index)}
+                                    {props.components[EPuzzleType.QUESTION](
+                                        index,
+                                        puzzle.id,
+                                        puzzle.title
+                                    )}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </Paper>
@@ -107,7 +121,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 })}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.INPUT_ANSWER](index)}
+                                    {props.components[EPuzzleType.INPUT_ANSWER](index, puzzle.id)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>

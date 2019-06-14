@@ -3,8 +3,9 @@
 import * as React from "react";
 import { Grid, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
+import { ISpecificPuzzleProps } from "entities";
 
-export const InputAnswerPuzzle: React.FC = () => {
+export const InputAnswerPuzzle: React.FC<ISpecificPuzzleProps> = () => {
     return (
         <Grid container alignItems="flex-end">
             <Grid
