@@ -305,7 +305,7 @@ function getActionLiteral(actionType: EActionType): string {
 
 function getConditionLiteral(index: number, conditionType: EConditionType): string {
     if (index === 0) {
-        return "ЕСли";
+        return "Если";
     }
     return {
         [EConditionType.AND]: "И",
