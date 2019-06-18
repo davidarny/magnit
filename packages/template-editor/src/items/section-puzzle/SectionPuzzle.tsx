@@ -13,7 +13,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({ title, index }) =
     return (
         <Grid container alignItems="flex-end">
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
-                <Typography variant="subtitle2">Раздел {index + 1}.</Typography>
+                <Typography variant="h5">Раздел {index + 2}.</Typography>
             </Grid>
             <Grid
                 item

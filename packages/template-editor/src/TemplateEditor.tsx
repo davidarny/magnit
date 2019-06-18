@@ -252,8 +252,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                 [EPuzzleType.GROUP]: index => (
                                     <GroupPuzzle
                                         template={template}
-                                        title={template.title}
-                                        description={template.description}
                                         isFocused={id => id === focusedPuzzleId}
                                         id={template.id}
                                         index={index}
@@ -315,11 +313,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                     puzzles={section.puzzles}
                                     index={index}
                                     components={{
-                                        [EPuzzleType.GROUP]: (index, id, title, description) => (
+                                        [EPuzzleType.GROUP]: (index, id) => (
                                             <GroupPuzzle
                                                 template={template}
-                                                title={title}
-                                                description={description}
                                                 isFocused={id => id === focusedPuzzleId}
                                                 id={id}
                                                 index={index}

@@ -23,6 +23,7 @@ const env = {
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const isProduction = process.env.NODE_ENV === "production";
+const fastBuildEnabled = !!process.env.FAST_BUILD_ENABLED;
 
 module.exports = {
     entry: {
@@ -41,10 +42,10 @@ module.exports = {
         modules: ["node_modules", "src"],
     },
     optimization: {
-        minimize: isProduction,
-        removeAvailableModules: isProduction,
-        removeEmptyChunks: isProduction,
-        splitChunks: isProduction && {},
+        minimize: isProduction && !fastBuildEnabled,
+        removeAvailableModules: isProduction && !fastBuildEnabled,
+        removeEmptyChunks: isProduction && !fastBuildEnabled,
+        splitChunks: isProduction && !fastBuildEnabled && {},
     },
     module: {
         rules: [
@@ -79,10 +80,11 @@ module.exports = {
         new HardSourceWebpackPlugin(),
         new PeerDepsExternalsPlugin(),
         new webpack.DefinePlugin(env.stringified),
-        new ForkTsCheckerWebpackPlugin({
-            watch: isDevelopment && "./src",
-            checkSyntacticErrors: true,
-        }),
+        !fastBuildEnabled &&
+            new ForkTsCheckerWebpackPlugin({
+                watch: isDevelopment && "./src",
+                checkSyntacticErrors: true,
+            }),
     ].filter(Boolean),
     node: {
         dgram: "empty",

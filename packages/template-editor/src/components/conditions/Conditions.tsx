@@ -87,122 +87,95 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
     }
 
     return (
-        <Grid container direction="column">
+        <Grid container spacing={2}>
             {conditions.map((condition, index) => {
                 const getConditionType = R.prop("conditionType");
                 const getActionType = R.prop("actionType");
                 const getQuestionPuzzleType = R.path<EPuzzleType>(["questionPuzzle", "puzzleType"]);
 
                 return (
-                    <Grid item key={index}>
-                        <Grid
-                            container
-                            spacing={4}
-                            alignItems={"center"}
-                            css={css`
-                                position: relative;
-                            `}
-                        >
-                            <Grid item>
-                                {getConditionLiteral(index, getConditionType(condition))}
-                            </Grid>
+                    <React.Fragment key={condition.id}>
+                        <Grid xs={2} item>
                             <Grid
-                                item
+                                container
+                                alignItems="center"
                                 css={css`
-                                    flex-grow: 1;
+                                    height: 100%;
                                 `}
                             >
-                                <FormControl fullWidth>
-                                    <InputLabel htmlFor="question-puzzle">
-                                        Выберите вопрос
-                                    </InputLabel>
-                                    <Select
-                                        value={condition.questionPuzzle}
-                                        input={<Input id="question-puzzle" />}
-                                    >
-                                        {questions.length === 0 && (
-                                            <MenuItem>Нет доступных вариантов</MenuItem>
-                                        )}
-                                        {questions.map(questionToChoseFrom => {
-                                            const value = R.prop("id")(questionToChoseFrom);
-                                            const title = R.prop("title")(questionToChoseFrom);
-                                            return (
-                                                <MenuItem key={value} value={value}>
-                                                    {title}
-                                                </MenuItem>
-                                            );
-                                        })}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                            {questions.length !== 0 && (
-                                <React.Fragment>
-                                    <Grid
-                                        item
-                                        css={css`
-                                            flex-grow: 1;
-                                        `}
-                                    >
-                                        <FormControl fullWidth>
-                                            <InputLabel htmlFor="action-type">
-                                                Выберите значение
-                                            </InputLabel>
-                                            <Select
-                                                value={condition.actionType}
-                                                input={<Input id="action-type" />}
-                                            >
-                                                {getActionVariants(
-                                                    getQuestionPuzzleType(condition)!
-                                                )}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid
-                                        item
-                                        css={css`
-                                            flex-grow: 1;
-                                        `}
-                                    >
-                                        {getAnswerPuzzle(
-                                            getActionType(condition),
-                                            condition,
-                                            answers
-                                        )}
-                                    </Grid>
-                                </React.Fragment>
-                            )}
-                            {/* hack to have close button at the end */}
-                            {questions.length === 0 && (
-                                <React.Fragment>
-                                    <Grid
-                                        item
-                                        css={css`
-                                            flex-grow: 1;
-                                        `}
-                                    />
-                                    <Grid
-                                        item
-                                        css={css`
-                                            flex-grow: 1;
-                                        `}
-                                    />
-                                </React.Fragment>
-                            )}
-                            <Grid item>
-                                <IconButton onClick={() => onConditionDelete(condition.id)}>
-                                    <DeleteIcon />
-                                </IconButton>
+                                <Grid item>
+                                    {getConditionLiteral(index, getConditionType(condition))}
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
+                        <Grid item xs={4}>
+                            <FormControl fullWidth>
+                                <InputLabel htmlFor="question-puzzle">Выберите вопрос</InputLabel>
+                                <Select
+                                    value={condition.questionPuzzle}
+                                    input={<Input id="question-puzzle" />}
+                                >
+                                    {questions.length === 0 && (
+                                        <MenuItem>Нет доступных вариантов</MenuItem>
+                                    )}
+                                    {questions.map(questionToChoseFrom => {
+                                        const value = R.prop("id")(questionToChoseFrom);
+                                        const title = R.prop("title")(questionToChoseFrom);
+                                        return (
+                                            <MenuItem key={value} value={value}>
+                                                {title}
+                                            </MenuItem>
+                                        );
+                                    })}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        {questions.length !== 0 && (
+                            <React.Fragment>
+                                <Grid item xs={3}>
+                                    <FormControl fullWidth>
+                                        <InputLabel htmlFor="action-type">
+                                            Выберите значение
+                                        </InputLabel>
+                                        <Select
+                                            value={condition.actionType}
+                                            input={<Input id="action-type" />}
+                                        >
+                                            {getActionVariants(getQuestionPuzzleType(condition)!)}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={2}>
+                                    {getAnswerPuzzle(getActionType(condition), condition, answers)}
+                                </Grid>
+                            </React.Fragment>
+                        )}
+                        <Grid item xs={questions.length !== 0 ? 1 : 6}>
+                            <Grid
+                                container
+                                justify="flex-end"
+                                alignItems="center"
+                                css={css`
+                                    height: 100%;
+                                `}
+                            >
+                                <Grid item>
+                                    <IconButton onClick={() => onConditionDelete(condition.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </React.Fragment>
                 );
             })}
-            <Grid item css={theme => ({ marginTop: theme.spacing(2) })}>
+            <Grid item xs={2}>
                 <Button
                     size="small"
                     css={css`
                         text-transform: none;
                     `}
+                    variant="contained"
                 >
                     + Добавить условие
                 </Button>

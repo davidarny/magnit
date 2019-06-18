@@ -12,12 +12,7 @@ interface IPuzzleProps {
     puzzles: IPuzzle[];
     index: number;
     components: {
-        [EPuzzleType.GROUP](
-            index: number,
-            id: string,
-            title: string,
-            description: string
-        ): ReactNode;
+        [EPuzzleType.GROUP](index: number, id: string): ReactNode;
         [EPuzzleType.QUESTION](index: number, id: string, title: string): ReactNode;
         [EPuzzleType.INPUT_ANSWER](index: number, id: string): ReactNode;
     };
@@ -68,12 +63,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 elevation={props.isFocused(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.GROUP](
-                                        index,
-                                        puzzle.id,
-                                        puzzle.title,
-                                        puzzle.description
-                                    )}
+                                    {props.components[EPuzzleType.GROUP](index, puzzle.id)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </Paper>
