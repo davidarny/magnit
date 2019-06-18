@@ -12,15 +12,36 @@ export default {
             puzzles: [
                 {
                     id: uuid(),
-                    title: "Основная группа вопросов",
+                    puzzleType: EPuzzleType.QUESTION,
+                    title: "Нужна парковка?",
                     description: "",
                     order: 0,
+                    puzzles: [
+                        {
+                            id: uuid(),
+                            puzzleType: EPuzzleType.INPUT_ANSWER,
+                            title: "",
+                            description: "",
+                            order: 0,
+                            puzzles: [],
+                            conditions: [],
+                            validations: [],
+                        },
+                    ],
+                    conditions: [],
+                    validations: [],
+                },
+                {
+                    id: uuid(),
+                    title: "",
+                    description: "",
+                    order: 1,
                     puzzleType: EPuzzleType.GROUP,
                     puzzles: [
                         {
                             id: uuid(),
                             puzzleType: EPuzzleType.QUESTION,
-                            title: "Нужна парковка?",
+                            title: "Размеры парковки",
                             description: "",
                             order: 0,
                             puzzles: [

@@ -71,10 +71,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return;
             }
             // do not allow to add question in section, question, answer, etc...
-            if (
-                !("puzzles" in value && "sections" in value) &&
-                !whitelist.includes(value.puzzleType)
-            ) {
+            if ("puzzleType" in value && !whitelist.includes(value.puzzleType)) {
                 return;
             }
             const puzzle = value as IPuzzle;
