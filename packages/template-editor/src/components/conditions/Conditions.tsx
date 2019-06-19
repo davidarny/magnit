@@ -79,7 +79,7 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     // if puzzle is one of answers types
                     // then it's allowed to be selected as an answerPuzzle
                     const allowedPuzzleTypes = [
-                        EPuzzleType.INPUT_ANSWER,
+                        EPuzzleType.TEXT_ANSWER,
                         EPuzzleType.RADIO_ANSWER,
                         EPuzzleType.DROPDOWN_ANSWER,
                     ];
@@ -252,7 +252,7 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
 
 function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
     switch (puzzleType) {
-        case EPuzzleType.INPUT_ANSWER:
+        case EPuzzleType.TEXT_ANSWER:
             return [
                 <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
                     {getActionLiteral(EActionType.EQUAL)}

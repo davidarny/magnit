@@ -19,7 +19,7 @@ export default {
                     puzzles: [
                         {
                             id: uuid(),
-                            puzzleType: EPuzzleType.INPUT_ANSWER,
+                            puzzleType: EPuzzleType.TEXT_ANSWER,
                             title: "",
                             description: "",
                             order: 0,
@@ -47,7 +47,7 @@ export default {
                             puzzles: [
                                 {
                                     id: uuid(),
-                                    puzzleType: EPuzzleType.INPUT_ANSWER,
+                                    puzzleType: EPuzzleType.TEXT_ANSWER,
                                     title: "",
                                     description: "",
                                     order: 0,

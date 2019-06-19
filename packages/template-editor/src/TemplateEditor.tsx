@@ -81,7 +81,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzles: [
                     {
                         id: uuid(),
-                        puzzleType: EPuzzleType.INPUT_ANSWER,
+                        puzzleType: EPuzzleType.TEXT_ANSWER,
                         title: ETerminals.EMPTY,
                         description: ETerminals.EMPTY,
                         order: 0,
@@ -269,7 +269,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                         onTemplateChange={onTemplateChange}
                                     />
                                 ),
-                                [EPuzzleType.INPUT_ANSWER]: index => (
+                                [EPuzzleType.TEXT_ANSWER]: index => (
                                     <InputAnswerPuzzle id={template.id} index={index} />
                                 ),
                             }}
@@ -337,7 +337,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                                 onTemplateChange={onTemplateChange}
                                             />
                                         ),
-                                        [EPuzzleType.INPUT_ANSWER]: (index, id) => (
+                                        [EPuzzleType.TEXT_ANSWER]: (index, id) => (
                                             <InputAnswerPuzzle index={index} id={id} />
                                         ),
                                     }}
