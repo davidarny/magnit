@@ -90,10 +90,26 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
 
     function onConditionChange(id: string, nextCondition: Partial<ICondition>): void {
         const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
-        const prevCondition = conditions[changedConditionIdx];
-        const nextConditions = conditions.splice(changedConditionIdx, 1);
-        nextConditions[changedConditionIdx] = { ...prevCondition, ...nextCondition };
-        setConditions(nextConditions);
+        conditions[changedConditionIdx] = { ...conditions[changedConditionIdx], ...nextCondition };
+        setConditions([...conditions]);
+    }
+
+    function onAddCondition(): void {
+        if (questions.length === 0 || !conditions.some(condition => !!condition.questionPuzzle)) {
+            return;
+        }
+        const getQuestionPuzzle = R.prop("questionPuzzle");
+        const conditionsHead = R.head(conditions) || { questionPuzzle: "" };
+        conditions.push({
+            id: uuid(),
+            order: 0,
+            questionPuzzle: getQuestionPuzzle(conditionsHead),
+            answerPuzzle: "",
+            value: "",
+            actionType: "" as EActionType,
+            conditionType: "" as EConditionType,
+        });
+        setConditions([...conditions]);
     }
 
     return (
@@ -125,36 +141,41 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
 
                 const getConditionType = R.prop("conditionType");
                 const getActionType = R.prop("actionType");
-                const getQuestionPuzzleType = R.path<EPuzzleType>(["questionPuzzle", "puzzleType"]);
+                const getAnswerPuzzleType = R.prop("puzzleType");
+                const answersHead = R.head(answers) || { puzzleType: "" as EPuzzleType };
 
                 return (
                     <React.Fragment key={condition.id}>
-                        <Grid xs={2} item>
+                        <Grid xs={index === 0 ? 2 : 6} item>
                             {getConditionLiteral(index, getConditionType(condition))}
                         </Grid>
-                        <Grid item xs={4}>
-                            <FormControl fullWidth>
-                                <InputLabel htmlFor="question-puzzle">Выберите вопрос</InputLabel>
-                                <Select
-                                    value={condition.questionPuzzle || ""}
-                                    input={<Input id="question-puzzle" />}
-                                    onChange={onQuestionPuzzleChange}
-                                >
-                                    {questions.length === 0 && (
-                                        <MenuItem>Нет доступных вариантов</MenuItem>
-                                    )}
-                                    {questions.map(questionToChoseFrom => {
-                                        const value = R.prop("id")(questionToChoseFrom);
-                                        const title = R.prop("title")(questionToChoseFrom);
-                                        return (
-                                            <MenuItem key={value} value={value}>
-                                                {title}
-                                            </MenuItem>
-                                        );
-                                    })}
-                                </Select>
-                            </FormControl>
-                        </Grid>
+                        {index === 0 && (
+                            <Grid item xs={4}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="question-puzzle">
+                                        Выберите вопрос
+                                    </InputLabel>
+                                    <Select
+                                        value={condition.questionPuzzle || ""}
+                                        input={<Input id="question-puzzle" />}
+                                        onChange={onQuestionPuzzleChange}
+                                    >
+                                        {questions.length === 0 && (
+                                            <MenuItem>Нет доступных вариантов</MenuItem>
+                                        )}
+                                        {questions.map(questionToChoseFrom => {
+                                            const value = R.prop("id")(questionToChoseFrom);
+                                            const title = R.prop("title")(questionToChoseFrom);
+                                            return (
+                                                <MenuItem key={value} value={value}>
+                                                    {title}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
                         {!!condition.questionPuzzle && (
                             <React.Fragment>
                                 <Grid item xs={3}>
@@ -167,7 +188,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                             input={<Input id="action-type" />}
                                             onChange={onActionTypeChange}
                                         >
-                                            {getActionVariants(getQuestionPuzzleType(condition)!)}
+                                            {getActionVariants(getAnswerPuzzleType(answersHead))}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -204,6 +225,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                         text-transform: none;
                     `}
                     variant="contained"
+                    onClick={onAddCondition}
                 >
                     + Добавить условие
                 </Button>
