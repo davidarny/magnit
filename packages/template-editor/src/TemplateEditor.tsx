@@ -256,6 +256,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                 ),
                                 [EPuzzleType.QUESTION]: index => (
                                     <QuestionPuzzle
+                                        template={template}
+                                        isFocused={id => id === focusedPuzzleId}
                                         title={template.title}
                                         id={template.id}
                                         index={index}
@@ -319,7 +321,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                             />
                                         ),
                                         [EPuzzleType.QUESTION]: (index, id, title) => (
-                                            <QuestionPuzzle title={title} index={index} id={id} />
+                                            <QuestionPuzzle
+                                                template={template}
+                                                isFocused={id => id === focusedPuzzleId}
+                                                title={title}
+                                                index={index}
+                                                id={id}
+                                            />
                                         ),
                                         [EPuzzleType.INPUT_ANSWER]: (index, id) => (
                                             <InputAnswerPuzzle index={index} id={id} />
