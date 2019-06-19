@@ -9,6 +9,13 @@ module.exports = {
         title: {
             type: "string",
             columnType: "text",
+            allowNull: true,
+        },
+
+        description: {
+            type: "string",
+            columnType: "text",
+            allowNull: true,
         },
 
         template_id: {

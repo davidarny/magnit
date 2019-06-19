@@ -33,12 +33,12 @@ module.exports = {
                 template = JSON.parse(template);
             }
 
-            if (template.sections) {
-                const newTemplate = await Template.create({
-                    title: template.title,
-                    description: template.description,
-                }).fetch();
+            const newTemplate = await Template.create({
+                title: template.title,
+                description: template.description,
+            }).fetch();
 
+            if (template.sections) {
                 for (let i = 0; i < template.sections.length; i++) {
                     let section = template.sections[i];
 
@@ -56,10 +56,13 @@ module.exports = {
                         null
                     );
                 }
-            } else if (template.puzzles) {
             }
 
-            return exits.success({ success: 1, message: "Ok" });
+            if (template.puzzles) {
+                await sails.helpers.savePuzzles(template.puzzles, newTemplate.id, null, null);
+            }
+
+            return exits.success({ success: 1, template_id: newTemplate.id });
         } catch (err) {
             console.log(err);
             return exits.serverError();

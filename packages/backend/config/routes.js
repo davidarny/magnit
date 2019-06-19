@@ -10,4 +10,5 @@
 
 module.exports.routes = {
     "POST     /v1/templates": "v1/admin/create-template",
+    "GET      /v1/templates/:id": "v1/admin/get-template",
 };
