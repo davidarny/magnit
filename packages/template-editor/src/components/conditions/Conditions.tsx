@@ -109,7 +109,10 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
     }
 
     function onAddCondition(): void {
-        if (questions.length === 0 || !conditions.some(condition => !!condition.questionPuzzle)) {
+        if (
+            questions.length === 0 ||
+            (conditions.length !== 0 && !conditions.some(condition => !!condition.questionPuzzle))
+        ) {
             return;
         }
         const getQuestionPuzzle = R.prop("questionPuzzle");
