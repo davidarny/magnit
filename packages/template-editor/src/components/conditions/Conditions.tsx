@@ -78,12 +78,12 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     }
                     // if puzzle is one of answers types
                     // then it's allowed to be selected as an answerPuzzle
-                    const allowedPuzzleTypes = [
-                        EPuzzleType.TEXT_ANSWER,
-                        EPuzzleType.RADIO_ANSWER,
-                        EPuzzleType.DROPDOWN_ANSWER,
+                    const excludedPuzzleTypes = [
+                        EPuzzleType.GROUP,
+                        EPuzzleType.QUESTION,
+                        EPuzzleType.UPLOAD_FILES,
                     ];
-                    if (allowedPuzzleTypes.includes(puzzle.puzzleType)) {
+                    if (!excludedPuzzleTypes.includes(puzzle.puzzleType)) {
                         answers.push(puzzle);
                         return;
                     }
@@ -159,7 +159,16 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                 const getConditionType = R.prop("conditionType");
                 const getActionType = R.prop("actionType");
                 const getAnswerPuzzleType = R.prop("puzzleType");
-                const answersHead = R.head(answers) || {
+                const questionAnswers = answers.filter(answer => {
+                    const question = questions.find(
+                        question => question.id === condition.questionPuzzle
+                    );
+                    if (!question) {
+                        return false;
+                    }
+                    return question.puzzles.some(puzzle => puzzle.id === answer.id);
+                });
+                const questionAnswersHead = R.head(questionAnswers) || {
                     puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
                 };
 
@@ -207,7 +216,9 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                                             input={<Input id="action-type" />}
                                             onChange={onActionTypeChange}
                                         >
-                                            {getActionVariants(getAnswerPuzzleType(answersHead))}
+                                            {getActionVariants(
+                                                getAnswerPuzzleType(questionAnswersHead)
+                                            )}
                                         </Select>
                                     </FormControl>
                                 </Grid>
@@ -256,6 +267,8 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
 function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
     switch (puzzleType) {
         case EPuzzleType.TEXT_ANSWER:
+        case EPuzzleType.NUMERIC_ANSWER:
+        case EPuzzleType.DATE_ANSWER:
             return [
                 <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
                     {getActionLiteral(EActionType.EQUAL)}
@@ -272,35 +285,14 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
             ];
         case EPuzzleType.DROPDOWN_ANSWER:
         case EPuzzleType.RADIO_ANSWER:
+        case EPuzzleType.CHECKBOX_ANSWER:
             return [
                 <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
                     {getActionLiteral(EActionType.CHOSEN_ANSWER)}
-                </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
-                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
                 </MenuItem>,
             ];
         default:
-            return [
-                <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
-                    {getActionLiteral(EActionType.EQUAL)}
-                </MenuItem>,
-                <MenuItem key={EActionType.LESS_THAN} value={EActionType.LESS_THAN}>
-                    {getActionLiteral(EActionType.LESS_THAN)}
-                </MenuItem>,
-                <MenuItem key={EActionType.MORE_THAN} value={EActionType.MORE_THAN}>
-                    {getActionLiteral(EActionType.MORE_THAN)}
-                </MenuItem>,
-                <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
-                    {getActionLiteral(EActionType.NOT_EQUAL)}
-                </MenuItem>,
-                <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
-                    {getActionLiteral(EActionType.CHOSEN_ANSWER)}
-                </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
-                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
-                </MenuItem>,
-            ];
+            return [];
     }
 }
 

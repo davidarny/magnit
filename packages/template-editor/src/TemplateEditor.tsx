@@ -14,6 +14,7 @@ import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import * as R from "ramda";
 import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
+import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -276,6 +277,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                 [EPuzzleType.NUMERIC_ANSWER]: index => (
                                     <NumericAnswerPuzzle id={template.id} index={index} />
                                 ),
+                                [EPuzzleType.RADIO_ANSWER]: (index, id) => (
+                                    <RadioAnswerPuzzle
+                                        id={id}
+                                        index={index}
+                                        template={template}
+                                        title={template.title}
+                                        onTemplateChange={onTemplateChange}
+                                    />
+                                ),
                             }}
                             onFocus={onPuzzleFocus}
                             onMouseDown={event => onPuzzleMouseDown(event, template.id)}
@@ -346,6 +356,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                         ),
                                         [EPuzzleType.NUMERIC_ANSWER]: (index, id) => (
                                             <NumericAnswerPuzzle id={id} index={index} />
+                                        ),
+                                        [EPuzzleType.RADIO_ANSWER]: (index, id, title) => (
+                                            <RadioAnswerPuzzle
+                                                template={template}
+                                                title={title}
+                                                onTemplateChange={onTemplateChange}
+                                                id={id}
+                                                index={index}
+                                            />
                                         ),
                                     }}
                                     onFocus={onPuzzleFocus}

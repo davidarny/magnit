@@ -45,6 +45,8 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
             if (!("id" in puzzle) || puzzle.id !== id) {
                 return;
             }
+            // set initial answerType based on
+            // first element of question children
             const childrenHeadPuzzle = R.head(puzzle.puzzles) || {
                 puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
             };
@@ -57,7 +59,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
         setConditionsEnabled(event.target.checked);
     }
 
-    function onQuestionTypeChange(event: TChangeEvent): void {
+    function onAnswerTypeChange(event: TChangeEvent): void {
         traverse(props.template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
@@ -66,12 +68,22 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
             if (!("id" in puzzle) || puzzle.id !== id) {
                 return;
             }
+            if (!puzzle.puzzles.length) {
+                return;
+            }
+            // set changed puzzle type of question children
+            // and strip it's length to 1
+            puzzle.puzzles.length = 1;
             puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
-                childPuzzle.puzzleType = event.target.value as EPuzzleType;
-                return { ...childPuzzle };
+                return {
+                    ...childPuzzle,
+                    puzzleType: event.target.value as EPuzzleType,
+                    title: "",
+                };
             });
         });
         props.onTemplateChange({ ...props.template });
+        setAnswersType(event.target.value as EPuzzleType);
     }
 
     return (
@@ -98,7 +110,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
                             <Select
                                 value={answersType}
                                 input={<Input id="question-puzzle-type" />}
-                                onChange={onQuestionTypeChange}
+                                onChange={onAnswerTypeChange}
                             >
                                 <MenuItem value={EPuzzleType.TEXT_ANSWER}>Текстовое поле</MenuItem>
                                 <MenuItem value={EPuzzleType.NUMERIC_ANSWER}>

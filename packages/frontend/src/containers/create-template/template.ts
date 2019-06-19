@@ -19,8 +19,18 @@ export default {
                     puzzles: [
                         {
                             id: uuid(),
-                            puzzleType: EPuzzleType.TEXT_ANSWER,
-                            title: "",
+                            puzzleType: EPuzzleType.RADIO_ANSWER,
+                            title: "Да",
+                            description: "",
+                            order: 0,
+                            puzzles: [],
+                            conditions: [],
+                            validations: [],
+                        },
+                        {
+                            id: uuid(),
+                            puzzleType: EPuzzleType.RADIO_ANSWER,
+                            title: "Нет",
                             description: "",
                             order: 0,
                             puzzles: [],
@@ -47,7 +57,7 @@ export default {
                             puzzles: [
                                 {
                                     id: uuid(),
-                                    puzzleType: EPuzzleType.TEXT_ANSWER,
+                                    puzzleType: EPuzzleType.NUMERIC_ANSWER,
                                     title: "",
                                     description: "",
                                     order: 0,
