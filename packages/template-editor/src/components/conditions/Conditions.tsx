@@ -97,11 +97,29 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
     }
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="flex-end">
             {conditions.map((condition, index) => {
-                function onQuestionPuzzleChange(event: TChangeEvent) {
+                function onQuestionPuzzleChange(event: TChangeEvent): void {
                     onConditionChange(condition.id, {
                         questionPuzzle: event.target.value as string,
+                    });
+                }
+
+                function onActionTypeChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        actionType: event.target.value as EActionType,
+                    });
+                }
+
+                function onAnswerPuzzleChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        answerPuzzle: event.target.value as string,
+                    });
+                }
+
+                function onValueChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        value: event.target.value as string,
                     });
                 }
 
@@ -112,23 +130,13 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                 return (
                     <React.Fragment key={condition.id}>
                         <Grid xs={2} item>
-                            <Grid
-                                container
-                                alignItems="center"
-                                css={css`
-                                    height: 100%;
-                                `}
-                            >
-                                <Grid item>
-                                    {getConditionLiteral(index, getConditionType(condition))}
-                                </Grid>
-                            </Grid>
+                            {getConditionLiteral(index, getConditionType(condition))}
                         </Grid>
                         <Grid item xs={4}>
                             <FormControl fullWidth>
                                 <InputLabel htmlFor="question-puzzle">Выберите вопрос</InputLabel>
                                 <Select
-                                    value={condition.questionPuzzle}
+                                    value={condition.questionPuzzle || ""}
                                     input={<Input id="question-puzzle" />}
                                     onChange={onQuestionPuzzleChange}
                                 >
@@ -147,7 +155,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                 </Select>
                             </FormControl>
                         </Grid>
-                        {questions.length !== 0 && (
+                        {!!condition.questionPuzzle && (
                             <React.Fragment>
                                 <Grid item xs={3}>
                                     <FormControl fullWidth>
@@ -155,27 +163,30 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                             Выберите значение
                                         </InputLabel>
                                         <Select
-                                            value={condition.actionType}
+                                            value={condition.actionType || ""}
                                             input={<Input id="action-type" />}
+                                            onChange={onActionTypeChange}
                                         >
                                             {getActionVariants(getQuestionPuzzleType(condition)!)}
                                         </Select>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={2}>
-                                    {getAnswerPuzzle(getActionType(condition), condition, answers)}
+                                    {getAnswerPuzzle(
+                                        getActionType(condition),
+                                        condition,
+                                        answers,
+                                        condition.value
+                                    )(
+                                        getActionType(condition) === EActionType.CHOSEN_ANSWER
+                                            ? onAnswerPuzzleChange
+                                            : onValueChange
+                                    )}
                                 </Grid>
                             </React.Fragment>
                         )}
-                        <Grid item xs={questions.length !== 0 ? 1 : 6}>
-                            <Grid
-                                container
-                                justify="flex-end"
-                                alignItems="center"
-                                css={css`
-                                    height: 100%;
-                                `}
-                            >
+                        <Grid item xs={!!condition.questionPuzzle ? 1 : 6}>
+                            <Grid container justify="flex-end">
                                 <Grid item>
                                     <IconButton onClick={() => onConditionDelete(condition.id)}>
                                         <DeleteIcon />
@@ -205,43 +216,47 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
     switch (puzzleType) {
         case EPuzzleType.INPUT_ANSWER:
             return [
-                <MenuItem key={EActionType.EQUAL}>{getActionLiteral(EActionType.EQUAL)}</MenuItem>,
-                <MenuItem key={EActionType.LESS_THAN}>
+                <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
+                    {getActionLiteral(EActionType.EQUAL)}
+                </MenuItem>,
+                <MenuItem key={EActionType.LESS_THAN} value={EActionType.LESS_THAN}>
                     {getActionLiteral(EActionType.LESS_THAN)}
                 </MenuItem>,
-                <MenuItem key={EActionType.MORE_THAN}>
+                <MenuItem key={EActionType.MORE_THAN} value={EActionType.MORE_THAN}>
                     {getActionLiteral(EActionType.MORE_THAN)}
                 </MenuItem>,
-                <MenuItem key={EActionType.NOT_EQUAL}>
+                <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
                     {getActionLiteral(EActionType.NOT_EQUAL)}
                 </MenuItem>,
             ];
         case EPuzzleType.DROPDOWN_ANSWER:
         case EPuzzleType.RADIO_ANSWER:
             return [
-                <MenuItem key={EActionType.CHOSEN_ANSWER}>
+                <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
                     {getActionLiteral(EActionType.CHOSEN_ANSWER)}
                 </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER}>
+                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
                     {getActionLiteral(EActionType.GIVEN_ANSWER)}
                 </MenuItem>,
             ];
         default:
             return [
-                <MenuItem key={EActionType.EQUAL}>{getActionLiteral(EActionType.EQUAL)}</MenuItem>,
-                <MenuItem key={EActionType.LESS_THAN}>
+                <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
+                    {getActionLiteral(EActionType.EQUAL)}
+                </MenuItem>,
+                <MenuItem key={EActionType.LESS_THAN} value={EActionType.LESS_THAN}>
                     {getActionLiteral(EActionType.LESS_THAN)}
                 </MenuItem>,
-                <MenuItem key={EActionType.MORE_THAN}>
+                <MenuItem key={EActionType.MORE_THAN} value={EActionType.MORE_THAN}>
                     {getActionLiteral(EActionType.MORE_THAN)}
                 </MenuItem>,
-                <MenuItem key={EActionType.NOT_EQUAL}>
+                <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
                     {getActionLiteral(EActionType.NOT_EQUAL)}
                 </MenuItem>,
-                <MenuItem key={EActionType.CHOSEN_ANSWER}>
+                <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
                     {getActionLiteral(EActionType.CHOSEN_ANSWER)}
                 </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER}>
+                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
                     {getActionLiteral(EActionType.GIVEN_ANSWER)}
                 </MenuItem>,
             ];
@@ -251,34 +266,55 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
 function getAnswerPuzzle(
     actionType: EActionType,
     condition: ICondition,
-    answers: IPuzzle[]
-): React.ReactNode {
+    answers: IPuzzle[],
+    value: string
+):
+    | ((onValueChange: (event: TChangeEvent) => void) => React.ReactNode)
+    | (() => React.ReactNode)
+    | ((onAnswerPuzzleChange: (event: TChangeEvent) => void) => React.ReactNode) {
     switch (actionType) {
         case EActionType.CHOSEN_ANSWER:
-            return (
-                <FormControl fullWidth>
-                    <InputLabel htmlFor="answer-puzzle">Выберите значение</InputLabel>
-                    <Select value={condition.answerPuzzle} input={<Input id="answer-puzzle" />}>
-                        {answers.map(answer => {
-                            const value = R.prop("id")(answer);
-                            const title = R.prop("title")(answer);
-                            return (
-                                <MenuItem key={value} value={value}>
-                                    {title}
-                                </MenuItem>
-                            );
-                        })}
-                    </Select>
-                </FormControl>
-            );
+            return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
+                return (
+                    <FormControl fullWidth>
+                        <InputLabel htmlFor="answer-puzzle">Выберите ответ</InputLabel>
+                        <Select
+                            onChange={onAnswerPuzzleChange}
+                            value={condition.answerPuzzle || ""}
+                            input={<Input id="answer-puzzle" />}
+                        >
+                            {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
+                            {answers.length !== 0 &&
+                                answers.map(answer => {
+                                    const value = R.prop("id")(answer);
+                                    const title = R.prop("title")(answer);
+                                    return (
+                                        <MenuItem key={value} value={value}>
+                                            {title}
+                                        </MenuItem>
+                                    );
+                                })}
+                        </Select>
+                    </FormControl>
+                );
+            };
         case EActionType.EQUAL:
         case EActionType.LESS_THAN:
         case EActionType.MORE_THAN:
         case EActionType.NOT_EQUAL:
-            return <TextField css={theme => ({ marginTop: theme.spacing(-2) })} label="Ответ" />;
+            return (onValueChange: (event: TChangeEvent) => void) => {
+                return (
+                    <TextField
+                        value={value}
+                        onChange={onValueChange}
+                        css={theme => ({ marginTop: theme.spacing(-2) })}
+                        label="Ответ"
+                    />
+                );
+            };
         case EActionType.GIVEN_ANSWER:
         default:
-            return <React.Fragment />;
+            return () => <React.Fragment />;
     }
 }
 
