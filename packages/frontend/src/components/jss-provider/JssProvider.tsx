@@ -1,4 +1,7 @@
-import React from "react";
+/** @jsx jsx */
+
+import { jsx } from "@emotion/core";
+import * as React from "react";
 import { JssProvider as ReactJssProvider } from "react-jss";
 import { create, GenerateClassName, JSSOptions } from "jss";
 import { createGenerateClassName, jssPreset } from "@material-ui/styles";

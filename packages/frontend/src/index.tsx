@@ -1,16 +1,25 @@
-import React from "react";
+/** @jsx jsx */
+
+import { jsx } from "@emotion/core";
 import ReactDOM from "react-dom";
 import { App } from "containers/app";
 import * as ServiceWorker from "./ServiceWorker";
 import { ThemeProvider } from "emotion-theming";
 import { JssProvider } from "components/jss-provider";
 
-// Allows <></> to be used
-(global as typeof global & { React: typeof React }).React = React;
-
 const theme = {
+    fontSize: {
+        small: "0.5rem",
+        smaller: "0.75rem",
+        normal: "1rem",
+        larger: "1.5rem",
+        large: "2rem",
+    },
+
+    maxTemplateWidth: "1280px",
+
     spacing(times: number = 1) {
-        return times * 10 + "px";
+        return times * 8 + "px";
     },
 };
 
