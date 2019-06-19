@@ -26,6 +26,8 @@ interface IConditionsType {
     template: ITemplate;
 }
 
+type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
+
 export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) => {
     const [conditions, setConditions] = useState<ICondition[]>([
         {
@@ -86,9 +88,23 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
         setConditions([...conditions.filter(condition => condition.id !== id)]);
     }
 
+    function onConditionChange(id: string, nextCondition: Partial<ICondition>): void {
+        const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
+        const prevCondition = conditions[changedConditionIdx];
+        const nextConditions = conditions.splice(changedConditionIdx, 1);
+        nextConditions[changedConditionIdx] = { ...prevCondition, ...nextCondition };
+        setConditions(nextConditions);
+    }
+
     return (
         <Grid container spacing={2}>
             {conditions.map((condition, index) => {
+                function onQuestionPuzzleChange(event: TChangeEvent) {
+                    onConditionChange(condition.id, {
+                        questionPuzzle: event.target.value as string,
+                    });
+                }
+
                 const getConditionType = R.prop("conditionType");
                 const getActionType = R.prop("actionType");
                 const getQuestionPuzzleType = R.path<EPuzzleType>(["questionPuzzle", "puzzleType"]);
@@ -114,6 +130,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                 <Select
                                     value={condition.questionPuzzle}
                                     input={<Input id="question-puzzle" />}
+                                    onChange={onQuestionPuzzleChange}
                                 >
                                     {questions.length === 0 && (
                                         <MenuItem>Нет доступных вариантов</MenuItem>
