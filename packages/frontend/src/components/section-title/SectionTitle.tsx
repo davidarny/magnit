@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx, css } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { Grid, Paper, Typography } from "@material-ui/core";
 
@@ -31,12 +31,7 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
                         paddingRight: theme.spacing(4),
                     })}
                 >
-                    <Grid
-                        item
-                        css={css`
-                            flex-grow: 1;
-                        `}
-                    >
+                    <Grid item xs>
                         <Typography variant="h4" component="div">
                             <span>{title}</span>
                         </Typography>

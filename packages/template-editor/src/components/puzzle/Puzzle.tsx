@@ -15,6 +15,7 @@ interface IPuzzleProps {
         [EPuzzleType.GROUP](index: number, id: string): ReactNode;
         [EPuzzleType.QUESTION](index: number, id: string, title: string): ReactNode;
         [EPuzzleType.TEXT_ANSWER](index: number, id: string): ReactNode;
+        [EPuzzleType.NUMERIC_ANSWER](index: number, id: string): ReactNode;
     };
 
     isFocused(id: string): boolean;
@@ -116,8 +117,23 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>
                         );
+                    case EPuzzleType.NUMERIC_ANSWER:
+                        return (
+                            <div
+                                key={puzzle.id}
+                                css={theme => ({
+                                    marginTop: theme.spacing(2),
+                                    marginBottom: theme.spacing(2),
+                                })}
+                            >
+                                <PuzzleWrapper>
+                                    {props.components[EPuzzleType.NUMERIC_ANSWER](index, puzzle.id)}
+                                </PuzzleWrapper>
+                                <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
+                            </div>
+                        );
                     default:
-                        return null;
+                        return <React.Fragment />;
                 }
             })}
         </React.Fragment>

@@ -9,10 +9,11 @@ import { SectionPuzzle } from "./items/section-puzzle";
 import { GroupPuzzle } from "./items/group-puzzle";
 import { QuestionPuzzle } from "./items/question-puzzle";
 import { EPuzzleType, Puzzle, PuzzleToolbar } from "./components/puzzle";
-import { InputAnswerPuzzle } from "./items/input-answer-puzzle";
+import { TextAnswerPuzzle } from "./items/text-answer-puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import * as R from "ramda";
+import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -270,7 +271,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                     />
                                 ),
                                 [EPuzzleType.TEXT_ANSWER]: index => (
-                                    <InputAnswerPuzzle id={template.id} index={index} />
+                                    <TextAnswerPuzzle id={template.id} index={index} />
+                                ),
+                                [EPuzzleType.NUMERIC_ANSWER]: index => (
+                                    <NumericAnswerPuzzle id={template.id} index={index} />
                                 ),
                             }}
                             onFocus={onPuzzleFocus}
@@ -338,7 +342,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                             />
                                         ),
                                         [EPuzzleType.TEXT_ANSWER]: (index, id) => (
-                                            <InputAnswerPuzzle index={index} id={id} />
+                                            <TextAnswerPuzzle index={index} id={id} />
+                                        ),
+                                        [EPuzzleType.NUMERIC_ANSWER]: (index, id) => (
+                                            <NumericAnswerPuzzle id={id} index={index} />
                                         ),
                                     }}
                                     onFocus={onPuzzleFocus}
