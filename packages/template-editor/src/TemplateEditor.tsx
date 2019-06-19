@@ -3,7 +3,7 @@
 import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { IPuzzle, ITemplate } from "./entities";
+import { ETerminals, IPuzzle, ITemplate } from "./entities";
 import { Grid, Paper, TextField } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { GroupPuzzle } from "./items/group-puzzle";
@@ -24,8 +24,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             id: uuid(),
             sections: [],
             puzzles: [],
-            title: "",
-            description: "",
+            title: ETerminals.EMPTY,
+            description: ETerminals.EMPTY,
         }
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
@@ -82,8 +82,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     {
                         id: uuid(),
                         puzzleType: EPuzzleType.INPUT_ANSWER,
-                        title: "",
-                        description: "",
+                        title: ETerminals.EMPTY,
+                        description: ETerminals.EMPTY,
                         order: 0,
                         puzzles: [],
                         conditions: [],
@@ -92,8 +92,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 ],
                 validations: [],
                 conditions: [],
-                title: "",
-                description: "",
+                title: ETerminals.EMPTY,
+                description: ETerminals.EMPTY,
                 puzzleType: EPuzzleType.QUESTION,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
@@ -135,8 +135,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzles: [...nearPuzzlesToGroup],
                 validations: [],
                 conditions: [],
-                description: "",
-                title: "",
+                description: ETerminals.EMPTY,
+                title: ETerminals.EMPTY,
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
@@ -154,13 +154,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzles: [],
                     validations: [],
                     conditions: [],
-                    description: "",
-                    title: "",
+                    description: ETerminals.EMPTY,
+                    title: ETerminals.EMPTY,
                     puzzleType: EPuzzleType.GROUP,
                     order: 0,
                 },
             ],
-            title: "",
+            title: ETerminals.EMPTY,
             order: (prevSection || { order: -1 }).order + 1,
         });
         setTemplate({ ...template });
@@ -187,6 +187,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             return;
         }
         setFocusedPuzzleChain([]);
+    }
+
+    function onTemplateChange(template: ITemplate) {
+        setTemplate({ ...template });
     }
 
     const focusedPuzzleId = R.head(focusedPuzzleChain);
@@ -252,6 +256,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                         isFocused={id => id === focusedPuzzleId}
                                         id={template.id}
                                         index={index}
+                                        onTemplateChange={onTemplateChange}
                                     />
                                 ),
                                 [EPuzzleType.QUESTION]: index => (
@@ -261,6 +266,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                         title={template.title}
                                         id={template.id}
                                         index={index}
+                                        onTemplateChange={onTemplateChange}
                                     />
                                 ),
                                 [EPuzzleType.INPUT_ANSWER]: index => (
@@ -318,6 +324,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                                 isFocused={id => id === focusedPuzzleId}
                                                 id={id}
                                                 index={index}
+                                                onTemplateChange={onTemplateChange}
                                             />
                                         ),
                                         [EPuzzleType.QUESTION]: (index, id, title) => (
@@ -327,6 +334,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                                 title={title}
                                                 index={index}
                                                 id={id}
+                                                onTemplateChange={onTemplateChange}
                                             />
                                         ),
                                         [EPuzzleType.INPUT_ANSWER]: (index, id) => (

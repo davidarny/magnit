@@ -1,4 +1,5 @@
 export enum EActionType {
+    NONE = "",
     CHOSEN_ANSWER = "chosen_answer",
     GIVEN_ANSWER = "given_answer",
     EQUAL = "equal",

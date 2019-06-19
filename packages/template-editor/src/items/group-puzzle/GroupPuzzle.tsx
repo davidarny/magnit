@@ -10,6 +10,8 @@ interface IGroupPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
 
     isFocused(id: string): boolean;
+
+    onTemplateChange(template: ITemplate): void;
 }
 
 export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }) => {
@@ -29,7 +31,11 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
                 })}
                 item
             >
-                <Conditions puzzleId={id} template={props.template} />
+                <Conditions
+                    puzzleId={id}
+                    template={props.template}
+                    onTemplateChange={props.onTemplateChange}
+                />
             </Grid>
         </Grid>
     );

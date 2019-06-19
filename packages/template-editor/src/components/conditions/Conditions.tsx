@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
@@ -15,38 +16,39 @@ import {
     TextField,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { EActionType, EConditionType, ICondition, IPuzzle, ITemplate } from "entities";
+import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import * as R from "ramda";
 import uuid from "uuid/v4";
 
-interface IConditionsType {
+interface IConditionsProps {
     puzzleId: string;
     template: ITemplate;
+
+    onTemplateChange(template: ITemplate): void;
 }
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) => {
+export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...props }) => {
     const [conditions, setConditions] = useState<ICondition[]>([
         {
             id: uuid(),
             order: 0,
-            questionPuzzle: "",
-            answerPuzzle: "",
-            value: "",
-            actionType: "" as EActionType,
-            conditionType: "" as EConditionType,
+            questionPuzzle: ETerminals.EMPTY,
+            answerPuzzle: ETerminals.EMPTY,
+            value: ETerminals.EMPTY,
+            actionType: EActionType.NONE,
+            conditionType: EConditionType.OR,
         },
     ]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
     useEffect(() => {
-        // traverse template and if found question ov
-        // of prev group or prev question
-        // set childPuzzle & parentPuzzle to those
+        // fill questions and answers initially
+        // by traversing whole template tree
         questions.length = 0;
         answers.length = 0;
         traverse(template, (value: any) => {
@@ -57,17 +59,25 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
             if (!puzzle.puzzles.some(child => child.id === puzzleId)) {
                 return;
             }
-            const index = puzzle.puzzles.findIndex(child => child.id === puzzleId);
+            // find index of current puzzle in a tree
+            const index = puzzle.puzzles.findIndex(item => item.id === puzzleId);
+            // traverse all children of parent puzzle
+            // in order to find all possible siblings above
+            // so that scope of questionPuzzle is always all puzzles above the current
             R.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any) => {
                     if (typeof value !== "object" || !("puzzleType" in value)) {
                         return;
                     }
                     const puzzle = value as IPuzzle;
+                    // if puzzle is question and has non-empty title
+                    // then it's allowed to be selected as a questionPuzzle
                     if (puzzle.puzzleType === EPuzzleType.QUESTION && puzzle.title.length > 0) {
                         questions.push(puzzle);
                         return;
                     }
+                    // if puzzle is one of answers types
+                    // then it's allowed to be selected as an answerPuzzle
                     const allowedPuzzleTypes = [
                         EPuzzleType.INPUT_ANSWER,
                         EPuzzleType.RADIO_ANSWER,
@@ -79,10 +89,14 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                     }
                 });
             });
+            // set conditions of current puzzle
+            puzzle.puzzles[index].conditions = [...conditions];
         });
         setQuestions([...questions]);
         setAnswers([...answers]);
-    }, [questions, template, conditions, puzzleId]);
+        // trigger template update
+        props.onTemplateChange({ ...template });
+    }, [conditions]);
 
     function onConditionDelete(id: string) {
         setConditions([...conditions.filter(condition => condition.id !== id)]);
@@ -99,15 +113,15 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
             return;
         }
         const getQuestionPuzzle = R.prop("questionPuzzle");
-        const conditionsHead = R.head(conditions) || { questionPuzzle: "" };
+        const conditionsHead = R.head(conditions) || { questionPuzzle: ETerminals.EMPTY };
         conditions.push({
             id: uuid(),
-            order: 0,
+            order: conditions.length - 1,
             questionPuzzle: getQuestionPuzzle(conditionsHead),
-            answerPuzzle: "",
-            value: "",
-            actionType: "" as EActionType,
-            conditionType: "" as EConditionType,
+            answerPuzzle: ETerminals.EMPTY,
+            value: ETerminals.EMPTY,
+            actionType: EActionType.NONE,
+            conditionType: EConditionType.OR,
         });
         setConditions([...conditions]);
     }
@@ -142,7 +156,9 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                 const getConditionType = R.prop("conditionType");
                 const getActionType = R.prop("actionType");
                 const getAnswerPuzzleType = R.prop("puzzleType");
-                const answersHead = R.head(answers) || { puzzleType: "" as EPuzzleType };
+                const answersHead = R.head(answers) || {
+                    puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+                };
 
                 return (
                     <React.Fragment key={condition.id}>
@@ -156,7 +172,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                         Выберите вопрос
                                     </InputLabel>
                                     <Select
-                                        value={condition.questionPuzzle || ""}
+                                        value={condition.questionPuzzle || ETerminals.EMPTY}
                                         input={<Input id="question-puzzle" />}
                                         onChange={onQuestionPuzzleChange}
                                     >
@@ -184,7 +200,7 @@ export const Conditions: React.FC<IConditionsType> = ({ puzzleId, template }) =>
                                             Выберите значение
                                         </InputLabel>
                                         <Select
-                                            value={condition.actionType || ""}
+                                            value={condition.actionType || ETerminals.EMPTY}
                                             input={<Input id="action-type" />}
                                             onChange={onActionTypeChange}
                                         >
@@ -302,7 +318,7 @@ function getAnswerPuzzle(
                         <InputLabel htmlFor="answer-puzzle">Выберите ответ</InputLabel>
                         <Select
                             onChange={onAnswerPuzzleChange}
-                            value={condition.answerPuzzle || ""}
+                            value={condition.answerPuzzle || ETerminals.EMPTY}
                             input={<Input id="answer-puzzle" />}
                         >
                             {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
@@ -348,6 +364,7 @@ function getActionLiteral(actionType: EActionType): string {
         [EActionType.LESS_THAN]: "Меньше чем",
         [EActionType.EQUAL]: "Равно",
         [EActionType.GIVEN_ANSWER]: "Дан ответ",
+        [EActionType.NONE]: ETerminals.EMPTY,
     }[actionType];
 }
 

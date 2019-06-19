@@ -12,6 +12,8 @@ interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     title: string;
 
     isFocused(id: string): boolean;
+
+    onTemplateChange(template: ITemplate): void;
 }
 
 export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, id, ...props }) => {
@@ -68,7 +70,11 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
                     })}
                     item
                 >
-                    <Conditions puzzleId={id} template={props.template} />
+                    <Conditions
+                        puzzleId={id}
+                        template={props.template}
+                        onTemplateChange={props.onTemplateChange}
+                    />
                 </Grid>
             )}
         </Grid>

@@ -29,7 +29,7 @@ module.exports = {
     entry: {
         index: "./src/index.ts",
     },
-    devtool: isProduction ? "source-map" : "eval",
+    devtool: isProduction && !fastBuildEnabled ? "source-map" : "eval",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
