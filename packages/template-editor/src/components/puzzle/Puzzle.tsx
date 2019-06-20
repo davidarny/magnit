@@ -25,8 +25,6 @@ interface IPuzzleProps {
 
     onFocus(id: string): void;
 
-    onMouseDown(event: React.SyntheticEvent, id: string): void;
-
     onBlur(event: React.SyntheticEvent): void;
 }
 
@@ -46,7 +44,6 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 id={puzzle.id}
                                 onFocus={onFocus}
                                 onBlur={props.onBlur}
-                                onMouseDown={event => props.onMouseDown(event, puzzle.id)}
                                 css={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
@@ -86,7 +83,6 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     ),
                                     zIndex: props.isFocused(puzzle.id) ? 1300 : 0,
                                 })}
-                                onMouseDown={event => props.onMouseDown(event, puzzle.id)}
                                 onFocus={onFocus}
                                 onBlur={props.onBlur}
                                 square={true}

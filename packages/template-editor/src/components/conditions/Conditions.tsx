@@ -19,7 +19,7 @@ import { Close as DeleteIcon } from "@material-ui/icons";
 import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
-import * as R from "ramda";
+import _ from "lodash";
 import uuid from "uuid/v4";
 
 interface IConditionsProps {
@@ -64,7 +64,7 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
             // traverse all children of parent puzzle
             // in order to find all possible siblings above
             // so that scope of questionPuzzle is always all puzzles above the current
-            R.range(0, index).forEach(i => {
+            _.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any) => {
                     if (typeof value !== "object" || !("puzzleType" in value)) {
                         return;
@@ -115,12 +115,11 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
         ) {
             return;
         }
-        const getQuestionPuzzle = R.prop("questionPuzzle");
-        const conditionsHead = R.head(conditions) || { questionPuzzle: ETerminals.EMPTY };
+        const conditionsHead = _.head(conditions) || { questionPuzzle: ETerminals.EMPTY };
         conditions.push({
             id: uuid(),
             order: conditions.length - 1,
-            questionPuzzle: getQuestionPuzzle(conditionsHead),
+            questionPuzzle: conditionsHead.questionPuzzle,
             answerPuzzle: ETerminals.EMPTY,
             value: ETerminals.EMPTY,
             actionType: EActionType.NONE,
@@ -156,9 +155,9 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     });
                 }
 
-                const getConditionType = R.prop("conditionType");
-                const getActionType = R.prop("actionType");
-                const getAnswerPuzzleType = R.prop("puzzleType");
+                // const getConditionType = R.prop("conditionType");
+                // const getActionType = R.prop("actionType");
+                // const getAnswerPuzzleType = R.prop("puzzleType");
                 const questionAnswers = answers.filter(answer => {
                     const question = questions.find(
                         question => question.id === condition.questionPuzzle
@@ -168,14 +167,14 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     }
                     return question.puzzles.some(puzzle => puzzle.id === answer.id);
                 });
-                const questionAnswersHead = R.head(questionAnswers) || {
+                const questionAnswersHead = _.head(questionAnswers) || {
                     puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
                 };
 
                 return (
                     <React.Fragment key={condition.id}>
                         <Grid xs={index === 0 ? 2 : 6} item>
-                            {getConditionLiteral(index, getConditionType(condition))}
+                            {getConditionLiteral(index, condition.conditionType)}
                         </Grid>
                         {index === 0 && (
                             <Grid item xs={4}>
@@ -192,11 +191,12 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                                             <MenuItem>Нет доступных вариантов</MenuItem>
                                         )}
                                         {questions.map(questionToChoseFrom => {
-                                            const value = R.prop("id")(questionToChoseFrom);
-                                            const title = R.prop("title")(questionToChoseFrom);
                                             return (
-                                                <MenuItem key={value} value={value}>
-                                                    {title}
+                                                <MenuItem
+                                                    key={questionToChoseFrom.id}
+                                                    value={questionToChoseFrom.id}
+                                                >
+                                                    {questionToChoseFrom.title}
                                                 </MenuItem>
                                             );
                                         })}
@@ -216,20 +216,18 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                                             input={<Input id="action-type" />}
                                             onChange={onActionTypeChange}
                                         >
-                                            {getActionVariants(
-                                                getAnswerPuzzleType(questionAnswersHead)
-                                            )}
+                                            {getActionVariants(questionAnswersHead.puzzleType)}
                                         </Select>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={2}>
                                     {getAnswerPuzzle(
-                                        getActionType(condition),
+                                        condition.actionType,
                                         condition,
                                         answers,
                                         condition.value
                                     )(
-                                        getActionType(condition) === EActionType.CHOSEN_ANSWER
+                                        condition.actionType === EActionType.CHOSEN_ANSWER
                                             ? onAnswerPuzzleChange
                                             : onValueChange
                                     )}
@@ -319,11 +317,9 @@ function getAnswerPuzzle(
                             {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
                             {answers.length !== 0 &&
                                 answers.map(answer => {
-                                    const value = R.prop("id")(answer);
-                                    const title = R.prop("title")(answer);
                                     return (
-                                        <MenuItem key={value} value={value}>
-                                            {title}
+                                        <MenuItem key={answer.id} value={answer.id}>
+                                            {answer.title}
                                         </MenuItem>
                                     );
                                 })}
