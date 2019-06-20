@@ -149,7 +149,14 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
         <Grid container spacing={2} alignItems="flex-end">
             {conditions.map((condition, index) => {
                 function onQuestionPuzzleChange(event: TChangeEvent): void {
+                    // reset conditions length when question changed
+                    conditions.length = 1;
+                    // reset first condition fields when question changed
+                    // and change questionPuzzle
                     onConditionChange(condition.id, {
+                        answerPuzzle: ETerminals.EMPTY,
+                        value: ETerminals.EMPTY,
+                        actionType: EActionType.NONE,
                         questionPuzzle: event.target.value as string,
                     });
                 }
@@ -238,12 +245,7 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={2}>
-                                    {getAnswerPuzzle(
-                                        condition.actionType,
-                                        condition,
-                                        answers,
-                                        condition.value
-                                    )(
+                                    {getAnswerPuzzle(condition, answers, questions)(
                                         condition.actionType === EActionType.CHOSEN_ANSWER
                                             ? onAnswerPuzzleChange
                                             : onValueChange
@@ -312,15 +314,14 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
 }
 
 function getAnswerPuzzle(
-    actionType: EActionType,
     condition: ICondition,
     answers: IPuzzle[],
-    value: string
+    questions: IPuzzle[]
 ):
     | ((onValueChange: (event: TChangeEvent) => void) => React.ReactNode)
     | (() => React.ReactNode)
     | ((onAnswerPuzzleChange: (event: TChangeEvent) => void) => React.ReactNode) {
-    switch (actionType) {
+    switch (condition.actionType) {
         case EActionType.CHOSEN_ANSWER:
             return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
                 return (
@@ -333,13 +334,30 @@ function getAnswerPuzzle(
                         >
                             {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
                             {answers.length !== 0 &&
-                                answers.map(answer => {
-                                    return (
-                                        <MenuItem key={answer.id} value={answer.id}>
-                                            {answer.title}
-                                        </MenuItem>
-                                    );
-                                })}
+                                answers
+                                    .filter(answer => {
+                                        // find which question references to current condition
+                                        const currentQuestion = questions.find(
+                                            question => condition.questionPuzzle === question.id
+                                        );
+                                        if (!currentQuestion) {
+                                            return false;
+                                        }
+                                        // check if current answer is referenced to found question
+                                        // if true then this answer is transition-referenced
+                                        // to current condition
+                                        // condition -> question -> answer ~ condition -> answer
+                                        return currentQuestion.puzzles.some(
+                                            puzzle => puzzle.id === answer.id
+                                        );
+                                    })
+                                    .map(answer => {
+                                        return (
+                                            <MenuItem key={answer.id} value={answer.id}>
+                                                {answer.title}
+                                            </MenuItem>
+                                        );
+                                    })}
                         </Select>
                     </FormControl>
                 );
@@ -351,7 +369,7 @@ function getAnswerPuzzle(
             return (onValueChange: (event: TChangeEvent) => void) => {
                 return (
                     <TextField
-                        value={value}
+                        value={condition.value}
                         onChange={onValueChange}
                         css={theme => ({ marginTop: theme.spacing(-2) })}
                         label="Ответ"
