@@ -7,7 +7,7 @@ import { Grid } from "@material-ui/core";
 import { RouteComponentProps, Router } from "@reach/router";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
-import * as R from "ramda";
+import _ from "lodash";
 
 const AsyncTasks = Loadable(({
     loader: () => import("containers/tasks").then(module => module.Tasks),
@@ -27,39 +27,21 @@ const App: React.FC = () => {
     const [logoHeight, setLogoHeight] = useState(0);
 
     useEffect(() => {
-        const isNotNil = R.compose(
-            R.not,
-            R.isNil
-        );
+        const drawer = document.getElementById("drawer");
+        if (!drawer) {
+            return;
+        }
+        const drawerFirstChild = _.head(Array.from(drawer.children));
+        if (!drawerFirstChild) {
+            return;
+        }
+        setDrawerWidth(drawerFirstChild.clientWidth);
 
-        const getChildren = R.prop("children") as () => HTMLCollection;
-        const getClientWidth = R.prop("clientWidth") as () => number;
-        const getClientHeight = R.prop("clientHeight") as () => number;
-
-        const getFirstChild = R.compose<HTMLCollection, HTMLElement[], HTMLElement>(
-            array => R.head(array)!,
-            Array.from,
-            getChildren
-        );
-
-        const setDrawerWidthWhenNotNil = R.when<HTMLElement, void>(
-            isNotNil,
-            R.pipe(
-                getFirstChild,
-                getClientWidth,
-                setDrawerWidth
-            )
-        );
-        const setLogoHeightWhenNotNil = R.when<HTMLElement, void>(
-            isNotNil,
-            R.pipe(
-                getClientHeight,
-                setLogoHeight
-            )
-        );
-
-        setDrawerWidthWhenNotNil(document.getElementById("drawer")!);
-        setLogoHeightWhenNotNil(document.getElementById("logo")!);
+        const logo = document.getElementById("logo");
+        if (!logo) {
+            return;
+        }
+        setLogoHeight(logo.clientHeight);
     }, []);
 
     return (

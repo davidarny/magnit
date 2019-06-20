@@ -19,7 +19,7 @@ import { jsx } from "@emotion/core";
 import { Conditions } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
-import * as R from "ramda";
+import _ from "lodash";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -47,11 +47,10 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
             }
             // set initial answerType based on
             // first element of question children
-            const childrenHeadPuzzle = R.head(puzzle.puzzles) || {
+            const childrenHeadPuzzle = _.head(puzzle.puzzles) || {
                 puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
             };
-            const getPuzzleType = R.prop("puzzleType");
-            setAnswersType(getPuzzleType(childrenHeadPuzzle));
+            setAnswersType(childrenHeadPuzzle.puzzleType);
         });
     });
 

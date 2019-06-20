@@ -48,7 +48,7 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                         </Match>
                     );
                 }
-                return null;
+                return <React.Fragment />;
             })}
         </React.Fragment>
     );

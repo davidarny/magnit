@@ -166,7 +166,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const wait = 100;
     const throttledChainCleaning = _.throttle(() => {
-        console.log("%c%s", "color:" + "#006DFF", "debounce call");
         focusedPuzzleChain.length = 0;
     }, wait);
 

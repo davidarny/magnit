@@ -149,7 +149,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                             </div>
                         );
                     default:
-                        return <React.Fragment />;
+                        return <React.Fragment key={puzzle.id} />;
                 }
             })}
         </React.Fragment>
