@@ -107,10 +107,11 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
         setAnswers([...answers]);
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
-        templateSnapshot.current = _.cloneDeep(template);
-        if (_.isEqual(template, templateSnapshot.current)) {
+        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
+            templateSnapshot.current = _.cloneDeep(template);
             return;
         }
+        templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(templateSnapshot.current);
     }, [conditions, template]);
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -20,6 +21,7 @@ import { Conditions } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
+import { useRef } from "react";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -32,12 +34,15 @@ interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, id, ...props }) => {
+export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
     const [conditionsEnabled, setConditionsEnabled] = useState(false);
-    const [answersType, setAnswersType] = useState(EPuzzleType.TEXT_ANSWER);
+    const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
+    const [questionTitle, setQuestionTitle] = useState(props.title);
+    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
+    const answerTypeSnapshot = useRef<EPuzzleType>((ETerminals.EMPTY as unknown) as EPuzzleType);
 
     useEffect(() => {
-        traverse(props.template, (value: any) => {
+        traverse(template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
             }
@@ -47,42 +52,52 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
             }
             // set initial answerType based on
             // first element of question children
-            const childrenHeadPuzzle = _.head(puzzle.puzzles) || {
-                puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
-            };
-            setAnswersType(childrenHeadPuzzle.puzzleType);
+            let nextAnswerType = answersType;
+            if (!nextAnswerType) {
+                const childrenHeadPuzzle = _.head(puzzle.puzzles) || {
+                    puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+                };
+                setAnswersType(childrenHeadPuzzle.puzzleType);
+                nextAnswerType = childrenHeadPuzzle.puzzleType;
+            }
+            if (!puzzle.puzzles.length) {
+                return;
+            }
+            // set changed puzzle type of question children
+            // and strip it's length to 1 only after initial render
+            if (answersType !== answerTypeSnapshot.current) {
+                puzzle.puzzles.length = 1;
+            }
+            puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+                return {
+                    ...childPuzzle,
+                    puzzleType: nextAnswerType,
+                    title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
+                };
+            });
+            puzzle.title = questionTitle;
+            answerTypeSnapshot.current = nextAnswerType;
         });
-    });
+        // trigger template update if snapshot changed
+        // also cloneDeep in order to track changes above in isEqual
+        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
+            templateSnapshot.current = _.cloneDeep(template);
+            return;
+        }
+        templateSnapshot.current = _.cloneDeep(template);
+        props.onTemplateChange(templateSnapshot.current);
+    }, [answersType, questionTitle, template]);
 
     function onConditionsCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
         setConditionsEnabled(event.target.checked);
     }
 
     function onAnswerTypeChange(event: TChangeEvent): void {
-        traverse(props.template, (value: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            if (!("id" in puzzle) || puzzle.id !== id) {
-                return;
-            }
-            if (!puzzle.puzzles.length) {
-                return;
-            }
-            // set changed puzzle type of question children
-            // and strip it's length to 1
-            puzzle.puzzles.length = 1;
-            puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
-                return {
-                    ...childPuzzle,
-                    puzzleType: event.target.value as EPuzzleType,
-                    title: "",
-                };
-            });
-        });
-        props.onTemplateChange({ ...props.template });
         setAnswersType(event.target.value as EPuzzleType);
+    }
+
+    function onQuestionTitleChange(event: TChangeEvent): void {
+        setQuestionTitle(event.target.value as string);
     }
 
     return (
@@ -92,13 +107,14 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
                     <Grid item xs={9}>
                         <Grid container alignItems="flex-end">
                             <Grid xs={1} item>
-                                <Typography variant="body1">{index + 1}.</Typography>
+                                <Typography variant="body1">{props.index + 1}.</Typography>
                             </Grid>
                             <Grid xs={11} item>
                                 <TextField
                                     fullWidth
                                     label="Название вопроса"
-                                    defaultValue={title}
+                                    value={questionTitle}
+                                    onChange={onQuestionTitleChange}
                                 />
                             </Grid>
                         </Grid>
@@ -158,7 +174,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ title, index, i
                 >
                     <Conditions
                         puzzleId={id}
-                        template={props.template}
+                        template={template}
                         onTemplateChange={props.onTemplateChange}
                     />
                 </Grid>

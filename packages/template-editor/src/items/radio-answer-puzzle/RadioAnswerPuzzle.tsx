@@ -16,21 +16,21 @@ interface IRadioAnswerPuzzleProps extends ISpecificPuzzleProps {
     onTemplateChange(template: ITemplate): void;
 }
 
-export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ id, index, ...props }) => {
-    const [label, setLabel] = useState(props.title || `Вариант ${index + 1}`);
+export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...props }) => {
+    const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
     useEffect(() => {
-        traverse(props.template, (value: any) => {
+        traverse(template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (!("id" in puzzle) || puzzle.id !== id) {
+            if (!("id" in puzzle) || puzzle.id !== props.id) {
                 return;
             }
             puzzle.title = label;
         });
-        props.onTemplateChange({ ...props.template });
+        props.onTemplateChange({ ...template });
     }, [label]);
 
     function onLabelChange(event: TChangeEvent): void {
@@ -42,6 +42,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ id, index
             <Grid item xs={1}>
                 <Radio
                     disabled
+                    checked
                     css={css`
                         padding-left: 0;
                     `}
