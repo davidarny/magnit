@@ -141,18 +141,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         const prevSection = template.sections[template.sections.length - 1];
         template.sections.push({
             id: uuid(),
-            puzzles: [
-                {
-                    id: uuid(),
-                    puzzles: [],
-                    validations: [],
-                    conditions: [],
-                    description: ETerminals.EMPTY,
-                    title: ETerminals.EMPTY,
-                    puzzleType: EPuzzleType.GROUP,
-                    order: 0,
-                },
-            ],
+            puzzles: [],
             title: ETerminals.EMPTY,
             order: (prevSection || { order: -1 }).order + 1,
         });
@@ -308,9 +297,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         </Grid>
                         <Grid container>
                             <Paper
-                                css={css`
-                                    width: 100%;
-                                `}
+                                css={theme => ({
+                                    width: "100%",
+                                    ":empty": {
+                                        minHeight: theme.spacing(32),
+                                    },
+                                })}
                                 elevation={focusedPuzzleId === section.id ? 16 : 0}
                             >
                                 <Puzzle
