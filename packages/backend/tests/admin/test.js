@@ -23,4 +23,5 @@ describe("Admin", () => {
 
     require("./parts/create-template.js")(options);
     require("./parts/get-template.js")(options);
+    require("./parts/get-templates.js")(options);
 });
