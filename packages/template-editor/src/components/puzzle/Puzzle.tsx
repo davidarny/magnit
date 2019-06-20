@@ -16,8 +16,16 @@ interface IPuzzleProps {
         [EPuzzleType.QUESTION](index: number, id: string, title: string): ReactNode;
         [EPuzzleType.TEXT_ANSWER](index: number, id: string): ReactNode;
         [EPuzzleType.NUMERIC_ANSWER](index: number, id: string): ReactNode;
-        [EPuzzleType.RADIO_ANSWER](index: number, id: string, title: string): ReactNode;
+        [EPuzzleType.RADIO_ANSWER](
+            index: number,
+            id: string,
+            title: string,
+            addRadioButton: boolean,
+            questionFocused: boolean
+        ): ReactNode;
     };
+    // if not focused, we don't show add button
+    questionFocused?: boolean;
 
     isFocused(id: string): boolean;
 
@@ -95,7 +103,12 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                         puzzle.title
                                     )}
                                 </PuzzleWrapper>
-                                <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
+                                <Puzzle
+                                    questionFocused={props.isFocused(puzzle.id)}
+                                    puzzles={puzzle.puzzles}
+                                    index={props.index}
+                                    {...props}
+                                />
                             </Paper>
                         );
                     }
@@ -142,7 +155,9 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     {props.components[EPuzzleType.RADIO_ANSWER](
                                         index,
                                         puzzle.id,
-                                        puzzle.title
+                                        puzzle.title,
+                                        index === puzzles.length - 1,
+                                        !!props.questionFocused
                                     )}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />

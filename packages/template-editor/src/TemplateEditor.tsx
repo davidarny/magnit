@@ -15,6 +15,7 @@ import { traverse } from "./services/json";
 import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
 import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
+import { bool } from "prop-types";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -174,6 +175,51 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
+    const components = {
+        [EPuzzleType.GROUP]: (index: number, id: string) => (
+            <GroupPuzzle
+                template={template}
+                isFocused={id => id === focusedPuzzleId}
+                id={id}
+                index={index}
+                onTemplateChange={onTemplateChange}
+            />
+        ),
+        [EPuzzleType.QUESTION]: (index: number, id: string, title: string) => (
+            <QuestionPuzzle
+                template={template}
+                isFocused={id => id === focusedPuzzleId}
+                title={title}
+                index={index}
+                id={id}
+                onTemplateChange={onTemplateChange}
+            />
+        ),
+        [EPuzzleType.TEXT_ANSWER]: (index: number, id: string) => (
+            <TextAnswerPuzzle index={index} id={id} />
+        ),
+        [EPuzzleType.NUMERIC_ANSWER]: (index: number, id: string) => (
+            <NumericAnswerPuzzle id={id} index={index} />
+        ),
+        [EPuzzleType.RADIO_ANSWER]: (
+            index: number,
+            id: string,
+            title: string,
+            addRadioButton: boolean,
+            questionFocused: boolean
+        ) => (
+            <RadioAnswerPuzzle
+                template={template}
+                title={title}
+                onTemplateChange={onTemplateChange}
+                id={id}
+                index={index}
+                addRadioButton={addRadioButton}
+                questionFocused={questionFocused}
+            />
+        ),
+    };
+
     return (
         <React.Fragment>
             <PuzzleToolbar
@@ -227,42 +273,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         <Puzzle
                             puzzles={template.puzzles}
                             index={0}
-                            components={{
-                                [EPuzzleType.GROUP]: (index, id) => (
-                                    <GroupPuzzle
-                                        template={template}
-                                        isFocused={id => id === focusedPuzzleId}
-                                        id={id}
-                                        index={index}
-                                        onTemplateChange={onTemplateChange}
-                                    />
-                                ),
-                                [EPuzzleType.QUESTION]: (index, id, title) => (
-                                    <QuestionPuzzle
-                                        template={template}
-                                        isFocused={id => id === focusedPuzzleId}
-                                        title={title}
-                                        index={index}
-                                        id={id}
-                                        onTemplateChange={onTemplateChange}
-                                    />
-                                ),
-                                [EPuzzleType.TEXT_ANSWER]: (index, id) => (
-                                    <TextAnswerPuzzle index={index} id={id} />
-                                ),
-                                [EPuzzleType.NUMERIC_ANSWER]: (index, id) => (
-                                    <NumericAnswerPuzzle id={id} index={index} />
-                                ),
-                                [EPuzzleType.RADIO_ANSWER]: (index, id, title) => (
-                                    <RadioAnswerPuzzle
-                                        template={template}
-                                        title={title}
-                                        onTemplateChange={onTemplateChange}
-                                        id={id}
-                                        index={index}
-                                    />
-                                ),
-                            }}
+                            components={components}
                             onFocus={onPuzzleFocus}
                             onBlur={onPuzzleBlur}
                             isFocused={id => id === focusedPuzzleId}
@@ -308,42 +319,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                 <Puzzle
                                     puzzles={section.puzzles}
                                     index={index}
-                                    components={{
-                                        [EPuzzleType.GROUP]: (index, id) => (
-                                            <GroupPuzzle
-                                                template={template}
-                                                isFocused={id => id === focusedPuzzleId}
-                                                id={id}
-                                                index={index}
-                                                onTemplateChange={onTemplateChange}
-                                            />
-                                        ),
-                                        [EPuzzleType.QUESTION]: (index, id, title) => (
-                                            <QuestionPuzzle
-                                                template={template}
-                                                isFocused={id => id === focusedPuzzleId}
-                                                title={title}
-                                                index={index}
-                                                id={id}
-                                                onTemplateChange={onTemplateChange}
-                                            />
-                                        ),
-                                        [EPuzzleType.TEXT_ANSWER]: (index, id) => (
-                                            <TextAnswerPuzzle index={index} id={id} />
-                                        ),
-                                        [EPuzzleType.NUMERIC_ANSWER]: (index, id) => (
-                                            <NumericAnswerPuzzle id={id} index={index} />
-                                        ),
-                                        [EPuzzleType.RADIO_ANSWER]: (index, id, title) => (
-                                            <RadioAnswerPuzzle
-                                                template={template}
-                                                title={title}
-                                                onTemplateChange={onTemplateChange}
-                                                id={id}
-                                                index={index}
-                                            />
-                                        ),
-                                    }}
+                                    components={components}
                                     onFocus={onPuzzleFocus}
                                     onBlur={onPuzzleBlur}
                                     isFocused={id => id === focusedPuzzleId}
