@@ -3,7 +3,7 @@
 
 import { css, jsx } from "@emotion/core";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Button,
     FormControl,
@@ -45,12 +45,23 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
     ]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
+    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
 
     useEffect(() => {
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
         answers.length = 0;
+        // track if template is changed
+        // outside of this component
+        if (!_.isEqual(template, templateSnapshot.current)) {
+            conditions.forEach((condition, index, array) => {
+                condition.answerPuzzle = ETerminals.EMPTY;
+                condition.value = ETerminals.EMPTY;
+                condition.actionType = EActionType.NONE;
+                array[index] = { ...condition };
+            });
+        }
         traverse(template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
@@ -94,9 +105,14 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
         });
         setQuestions([...questions]);
         setAnswers([...answers]);
-        // trigger template update
-        props.onTemplateChange({ ...template });
-    }, [conditions]);
+        // trigger template update if snapshot changed
+        // also cloneDeep in order to track changes above in isEqual
+        templateSnapshot.current = _.cloneDeep(template);
+        if (_.isEqual(template, templateSnapshot.current)) {
+            return;
+        }
+        props.onTemplateChange(templateSnapshot.current);
+    }, [conditions, template]);
 
     function onConditionDelete(id: string) {
         setConditions([...conditions.filter(condition => condition.id !== id)]);
