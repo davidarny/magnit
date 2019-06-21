@@ -323,6 +323,9 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
                 <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
                     {getActionLiteral(EActionType.NOT_EQUAL)}
                 </MenuItem>,
+                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
+                </MenuItem>,
             ];
         case EPuzzleType.DROPDOWN_ANSWER:
         case EPuzzleType.RADIO_ANSWER:
@@ -331,9 +334,16 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
                 <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
                     {getActionLiteral(EActionType.CHOSEN_ANSWER)}
                 </MenuItem>,
+                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
+                </MenuItem>,
             ];
         default:
-            return [];
+            return [
+                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
+                </MenuItem>,
+            ];
     }
 }
 
