@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, Radio, TextField } from "@material-ui/core";
+import { Button, Grid, IconButton, Radio, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
 import { traverse } from "services/json";
+import { Close as DeleteIcon } from "@material-ui/icons";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -19,6 +20,10 @@ interface IRadioAnswerPuzzleProps extends ISpecificPuzzleProps {
     questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
+
+    onAddRadioButton(id: string): void;
+
+    onDeleteRadioButton(id: string): void;
 }
 
 export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...props }) => {
@@ -42,6 +47,14 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
         setLabel(event.target.value as string);
     }
 
+    function onAddRadioButton(): void {
+        props.onAddRadioButton(props.id);
+    }
+
+    function onDeleteRadioButton(): void {
+        props.onDeleteRadioButton(props.id);
+    }
+
     return (
         <React.Fragment>
             <Grid container alignItems="center">
@@ -54,8 +67,17 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                         `}
                     />
                 </Grid>
-                <Grid item xs={11}>
+                <Grid item xs={10}>
                     <TextField fullWidth value={label} onChange={onLabelChange} />
+                </Grid>
+                <Grid item xs={1}>
+                    <Grid container justify="flex-end">
+                        <Grid item>
+                            <IconButton onClick={onDeleteRadioButton}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
             {props.addRadioButton && props.questionFocused && (
@@ -76,6 +98,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                             css={css`
                                 text-transform: none;
                             `}
+                            onClick={onAddRadioButton}
                         >
                             Добавить вариант
                         </Button>

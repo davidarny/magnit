@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
@@ -15,7 +15,6 @@ import { traverse } from "./services/json";
 import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
 import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
-import { bool } from "prop-types";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -173,6 +172,66 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
+    function onAddAnswerPuzzle(id: string): void {
+        traverse(template, (value: any) => {
+            if (typeof value !== "object" || !("id" in value)) {
+                return;
+            }
+            const puzzle = value as IPuzzle;
+            if (!("puzzles" in puzzle)) {
+                return;
+            }
+            if (!puzzle.puzzles.some(child => child.id === id)) {
+                return;
+            }
+            const lastPuzzle = _.last(puzzle.puzzles) || {
+                order: -1,
+                puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+            };
+            puzzle.puzzles.push({
+                id: uuid(),
+                title: "",
+                puzzles: [],
+                puzzleType: lastPuzzle.puzzleType,
+                order: lastPuzzle.order + 1,
+                conditions: [],
+                description: "",
+                validations: [],
+            });
+        });
+        setTemplate({ ...template });
+    }
+
+    function onDeleteAnswerPuzzle(id: string): void {
+        traverse(template, (value: any) => {
+            if (typeof value !== "object" || !("id" in value)) {
+                return;
+            }
+            const puzzle = value as IPuzzle;
+            if (!("puzzles" in puzzle)) {
+                return;
+            }
+            if (!puzzle.puzzles.some(child => child.id === id)) {
+                return;
+            }
+            // do not allow to delete puzzle if only one found
+            if (puzzle.puzzles.length === 1) {
+                return;
+            }
+            const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(child => child.id === id);
+            console.log("%c%s", "color:" + "#094349", "index", indexOfPuzzleToDelete);
+            puzzle.puzzles.splice(indexOfPuzzleToDelete, 1);
+            // re-calculate order
+            puzzle.puzzles = puzzle.puzzles.map((element, index) => {
+                return {
+                    order: index,
+                    ...element,
+                };
+            });
+        });
+        setTemplate({ ...template });
+    }
+
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
     const components = {
@@ -216,6 +275,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 index={index}
                 addRadioButton={addRadioButton}
                 questionFocused={questionFocused}
+                onAddRadioButton={onAddAnswerPuzzle}
+                onDeleteRadioButton={onDeleteAnswerPuzzle}
             />
         ),
     };
