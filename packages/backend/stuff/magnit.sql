@@ -21,6 +21,7 @@ ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_left_hand_puzzle_fkey;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_object_id_fkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
+ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_pkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_pkey;
@@ -50,6 +51,7 @@ ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_pkey;
 ALTER TABLE public.validations ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.templates ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.task_users ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.task_templates ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tasks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tariffs ALTER COLUMN id DROP DEFAULT;
@@ -68,6 +70,7 @@ DROP SEQUENCE public.templates_id_seq;
 DROP TABLE public.templates;
 DROP SEQUENCE public.tasks_id_seq;
 DROP TABLE public.tasks;
+DROP SEQUENCE public.task_users_id_seq;
 DROP TABLE public.task_users;
 DROP SEQUENCE public.task_templates_id_seq;
 DROP TABLE public.task_templates;
@@ -566,7 +569,7 @@ CREATE TABLE public.task_templates (
 ALTER TABLE public.task_templates OWNER TO postgres;
 
 --
--- Name: tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: task_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.task_templates_id_seq
@@ -591,6 +594,7 @@ ALTER SEQUENCE public.task_templates_id_seq OWNED BY public.task_templates.id;
 --
 
 CREATE TABLE public.task_users (
+    id integer NOT NULL,
     task_id integer,
     users_id integer,
     taken boolean,
@@ -600,6 +604,27 @@ CREATE TABLE public.task_users (
 
 
 ALTER TABLE public.task_users OWNER TO postgres;
+
+--
+-- Name: task_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.task_users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.task_users_id_seq OWNER TO postgres;
+
+--
+-- Name: task_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.task_users_id_seq OWNED BY public.task_users.id;
 
 --
 -- Name: tasks; Type: TABLE; Schema: public; Owner: postgres
@@ -831,6 +856,13 @@ ALTER TABLE ONLY public.task_templates ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: task_users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_users ALTER COLUMN id SET DEFAULT nextval('public.task_users_id_seq'::regclass);
+
+
+--
 -- Name: templates id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -927,7 +959,7 @@ COPY public.task_templates (id, task_id, template_id, created_at, updated_at) FR
 -- Data for Name: task_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.task_users (task_id, users_id, taken, created_at, updated_at) FROM stdin;
+COPY public.task_users (id, task_id, users_id, taken, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -1034,6 +1066,13 @@ SELECT pg_catalog.setval('public.task_templates_id_seq', 1, false);
 
 
 --
+-- Name: task_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.task_users_id_seq', 1, false);
+
+
+--
 -- Name: templates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1132,6 +1171,14 @@ ALTER TABLE ONLY public.tasks
 
 ALTER TABLE ONLY public.task_templates
     ADD CONSTRAINT task_templates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tasks task_users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_users
+    ADD CONSTRAINT task_users_pkey PRIMARY KEY (id);
 
 
 --

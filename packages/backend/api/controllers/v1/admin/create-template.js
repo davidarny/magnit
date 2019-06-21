@@ -8,6 +8,12 @@ module.exports = {
             type: "json",
             required: true,
         },
+        template_id: {
+            type: "number",
+        },
+        created_at: {
+            type: "ref",
+        },
     },
 
     exits: {
@@ -22,6 +28,8 @@ module.exports = {
     fn: async function(inputs, exits) {
         try {
             let template = inputs.template;
+            let templateId = _.escape(inputs.template_id);
+            let createdAt = _.escape(inputs.created_at);
 
             if (typeof template === "string") {
                 const valid = await sails.helpers.isJsonValid(template);
@@ -33,10 +41,20 @@ module.exports = {
                 template = JSON.parse(template);
             }
 
-            const newTemplate = await Template.create({
+            let criteria = {
                 title: template.title,
                 description: template.description,
-            }).fetch();
+            };
+
+            if (templateId) {
+                criteria.id = templateId;
+            }
+
+            if (createdAt) {
+                criteria.createdAt = createdAt;
+            }
+
+            const newTemplate = await Template.create(criteria).fetch();
 
             if (template.sections) {
                 for (let i = 0; i < template.sections.length; i++) {

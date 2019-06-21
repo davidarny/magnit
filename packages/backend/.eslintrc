@@ -14,7 +14,7 @@
     "rules": {
         "block-scoped-var": ["error"],
         "callback-return": ["error", ["done", "proceed", "next", "onwards", "callback", "cb"]],
-        "camelcase": ["warn", { "properties": "always" }],
+        "camelcase": ["warn", { "properties": "never" }],
         "comma-style": ["warn", "last"],
         "curly": ["warn"],
         "eqeqeq": ["error", "always"],
