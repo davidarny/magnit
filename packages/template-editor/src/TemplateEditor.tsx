@@ -26,6 +26,7 @@ import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
 import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
+import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -264,6 +265,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         ),
         [EPuzzleType.TEXT_ANSWER]: (props: ICommonComponentProps) => (
             <TextAnswerPuzzle {...props} />
+        ),
+        [EPuzzleType.DATE_ANSWER]: (props: ICommonComponentProps) => (
+            <DateAnswerPuzzle {...props} />
         ),
         [EPuzzleType.NUMERIC_ANSWER]: (props: ICommonComponentProps) => (
             <NumericAnswerPuzzle {...props} />

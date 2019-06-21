@@ -40,6 +40,7 @@ interface IPuzzleProps {
         [EPuzzleType.GROUP](props: ICommonComponentProps): ReactNode;
         [EPuzzleType.QUESTION](props: ITitledComponentProps): ReactNode;
         [EPuzzleType.TEXT_ANSWER](props: ICommonComponentProps): ReactNode;
+        [EPuzzleType.DATE_ANSWER](props: ICommonComponentProps): ReactNode;
         [EPuzzleType.NUMERIC_ANSWER](props: ICommonComponentProps): ReactNode;
         [EPuzzleType.RADIO_ANSWER](props: IRadioComponentProps): ReactNode;
         [EPuzzleType.CHECKBOX_ANSWER](props: ICheckboxComponentProps): ReactNode;
@@ -150,6 +151,23 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.TEXT_ANSWER](
+                                        commonComponentProps
+                                    )}
+                                </PuzzleWrapper>
+                                <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
+                            </div>
+                        );
+                    case EPuzzleType.DATE_ANSWER:
+                        return (
+                            <div
+                                key={puzzle.id}
+                                css={theme => ({
+                                    marginTop: theme.spacing(2),
+                                    marginBottom: theme.spacing(2),
+                                })}
+                            >
+                                <PuzzleWrapper>
+                                    {props.components[EPuzzleType.DATE_ANSWER](
                                         commonComponentProps
                                     )}
                                 </PuzzleWrapper>
