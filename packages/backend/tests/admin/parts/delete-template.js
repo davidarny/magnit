@@ -33,7 +33,7 @@ module.exports = function(options) {
             });
         });
 
-        it("should delete template with id 1 cascade", done => {
+        it("should cascade delete template with id 1", done => {
             request(options, async (err, httpResponse, body) => {
                 try {
                     if (err) {
