@@ -3,15 +3,18 @@
 import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
+import { IIconProps } from "./IIconProps";
 
-export const CopyIcon: React.FC = () => {
+export const CopyIcon: React.FC<IIconProps> = ({ size = 24 }) => {
     return (
         <SvgIcon
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
             css={css`
                 fill: none;
+                width: ${size}px;
+                height: ${size}px;
             `}
         >
             <path

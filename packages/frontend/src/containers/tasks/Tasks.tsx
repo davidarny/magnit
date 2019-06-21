@@ -6,8 +6,8 @@ import * as React from "react";
 import { Link, RouteComponentProps } from "@reach/router";
 import { useState } from "react";
 import { RouteMatcher } from "components/route-matcher";
-import { SectionLayout } from "../../components/section-layout";
-import { SectionTitle } from "../../components/section-title";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
 
 enum ETabIndex {
     ALL = 0,

@@ -1,15 +1,11 @@
 /** @jsx jsx */
 
-import { jsx, css } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
-import { Divider, Drawer, List, ListItem, ListItemIcon, Grid, Typography } from "@material-ui/core";
-import {
-    Assignment as TasksIcon,
-    Web as TemplateIcon,
-    PieChart as ReportsIcon,
-} from "@material-ui/icons";
-import MagintIcon from "assets/magnit.png";
+import { Divider, Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
+import LogoIcon from "assets/magnit.png";
 import { Link } from "@reach/router";
+import { ReportsIcon, TasksIcon, TemplatesIcon } from "icons";
 
 export const Sidebar: React.FC = () => {
     return (
@@ -18,7 +14,7 @@ export const Sidebar: React.FC = () => {
                 <Grid item css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}>
                     <Link to="/">
                         <img
-                            src={MagintIcon}
+                            src={LogoIcon}
                             css={css`
                                 max-width: 60px;
                             `}
@@ -31,14 +27,18 @@ export const Sidebar: React.FC = () => {
             <List>
                 {[
                     { text: "Задания", icon: TasksIcon, to: "/tasks" },
-                    { text: "Шаблоны", icon: TemplateIcon, to: "/templates" },
+                    { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
                     { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
                 ].map(({ text, icon: Icon, to }) => (
                     <ListItem
                         component={Link}
                         to={to}
                         key={text}
-                        css={theme => ({ padding: `${theme.spacing(3)} 0` })}
+                        css={theme => ({
+                            padding: `${theme.spacing(3)} 0`,
+                            ":visited": { color: theme.colors.secondary },
+                            ":hover, :active": { color: theme.colors.primary },
+                        })}
                     >
                         <Grid container direction="column" justify="center" alignItems="center">
                             <Grid item>
@@ -51,7 +51,12 @@ export const Sidebar: React.FC = () => {
                                 </ListItemIcon>
                             </Grid>
                             <Grid item>
-                                <Typography css={theme => ({ fontSize: theme.fontSize.smaller })}>
+                                <Typography
+                                    css={theme => ({
+                                        fontSize: theme.fontSize.small,
+                                        fontWeight: 500,
+                                    })}
+                                >
                                     {text}
                                 </Typography>
                             </Grid>

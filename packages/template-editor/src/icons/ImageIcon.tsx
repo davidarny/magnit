@@ -3,15 +3,18 @@
 import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
+import { IIconProps } from "./IIconProps";
 
-export const ImageIcon: React.FC = () => {
+export const ImageIcon: React.FC<IIconProps> = ({ size = 24 }) => {
     return (
         <SvgIcon
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
             css={css`
                 fill: none;
+                width: ${size}px;
+                height: ${size}px;
             `}
         >
             <path d="M14.14 12L11.14 15.87L9 13.28L6 17.14H18L14.14 12Z" fill="#2F97FF" />
