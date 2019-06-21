@@ -19,17 +19,18 @@
 
 ## Table of Contents
 
--   [Table of Contents](#table-of-contents)
-    -   [Requirements](#requirements)
-    -   [Project structure](#project-structure)
-    -   [Usage](#usage)
-        -   [Installation](#installation)
-        -   [Running](#running)
-            -   [Frontend](#frontend)
-            -   [Backend](#backend)
-        -   [Testing](#testing)
-        -   [Contributing](#contributing)
-        -   [Documentation](#documentation)
+-   [Table of Contents](#Table-of-Contents)
+    -   [Requirements](#Requirements)
+    -   [Project structure](#Project-structure)
+    -   [Usage](#Usage)
+        -   [Installation](#Installation)
+        -   [Running](#Running)
+            -   [Frontend](#Frontend)
+            -   [Backend](#Backend)
+            -   [Libraries](#Libraries)
+        -   [Testing](#Testing)
+        -   [Contributing](#Contributing)
+        -   [Documentation](#Documentation)
 
 ### Requirements
 
@@ -99,6 +100,18 @@ To start backend just run this command
 ```bash
 $ yarn start:backend
 ```
+
+##### Libraries
+
+It's recommended to build all libraries before starting project
+
+```bash
+lerna run build:lib
+```
+
+Also if you're developing a library, provide a `build:lib` script, which will package and bundle your library
+
+You can find examples in [@magnit/template-editor](packages/template-editor/package.json) `package.json` file
 
 #### Testing
 
