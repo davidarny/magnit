@@ -131,15 +131,9 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                                 <MenuItem value={EPuzzleType.NUMERIC_ANSWER}>
                                     Числовое поле
                                 </MenuItem>
-                                <MenuItem value={EPuzzleType.REFERENCE_ANSWER}>
-                                    Справочное поле
-                                </MenuItem>
                                 <MenuItem value={EPuzzleType.RADIO_ANSWER}>Один из списка</MenuItem>
                                 <MenuItem value={EPuzzleType.CHECKBOX_ANSWER}>
                                     Несколько из списка
-                                </MenuItem>
-                                <MenuItem value={EPuzzleType.UPLOAD_FILES}>
-                                    Загрузка файлов
                                 </MenuItem>
                                 <MenuItem value={EPuzzleType.DATE_ANSWER}>Дата</MenuItem>
                                 <MenuItem value={EPuzzleType.DROPDOWN_ANSWER}>
