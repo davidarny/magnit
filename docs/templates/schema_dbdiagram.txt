@@ -46,12 +46,16 @@ Table validation {
 }
 
 enum puzzle_type {
- question
- numeric_answer
- string_answer
- radio_answer
- input_answer
  group
+ question
+ radio_answer
+ checkbox_answer
+ dropdown_answer
+ reference_answer
+ upload_files
+ date_answer
+ text_answer
+ numeric_answer
 }
 
 enum condition_action_type {

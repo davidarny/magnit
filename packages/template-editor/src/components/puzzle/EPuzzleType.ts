@@ -7,6 +7,6 @@ export enum EPuzzleType {
     REFERENCE_ANSWER = "reference_answer",
     UPLOAD_FILES = "upload_files",
     DATE_ANSWER = "date_answer",
-    TEXT_ANSWER = "input_answer",
+    TEXT_ANSWER = "text_answer",
     NUMERIC_ANSWER = "numeric_answer",
 }

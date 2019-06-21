@@ -23,6 +23,13 @@ interface IPuzzleProps {
             addRadioButton: boolean,
             questionFocused: boolean
         ): ReactNode;
+        [EPuzzleType.CHECKBOX_ANSWER](
+            index: number,
+            id: string,
+            title: string,
+            addCheckboxButton: boolean,
+            questionFocused: boolean
+        ): ReactNode;
     };
     // if not focused, we don't show add button
     questionFocused?: boolean;
@@ -153,6 +160,27 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.RADIO_ANSWER](
+                                        index,
+                                        puzzle.id,
+                                        puzzle.title,
+                                        index === puzzles.length - 1,
+                                        !!props.questionFocused
+                                    )}
+                                </PuzzleWrapper>
+                                <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
+                            </div>
+                        );
+                    case EPuzzleType.CHECKBOX_ANSWER:
+                        return (
+                            <div
+                                key={puzzle.id}
+                                css={theme => ({
+                                    marginTop: theme.spacing(2),
+                                    marginBottom: theme.spacing(2),
+                                })}
+                            >
+                                <PuzzleWrapper>
+                                    {props.components[EPuzzleType.CHECKBOX_ANSWER](
                                         index,
                                         puzzle.id,
                                         puzzle.title,

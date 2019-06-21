@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, IconButton, Radio, TextField } from "@material-ui/core";
+import { Button, Checkbox, Grid, IconButton, Radio, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
 import { traverse } from "services/json";
@@ -10,27 +10,27 @@ import { Close as DeleteIcon } from "@material-ui/icons";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-interface IRadioAnswerPuzzleProps extends ISpecificPuzzleProps {
+interface ICheckboxAnswerPuzzleProps extends ISpecificPuzzleProps {
     title: string;
     template: ITemplate;
-    // flag indication this radio should render
-    // button which adds new radio when clicked
-    addRadioButton: boolean;
+    // flag indication this checkbox should render
+    // button which adds new checkbox when clicked
+    addCheckboxButton: boolean;
     // if not focused, we don't show add button
     questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 
-    onAddRadioButton(id: string): void;
+    onAddCheckboxButton(id: string): void;
 
-    onDeleteRadioButton(id: string): void;
+    onDeleteCheckboxButton(id: string): void;
 }
 
-export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...props }) => {
+export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
     useEffect(() => {
-        traverse(template, (value: any) => {
+        traverse(props.template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
             }
@@ -40,26 +40,26 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             }
             puzzle.title = label;
         });
-        props.onTemplateChange({ ...template });
+        props.onTemplateChange({ ...props.template });
     }, [label]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
     }
 
-    function onAddRadioButton(): void {
-        props.onAddRadioButton(props.id);
+    function onAddCheckboxButton(): void {
+        props.onAddCheckboxButton(props.id);
     }
 
-    function onDeleteRadioButton(): void {
-        props.onDeleteRadioButton(props.id);
+    function onDeleteCheckboxButton(): void {
+        props.onDeleteCheckboxButton(props.id);
     }
 
     return (
         <React.Fragment>
             <Grid container alignItems="center">
                 <Grid item xs={1}>
-                    <Radio
+                    <Checkbox
                         disabled
                         checked
                         css={css`
@@ -73,17 +73,17 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 <Grid item xs={1}>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <IconButton onClick={onDeleteRadioButton}>
+                            <IconButton onClick={onDeleteCheckboxButton}>
                                 <DeleteIcon />
                             </IconButton>
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
-            {props.addRadioButton && props.questionFocused && (
+            {props.addCheckboxButton && props.questionFocused && (
                 <Grid container alignItems="center">
                     <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        <Radio
+                        <Checkbox
                             disabled
                             checked
                             css={css`
@@ -98,7 +98,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                             css={css`
                                 text-transform: none;
                             `}
-                            onClick={onAddRadioButton}
+                            onClick={onAddCheckboxButton}
                         >
                             Добавить вариант
                         </Button>

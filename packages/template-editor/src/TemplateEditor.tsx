@@ -15,6 +15,7 @@ import { traverse } from "./services/json";
 import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
 import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
+import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -277,6 +278,25 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 questionFocused={questionFocused}
                 onAddRadioButton={onAddAnswerPuzzle}
                 onDeleteRadioButton={onDeleteAnswerPuzzle}
+            />
+        ),
+        [EPuzzleType.CHECKBOX_ANSWER]: (
+            index: number,
+            id: string,
+            title: string,
+            addCheckboxButton: boolean,
+            questionFocused: boolean
+        ) => (
+            <CheckboxAnswerPuzzle
+                template={template}
+                title={title}
+                onTemplateChange={onTemplateChange}
+                id={id}
+                index={index}
+                addCheckboxButton={addCheckboxButton}
+                questionFocused={questionFocused}
+                onAddCheckboxButton={onAddAnswerPuzzle}
+                onDeleteCheckboxButton={onDeleteAnswerPuzzle}
             />
         ),
     };
