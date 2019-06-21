@@ -56,6 +56,8 @@ interface IPuzzleProps {
     onFocus(id: string): void;
 
     onBlur(event: React.SyntheticEvent): void;
+
+    onMouseDown?(): void;
 }
 
 export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
@@ -83,6 +85,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 key={puzzle.id}
                                 id={puzzle.id}
                                 onFocus={onFocus}
+                                onMouseDown={onFocus}
                                 onBlur={props.onBlur}
                                 css={theme => ({
                                     position: "relative",
@@ -124,6 +127,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     zIndex: props.isFocused(puzzle.id) ? 1300 : 0,
                                 })}
                                 onFocus={onFocus}
+                                onMouseDown={onFocus}
                                 onBlur={props.onBlur}
                                 square={true}
                                 elevation={props.isFocused(puzzle.id) ? 16 : 0}
@@ -135,6 +139,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     questionFocused={props.isFocused(puzzle.id)}
                                     puzzles={puzzle.puzzles}
                                     index={props.index}
+                                    onMouseDown={onFocus}
                                     {...props}
                                 />
                             </Paper>
@@ -148,6 +153,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.TEXT_ANSWER](
@@ -165,6 +171,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.DATE_ANSWER](
@@ -182,6 +189,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.NUMERIC_ANSWER](
@@ -199,6 +207,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.RADIO_ANSWER]({
@@ -217,6 +226,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.CHECKBOX_ANSWER]({
@@ -235,6 +245,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     marginTop: theme.spacing(2),
                                     marginBottom: theme.spacing(2),
                                 })}
+                                onMouseDown={props.onMouseDown}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.DROPDOWN_ANSWER]({
