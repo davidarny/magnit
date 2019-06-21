@@ -33,50 +33,63 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
             <Grid
                 container
                 direction="column"
-                alignContent="center"
+                alignItems="center"
+                justify="center"
                 css={theme => ({ padding: theme.spacing() })}
             >
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton
-                        color="primary"
-                        aria-label="Добавить вопрос"
-                        onClick={props.onAddClick}
-                    >
-                        <QuestionIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton
+                            color="primary"
+                            aria-label="Добавить вопрос"
+                            onClick={props.onAddClick}
+                        >
+                            <QuestionIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton
-                        onClick={props.onAddGroup}
-                        color="primary"
-                        aria-label="Добавить группу"
-                    >
-                        <GroupIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton
+                            onClick={props.onAddGroup}
+                            color="primary"
+                            aria-label="Добавить группу"
+                        >
+                            <GroupIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton
-                        color="primary"
-                        onClick={props.onAddSection}
-                        aria-label="Добавить раздел"
-                    >
-                        <SectionIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton
+                            color="primary"
+                            onClick={props.onAddSection}
+                            aria-label="Добавить раздел"
+                        >
+                            <SectionIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Скопировать">
-                        <CopyIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton color="primary" aria-label="Скопировать">
+                            <CopyIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Добавить фото">
-                        <ImageIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton color="primary" aria-label="Добавить фото">
+                            <ImageIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
-                    <IconButton color="primary" aria-label="Удалить элемент">
-                        <TrashIcon />
-                    </IconButton>
+                    <Grid container justify="center" alignItems="center">
+                        <IconButton color="primary" aria-label="Удалить элемент">
+                            <TrashIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
             </Grid>
         </Paper>

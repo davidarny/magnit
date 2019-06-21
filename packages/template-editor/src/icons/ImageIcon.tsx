@@ -25,7 +25,7 @@ export const ImageIcon: React.FC<IIconProps> = ({ size = 24 }) => {
                 height="16.5"
                 rx="1.25"
                 stroke="#2F97FF"
-                stroke-width="1.5"
+                strokeWidth="1.5"
             />
             <circle cx="9" cy="10" r="0.5" fill="#3F4752" stroke="#2F97FF" />
         </SvgIcon>
