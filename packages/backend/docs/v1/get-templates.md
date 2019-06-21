@@ -26,13 +26,13 @@ None
     `total` - total number of pages by criteria
 
     `object sample:`
-    {
-    &nbsp;&nbsp;&nbsp;&nbsp;createdAt: '2019-06-20T14:40:43.463Z',
-    &nbsp;&nbsp;&nbsp;&nbsp;updatedAt: '2019-06-20T14:40:43.463Z',
-    &nbsp;&nbsp;&nbsp;&nbsp;id: 17,
-    &nbsp;&nbsp;&nbsp;&nbsp;title: 'some title',
-    &nbsp;&nbsp;&nbsp;&nbsp;description: 'some description',
-    &nbsp;&nbsp;&nbsp;&nbsp;assigned: false
+    {  
+    &nbsp;&nbsp;&nbsp;&nbsp;createdAt: '2019-06-20T14:40:43.463Z',  
+    &nbsp;&nbsp;&nbsp;&nbsp;updatedAt: '2019-06-20T14:40:43.463Z',  
+    &nbsp;&nbsp;&nbsp;&nbsp;id: 17,  
+    &nbsp;&nbsp;&nbsp;&nbsp;title: 'some title',  
+    &nbsp;&nbsp;&nbsp;&nbsp;description: 'some description',  
+    &nbsp;&nbsp;&nbsp;&nbsp;assigned: false  
     }
 
 **Sample Call:**
