@@ -23,6 +23,7 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
                     display: flex;
                     align-items: center;
                 `}
+                elevation={0}
             >
                 <Grid
                     container

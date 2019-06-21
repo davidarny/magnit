@@ -24,6 +24,10 @@ const theme = {
         return times * 8 + "px";
     },
 
+    radius(times: number = 1) {
+        return times * 8 + "px";
+    },
+
     colors: {
         primary: "#2F97FF",
         secondary: "#8A94A2",
