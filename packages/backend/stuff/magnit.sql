@@ -23,6 +23,7 @@ ALTER TABLE ONLY public.users DROP CONSTRAINT users_object_id_fkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
+ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_pkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_template_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_task_id_fkey;
 ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_template_id_fkey;
@@ -49,6 +50,7 @@ ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_pkey;
 ALTER TABLE public.validations ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.templates ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.task_templates ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tasks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tariffs ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.sections ALTER COLUMN id DROP DEFAULT;
@@ -67,6 +69,7 @@ DROP TABLE public.templates;
 DROP SEQUENCE public.tasks_id_seq;
 DROP TABLE public.tasks;
 DROP TABLE public.task_users;
+DROP SEQUENCE public.task_templates_id_seq;
 DROP TABLE public.task_templates;
 DROP SEQUENCE public.tariffs_id_seq;
 DROP TABLE public.tariffs;
@@ -552,6 +555,7 @@ ALTER SEQUENCE public.tariffs_id_seq OWNED BY public.tariffs.id;
 --
 
 CREATE TABLE public.task_templates (
+    id integer NOT NULL,
     task_id integer,
     template_id integer,
     created_at timestamp without time zone,
@@ -560,6 +564,27 @@ CREATE TABLE public.task_templates (
 
 
 ALTER TABLE public.task_templates OWNER TO postgres;
+
+--
+-- Name: tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.task_templates_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.task_templates_id_seq OWNER TO postgres;
+
+--
+-- Name: task_templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.task_templates_id_seq OWNED BY public.task_templates.id;
 
 --
 -- Name: task_users; Type: TABLE; Schema: public; Owner: postgres
@@ -799,6 +824,13 @@ ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_
 
 
 --
+-- Name: task_templates id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_templates ALTER COLUMN id SET DEFAULT nextval('public.task_templates_id_seq'::regclass);
+
+
+--
 -- Name: templates id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -887,7 +919,7 @@ COPY public.tariffs (id, name, toir_id, toir_name, toir_type, created_at, update
 -- Data for Name: task_templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.task_templates (task_id, template_id, created_at, updated_at) FROM stdin;
+COPY public.task_templates (id, task_id, template_id, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -995,6 +1027,13 @@ SELECT pg_catalog.setval('public.tasks_id_seq', 1, false);
 
 
 --
+-- Name: task_templates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.task_templates_id_seq', 1, false);
+
+
+--
 -- Name: templates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1088,6 +1127,14 @@ ALTER TABLE ONLY public.tasks
 
 
 --
+-- Name: tasks task_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_templates
+    ADD CONSTRAINT task_templates_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: templates templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1116,7 +1163,7 @@ ALTER TABLE ONLY public.validations
 --
 
 ALTER TABLE ONLY public.answers
-    ADD CONSTRAINT answers_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT answers_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id) ON DELETE CASCADE;
 
 
 --
@@ -1124,7 +1171,7 @@ ALTER TABLE ONLY public.answers
 --
 
 ALTER TABLE ONLY public.conditions
-    ADD CONSTRAINT conditions_answer_puzzle_fkey FOREIGN KEY (answer_puzzle) REFERENCES public.puzzles(uuid);
+    ADD CONSTRAINT conditions_answer_puzzle_fkey FOREIGN KEY (answer_puzzle) REFERENCES public.puzzles(uuid) ON DELETE CASCADE;
 
 
 --
@@ -1132,7 +1179,7 @@ ALTER TABLE ONLY public.conditions
 --
 
 ALTER TABLE ONLY public.conditions
-    ADD CONSTRAINT conditions_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT conditions_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id) ON DELETE CASCADE;
 
 
 --
@@ -1140,7 +1187,7 @@ ALTER TABLE ONLY public.conditions
 --
 
 ALTER TABLE ONLY public.conditions
-    ADD CONSTRAINT conditions_question_puzzle_fkey FOREIGN KEY (question_puzzle) REFERENCES public.puzzles(uuid);
+    ADD CONSTRAINT conditions_question_puzzle_fkey FOREIGN KEY (question_puzzle) REFERENCES public.puzzles(uuid) ON DELETE CASCADE;
 
 
 --
@@ -1148,7 +1195,7 @@ ALTER TABLE ONLY public.conditions
 --
 
 ALTER TABLE ONLY public.notifications
-    ADD CONSTRAINT notifications_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
+    ADD CONSTRAINT notifications_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -1156,7 +1203,7 @@ ALTER TABLE ONLY public.notifications
 --
 
 ALTER TABLE ONLY public.objects
-    ADD CONSTRAINT objects_region_fkey FOREIGN KEY (region) REFERENCES public.regions(id);
+    ADD CONSTRAINT objects_region_fkey FOREIGN KEY (region) REFERENCES public.regions(id) ON DELETE CASCADE;
 
 
 --
@@ -1164,7 +1211,7 @@ ALTER TABLE ONLY public.objects
 --
 
 ALTER TABLE ONLY public.puzzles
-    ADD CONSTRAINT puzzles_section_id_fkey FOREIGN KEY (section_id) REFERENCES public.sections(id);
+    ADD CONSTRAINT puzzles_section_id_fkey FOREIGN KEY (section_id) REFERENCES public.sections(id) ON DELETE CASCADE;
 
 
 --
@@ -1172,7 +1219,7 @@ ALTER TABLE ONLY public.puzzles
 --
 
 ALTER TABLE ONLY public.puzzles
-    ADD CONSTRAINT puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id);
+    ADD CONSTRAINT puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
 
 
 --
@@ -1180,7 +1227,7 @@ ALTER TABLE ONLY public.puzzles
 --
 
 ALTER TABLE ONLY public.sections
-    ADD CONSTRAINT sections_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id);
+    ADD CONSTRAINT sections_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
 
 
 --
@@ -1188,7 +1235,7 @@ ALTER TABLE ONLY public.sections
 --
 
 ALTER TABLE ONLY public.task_templates
-    ADD CONSTRAINT task_templates_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
+    ADD CONSTRAINT task_templates_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id)ON DELETE CASCADE;
 
 
 --
@@ -1196,7 +1243,7 @@ ALTER TABLE ONLY public.task_templates
 --
 
 ALTER TABLE ONLY public.task_templates
-    ADD CONSTRAINT task_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id);
+    ADD CONSTRAINT task_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
 
 
 --
@@ -1204,7 +1251,7 @@ ALTER TABLE ONLY public.task_templates
 --
 
 ALTER TABLE ONLY public.task_users
-    ADD CONSTRAINT task_users_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id);
+    ADD CONSTRAINT task_users_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id)ON DELETE CASCADE;
 
 
 --
@@ -1212,7 +1259,7 @@ ALTER TABLE ONLY public.task_users
 --
 
 ALTER TABLE ONLY public.task_users
-    ADD CONSTRAINT task_users_users_id_fkey FOREIGN KEY (users_id) REFERENCES public.users(id);
+    ADD CONSTRAINT task_users_users_id_fkey FOREIGN KEY (users_id) REFERENCES public.users(id)ON DELETE CASCADE;
 
 
 --
@@ -1220,7 +1267,7 @@ ALTER TABLE ONLY public.task_users
 --
 
 ALTER TABLE ONLY public.tasks
-    ADD CONSTRAINT tasks_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id);
+    ADD CONSTRAINT tasks_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id) ON DELETE CASCADE;
 
 
 --
@@ -1228,7 +1275,7 @@ ALTER TABLE ONLY public.tasks
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id);
+    ADD CONSTRAINT users_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id) ON DELETE CASCADE;
 
 
 --
@@ -1236,7 +1283,7 @@ ALTER TABLE ONLY public.users
 --
 
 ALTER TABLE ONLY public.validations
-    ADD CONSTRAINT validations_left_hand_puzzle_fkey FOREIGN KEY (left_hand_puzzle) REFERENCES public.puzzles(uuid);
+    ADD CONSTRAINT validations_left_hand_puzzle_fkey FOREIGN KEY (left_hand_puzzle) REFERENCES public.puzzles(uuid) ON DELETE CASCADE;
 
 
 --
@@ -1244,7 +1291,7 @@ ALTER TABLE ONLY public.validations
 --
 
 ALTER TABLE ONLY public.validations
-    ADD CONSTRAINT validations_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id);
+    ADD CONSTRAINT validations_puzzle_id_fkey FOREIGN KEY (puzzle_id) REFERENCES public.puzzles(id) ON DELETE CASCADE;
 
 
 --
@@ -1252,7 +1299,7 @@ ALTER TABLE ONLY public.validations
 --
 
 ALTER TABLE ONLY public.validations
-    ADD CONSTRAINT validations_right_hand_puzzle_fkey FOREIGN KEY (right_hand_puzzle) REFERENCES public.puzzles(uuid);
+    ADD CONSTRAINT validations_right_hand_puzzle_fkey FOREIGN KEY (right_hand_puzzle) REFERENCES public.puzzles(uuid) ON DELETE CASCADE;
 
 
 --

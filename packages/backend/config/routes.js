@@ -9,5 +9,9 @@
  */
 
 module.exports.routes = {
-    "POST     /v1/templates": "v1/admin/create-template",
+    "GET /v1/templates": "v1/admin/get-templates",
+    "POST /v1/templates": "v1/admin/create-template",
+    "GET /v1/templates/:id": "v1/admin/get-template",
+    // "PUT /v1/templates:/id": "v1/admin/edit-template",
+    "DELETE /v1/templates/:id": "v1/admin/delete-template",
 };
