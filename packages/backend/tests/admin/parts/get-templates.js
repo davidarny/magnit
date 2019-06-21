@@ -36,10 +36,13 @@ module.exports = function(options) {
                     assert.equal(body.templates.length, 10);
                     assert.equal(body.templates[0].title, "title 0");
                     assert.equal(body.templates[0].description, "description 0");
+                    assert.equal(body.templates[0].assigned, false);
                     assert.equal(body.templates[1].title, "title 1");
                     assert.equal(body.templates[1].description, "description 1");
+                    assert.equal(body.templates[1].assigned, false);
                     assert.equal(body.templates[9].title, "title 17");
                     assert.equal(body.templates[9].description, "description 17");
+                    assert.equal(body.templates[9].assigned, false);
 
                     options.uri = `${host}/v1/templates?offset=7&limit=10`;
 
@@ -66,10 +69,13 @@ module.exports = function(options) {
                     assert.equal(body.templates.length, 10);
                     assert.equal(body.templates[0].title, "title 15");
                     assert.equal(body.templates[0].description, "description 15");
+                    assert.equal(body.templates[0].assigned, false);
                     assert.equal(body.templates[1].title, "title 16");
                     assert.equal(body.templates[1].description, "description 16");
+                    assert.equal(body.templates[1].assigned, false);
                     assert.equal(body.templates[9].title, "title 23");
                     assert.equal(body.templates[9].description, "description 23");
+                    assert.equal(body.templates[9].assigned, false);
 
                     options.uri = `${host}/v1/templates?offset=7&limit=10&sort=DESC`;
 
@@ -96,10 +102,13 @@ module.exports = function(options) {
                     assert.equal(body.templates.length, 10);
                     assert.equal(body.templates[0].title, "title 3");
                     assert.equal(body.templates[0].description, "description 3");
+                    assert.equal(body.templates[0].assigned, false);
                     assert.equal(body.templates[1].title, "title 26");
                     assert.equal(body.templates[1].description, "description 26");
+                    assert.equal(body.templates[1].assigned, false);
                     assert.equal(body.templates[9].title, "title 19");
                     assert.equal(body.templates[9].description, "description 19");
+                    assert.equal(body.templates[9].assigned, false);
 
                     options.uri = `${host}/v1/templates?title=${encodeURIComponent(
                         "Ведомость работ"
@@ -128,6 +137,7 @@ module.exports = function(options) {
                     assert.equal(body.templates.length, 1);
                     assert.equal(body.templates[0].title, "Ведомость работ");
                     assert.equal(body.templates[0].description, null);
+                    assert.equal(body.templates[0].assigned, false);
 
                     return done();
                 } catch (err) {

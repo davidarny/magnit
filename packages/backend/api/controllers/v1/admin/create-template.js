@@ -24,7 +24,7 @@ module.exports = {
             let template = inputs.template;
 
             if (typeof template === "string") {
-                let valid = await sails.helpers.isJsonValid(template);
+                const valid = await sails.helpers.isJsonValid(template);
 
                 if (!valid) {
                     return exits.badRequest({ success: 0, message: "Not valid JSON" });

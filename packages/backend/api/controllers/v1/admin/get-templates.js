@@ -50,6 +50,16 @@ module.exports = {
                 .limit(limit)
                 .sort([{ title: sort }]);
 
+            for (let i = 0; i < templates.length; i++) {
+                templates[i].assigned = false;
+
+                let taskTemplatesCount = await TaskTemplate.find({ template_id: templates[i].id });
+
+                if (taskTemplatesCount > 0) {
+                    templates[i].assigned = true;
+                }
+            }
+
             return exits.success({ success: 1, total: total, templates: templates });
         } catch (err) {
             console.log(err);
