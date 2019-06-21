@@ -7,11 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import {
     Button,
     FormControl,
+    FormControlLabel,
     Grid,
     IconButton,
     Input,
     InputLabel,
     MenuItem,
+    Radio,
+    RadioGroup,
     Select,
     TextField,
 } from "@material-ui/core";
@@ -203,6 +206,12 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     });
                 }
 
+                function onConditionTypeChange(event: unknown, value: unknown): void {
+                    onConditionChange(condition.id, {
+                        conditionType: value as EConditionType,
+                    });
+                }
+
                 // const getConditionType = R.prop("conditionType");
                 // const getActionType = R.prop("actionType");
                 // const getAnswerPuzzleType = R.prop("puzzleType");
@@ -219,10 +228,34 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
                     puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
                 };
 
+                const conditionLiteral = getConditionLiteral(index, condition.conditionType);
+
                 return (
                     <React.Fragment key={condition.id}>
                         <Grid xs={index === 0 ? 2 : 6} item>
-                            {getConditionLiteral(index, condition.conditionType)}
+                            {index === 0 && conditionLiteral}
+                            {index > 0 && (
+                                <React.Fragment>
+                                    <RadioGroup
+                                        value={condition.conditionType}
+                                        onChange={onConditionTypeChange}
+                                        row
+                                    >
+                                        <FormControlLabel
+                                            value={EConditionType.AND}
+                                            control={<Radio color="primary" />}
+                                            label="И"
+                                            labelPlacement="end"
+                                        />
+                                        <FormControlLabel
+                                            value={EConditionType.OR}
+                                            control={<Radio color="primary" />}
+                                            label="Или"
+                                            labelPlacement="end"
+                                        />
+                                    </RadioGroup>
+                                </React.Fragment>
+                            )}
                         </Grid>
                         {index === 0 && (
                             <Grid item xs={4}>
