@@ -181,5 +181,27 @@
                 }
             ]
         }
+    ],
+    "puzzles": [
+        {
+            "id": "f0dc6bef-1993-45aa-8df0-2dac0a32dcc0",
+            "order": 0,
+            "title": "Нужен ремонт?",
+            "puzzle_type": "question",
+            "puzzles": [
+                {
+                    "id": "0cf23a3b-6c40-42eb-bcde-9d3f5a390812",
+                    "order": 0,
+                    "title": "Да",
+                    "puzzle_type": "radio_answer"
+                },
+                {
+                    "id": "81b1b459-f738-4435-9aee-3baf576ae7d2",
+                    "order": 1,
+                    "title": "Нет",
+                    "puzzle_type": "radio_answer"
+                }
+            ]
+        }
     ]
 }

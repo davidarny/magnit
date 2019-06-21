@@ -12,6 +12,7 @@ module.exports = {
         },
         section_id: {
             type: "number",
+            allowNull: true,
         },
         puzzle_id: {
             type: "number",
@@ -41,8 +42,8 @@ module.exports = {
             }).fetch();
 
             if (puzzle.conditions) {
-                for (let i = 0; i < puzzle.conditions.length; i++) {
-                    let condition = puzzle.conditions[i];
+                for (let j = 0; j < puzzle.conditions.length; j++) {
+                    let condition = puzzle.conditions[j];
 
                     await Condition.create({
                         puzzle_id: newPuzzle.id,
@@ -57,8 +58,8 @@ module.exports = {
             }
 
             if (puzzle.validations) {
-                for (let i = 0; i < puzzle.validations.length; i++) {
-                    let validation = puzzle.validations[i];
+                for (let j = 0; j < puzzle.validations.length; j++) {
+                    let validation = puzzle.validations[j];
 
                     await Validation.create({
                         puzzle_id: newPuzzle.id,

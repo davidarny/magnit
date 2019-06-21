@@ -3,15 +3,15 @@ module.exports = function(options) {
     let host = options.host;
     let assert = options.assert;
 
-    let json = require("./data.json");
+    let json = require("./../assets/data.json");
 
     async function onTemplateCreate(httpResponse, body) {
         assert.equal(httpResponse.statusCode, 200);
         assert.equal(body.success, 1);
-        assert.equal(body.message, "Ok");
+        assert.equal(body.template_id, 1);
 
         const rootPuzzles = await Puzzle.find({ parent_id: null });
-        assert.equal(rootPuzzles.length, 2);
+        assert.equal(rootPuzzles.length, 3);
         assert.equal(rootPuzzles[0].title, "Основная группа вопросов");
         assert.equal(rootPuzzles[0].parent_id, null);
         assert.equal(rootPuzzles[0].order, 0);
@@ -22,7 +22,7 @@ module.exports = function(options) {
         assert.equal(rootPuzzles[1].puzzle_type, "group");
 
         const puzzles = await Puzzle.find();
-        assert.equal(puzzles.length, 18);
+        assert.equal(puzzles.length, 21);
         assert.equal(puzzles[1].template_id, 1);
         assert.equal(puzzles[1].section_id, 1);
         assert.equal(puzzles[1].parent_id, 1);
@@ -67,7 +67,7 @@ module.exports = function(options) {
         assert.equal(puzzles[12].puzzle_type, "question");
         assert.equal(puzzles[12].order, 1);
         assert.equal(puzzles[13].parent_id, 13);
-        assert.equal(puzzles[13].title, "");
+        assert.equal(puzzles[13].title, null);
         assert.equal(puzzles[13].puzzle_type, "input_answer");
         assert.equal(puzzles[13].order, 0);
         assert.equal(puzzles[13].answer_type, "number");
@@ -77,7 +77,7 @@ module.exports = function(options) {
         assert.equal(puzzles[14].puzzle_type, "question");
         assert.equal(puzzles[14].order, 2);
         assert.equal(puzzles[15].parent_id, 15);
-        assert.equal(puzzles[15].title, "");
+        assert.equal(puzzles[15].title, null);
         assert.equal(puzzles[15].puzzle_type, "input_answer");
         assert.equal(puzzles[15].order, 0);
         assert.equal(puzzles[15].answer_type, "number");
@@ -86,11 +86,21 @@ module.exports = function(options) {
         assert.equal(puzzles[16].puzzle_type, "question");
         assert.equal(puzzles[16].order, 3);
         assert.equal(puzzles[17].parent_id, 17);
-        assert.equal(puzzles[17].title, "");
+        assert.equal(puzzles[17].title, null);
         assert.equal(puzzles[17].puzzle_type, "input_answer");
         assert.equal(puzzles[17].order, 0);
         assert.equal(puzzles[17].answer_type, "number");
         assert.equal(puzzles[17].uuid, "f1c77dcd-95a1-4cea-982f-ba3269365b2d");
+        assert.equal(puzzles[18].parent_id, null);
+        assert.equal(puzzles[18].title, "Нужен ремонт?");
+        assert.equal(puzzles[18].puzzle_type, "question");
+        assert.equal(puzzles[18].order, 0);
+        assert.equal(puzzles[18].answer_type, null);
+        assert.equal(puzzles[18].uuid, "f0dc6bef-1993-45aa-8df0-2dac0a32dcc0");
+        assert.equal(puzzles[19].parent_id, 19);
+        assert.equal(puzzles[19].uuid, "0cf23a3b-6c40-42eb-bcde-9d3f5a390812");
+        assert.equal(puzzles[20].parent_id, 19);
+        assert.equal(puzzles[20].uuid, "81b1b459-f738-4435-9aee-3baf576ae7d2");
 
         const conditions = await Condition.find();
         assert.equal(conditions.length, 4);
@@ -147,6 +157,18 @@ module.exports = function(options) {
             validations[1].error_message,
             "Ошибка! Площадь объекта не может быть больше 100м*м"
         );
+
+        const templates = await Template.find();
+        assert.equal(templates.length, 1);
+        assert.equal(templates[0].title, "Ведомость работ");
+        assert.equal(templates[0].description, null);
+
+        const sections = await Section.find();
+        assert.equal(sections.length, 1);
+        assert.equal(sections[0].template_id, 1);
+        assert.equal(sections[0].title, "Благоустройство");
+        assert.equal(sections[0].description, null);
+        assert.equal(sections[0].order, 0);
     }
 
     describe("#create-template", () => {
@@ -186,6 +208,11 @@ module.exports = function(options) {
 
                     await onTemplateCreate(httpResponse, body);
 
+                    const config = JSON.parse(require("fs").readFileSync("config.json"), "utf8");
+                    const postgresDb = config.postgresql_db;
+                    const exec = require("child_process").execSync;
+                    exec(`sudo -u postgres psql --quiet ${postgresDb} < stuff/magnit.sql`);
+
                     options.json = { template: json };
 
                     return done();
@@ -195,20 +222,20 @@ module.exports = function(options) {
             });
         });
 
-        // it("valid json", done => {
-        //     request(options, async (err, httpResponse, body) => {
-        //         try {
-        //             if (err) {
-        //                 throw err;
-        //             }
-        //
-        //             await onTemplateCreate(httpResponse, body);
-        //
-        //             return done();
-        //         } catch (err) {
-        //             return done(err);
-        //         }
-        //     });
-        // });
+        it("valid json", done => {
+            request(options, async (err, httpResponse, body) => {
+                try {
+                    if (err) {
+                        throw err;
+                    }
+
+                    await onTemplateCreate(httpResponse, body);
+
+                    return done();
+                } catch (err) {
+                    return done(err);
+                }
+            });
+        });
     });
 };
