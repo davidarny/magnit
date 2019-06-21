@@ -48,20 +48,44 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
 
     useEffect(() => {
-        // fill questions and answers initially
-        // by traversing whole template tree
-        questions.length = 0;
-        answers.length = 0;
         // track if template is changed
         // outside of this component
         if (!_.isEqual(template, templateSnapshot.current)) {
             conditions.forEach((condition, index, array) => {
-                condition.answerPuzzle = ETerminals.EMPTY;
-                condition.value = ETerminals.EMPTY;
-                condition.actionType = EActionType.NONE;
-                array[index] = { ...condition };
+                let hasDependentQuestionChanged = false;
+                const dependentQuestion = questions.find(
+                    question => question.id === condition.questionPuzzle
+                );
+                if (dependentQuestion) {
+                    traverse(template, (value: any) => {
+                        if (typeof value !== "object" || !("puzzles" in value)) {
+                            return;
+                        }
+                        const puzzle = value as IPuzzle;
+                        // find dependent question in template
+                        if (
+                            !("puzzleType" in puzzle) ||
+                            puzzle.puzzleType !== EPuzzleType.QUESTION ||
+                            puzzle.id !== dependentQuestion.id
+                        ) {
+                            return;
+                        }
+                        // check if dependent question has changed
+                        hasDependentQuestionChanged = !_.isEqual(dependentQuestion, puzzle);
+                    });
+                    if (hasDependentQuestionChanged) {
+                        condition.answerPuzzle = ETerminals.EMPTY;
+                        condition.value = ETerminals.EMPTY;
+                        condition.actionType = EActionType.NONE;
+                        array[index] = { ...condition };
+                    }
+                }
             });
         }
+        // fill questions and answers initially
+        // by traversing whole template tree
+        questions.length = 0;
+        answers.length = 0;
         traverse(template, (value: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
@@ -103,8 +127,8 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
             // set conditions of current puzzle
             puzzle.puzzles[index].conditions = [...conditions];
         });
-        setQuestions([...questions]);
-        setAnswers([...answers]);
+        setQuestions(_.cloneDeep(questions));
+        setAnswers(_.cloneDeep(answers));
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
         if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
