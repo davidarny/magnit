@@ -3,14 +3,7 @@
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import {
-    Add as AddQuestionIcon,
-    AddPhotoAlternate as AddPhotoIcon,
-    Title as AddSectionIcon,
-    FileCopy as CopyToClipboardIcon,
-    NoteAdd as AddGroupIcon,
-    Delete as DeleteIcon,
-} from "@material-ui/icons";
+import { CopyIcon, GroupIcon, ImageIcon, QuestionIcon, SectionIcon, TrashIcon } from "icons";
 
 interface IPuzzleToolbarProps {
     right?: number;
@@ -49,7 +42,7 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                         aria-label="Добавить вопрос"
                         onClick={props.onAddClick}
                     >
-                        <AddQuestionIcon />
+                        <QuestionIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
@@ -58,7 +51,7 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                         color="primary"
                         aria-label="Добавить группу"
                     >
-                        <AddGroupIcon />
+                        <GroupIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
@@ -67,22 +60,22 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                         onClick={props.onAddSection}
                         aria-label="Добавить раздел"
                     >
-                        <AddSectionIcon />
+                        <SectionIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Скопировать">
-                        <CopyToClipboardIcon />
+                        <CopyIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Добавить фото">
-                        <AddPhotoIcon />
+                        <ImageIcon />
                     </IconButton>
                 </Grid>
                 <Grid item css={theme => ({ marginBottom: theme.spacing() })}>
                     <IconButton color="primary" aria-label="Удалить элемент">
-                        <DeleteIcon />
+                        <TrashIcon />
                     </IconButton>
                 </Grid>
             </Grid>
