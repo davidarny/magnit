@@ -142,6 +142,9 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                                     Загрузка файлов
                                 </MenuItem>
                                 <MenuItem value={EPuzzleType.DATE_ANSWER}>Дата</MenuItem>
+                                <MenuItem value={EPuzzleType.DROPDOWN_ANSWER}>
+                                    Выпадающий список
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Grid, IconButton, TextField } from "@material-ui/core";
+import { Button, Grid, IconButton, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
 import { traverse } from "services/json";
@@ -10,23 +10,23 @@ import { Close as DeleteIcon } from "@material-ui/icons";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-interface ICheckboxAnswerPuzzleProps extends ISpecificPuzzleProps {
+interface IDropdownAnswerPuzzleProps extends ISpecificPuzzleProps {
     title: string;
     template: ITemplate;
-    // flag indication this checkbox should render
-    // button which adds new checkbox when clicked
-    addCheckboxButton: boolean;
+    // flag indication this dropdown should render
+    // button which adds new dropdown when clicked
+    addDropdownButton: boolean;
     // if not focused, we don't show add button
     questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 
-    onAddCheckboxButton(id: string): void;
+    onAddDropdownButton(id: string): void;
 
-    onDeleteCheckboxButton(id: string): void;
+    onDeleteDropdownButton(id: string): void;
 }
 
-export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props }) => {
+export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
     useEffect(() => {
@@ -47,25 +47,19 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
         setLabel(event.target.value as string);
     }
 
-    function onAddCheckboxButton(): void {
-        props.onAddCheckboxButton(props.id);
+    function onAddDropdownButton(): void {
+        props.onAddDropdownButton(props.id);
     }
 
-    function onDeleteCheckboxButton(): void {
-        props.onDeleteCheckboxButton(props.id);
+    function onDeleteDropdownButton(): void {
+        props.onDeleteDropdownButton(props.id);
     }
 
     return (
         <React.Fragment>
             <Grid container alignItems="center">
                 <Grid item xs={1}>
-                    <Checkbox
-                        disabled
-                        checked
-                        css={css`
-                            padding-left: 0;
-                        `}
-                    />
+                    {props.index + 1}.
                 </Grid>
                 <Grid item xs={10}>
                     <TextField fullWidth value={label} onChange={onLabelChange} />
@@ -73,23 +67,17 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                 <Grid item xs={1}>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <IconButton onClick={onDeleteCheckboxButton}>
+                            <IconButton onClick={onDeleteDropdownButton}>
                                 <DeleteIcon />
                             </IconButton>
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
-            {props.addCheckboxButton && props.questionFocused && (
+            {props.addDropdownButton && props.questionFocused && (
                 <Grid container alignItems="center">
                     <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        <Checkbox
-                            disabled
-                            checked
-                            css={css`
-                                padding-left: 0;
-                            `}
-                        />
+                        {props.index + 2}.
                     </Grid>
                     <Grid item xs={11} css={theme => ({ marginTop: theme.spacing(2) })}>
                         <Button
@@ -98,7 +86,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                             css={css`
                                 text-transform: none;
                             `}
-                            onClick={onAddCheckboxButton}
+                            onClick={onAddDropdownButton}
                         >
                             Добавить вариант
                         </Button>

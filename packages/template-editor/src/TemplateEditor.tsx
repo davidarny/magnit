@@ -8,7 +8,16 @@ import { Grid, Paper, TextField } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { GroupPuzzle } from "./items/group-puzzle";
 import { QuestionPuzzle } from "./items/question-puzzle";
-import { EPuzzleType, Puzzle, PuzzleToolbar } from "./components/puzzle";
+import {
+    EPuzzleType,
+    ICheckboxComponentProps,
+    ICommonComponentProps,
+    IDropdownComponentProps,
+    IRadioComponentProps,
+    ITitledComponentProps,
+    Puzzle,
+    PuzzleToolbar,
+} from "./components/puzzle";
 import { TextAnswerPuzzle } from "./items/text-answer-puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
@@ -16,6 +25,7 @@ import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
 import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
 import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
+import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -236,67 +246,53 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
     const components = {
-        [EPuzzleType.GROUP]: (index: number, id: string) => (
+        [EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
             <GroupPuzzle
                 template={template}
                 isFocused={id => id === focusedPuzzleId}
-                id={id}
-                index={index}
                 onTemplateChange={onTemplateChange}
+                {...props}
             />
         ),
-        [EPuzzleType.QUESTION]: (index: number, id: string, title: string) => (
+        [EPuzzleType.QUESTION]: (props: ITitledComponentProps) => (
             <QuestionPuzzle
                 template={template}
                 isFocused={id => id === focusedPuzzleId}
-                title={title}
-                index={index}
-                id={id}
                 onTemplateChange={onTemplateChange}
+                {...props}
             />
         ),
-        [EPuzzleType.TEXT_ANSWER]: (index: number, id: string) => (
-            <TextAnswerPuzzle index={index} id={id} />
+        [EPuzzleType.TEXT_ANSWER]: (props: ICommonComponentProps) => (
+            <TextAnswerPuzzle {...props} />
         ),
-        [EPuzzleType.NUMERIC_ANSWER]: (index: number, id: string) => (
-            <NumericAnswerPuzzle id={id} index={index} />
+        [EPuzzleType.NUMERIC_ANSWER]: (props: ICommonComponentProps) => (
+            <NumericAnswerPuzzle {...props} />
         ),
-        [EPuzzleType.RADIO_ANSWER]: (
-            index: number,
-            id: string,
-            title: string,
-            addRadioButton: boolean,
-            questionFocused: boolean
-        ) => (
+        [EPuzzleType.RADIO_ANSWER]: (props: IRadioComponentProps) => (
             <RadioAnswerPuzzle
                 template={template}
-                title={title}
+                {...props}
                 onTemplateChange={onTemplateChange}
-                id={id}
-                index={index}
-                addRadioButton={addRadioButton}
-                questionFocused={questionFocused}
                 onAddRadioButton={onAddAnswerPuzzle}
                 onDeleteRadioButton={onDeleteAnswerPuzzle}
             />
         ),
-        [EPuzzleType.CHECKBOX_ANSWER]: (
-            index: number,
-            id: string,
-            title: string,
-            addCheckboxButton: boolean,
-            questionFocused: boolean
-        ) => (
+        [EPuzzleType.CHECKBOX_ANSWER]: (props: ICheckboxComponentProps) => (
             <CheckboxAnswerPuzzle
                 template={template}
-                title={title}
+                {...props}
                 onTemplateChange={onTemplateChange}
-                id={id}
-                index={index}
-                addCheckboxButton={addCheckboxButton}
-                questionFocused={questionFocused}
                 onAddCheckboxButton={onAddAnswerPuzzle}
                 onDeleteCheckboxButton={onDeleteAnswerPuzzle}
+            />
+        ),
+        [EPuzzleType.DROPDOWN_ANSWER]: (props: IDropdownComponentProps) => (
+            <DropdownAnswerPuzzle
+                template={template}
+                {...props}
+                onTemplateChange={onTemplateChange}
+                onAddDropdownButton={onAddAnswerPuzzle}
+                onDeleteDropdownButton={onDeleteAnswerPuzzle}
             />
         ),
     };

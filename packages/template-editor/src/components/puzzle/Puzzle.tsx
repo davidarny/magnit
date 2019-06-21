@@ -8,28 +8,42 @@ import { IPuzzle } from "entities";
 import { Paper } from "@material-ui/core";
 import { EPuzzleType } from "./EPuzzleType";
 
+export interface ICommonComponentProps {
+    index: number;
+    id: string;
+}
+
+export interface ITitledComponentProps extends ICommonComponentProps {
+    title: string;
+}
+
+export interface IExtendedComponentProps extends ITitledComponentProps {
+    questionFocused: boolean;
+}
+
+export interface IRadioComponentProps extends IExtendedComponentProps {
+    addRadioButton: boolean;
+}
+
+export interface ICheckboxComponentProps extends IExtendedComponentProps {
+    addCheckboxButton: boolean;
+}
+
+export interface IDropdownComponentProps extends IExtendedComponentProps {
+    addDropdownButton: boolean;
+}
+
 interface IPuzzleProps {
     puzzles: IPuzzle[];
     index: number;
     components: {
-        [EPuzzleType.GROUP](index: number, id: string): ReactNode;
-        [EPuzzleType.QUESTION](index: number, id: string, title: string): ReactNode;
-        [EPuzzleType.TEXT_ANSWER](index: number, id: string): ReactNode;
-        [EPuzzleType.NUMERIC_ANSWER](index: number, id: string): ReactNode;
-        [EPuzzleType.RADIO_ANSWER](
-            index: number,
-            id: string,
-            title: string,
-            addRadioButton: boolean,
-            questionFocused: boolean
-        ): ReactNode;
-        [EPuzzleType.CHECKBOX_ANSWER](
-            index: number,
-            id: string,
-            title: string,
-            addCheckboxButton: boolean,
-            questionFocused: boolean
-        ): ReactNode;
+        [EPuzzleType.GROUP](props: ICommonComponentProps): ReactNode;
+        [EPuzzleType.QUESTION](props: ITitledComponentProps): ReactNode;
+        [EPuzzleType.TEXT_ANSWER](props: ICommonComponentProps): ReactNode;
+        [EPuzzleType.NUMERIC_ANSWER](props: ICommonComponentProps): ReactNode;
+        [EPuzzleType.RADIO_ANSWER](props: IRadioComponentProps): ReactNode;
+        [EPuzzleType.CHECKBOX_ANSWER](props: ICheckboxComponentProps): ReactNode;
+        [EPuzzleType.DROPDOWN_ANSWER](props: IDropdownComponentProps): ReactNode;
     };
     // if not focused, we don't show add button
     questionFocused?: boolean;
@@ -50,6 +64,16 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                 function onFocus(): void {
                     props.onFocus(puzzle.id);
                 }
+
+                const commonComponentProps: ICommonComponentProps = {
+                    index,
+                    id: puzzle.id,
+                };
+                const extendedComponentProps: IExtendedComponentProps = {
+                    ...commonComponentProps,
+                    title: puzzle.title,
+                    questionFocused: index === puzzles.length - 1,
+                };
 
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
@@ -77,7 +101,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 elevation={props.isFocused(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.GROUP](index, puzzle.id)}
+                                    {props.components[EPuzzleType.GROUP](commonComponentProps)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </Paper>
@@ -104,11 +128,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 elevation={props.isFocused(puzzle.id) ? 16 : 0}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.QUESTION](
-                                        index,
-                                        puzzle.id,
-                                        puzzle.title
-                                    )}
+                                    {props.components[EPuzzleType.QUESTION](extendedComponentProps)}
                                 </PuzzleWrapper>
                                 <Puzzle
                                     questionFocused={props.isFocused(puzzle.id)}
@@ -129,7 +149,9 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 })}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.TEXT_ANSWER](index, puzzle.id)}
+                                    {props.components[EPuzzleType.TEXT_ANSWER](
+                                        commonComponentProps
+                                    )}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>
@@ -144,7 +166,9 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 })}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.NUMERIC_ANSWER](index, puzzle.id)}
+                                    {props.components[EPuzzleType.NUMERIC_ANSWER](
+                                        commonComponentProps
+                                    )}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>
@@ -159,13 +183,10 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 })}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.RADIO_ANSWER](
-                                        index,
-                                        puzzle.id,
-                                        puzzle.title,
-                                        index === puzzles.length - 1,
-                                        !!props.questionFocused
-                                    )}
+                                    {props.components[EPuzzleType.RADIO_ANSWER]({
+                                        ...extendedComponentProps,
+                                        addRadioButton: !!props.questionFocused,
+                                    })}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>
@@ -180,13 +201,28 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 })}
                             >
                                 <PuzzleWrapper>
-                                    {props.components[EPuzzleType.CHECKBOX_ANSWER](
-                                        index,
-                                        puzzle.id,
-                                        puzzle.title,
-                                        index === puzzles.length - 1,
-                                        !!props.questionFocused
-                                    )}
+                                    {props.components[EPuzzleType.CHECKBOX_ANSWER]({
+                                        ...extendedComponentProps,
+                                        addCheckboxButton: !!props.questionFocused,
+                                    })}
+                                </PuzzleWrapper>
+                                <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
+                            </div>
+                        );
+                    case EPuzzleType.DROPDOWN_ANSWER:
+                        return (
+                            <div
+                                key={puzzle.id}
+                                css={theme => ({
+                                    marginTop: theme.spacing(2),
+                                    marginBottom: theme.spacing(2),
+                                })}
+                            >
+                                <PuzzleWrapper>
+                                    {props.components[EPuzzleType.DROPDOWN_ANSWER]({
+                                        ...extendedComponentProps,
+                                        addDropdownButton: !!props.questionFocused,
+                                    })}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
                             </div>
