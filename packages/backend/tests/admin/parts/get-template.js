@@ -328,7 +328,7 @@ module.exports = function(options) {
                     assert.equal(template.sections[0].puzzles[1].puzzles[1].puzzles[0].order, 0);
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[1].puzzles[0].puzzle_type,
-                        "input_answer"
+                        "text_answer"
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[1].puzzles[0].answer_type,
@@ -437,7 +437,7 @@ module.exports = function(options) {
                     assert.equal(template.sections[0].puzzles[1].puzzles[2].puzzles[0].order, 0);
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[2].puzzles[0].puzzle_type,
-                        "input_answer"
+                        "text_answer"
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[2].puzzles[0].answer_type,
@@ -471,7 +471,7 @@ module.exports = function(options) {
                     assert.equal(template.sections[0].puzzles[1].puzzles[3].puzzles[0].order, 0);
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].puzzles[0].puzzle_type,
-                        "input_answer"
+                        "text_answer"
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].puzzles[0].answer_type,
@@ -492,7 +492,7 @@ module.exports = function(options) {
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].validations[0].operator_type,
-                        "more"
+                        "more_than"
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].validations[0].validation_type,
@@ -520,7 +520,7 @@ module.exports = function(options) {
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].validations[1].operator_type,
-                        "less"
+                        "less_than"
                     );
                     assert.equal(
                         template.sections[0].puzzles[1].puzzles[3].validations[1].validation_type,

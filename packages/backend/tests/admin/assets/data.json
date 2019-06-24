@@ -94,7 +94,7 @@
                                 {
                                     "id": "c047a25f-6d09-498a-b674-019c99c224f8",
                                     "order": 0,
-                                    "puzzle_type": "input_answer",
+                                    "puzzle_type": "text_answer",
                                     "answer_type": "number"
                                 }
                             ],
@@ -130,7 +130,7 @@
                                 {
                                     "id": "f6ad1dd8-8c56-46bd-833d-a8325beb0e0a",
                                     "order": 0,
-                                    "puzzle_type": "input_answer",
+                                    "puzzle_type": "text_answer",
                                     "answer_type": "number"
                                 }
                             ]
@@ -144,7 +144,7 @@
                                 {
                                     "id": "f1c77dcd-95a1-4cea-982f-ba3269365b2d",
                                     "order": 0,
-                                    "puzzle_type": "input_answer",
+                                    "puzzle_type": "text_answer",
                                     "answer_type": "number"
                                 }
                             ],
@@ -152,7 +152,7 @@
                                 {
                                     "order": 0,
                                     "left_hand_puzzle": "09cf0415-57ec-4efb-a33e-a7da68faaba6",
-                                    "operator_type": "more",
+                                    "operator_type": "more_than",
                                     "validation_type": "compare_with_answer",
                                     "right_hand_puzzle": "b0828257-4687-45de-8863-1aff3d1d0b50",
                                     "value": null,
@@ -161,7 +161,7 @@
                                 {
                                     "order": 1,
                                     "left_hand_puzzle": "b0828257-4687-45de-8863-1aff3d1d0b50",
-                                    "operator_type": "less",
+                                    "operator_type": "less_than",
                                     "validation_type": "set_value",
                                     "value": 100,
                                     "right_hand_puzzle": null,

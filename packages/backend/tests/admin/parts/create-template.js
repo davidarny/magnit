@@ -70,7 +70,7 @@ module.exports = function(options) {
         assert.equal(puzzles[12].order, 1);
         assert.equal(puzzles[13].parent_id, 13);
         assert.equal(puzzles[13].title, null);
-        assert.equal(puzzles[13].puzzle_type, "input_answer");
+        assert.equal(puzzles[13].puzzle_type, "text_answer");
         assert.equal(puzzles[13].order, 0);
         assert.equal(puzzles[13].answer_type, "number");
         assert.equal(puzzles[13].uuid, "c047a25f-6d09-498a-b674-019c99c224f8");
@@ -80,7 +80,7 @@ module.exports = function(options) {
         assert.equal(puzzles[14].order, 2);
         assert.equal(puzzles[15].parent_id, 15);
         assert.equal(puzzles[15].title, null);
-        assert.equal(puzzles[15].puzzle_type, "input_answer");
+        assert.equal(puzzles[15].puzzle_type, "text_answer");
         assert.equal(puzzles[15].order, 0);
         assert.equal(puzzles[15].answer_type, "number");
         assert.equal(puzzles[16].parent_id, 8);
@@ -89,7 +89,7 @@ module.exports = function(options) {
         assert.equal(puzzles[16].order, 3);
         assert.equal(puzzles[17].parent_id, 17);
         assert.equal(puzzles[17].title, null);
-        assert.equal(puzzles[17].puzzle_type, "input_answer");
+        assert.equal(puzzles[17].puzzle_type, "text_answer");
         assert.equal(puzzles[17].order, 0);
         assert.equal(puzzles[17].answer_type, "number");
         assert.equal(puzzles[17].uuid, "f1c77dcd-95a1-4cea-982f-ba3269365b2d");
@@ -139,7 +139,7 @@ module.exports = function(options) {
         assert.equal(validations.length, 2);
         assert.equal(validations[0].puzzle_id, 17);
         assert.equal(validations[0].order, 0);
-        assert.equal(validations[0].operator_type, "more");
+        assert.equal(validations[0].operator_type, "more_than");
         assert.equal(validations[0].validation_type, "compare_with_answer");
         assert.equal(validations[0].left_hand_puzzle, "09cf0415-57ec-4efb-a33e-a7da68faaba6");
         assert.equal(validations[0].right_hand_puzzle, "b0828257-4687-45de-8863-1aff3d1d0b50");
@@ -150,7 +150,7 @@ module.exports = function(options) {
         );
         assert.equal(validations[1].puzzle_id, 17);
         assert.equal(validations[1].order, 1);
-        assert.equal(validations[1].operator_type, "less");
+        assert.equal(validations[1].operator_type, "less_than");
         assert.equal(validations[1].validation_type, "set_value");
         assert.equal(validations[1].left_hand_puzzle, "b0828257-4687-45de-8863-1aff3d1d0b50");
         assert.equal(validations[1].right_hand_puzzle, null);

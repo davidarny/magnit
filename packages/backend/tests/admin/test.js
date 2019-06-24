@@ -25,5 +25,6 @@ describe("Admin", () => {
     require("./parts/get-template.js")(options);
     require("./parts/get-templates.js")(options);
     require("./parts/edit-template.js")(options);
-    // require("./parts/delete-template.js")(options);
+    require("./parts/delete-template.js")(options);
+    require("./parts/get-objects.js")(options);
 });
