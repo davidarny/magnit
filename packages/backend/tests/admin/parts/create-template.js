@@ -1,5 +1,3 @@
-"use strict";
-
 module.exports = function(options) {
     let request = options.request;
     let host = options.host;

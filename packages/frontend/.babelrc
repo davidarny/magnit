@@ -17,14 +17,6 @@
                 "libraryDirectory": "",
                 "camel2DashComponentName": false
             }
-        ],
-        [
-            "import",
-            {
-                "libraryName": "lodash",
-                "libraryDirectory": "",
-                "camel2DashComponentName": false
-            }
         ]
     ]
 }

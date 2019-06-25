@@ -1,9 +1,5 @@
 node_modules/
-
-packages/backend/assets/dependencies/**/*.js
-packages/backendviews/**/*.ejs
-packages/backend/node_modules
-
-packages/frontend/node_modules/
-packages/frontend/pubilc/
-packages/frontend/build/
+dist/
+public/
+build/
+backend/

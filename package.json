@@ -1,28 +1,34 @@
 {
-    "name": "@magnit/core",
+    "name": "magnit",
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "clean": "lerna run clean",
+        "start:frontend": "lerna run --scope @magnit/frontend start --stream",
+        "start:backend": "lerna run --scope @magnit/backend start --stream",
+        "build:frontend": "lerna run --scope @magnit/frontend build --stream",
+        "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
+        "deploy:frontend": "yarn build:frontend && gh-pages -d packages/frontend/build -b release/frontend",
         "commit": "git-cz"
     },
     "devDependencies": {
         "@commitlint/cli": "^7.6.1",
         "@commitlint/config-conventional": "^7.6.0",
         "commitizen": "^3.1.1",
+        "concurrently": "^4.1.0",
         "cross-env": "^5.2.0",
         "cz-conventional-changelog": "^2.1.0",
         "eslint": "^5.16.0",
         "eslint-config-prettier": "^4.3.0",
         "eslint-plugin-prettier": "^3.1.0",
+        "gh-pages": "^2.0.1",
         "husky": "^2.3.0",
         "lerna": "^3.14.1",
         "lint-staged": "^8.1.7",
         "prettier": "^1.17.1",
-        "pretty-quick": "^1.11.0"
-    },
-    "dependencies": {
-        "@magnit/backend": "file:packages\\backend",
-        "@magnit/frontend": "file:packages\\frontend"
+        "pretty-quick": "^1.11.0",
+        "rimraf": "^2.6.3",
+        "serve": "^11.0.1"
     },
     "config": {
         "commitizen": {
@@ -31,5 +37,8 @@
     },
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "dependencies": {
+        "@types/lodash": "^4.14.134"
+    }
 }
