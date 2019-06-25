@@ -6,7 +6,7 @@
         "@sailshq/connect-redis": "^3.2.1",
         "@sailshq/lodash": "^3.10.3",
         "@sailshq/socket.io-redis": "^5.2.0",
-        "@types/lodash": "^4.14.134",
+        "moment": "^2.24.0",
         "request": "^2.88.0",
         "sails": "^1.2.2",
         "sails-hook-orm": "^2.1.1",
@@ -17,5 +17,8 @@
         "start": "cross-env NODE_ENV=production node app.js",
         "test": "mocha --timeout 30s tests/bootstrap.test.js tests/admin/test.js"
     },
-    "main": "app.js"
+    "main": "app.js",
+    "engines": {
+        "node": "^10.15"
+    }
 }
