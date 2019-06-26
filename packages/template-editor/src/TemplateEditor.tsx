@@ -4,7 +4,7 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
-import { Grid, Paper, TextField } from "@material-ui/core";
+import { Grid, TextField } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { GroupPuzzle } from "./items/group-puzzle";
 import { QuestionPuzzle } from "./items/question-puzzle";
@@ -27,6 +27,7 @@ import _ from "lodash";
 import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
 import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
+import { Block } from "./components/block";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -309,20 +310,20 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onAddGroup={onToolbarAddGroup}
                 onAddSection={onToolbarAddSection}
             />
-            <Paper
-                css={theme => ({
-                    paddingTop: theme.spacing(4),
+            <Block
+                id={template.id}
+                styles={theme => ({
+                    paddingTop: theme.spacing(2),
                     paddingBottom: template.puzzles.some(
                         puzzle => puzzle.puzzleType === EPuzzleType.GROUP
                     )
                         ? theme.spacing(0)
-                        : theme.spacing(4),
+                        : theme.spacing(2),
                 })}
-                id={template.id}
+                focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
-                elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
                 <Grid container direction="column">
                     <Grid
@@ -344,6 +345,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingLeft: theme.spacing(4),
                             paddingRight: theme.spacing(4),
                         })}
+                        style={{
+                            paddingBottom: 10,
+                        }}
                     >
                         <TextField
                             fullWidth
@@ -363,41 +367,34 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         />
                     </Grid>
                 </Grid>
-            </Paper>
+            </Block>
             {template.sections.map((section, index) => {
                 return (
-                    <div
+                    <Block
                         key={section.id}
                         id={section.id}
+                        styles={theme => ({
+                            marginTop: theme.spacing(4),
+                            marginBottom: theme.spacing(2),
+                            paddingTop: theme.spacing(2),
+                            paddingBottom: theme.spacing(2),
+                        })}
                         onFocus={onPuzzleFocus.bind(null, section.id)}
                         onMouseDown={onPuzzleFocus.bind(null, section.id)}
                         onBlur={onPuzzleBlur}
+                        focused={focusedPuzzleId === section.id}
                     >
-                        <div css={theme => ({ margin: theme.spacing(4) })} />
-                        <Grid
-                            container
-                            direction="column"
-                            css={theme => ({ marginBottom: theme.spacing(2) })}
-                        >
-                            <Grid item>
-                                <Grid container alignItems="flex-end">
-                                    <SectionPuzzle
-                                        title={section.title}
-                                        id={section.id}
-                                        index={index}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Grid>
+                        <div css={theme => ({ margin: theme.spacing(0) })} />
+                        <SectionPuzzle title={section.title} id={section.id} index={index} />
                         <Grid container>
-                            <Paper
-                                css={theme => ({
+                            <Block
+                                styles={theme => ({
                                     width: "100%",
                                     ":empty": {
                                         minHeight: theme.spacing(32),
                                     },
                                 })}
-                                elevation={focusedPuzzleId === section.id ? 16 : 0}
+                                focused={focusedPuzzleId === template.id}
                             >
                                 <Puzzle
                                     puzzles={section.puzzles}
@@ -408,9 +405,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                     isFocused={id => id === focusedPuzzleId}
                                     isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                                 />
-                            </Paper>
+                            </Block>
                         </Grid>
-                    </div>
+                    </Block>
                 );
             })}
         </React.Fragment>

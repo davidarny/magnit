@@ -5,8 +5,8 @@ import { ReactNode } from "react";
 import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
 import { IPuzzle } from "entities";
-import { Paper } from "@material-ui/core";
 import { EPuzzleType } from "./EPuzzleType";
+import { Block } from "../block";
 
 export interface ICommonComponentProps {
     index: number;
@@ -81,13 +81,13 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
                         return (
-                            <Paper
+                            <Block
                                 key={puzzle.id}
                                 id={puzzle.id}
                                 onFocus={onFocus}
                                 onMouseDown={onFocus}
                                 onBlur={props.onBlur}
-                                css={theme => ({
+                                styles={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
@@ -102,21 +102,21 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                         : 0,
                                 })}
                                 square={true}
-                                elevation={props.isFocused(puzzle.id) ? 16 : 0}
+                                focused={props.isFocused(puzzle.id)}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.GROUP](commonComponentProps)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
-                            </Paper>
+                            </Block>
                         );
                     }
                     case EPuzzleType.QUESTION: {
                         return (
-                            <Paper
+                            <Block
                                 key={puzzle.id}
                                 id={puzzle.id}
-                                css={theme => ({
+                                styles={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 2 : 0),
@@ -130,7 +130,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 onMouseDown={onFocus}
                                 onBlur={props.onBlur}
                                 square={true}
-                                elevation={props.isFocused(puzzle.id) ? 16 : 0}
+                                focused={props.isFocused(puzzle.id)}
                             >
                                 <PuzzleWrapper>
                                     {props.components[EPuzzleType.QUESTION](extendedComponentProps)}
@@ -142,7 +142,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     onMouseDown={onFocus}
                                     {...props}
                                 />
-                            </Paper>
+                            </Block>
                         );
                     }
                     case EPuzzleType.TEXT_ANSWER:
