@@ -17,7 +17,7 @@ module.exports = {
             isIn: ["ASC", "DESC"],
             defaultsTo: "ASC",
         },
-        object_id: {
+        user_id: {
             type: "number",
         },
         region: {
@@ -42,14 +42,14 @@ module.exports = {
             const offset = _.escape(inputs.offset);
             const limit = _.escape(inputs.limit);
             const sort = _.escape(inputs.sort);
-            const objectId = _.escape(inputs.object_id);
+            const userId = _.escape(inputs.user_id);
             const region = _.escape(inputs.region);
             const branch = _.escape(inputs.branch);
 
             let sql = "WHERE 1=1";
 
-            if (objectId) {
-                sql += ` AND objects.id = ${objectId}`;
+            if (userId) {
+                sql += ` AND users.id = ${userId}`;
             }
             if (region) {
                 sql += ` AND regions.name = '${region}'`;
@@ -60,37 +60,37 @@ module.exports = {
 
             const objectData = await sails.getDatastore().sendNativeQuery(`
                 SELECT
-                    objects.id,
+                    users.id,
                     regions.name AS region,
                     branches.name AS branch,
-                    objects.address,
-                    objects.format,
+                    users.name,
+                    users.position,
                     (
                         SELECT COUNT(*) FROM tasks
-                        WHERE tasks.object_id = objects.id AND status='assigned'
+                        WHERE tasks.user_id = users.id AND status='assigned'
                     ) AS assigned_count,
                     (
                         SELECT COUNT(*) FROM tasks
-                        WHERE tasks.object_id = objects.id AND status='completed'
+                        WHERE tasks.user_id = users.id AND status='completed'
                     ) AS completed_count
-                FROM objects
-                INNER JOIN branches ON objects.branch_id = branches.id
+                FROM users
+                INNER JOIN branches ON users.branch_id = branches.id
                 INNER JOIN regions ON branches.region_id = regions.id
                 ${sql}
-                ORDER BY regions.name ${sort} LIMIT ${limit} OFFSET ${offset}
+                ORDER BY users.name ${sort} LIMIT ${limit} OFFSET ${offset}
             `);
 
             const countData = await sails.getDatastore().sendNativeQuery(`
-                SELECT COUNT(*) FROM objects
-                INNER JOIN branches ON objects.branch_id = branches.id
+                SELECT COUNT(*) FROM users
+                INNER JOIN branches ON users.branch_id = branches.id
                 INNER JOIN regions ON branches.region_id = regions.id
                 ${sql}
             `);
 
-            const objects = objectData.rows;
+            const users = objectData.rows;
             const total = Number(countData.rows[0].count);
 
-            return exits.success({ success: 1, total: total, objects: objects });
+            return exits.success({ success: 1, total: total, users: users });
         } catch (err) {
             console.log(err);
             return exits.serverError();

@@ -1,23 +1,22 @@
 module.exports = {
-    tableName: "objects",
+    tableName: "users",
 
     attributes: {
         branch_id: {
             type: "number",
         },
 
+        login: {
+            type: "string",
+            columnType: "text",
+        },
+
         name: {
             type: "string",
             columnType: "text",
-            allowNull: true,
         },
 
-        address: {
-            type: "string",
-            columnType: "text",
-        },
-
-        format: {
+        position: {
             type: "string",
             columnType: "text",
         },
