@@ -355,6 +355,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             fullWidth={true}
                             placeholder="Описание шаблона (необязательно)"
                             defaultValue={template.description}
+                            InputProps={{
+                                style: {
+                                    fontSize: 18,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid item>
