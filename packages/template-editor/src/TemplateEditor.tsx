@@ -27,7 +27,7 @@ import _ from "lodash";
 import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
 import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
-import { InputField } from "./components/input-field/InputField";
+import { InputField } from "./components/fields";
 import { Block } from "./components/block";
 
 interface ITemplateEditorProps {
@@ -314,12 +314,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             <Block
                 id={template.id}
                 styles={theme => ({
-                    paddingTop: theme.spacing(2),
+                    paddingTop: theme.spacing(3),
                     paddingBottom: template.puzzles.some(
                         puzzle => puzzle.puzzleType === EPuzzleType.GROUP
                     )
                         ? theme.spacing(0)
-                        : theme.spacing(2),
+                        : theme.spacing(3),
                 })}
                 focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
@@ -338,9 +338,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             fullWidth={true}
                             placeholder="Название шаблона"
                             defaultValue={template.title}
+                            isFocus={focusedPuzzleId === template.id}
                             InputProps={{
                                 style: {
                                     fontSize: 26,
+                                    fontWeight: 500,
                                     marginBottom: 20,
                                 },
                             }}
@@ -360,9 +362,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             fullWidth={true}
                             placeholder="Описание шаблона (необязательно)"
                             defaultValue={template.description}
+                            isFocus={focusedPuzzleId === template.id}
                             InputProps={{
                                 style: {
                                     fontSize: 18,
+                                    fontWeight: 300,
                                 },
                             }}
                         />

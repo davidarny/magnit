@@ -2,10 +2,15 @@ import { TextField } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { TextFieldProps } from "@material-ui/core/TextField";
 
-export const InputField: React.FC<TextFieldProps> = ({
+export interface IInputField {
+    isFocus: boolean;
+}
+
+export const InputField: React.FC<IInputField & TextFieldProps> = ({
     placeholder,
     defaultValue,
     fullWidth,
+    isFocus,
     ...rest
 }) => {
     return (
@@ -24,8 +29,11 @@ export const InputField: React.FC<TextFieldProps> = ({
                 },
                 div: {
                     minHeight: theme.spacing(6),
+                    ":before": {
+                        borderBottom: isFocus ? `1px solid rgba(0, 0, 0, 0.42)` : "none !important",
+                    },
                     ":after": {
-                        borderBottom: `2px solid ${theme.colors.primary}`,
+                        borderBottom: isFocus ? `2px solid ${theme.colors.primary}` : "none !important",
                     },
                 },
             })}
