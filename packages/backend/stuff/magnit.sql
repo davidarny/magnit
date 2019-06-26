@@ -19,8 +19,9 @@ SET row_security = off;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_right_hand_puzzle_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_left_hand_puzzle_fkey;
-ALTER TABLE ONLY public.users DROP CONSTRAINT users_object_id_fkey;
+ALTER TABLE ONLY public.users DROP CONSTRAINT users_branch_id_fkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
+ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_user_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_template_id_fkey;
@@ -706,6 +707,7 @@ CREATE TABLE public.tasks (
     departure_date timestamp without time zone,
     deadline_date timestamp without time zone,
     object_id integer,
+    user_id integer,
     status public.status_type,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -782,7 +784,7 @@ CREATE TABLE public.users (
     login text,
     name text,
     "position" text,
-    object_id integer,
+    branch_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -1052,7 +1054,7 @@ COPY public.task_users (id, task_id, users_id, taken, created_at, updated_at) FR
 -- Data for Name: tasks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tasks (id, name, description, departure_date, deadline_date, object_id, status, created_at, updated_at) FROM stdin;
+COPY public.tasks (id, name, description, departure_date, deadline_date, object_id, user_id, status, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -1068,7 +1070,7 @@ COPY public.templates (id, title, description, created_at, updated_at) FROM stdi
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, login, name, "position", object_id, created_at, updated_at) FROM stdin;
+COPY public.users (id, login, name, "position", branch_id, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -1434,11 +1436,19 @@ ALTER TABLE ONLY public.tasks
 
 
 --
--- Name: users users_object_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: tasks tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tasks
+    ADD CONSTRAINT tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users users_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id) ON DELETE CASCADE;
+    ADD CONSTRAINT users_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id) ON DELETE CASCADE;
 
 
 --
