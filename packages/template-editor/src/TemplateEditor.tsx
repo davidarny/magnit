@@ -4,7 +4,7 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
-import { Grid, Paper, TextField } from "@material-ui/core";
+import { Grid, Paper } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { GroupPuzzle } from "./items/group-puzzle";
 import { QuestionPuzzle } from "./items/question-puzzle";
@@ -27,6 +27,7 @@ import _ from "lodash";
 import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
 import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
+import { InputField } from "./components/input-field/InputField";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -322,7 +323,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
-                elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
                 <Grid container direction="column">
                     <Grid
@@ -332,10 +332,16 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingRight: theme.spacing(4),
                         })}
                     >
-                        <TextField
-                            fullWidth
-                            label="Название шаблона"
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Название шаблона"
                             defaultValue={template.title}
+                            InputProps={{
+                                style: {
+                                    fontSize: 26,
+                                    marginBottom: 20,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid
@@ -345,9 +351,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingRight: theme.spacing(4),
                         })}
                     >
-                        <TextField
-                            fullWidth
-                            label="Описание шаблона (необязательно)"
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Описание шаблона (необязательно)"
                             defaultValue={template.description}
                         />
                     </Grid>

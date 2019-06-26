@@ -33,6 +33,12 @@ const theme = {
         secondary: "#8A94A2",
         default: "#000000",
     },
+
+    boxShadows: {
+        primary: "",
+        secondary: "0 0 16px rgba(192, 201, 211, 0.8)",
+        default: "none",
+    },
 };
 
 ReactDOM.render(
