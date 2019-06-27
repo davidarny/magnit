@@ -53,9 +53,17 @@ export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
         blueWithout: {
             color: "#2F97FF",
             border: "1px solid #2F97FF",
-            background: "#FFFFFF !important",
+            background: "none !important",
             hover: {
                 boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
+            },
+        },
+        greyWithout: {
+            color: "#AAB4BE",
+            border: "1px solid #AAB4BE",
+            background: "none !important",
+            hover: {
+                boxShadow: "0 8px 24px rgba(170, 180, 190, 0.5) !important",
             },
         },
     };
