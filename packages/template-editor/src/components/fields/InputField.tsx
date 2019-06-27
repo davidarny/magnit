@@ -25,7 +25,7 @@ export const InputField: React.FC<IInputField & TextFieldProps> = ({
                     position: "absolute",
                     bottom: 0,
                     fontFamily: "Roboto",
-                    color: theme.colors.secondary,
+                    color: theme.colors.black,
                 },
                 div: {
                     minHeight: theme.spacing(6),
@@ -33,7 +33,9 @@ export const InputField: React.FC<IInputField & TextFieldProps> = ({
                         borderBottom: isFocus ? `1px solid rgba(0, 0, 0, 0.42)` : "none !important",
                     },
                     ":after": {
-                        borderBottom: isFocus ? `2px solid ${theme.colors.primary}` : "none !important",
+                        borderBottom: isFocus
+                            ? `2px solid ${theme.colors.primary}`
+                            : "none !important",
                     },
                 },
             })}

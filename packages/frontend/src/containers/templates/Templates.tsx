@@ -2,12 +2,12 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { Button, Grid, Typography } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { CenteredSectionItem } from "components/centered-section-item";
-import { Add as AddIcon } from "@material-ui/icons";
 import { Link } from "@reach/router";
+import { CustomButton, PlusIcon } from "@magnit/template-editor";
 
 export const Templates: React.FC = () => {
     return (
@@ -31,19 +31,15 @@ export const Templates: React.FC = () => {
                     <Grid item>
                         <Grid container justify="center" alignContent="center">
                             <Grid item>
-                                <Button
+                                <CustomButton
                                     component={Link}
                                     to="/templates/create"
                                     aria-label="Создать шаблон"
                                     variant="contained"
-                                    color="primary"
-                                >
-                                    <AddIcon
-                                        alignmentBaseline="middle"
-                                        css={theme => ({ marginRight: theme.spacing() })}
-                                    />
-                                    <span>Создать шаблон</span>
-                                </Button>
+                                    buttonColor="blue"
+                                    title="Создать шаблон"
+                                    icon={<PlusIcon />}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>

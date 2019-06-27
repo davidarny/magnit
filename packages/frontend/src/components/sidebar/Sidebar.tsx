@@ -15,9 +15,9 @@ export const Sidebar: React.FC = () => {
                     <Link to="/">
                         <img
                             src={LogoIcon}
-                            css={css`
-                                max-width: 60px;
-                            `}
+                            css={{
+                                maxWidth: 60,
+                            }}
                             alt="Магнит"
                         />
                     </Link>

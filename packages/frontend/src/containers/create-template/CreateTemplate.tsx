@@ -4,9 +4,8 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { Button, Grid } from "@material-ui/core";
-import { Check as CheckIcon } from "@material-ui/icons";
-import { TemplateEditor } from "@magnit/template-editor";
+import { Grid } from "@material-ui/core";
+import { TemplateEditor, CustomButton, CheckIcon } from "@magnit/template-editor";
 import template from "./template";
 
 export const CreateTemplate: React.FC = () => {
@@ -14,22 +13,12 @@ export const CreateTemplate: React.FC = () => {
         <SectionLayout>
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button
+                    <CustomButton
                         variant="contained"
-                        css={theme => ({
-                            background: theme.colors.primary,
-                            ":hover": { background: theme.colors.primary },
-                            color: "white",
-                            textTransform: "none",
-                            borderRadius: theme.radius(5),
-                        })}
-                    >
-                        <CheckIcon
-                            css={theme => ({ marginRight: theme.spacing() })}
-                            alignmentBaseline="middle"
-                        />
-                        <span>Сохранить</span>
-                    </Button>
+                        title={"Сохранить"}
+                        buttonColor={"blue"}
+                        icon={<CheckIcon />}
+                    />
                 </Grid>
             </SectionTitle>
             <Grid

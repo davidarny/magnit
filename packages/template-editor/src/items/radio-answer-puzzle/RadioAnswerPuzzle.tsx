@@ -61,10 +61,9 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 <Grid item xs={1}>
                     <Radio
                         disabled
-                        checked
-                        css={css`
-                            padding-left: 0;
-                        `}
+                        css={{
+                            paddingLeft: 0,
+                        }}
                     />
                 </Grid>
                 <Grid item xs={10}>
@@ -85,10 +84,9 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
                         <Radio
                             disabled
-                            checked
-                            css={css`
-                                padding-left: 0;
-                            `}
+                            css={{
+                                paddingLeft: 0,
+                            }}
                         />
                     </Grid>
                     <Grid item xs={11} css={theme => ({ marginTop: theme.spacing(2) })}>

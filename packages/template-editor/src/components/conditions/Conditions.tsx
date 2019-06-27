@@ -16,7 +16,6 @@ import {
     Radio,
     RadioGroup,
     Select,
-    TextField,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
 import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
@@ -24,6 +23,7 @@ import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
+import { InputField } from "../fields";
 
 interface IConditionsProps {
     puzzleId: string;
@@ -435,11 +435,12 @@ function getAnswerPuzzle(
         case EActionType.NOT_EQUAL:
             return (onValueChange: (event: TChangeEvent) => void) => {
                 return (
-                    <TextField
+                    <InputField
                         value={condition.value}
                         onChange={onValueChange}
+                        placeholder="Ответ"
+                        isFocus={true}
                         css={theme => ({ marginTop: theme.spacing(-2) })}
-                        label="Ответ"
                     />
                 );
             };
