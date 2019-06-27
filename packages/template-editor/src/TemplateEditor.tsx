@@ -4,12 +4,13 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
-import { Grid, TextField } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
+import { InputField } from "./components/fields";
 import { Block } from "./components/block";
 import { Content } from "./components/content";
 
@@ -261,12 +262,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             <Block
                 id={template.id}
                 styles={theme => ({
-                    paddingTop: theme.spacing(2),
+                    paddingTop: theme.spacing(3),
                     paddingBottom: template.puzzles.some(
                         puzzle => puzzle.puzzleType === EPuzzleType.GROUP
                     )
                         ? theme.spacing(0)
-                        : theme.spacing(2),
+                        : theme.spacing(3),
                 })}
                 focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
@@ -281,10 +282,18 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingRight: theme.spacing(4),
                         })}
                     >
-                        <TextField
-                            fullWidth
-                            label="Название шаблона"
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Название шаблона"
                             defaultValue={template.title}
+                            isFocus={focusedPuzzleId === template.id}
+                            InputProps={{
+                                style: {
+                                    fontSize: 26,
+                                    fontWeight: 500,
+                                    marginBottom: 20,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid
@@ -297,10 +306,17 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             paddingBottom: 10,
                         }}
                     >
-                        <TextField
-                            fullWidth
-                            label="Описание шаблона (необязательно)"
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Описание шаблона (необязательно)"
                             defaultValue={template.description}
+                            isFocus={focusedPuzzleId === template.id}
+                            InputProps={{
+                                style: {
+                                    fontSize: 18,
+                                    fontWeight: 300,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid item>

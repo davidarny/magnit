@@ -40,7 +40,12 @@ export const CreateTemplate: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TemplateEditor initialState={template} />
+                <TemplateEditor
+                    initialState={template}
+                    css={theme => ({
+                        background: theme.colors.main,
+                    })}
+                />
             </Grid>
         </SectionLayout>
     );
