@@ -15,7 +15,6 @@ import {
     IDropdownComponentProps,
     IRadioComponentProps,
     ITitledComponentProps,
-    Puzzle,
     PuzzleToolbar,
 } from "./components/puzzle";
 import { TextAnswerPuzzle } from "./items/text-answer-puzzle";
@@ -28,6 +27,7 @@ import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
 import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
 import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
 import { Block } from "./components/block";
+import { Content } from "./components/content";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -247,7 +247,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
-    const components = {
+    /* const components = {
         [EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
             <GroupPuzzle
                 template={template}
@@ -300,7 +300,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onDeleteDropdownButton={onDeleteAnswerPuzzle}
             />
         ),
-    };
+    };*/
 
     return (
         <React.Fragment>
@@ -356,14 +356,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         />
                     </Grid>
                     <Grid item>
-                        <Puzzle
+                        <Content
                             puzzles={template.puzzles}
-                            index={0}
-                            components={components}
                             onFocus={onPuzzleFocus}
                             onBlur={onPuzzleBlur}
                             isFocused={id => id === focusedPuzzleId}
-                            isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                         />
                     </Grid>
                 </Grid>
@@ -384,28 +381,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         onBlur={onPuzzleBlur}
                         focused={focusedPuzzleId === section.id}
                     >
-                        <div css={theme => ({ margin: theme.spacing(0) })} />
+                        <div style={{ margin: 0 }} />
                         <SectionPuzzle title={section.title} id={section.id} index={index} />
-                        <Grid container>
-                            <Block
-                                styles={theme => ({
-                                    width: "100%",
-                                    ":empty": {
-                                        minHeight: theme.spacing(32),
-                                    },
-                                })}
-                                focused={focusedPuzzleId === template.id}
-                            >
-                                <Puzzle
-                                    puzzles={section.puzzles}
-                                    index={index}
-                                    components={components}
-                                    onFocus={onPuzzleFocus}
-                                    onBlur={onPuzzleBlur}
-                                    isFocused={id => id === focusedPuzzleId}
-                                    isInFocusedChain={id => focusedPuzzleChain.includes(id)}
-                                />
-                            </Block>
+                        <Grid item>
+                            <Content
+                                puzzles={section.puzzles}
+                                onFocus={onPuzzleFocus}
+                                onBlur={onPuzzleBlur}
+                                isFocused={id => id === focusedPuzzleId}
+                            />
                         </Grid>
                     </Block>
                 );
