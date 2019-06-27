@@ -4,20 +4,18 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button, Grid, IconButton, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-interface IDropdownAnswerPuzzleProps extends ISpecificPuzzleProps {
+interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;
     template: ITemplate;
     // flag indication this dropdown should render
     // button which adds new dropdown when clicked
     addDropdownButton: boolean;
-    // if not focused, we don't show add button
-    questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 
