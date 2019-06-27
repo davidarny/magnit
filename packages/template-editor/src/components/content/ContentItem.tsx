@@ -4,6 +4,7 @@ import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "../puzzle/PuzzleWrapper";
 import * as React from "react";
 import { IPuzzle } from "../../entities";
+import { getFactory } from "../../services/item";
 
 interface IContentItem {
     item: IPuzzle;
@@ -13,6 +14,16 @@ interface IContentItem {
     onMouseDown?(): void;
 }
 
-export const ContentItem: React.FC<IContentItem> = ({ children, ...props }) => {
-    return <PuzzleWrapper>{props.item.title}</PuzzleWrapper>;
+export const ContentItem: React.FC<IContentItem> = ({ item, ...props }) => {
+    const factory = getFactory(item.puzzleType);
+    const view = factory.createItem({
+        focused: !!props.active,
+        item: item,
+        index: props.index
+    });
+    return (
+        <PuzzleWrapper>
+            {view}
+        </PuzzleWrapper>
+    );
 };

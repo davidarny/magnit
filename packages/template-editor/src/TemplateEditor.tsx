@@ -33,6 +33,15 @@ interface ITemplateEditorProps {
     initialState?: ITemplate;
 }
 
+export interface IEditorContext {
+    template: ITemplate;
+    onTemplateChange(template: ITemplate): void;
+    onAddAnswerPuzzle?(id: string): void;
+    onDeleteAnswerPuzzle?(id: string): void;
+}
+
+export const EditorContext = React.createContext<IEditorContext>(_.stubObject());
+
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [template, setTemplate] = useState<ITemplate>(
         props.initialState || {
@@ -247,23 +256,23 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
-    /* const components = {
-        [EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
+    const components = {
+        /*[EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
             <GroupPuzzle
                 template={template}
                 isFocused={id => id === focusedPuzzleId}
                 onTemplateChange={onTemplateChange}
                 {...props}
             />
-        ),
-        [EPuzzleType.QUESTION]: (props: ITitledComponentProps) => (
+        ),*/
+       /* [EPuzzleType.QUESTION]: (props: ITitledComponentProps) => (
             <QuestionPuzzle
                 template={template}
                 isFocused={id => id === focusedPuzzleId}
                 onTemplateChange={onTemplateChange}
                 {...props}
             />
-        ),
+        ),*/
         [EPuzzleType.TEXT_ANSWER]: (props: ICommonComponentProps) => (
             <TextAnswerPuzzle {...props} />
         ),
@@ -300,10 +309,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onDeleteDropdownButton={onDeleteAnswerPuzzle}
             />
         ),
-    };*/
+    };
 
     return (
-        <React.Fragment>
+       <EditorContext.Provider value={{
+           template,
+           onTemplateChange,
+           onAddAnswerPuzzle,
+           onDeleteAnswerPuzzle,
+       }}>
             <PuzzleToolbar
                 top={toolbarTopPosition}
                 onAddClick={onToolbarAddQuestion}
@@ -394,6 +408,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     </Block>
                 );
             })}
-        </React.Fragment>
+        </EditorContext.Provider>
     );
 };

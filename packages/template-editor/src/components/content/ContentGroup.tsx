@@ -56,7 +56,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                         />
                     );
                 }
-                return <ContentItem item={puzzle} index={index} active={focused} />;
+                return <ContentItem item={puzzle} index={index} active={focused} key={puzzle.id} />;
             })}
         </Block>
     );
