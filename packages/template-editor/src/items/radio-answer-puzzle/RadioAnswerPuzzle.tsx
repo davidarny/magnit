@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, IconButton, Radio, TextField } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
+import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
+import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { InputField } from "../../components/fields";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -53,52 +54,63 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
         props.onDeleteRadioButton(props.id);
     }
 
+    if (!props.questionFocused) {
+        return (
+            <Grid container alignItems="center">
+                <Grid item>
+                    <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                </Grid>
+                <Grid item>
+                    <Typography variant="body1">{label}</Typography>
+                </Grid>
+            </Grid>
+        );
+    }
+
     return (
         <React.Fragment>
-            <Grid container alignItems="center">
-                <Grid item xs={1}>
+            <Grid container alignItems="flex-end" spacing={2}>
+                <Grid item>
                     <Radio
-                        css={css`
-                            padding-left: 0;
-                        `}
+                        disabled
+                        css={theme => ({
+                            marginLeft: `-${theme.spacing()}`,
+                            paddingBottom: theme.spacing(0.5),
+                        })}
                     />
                 </Grid>
-                <Grid item xs={10}>
-                    <TextField fullWidth value={label} onChange={onLabelChange} />
+                <Grid item xs style={{ paddingLeft: 0 }}>
+                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                     <Grid container justify="flex-end">
-                        <Grid item>
-                            <IconButton onClick={onDeleteRadioButton}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Grid>
+                        <IconButton onClick={onDeleteRadioButton} style={{ padding: 0 }}>
+                            <DeleteIcon />
+                        </IconButton>
                     </Grid>
                 </Grid>
             </Grid>
-            {props.addRadioButton && props.questionFocused && (
-                <Grid container alignItems="center">
-                    <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
+
+            {props.addRadioButton && (
+                <Grid container alignItems="flex-end" spacing={2}>
+                    <Grid item>
                         <Radio
                             disabled
-                            checked
-                            css={css`
-                                padding-left: 0;
-                            `}
+                            css={theme => ({
+                                marginLeft: `-${theme.spacing()}`,
+                                paddingBottom: theme.spacing(0.5),
+                            })}
                         />
                     </Grid>
-                    <Grid item xs={11} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            css={css`
-                                text-transform: none;
-                            `}
-                            onClick={onAddRadioButton}
-                        >
-                            Добавить вариант
-                        </Button>
+                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                        <InputField
+                            disabled
+                            fullWidth
+                            placeholder={"Добавить вариант"}
+                            onChange={onAddRadioButton}
+                        />
                     </Grid>
+                    <Grid item />
                 </Grid>
             )}
         </React.Fragment>

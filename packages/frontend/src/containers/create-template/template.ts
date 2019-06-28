@@ -19,7 +19,7 @@ export default {
                     puzzles: [
                         {
                             id: uuid(),
-                            puzzleType: EPuzzleType.RADIO_ANSWER,
+                            puzzleType: EPuzzleType.CHECKBOX_ANSWER,
                             title: "Да",
                             description: "",
                             order: 0,
@@ -29,7 +29,7 @@ export default {
                         },
                         {
                             id: uuid(),
-                            puzzleType: EPuzzleType.RADIO_ANSWER,
+                            puzzleType: EPuzzleType.CHECKBOX_ANSWER,
                             title: "Нет",
                             description: "",
                             order: 0,

@@ -8,6 +8,7 @@ import { ContentItem } from "./ContentItem";
 interface IContentGroupProps {
     index: number;
     item: IPuzzle;
+    parentItem?: IPuzzle;
 
     isFocused(id: string): boolean;
 
@@ -22,6 +23,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
     isFocused,
     item,
     children,
+    parentItem,
     ...props
 }) => {
     function onFocus(): void {
@@ -42,22 +44,42 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                 zIndex: focused ? 1300 : 0,
             })}
         >
-            <ContentItem item={item} index={props.index} active={focused} />
-            {item.puzzles.map((puzzle, index) => {
-                if (puzzle.puzzleType === EPuzzleType.QUESTION) {
+            <div
+                css={theme => ({
+                    paddingLeft: !!parentItem ? theme.spacing(4) : 0,
+                })}
+            >
+                <ContentItem
+                    item={item}
+                    parentItem={parentItem}
+                    index={props.index}
+                    active={focused}
+                />
+                {item.puzzles.map((puzzle, index) => {
+                    if (puzzle.puzzleType === EPuzzleType.QUESTION) {
+                        return (
+                            <ContentGroup
+                                key={puzzle.id}
+                                item={puzzle}
+                                onFocus={props.onFocus}
+                                onBlur={props.onBlur}
+                                isFocused={isFocused}
+                                index={index}
+                                parentItem={item}
+                            />
+                        );
+                    }
                     return (
-                        <ContentGroup
-                            key={puzzle.id}
+                        <ContentItem
                             item={puzzle}
-                            onFocus={props.onFocus}
-                            onBlur={props.onBlur}
-                            isFocused={isFocused}
                             index={index}
+                            active={focused}
+                            key={puzzle.id}
+                            parentItem={item}
                         />
                     );
-                }
-                return <ContentItem item={puzzle} index={index} active={focused} key={puzzle.id} />;
-            })}
+                })}
+            </div>
         </Block>
     );
 };

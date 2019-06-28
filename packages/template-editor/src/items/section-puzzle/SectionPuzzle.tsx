@@ -43,13 +43,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
                         Раздел {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid
-                    item
-                    style={{
-                        display: "flex",
-                        flexGrow: 1,
-                    }}
-                >
+                <Grid item xs style={{ display: "flex" }}>
                     <InputField
                         fullWidth
                         placeholder="Название раздела"

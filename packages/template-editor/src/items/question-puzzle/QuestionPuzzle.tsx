@@ -125,7 +125,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                             {props.index + 1}.
                         </Typography>
                     </Grid>
-                    <Grid item style={{ flexGrow: 1, paddingLeft: 0 }}>
+                    <Grid item xs style={{ paddingLeft: 0 }}>
                         <InputField
                             fullWidth
                             placeholder="Название вопроса"
