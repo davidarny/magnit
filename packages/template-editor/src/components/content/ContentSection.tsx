@@ -37,10 +37,8 @@ export const ContentSection: React.FC<IContentSectionProps> = ({ children, templ
                 css={theme => ({
                     paddingLeft: theme.spacing(4),
                     paddingRight: theme.spacing(4),
+                    paddingBottom: theme.spacing(2),
                 })}
-                style={{
-                    paddingBottom: 10,
-                }}
             >
                 <InputField
                     fullWidth={true}

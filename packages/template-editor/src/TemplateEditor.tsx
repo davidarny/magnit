@@ -261,7 +261,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 id={template.id}
                 styles={theme => ({
                     paddingTop: theme.spacing(3),
-                    paddingBottom: theme.spacing(3),
+                    marginBottom: theme.spacing(2),
                 })}
                 focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
@@ -287,7 +287,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             marginTop: theme.spacing(4),
                             marginBottom: theme.spacing(2),
                             paddingTop: theme.spacing(2),
-                            paddingBottom: theme.spacing(2),
                         })}
                         onFocus={onPuzzleFocus.bind(null, section.id)}
                         onMouseDown={onPuzzleFocus.bind(null, section.id)}
