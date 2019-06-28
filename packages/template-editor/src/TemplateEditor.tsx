@@ -6,33 +6,29 @@ import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
 import { Grid } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
-import { GroupPuzzle } from "./items/group-puzzle";
-import { QuestionPuzzle } from "./items/question-puzzle";
-import {
-    EPuzzleType,
-    ICheckboxComponentProps,
-    ICommonComponentProps,
-    IDropdownComponentProps,
-    IRadioComponentProps,
-    ITitledComponentProps,
-    Puzzle,
-    PuzzleToolbar,
-} from "./components/puzzle";
-import { TextAnswerPuzzle } from "./items/text-answer-puzzle";
+import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
-import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
-import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
-import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
-import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
-import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
 import { InputField } from "./components/fields";
 import { Block } from "./components/block";
+import { Content } from "./components/content";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
 }
+
+export interface IEditorContext {
+    template: ITemplate;
+
+    onTemplateChange(template: ITemplate): void;
+
+    onAddAnswerPuzzle(id: string): void;
+
+    onDeleteAnswerPuzzle(id: string): void;
+}
+
+export const EditorContext = React.createContext<IEditorContext>(_.stubObject());
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [template, setTemplate] = useState<ITemplate>(
@@ -248,63 +244,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
-    const components = {
-        [EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
-            <GroupPuzzle
-                template={template}
-                isFocused={id => id === focusedPuzzleId}
-                onTemplateChange={onTemplateChange}
-                {...props}
-            />
-        ),
-        [EPuzzleType.QUESTION]: (props: ITitledComponentProps) => (
-            <QuestionPuzzle
-                template={template}
-                isFocused={id => id === focusedPuzzleId}
-                onTemplateChange={onTemplateChange}
-                {...props}
-            />
-        ),
-        [EPuzzleType.TEXT_ANSWER]: (props: ICommonComponentProps) => (
-            <TextAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.DATE_ANSWER]: (props: ICommonComponentProps) => (
-            <DateAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.NUMERIC_ANSWER]: (props: ICommonComponentProps) => (
-            <NumericAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.RADIO_ANSWER]: (props: IRadioComponentProps) => (
-            <RadioAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddRadioButton={onAddAnswerPuzzle}
-                onDeleteRadioButton={onDeleteAnswerPuzzle}
-            />
-        ),
-        [EPuzzleType.CHECKBOX_ANSWER]: (props: ICheckboxComponentProps) => (
-            <CheckboxAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddCheckboxButton={onAddAnswerPuzzle}
-                onDeleteCheckboxButton={onDeleteAnswerPuzzle}
-            />
-        ),
-        [EPuzzleType.DROPDOWN_ANSWER]: (props: IDropdownComponentProps) => (
-            <DropdownAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddDropdownButton={onAddAnswerPuzzle}
-                onDeleteDropdownButton={onDeleteAnswerPuzzle}
-            />
-        ),
-    };
-
     return (
-        <React.Fragment>
+        <EditorContext.Provider
+            value={{
+                template,
+                onTemplateChange,
+                onAddAnswerPuzzle,
+                onDeleteAnswerPuzzle,
+            }}
+        >
             <PuzzleToolbar
                 top={toolbarTopPosition}
                 onAddClick={onToolbarAddQuestion}
@@ -374,14 +322,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         />
                     </Grid>
                     <Grid item>
-                        <Puzzle
+                        <Content
                             puzzles={template.puzzles}
-                            index={0}
-                            components={components}
                             onFocus={onPuzzleFocus}
                             onBlur={onPuzzleBlur}
                             isFocused={id => id === focusedPuzzleId}
-                            isInFocusedChain={id => focusedPuzzleChain.includes(id)}
                         />
                     </Grid>
                 </Grid>
@@ -402,37 +347,24 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         onBlur={onPuzzleBlur}
                         focused={focusedPuzzleId === section.id}
                     >
-                        <div css={theme => ({ margin: theme.spacing(0) })} />
+                        <div style={{ margin: 0 }} />
                         <SectionPuzzle
                             title={section.title}
                             id={section.id}
                             index={index}
                             isFocus={focusedPuzzleId === section.id}
                         />
-                        <Grid container>
-                            <Block
-                                styles={theme => ({
-                                    width: "100%",
-                                    ":empty": {
-                                        minHeight: theme.spacing(32),
-                                    },
-                                })}
-                                focused={focusedPuzzleId === template.id}
-                            >
-                                <Puzzle
-                                    puzzles={section.puzzles}
-                                    index={index}
-                                    components={components}
-                                    onFocus={onPuzzleFocus}
-                                    onBlur={onPuzzleBlur}
-                                    isFocused={id => id === focusedPuzzleId}
-                                    isInFocusedChain={id => focusedPuzzleChain.includes(id)}
-                                />
-                            </Block>
+                        <Grid item>
+                            <Content
+                                puzzles={section.puzzles}
+                                onFocus={onPuzzleFocus}
+                                onBlur={onPuzzleBlur}
+                                isFocused={id => id === focusedPuzzleId}
+                            />
                         </Grid>
                     </Block>
                 );
             })}
-        </React.Fragment>
+        </EditorContext.Provider>
     );
 };

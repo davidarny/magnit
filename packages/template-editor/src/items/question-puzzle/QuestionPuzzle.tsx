@@ -26,8 +26,7 @@ import { useRef } from "react";
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
     title: string;
-
-    isFocused(id: string): boolean;
+    focused?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -145,7 +144,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                {props.isFocused(id) && (
+                {props.focused && (
                     <FormControlLabel
                         css={theme => ({ marginTop: theme.spacing(2) })}
                         control={
@@ -164,8 +163,8 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     xs={12}
                     css={theme => ({
                         marginTop: theme.spacing(2),
-                        opacity: !props.isFocused(id) ? 0.5 : 1,
-                        pointerEvents: !props.isFocused(id) ? "none" : "initial",
+                        opacity: !props.focused ? 0.5 : 1,
+                        pointerEvents: !props.focused ? "none" : "initial",
                     })}
                     item
                 >
