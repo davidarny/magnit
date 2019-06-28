@@ -10,6 +10,7 @@ import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
 import { InputField } from "../../components/fields";
+import { SelectField } from "../../components/fields/SelectField";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -134,7 +135,19 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                         />
                     </Grid>
                     <Grid item xs={3}>
-                        <FormControl fullWidth>
+                        <SelectField
+                            id={"question-puzzle-type"}
+                            fullWidth={true}
+                            value={answersType}
+                            onChange={onAnswerTypeChange}
+                        >
+                            {answerTypes.map(({ label, type }, index) => (
+                                <MenuItem value={type} key={index}>
+                                    {label}
+                                </MenuItem>
+                            ))}
+                        </SelectField>
+                        {/* <FormControl fullWidth>
                             <Select
                                 value={answersType}
                                 input={<Input id="question-puzzle-type" />}
@@ -146,7 +159,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>
+                        </FormControl>*/}
                     </Grid>
                 </Grid>
             </Grid>
