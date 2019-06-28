@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { Divider, Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import LogoIcon from "assets/magnit.png";
