@@ -10,10 +10,12 @@ import { InputField } from "../../components/fields";
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     title: string;
     focused: boolean;
+    description: string;
 }
 
 export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
     title,
+    description,
     index,
     focused,
     children,
@@ -28,33 +30,76 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
                 css={theme => ({
                     paddingLeft: theme.spacing(4),
                     paddingRight: theme.spacing(4),
+                    position: "relative",
                 })}
                 style={{
                     paddingBottom: 10,
                 }}
             >
-                <Grid item>
+                <Grid
+                    item
+                    css={{
+                        position: "absolute",
+                        top: 10,
+                        left: 30,
+                    }}
+                >
                     <Typography
                         style={{
                             fontSize: 26,
-                            marginBottom: 2,
                         }}
                     >
                         Раздел {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs style={{ display: "flex" }}>
-                    <InputField
-                        fullWidth
-                        placeholder="Название раздела"
-                        defaultValue={title}
-                        isSimpleMode={!focused}
-                        InputProps={{
-                            style: {
-                                fontSize: 26,
-                            },
-                        }}
-                    />
+                <Grid
+                    item
+                    xs
+                    css={{
+                        marginLeft: "130px !important",
+                    }}
+                >
+                    <Grid
+                        item
+                        css={theme => ({
+                            paddingLeft: theme.spacing(4),
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Название раздела"
+                            defaultValue={title}
+                            isSimpleMode={!focused}
+                            InputProps={{
+                                style: {
+                                    fontSize: 26,
+                                    fontWeight: 500,
+                                },
+                            }}
+                        />
+                    </Grid>
+                    <Grid
+                        item
+                        css={theme => ({
+                            paddingLeft: theme.spacing(4),
+                            paddingRight: theme.spacing(4),
+                            paddingTop: theme.spacing(2),
+                        })}
+                    >
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Описание раздела (необязательно)"
+                            defaultValue={description}
+                            isSimpleMode={!focused}
+                            InputProps={{
+                                style: {
+                                    fontSize: 18,
+                                    fontWeight: 300,
+                                },
+                            }}
+                        />
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid container direction="column">
