@@ -22,7 +22,6 @@ export const CreateTemplate: React.FC = () => {
                 </Grid>
             </SectionTitle>
             <Grid
-                item
                 css={theme => ({
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),

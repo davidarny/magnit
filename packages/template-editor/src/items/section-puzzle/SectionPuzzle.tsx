@@ -1,73 +1,65 @@
 /** @jsx jsx */
 
 import * as React from "react";
+import { Fragment } from "react";
 import { ISpecificPuzzleProps } from "entities";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { InputField } from "components/fields";
+import { InputField } from "../../components/fields";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     title: string;
-    isFocus?: boolean;
+    focused: boolean;
 }
 
-export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({ title, index, isFocus = true }) => {
+export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
+    title,
+    index,
+    focused,
+    children,
+}) => {
     return (
-        <Grid
-            container
-            alignItems="flex-end"
-            spacing={2}
-            css={theme => ({
-                paddingTop: theme.spacing(3),
-                paddingRight: theme.spacing(2),
-                paddingBottom: theme.spacing(3),
-                paddingLeft: theme.spacing(2),
-            })}
-        >
-            <Grid container direction="column">
-                <Grid
-                    item
-                    css={theme => ({
-                        paddingLeft: theme.spacing(4),
-                        paddingRight: theme.spacing(4),
-                    })}
-                >
+        <Fragment>
+            <Grid
+                container
+                alignItems="flex-end"
+                justify="center"
+                spacing={2}
+                css={theme => ({
+                    paddingLeft: theme.spacing(4),
+                    paddingRight: theme.spacing(4),
+                })}
+                style={{
+                    paddingBottom: 10,
+                }}
+            >
+                <Grid item>
+                    <Typography
+                        style={{
+                            fontSize: 26,
+                            marginBottom: 2,
+                        }}
+                    >
+                        Раздел {index + 1}.
+                    </Typography>
+                </Grid>
+                <Grid item xs style={{ display: "flex" }}>
                     <InputField
-                        fullWidth={true}
+                        fullWidth
                         placeholder="Название раздела"
-                        isFocus={isFocus}
+                        defaultValue={title}
+                        isSimpleMode={!focused}
                         InputProps={{
                             style: {
                                 fontSize: 26,
-                                fontWeight: 500,
-                                marginBottom: 20,
-                            },
-                        }}
-                    />
-                </Grid>
-                <Grid
-                    item
-                    css={theme => ({
-                        paddingLeft: theme.spacing(4),
-                        paddingRight: theme.spacing(4),
-                    })}
-                    style={{
-                        paddingBottom: 10,
-                    }}
-                >
-                    <InputField
-                        fullWidth={true}
-                        placeholder="Описание раздела (необязательно)"
-                        isFocus={isFocus}
-                        InputProps={{
-                            style: {
-                                fontSize: 18,
-                                fontWeight: 300,
                             },
                         }}
                     />
                 </Grid>
             </Grid>
-        </Grid>
+            <Grid container direction="column">
+                {children}
+            </Grid>
+        </Fragment>
     );
 };

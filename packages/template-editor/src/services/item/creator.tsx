@@ -20,6 +20,7 @@ export interface IPuzzleFactoryProps {
     index: number;
     focused: boolean;
     item: IPuzzle;
+    parentItem?: IPuzzle;
 }
 
 class DefaultFactory implements IPuzzleFactory {

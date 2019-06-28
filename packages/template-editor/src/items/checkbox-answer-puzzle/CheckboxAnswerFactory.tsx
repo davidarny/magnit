@@ -5,7 +5,7 @@ import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
 import { jsx } from "@emotion/core";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
+    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (
@@ -15,7 +15,9 @@ export class CheckboxAnswerFactory implements IPuzzleFactory {
                         {...{ id: item.id, title: item.title, questionFocused: focused }}
                         onAddCheckboxButton={onAddAnswerPuzzle}
                         onDeleteCheckboxButton={onDeleteAnswerPuzzle}
-                        addCheckboxButton={!!focused}
+                        addCheckboxButton={
+                            !!parentItem && parentItem.puzzles.length - 1 === rest.index
+                        }
                     />
                 )}
             </EditorContext.Consumer>

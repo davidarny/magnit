@@ -17,9 +17,12 @@ export const Sidebar: React.FC = () => {
                     },
                 }}
         >
-            <div css={{
-                boxShadow: "none",
-            }}>
+            <div
+                css={{
+                    boxShadow: "none",
+                    width: 88,
+                }}
+            >
                 <Grid container justify="center" alignItems="center" id="logo" css={{ width: 88, height: 96 }}>
                     <Grid item css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}>
                         <Link to="/">
