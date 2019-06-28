@@ -31,6 +31,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
     }
 
     const focused = isFocused(item.id);
+    const hasBorder = !focused && item.puzzleType === EPuzzleType.GROUP;
     return (
         <Block
             onFocus={onFocus}
@@ -48,6 +49,10 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                 css={theme => ({
                     paddingLeft: !!parentItem ? theme.spacing(4) : 0,
                 })}
+                style={{
+                    borderTop: hasBorder ? "1px dashed #AAB4BE" : "none",
+                    borderBottom: hasBorder ? "1px dashed #AAB4BE" : "none",
+                }}
             >
                 <ContentItem
                     item={item}
