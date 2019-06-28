@@ -10,7 +10,7 @@ export interface IBlockProps extends PaperProps {
     styles?: (theme: any) => CSSProperties;
 }
 
-export const Block: React.FC<IBlockProps> = ({
+export const ClickableBlock: React.FC<IBlockProps> = ({
     children,
     focused = false,
     styles = () => {},
