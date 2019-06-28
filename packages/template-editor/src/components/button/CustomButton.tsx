@@ -7,20 +7,25 @@ export interface ICustomButtonProps {
     title?: string;
     icon?: React.ReactNode;
     buttonColor?: string;
+    onlyIcon?: boolean;
+    sizeIcon?: number;
 }
 
 export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
-    title = "",
-    icon = "check",
-    buttonColor = "blue",
-    ...rest
-}) => {
+                                                                             title = "",
+                                                                             icon = "check",
+                                                                             buttonColor = "blue",
+                                                                             onlyIcon = false,
+                                                                             sizeIcon = 24,
+                                                                             ...rest
+                                                                         }) => {
     const buttons = {
         main: {
             transaction: "0.25s",
             borderRadius: 40,
             width: 160,
             height: 40,
+            minWidth: 40,
         },
         icon: {
             height: 24,
@@ -77,6 +82,7 @@ export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
                 borderRadius: buttons.main.borderRadius,
                 width: buttons.main.width,
                 height: buttons.main.height,
+                minWidth: buttons.main.minWidth,
                 textTransform: "none",
                 position: "relative",
 
@@ -93,8 +99,12 @@ export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
             <div
                 css={{
                     position: "absolute",
-                    top: 8,
-                    left: 12,
+                    top: onlyIcon ? -1 : 8,
+                    left: onlyIcon ? -1 : 12,
+                    "svg": {
+                        width: sizeIcon,
+                        height: sizeIcon,
+                    },
                 }}
             >
                 {icon}
