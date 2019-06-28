@@ -5,7 +5,7 @@ import { jsx } from "@emotion/core";
 import { DropdownAnswerPuzzle } from "./DropdownAnswerPuzzle";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (
@@ -15,7 +15,9 @@ export class DropdownAnswerFactory implements IPuzzleFactory {
                         {...{ id: item.id, title: item.title, questionFocused: focused }}
                         onAddDropdownButton={onAddAnswerPuzzle}
                         onDeleteDropdownButton={onDeleteAnswerPuzzle}
-                        addDropdownButton={!!focused}
+                        addDropdownButton={
+                            !!parentItem && parentItem.puzzles.length - 1 === rest.index
+                        }
                     />
                 )}
             </EditorContext.Consumer>

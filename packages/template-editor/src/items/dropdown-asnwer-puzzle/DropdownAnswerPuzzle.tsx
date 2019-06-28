@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, IconButton, TextField } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
+import { Grid, IconButton, Typography } from "@material-ui/core";
+import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { InputField } from "../../components/fields";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -53,42 +54,61 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
         props.onDeleteDropdownButton(props.id);
     }
 
+    if (!props.questionFocused) {
+        return (
+            <Grid container direction="column" css={theme => ({ paddingLeft: theme.spacing(2) })}>
+                <Grid item>
+                    <Typography variant="body1">
+                        <Typography
+                            component="span"
+                            css={theme => ({
+                                paddingRight: theme.spacing(),
+                            })}
+                        >
+                            {props.index + 1}.
+                        </Typography>
+                        {label}
+                    </Typography>
+                </Grid>
+            </Grid>
+        );
+    }
+
     return (
         <React.Fragment>
-            <Grid container alignItems="center">
-                <Grid item xs={1}>
-                    {props.index + 1}.
+            <Grid container alignItems="flex-end" spacing={2}>
+                <Grid item>
+                    <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                        {props.index + 1}.
+                    </Typography>
                 </Grid>
-                <Grid item xs={10}>
-                    <TextField fullWidth value={label} onChange={onLabelChange} />
+                <Grid item xs style={{ paddingLeft: 0 }}>
+                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                     <Grid container justify="flex-end">
-                        <Grid item>
-                            <IconButton onClick={onDeleteDropdownButton}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Grid>
+                        <IconButton onClick={onDeleteDropdownButton} style={{ padding: 0 }}>
+                            <DeleteIcon />
+                        </IconButton>
                     </Grid>
                 </Grid>
             </Grid>
+
             {props.addDropdownButton && props.questionFocused && (
-                <Grid container alignItems="center">
-                    <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        {props.index + 2}.
+                <Grid container alignItems="flex-end" spacing={2}>
+                    <Grid item>
+                        <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                            {props.index + 2}.
+                        </Typography>
                     </Grid>
-                    <Grid item xs={11} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            css={css`
-                                text-transform: none;
-                            `}
-                            onClick={onAddDropdownButton}
-                        >
-                            Добавить вариант
-                        </Button>
+                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                        <InputField
+                            fullWidth
+                            placeholder={"Добавить вариант"}
+                            onChange={onAddDropdownButton}
+                        />
                     </Grid>
+                    <Grid item />
                 </Grid>
             )}
         </React.Fragment>
