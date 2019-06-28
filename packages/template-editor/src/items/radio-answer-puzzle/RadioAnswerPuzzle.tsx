@@ -58,8 +58,6 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             <Grid container alignItems="center">
                 <Grid item xs={1}>
                     <Radio
-                        disabled
-                        checked
                         css={css`
                             padding-left: 0;
                         `}

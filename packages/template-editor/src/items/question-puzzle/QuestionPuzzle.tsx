@@ -2,26 +2,14 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ETerminals, IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    Grid,
-    Input,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-    Typography,
-} from "@material-ui/core";
+import { FormControl, Grid, Input, MenuItem, Select, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { Conditions } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
-import { useRef } from "react";
+import { InputField } from "../../components/fields";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -32,6 +20,15 @@ interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
 }
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
+
+const answerTypes = [
+    { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER },
+    { label: "Числовое поле", type: EPuzzleType.NUMERIC_ANSWER },
+    { label: "Один из списка", type: EPuzzleType.RADIO_ANSWER },
+    { label: "Несколько из списка", type: EPuzzleType.CHECKBOX_ANSWER },
+    { label: "Дата", type: EPuzzleType.DATE_ANSWER },
+    { label: "Выпадающий список", type: EPuzzleType.DROPDOWN_ANSWER },
+];
 
 export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
     const [conditionsEnabled, setConditionsEnabled] = useState(false);
@@ -99,51 +96,61 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
         setQuestionTitle(event.target.value as string);
     }
 
+    if (!props.focused) {
+        return (
+            <Grid container direction="column">
+                <Grid item>
+                    <Typography variant="body1">
+                        <Typography
+                            component="span"
+                            css={theme => ({
+                                paddingRight: theme.spacing(),
+                            })}
+                        >
+                            {props.index + 1}.
+                        </Typography>
+                        {questionTitle}
+                    </Typography>
+                </Grid>
+            </Grid>
+        );
+    }
+
     return (
         <Grid container direction="column">
             <Grid item xs={12}>
-                <Grid container spacing={4}>
-                    <Grid item xs={9}>
-                        <Grid container alignItems="flex-end">
-                            <Grid xs={1} item>
-                                <Typography variant="body1">{props.index + 1}.</Typography>
-                            </Grid>
-                            <Grid xs={11} item>
-                                <TextField
-                                    fullWidth
-                                    label="Название вопроса"
-                                    value={questionTitle}
-                                    onChange={onQuestionTitleChange}
-                                />
-                            </Grid>
-                        </Grid>
+                <Grid container alignItems="flex-end" spacing={2}>
+                    <Grid item>
+                        <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                            {props.index + 1}.
+                        </Typography>
+                    </Grid>
+                    <Grid item style={{ flexGrow: 1, paddingLeft: 0 }}>
+                        <InputField
+                            fullWidth
+                            placeholder="Название вопроса"
+                            value={questionTitle}
+                            onChange={onQuestionTitleChange}
+                        />
                     </Grid>
                     <Grid item xs={3}>
                         <FormControl fullWidth>
-                            <InputLabel htmlFor="question-puzzle-type">Выберите вопрос</InputLabel>
                             <Select
                                 value={answersType}
                                 input={<Input id="question-puzzle-type" />}
                                 onChange={onAnswerTypeChange}
                             >
-                                <MenuItem value={EPuzzleType.TEXT_ANSWER}>Текстовое поле</MenuItem>
-                                <MenuItem value={EPuzzleType.NUMERIC_ANSWER}>
-                                    Числовое поле
-                                </MenuItem>
-                                <MenuItem value={EPuzzleType.RADIO_ANSWER}>Один из списка</MenuItem>
-                                <MenuItem value={EPuzzleType.CHECKBOX_ANSWER}>
-                                    Несколько из списка
-                                </MenuItem>
-                                <MenuItem value={EPuzzleType.DATE_ANSWER}>Дата</MenuItem>
-                                <MenuItem value={EPuzzleType.DROPDOWN_ANSWER}>
-                                    Выпадающий список
-                                </MenuItem>
+                                {answerTypes.map(({ label, type }, index) => (
+                                    <MenuItem value={type} key={index}>
+                                        {label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={12}>
+            {/*<Grid item xs={12}> // TODO: implement later
                 {props.focused && (
                     <FormControlLabel
                         css={theme => ({ marginTop: theme.spacing(2) })}
@@ -174,7 +181,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                         onTemplateChange={props.onTemplateChange}
                     />
                 </Grid>
-            )}
+            )}*/}
         </Grid>
     );
 };

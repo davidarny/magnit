@@ -57,7 +57,6 @@ const App: React.FC = () => {
                     <Sidebar />
                 </Grid>
                 <Grid
-                    item
                     css={css`
                         margin-left: var(--section-left-margin);
                         width: 100%;

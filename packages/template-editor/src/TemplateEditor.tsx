@@ -4,15 +4,13 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
-import { Grid } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
-import { InputField } from "./components/fields";
 import { Block } from "./components/block";
-import { Content } from "./components/content";
+import { Content, ContentSection } from "./components/content";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -263,73 +261,24 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 id={template.id}
                 styles={theme => ({
                     paddingTop: theme.spacing(3),
-                    paddingBottom: template.puzzles.some(
-                        puzzle => puzzle.puzzleType === EPuzzleType.GROUP
-                    )
-                        ? theme.spacing(0)
-                        : theme.spacing(3),
+                    paddingBottom: theme.spacing(3),
                 })}
                 focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
             >
-                <Grid container direction="column">
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                    >
-                        <InputField
-                            fullWidth={true}
-                            placeholder="Название шаблона"
-                            defaultValue={template.title}
-                            isFocus={focusedPuzzleId === template.id}
-                            InputProps={{
-                                style: {
-                                    fontSize: 26,
-                                    fontWeight: 500,
-                                    marginBottom: 20,
-                                },
-                            }}
-                        />
-                    </Grid>
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                        style={{
-                            paddingBottom: 10,
-                        }}
-                    >
-                        <InputField
-                            fullWidth={true}
-                            placeholder="Описание шаблона (необязательно)"
-                            defaultValue={template.description}
-                            isFocus={focusedPuzzleId === template.id}
-                            InputProps={{
-                                style: {
-                                    fontSize: 18,
-                                    fontWeight: 300,
-                                },
-                            }}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Content
-                            puzzles={template.puzzles}
-                            onFocus={onPuzzleFocus}
-                            onBlur={onPuzzleBlur}
-                            isFocused={id => id === focusedPuzzleId}
-                        />
-                    </Grid>
-                </Grid>
+                <ContentSection template={template} focused={focusedPuzzleId === template.id}>
+                    <Content
+                        puzzles={template.puzzles}
+                        onFocus={onPuzzleFocus}
+                        onBlur={onPuzzleBlur}
+                        isFocused={id => id === focusedPuzzleId}
+                    />
+                </ContentSection>
             </Block>
             {template.sections.map((section, index) => {
+                const focused = focusedPuzzleId === section.id;
                 return (
                     <Block
                         key={section.id}
@@ -343,18 +292,21 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         onFocus={onPuzzleFocus.bind(null, section.id)}
                         onMouseDown={onPuzzleFocus.bind(null, section.id)}
                         onBlur={onPuzzleBlur}
-                        focused={focusedPuzzleId === section.id}
+                        focused={focused}
                     >
-                        <div style={{ margin: 0 }} />
-                        <SectionPuzzle title={section.title} id={section.id} index={index} />
-                        <Grid item>
+                        <SectionPuzzle
+                            title={section.title}
+                            id={section.id}
+                            index={index}
+                            focused={focused}
+                        >
                             <Content
                                 puzzles={section.puzzles}
                                 onFocus={onPuzzleFocus}
                                 onBlur={onPuzzleBlur}
                                 isFocused={id => id === focusedPuzzleId}
                             />
-                        </Grid>
+                        </SectionPuzzle>
                     </Block>
                 );
             })}

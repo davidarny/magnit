@@ -1,10 +1,10 @@
 import uuid from "uuid/v4";
-// import { EPuzzleType } from "@magnit/template-editor";
+import { EPuzzleType } from "@magnit/template-editor";
 
 export default {
     id: uuid(),
     sections: [
-        /* {
+        {
             id: uuid(),
             title: "Благоустройство",
             description: "",
@@ -74,7 +74,7 @@ export default {
                     validations: [],
                 },
             ],
-        },*/
+        },
     ],
     puzzles: [],
     title: "Ведомость работ",

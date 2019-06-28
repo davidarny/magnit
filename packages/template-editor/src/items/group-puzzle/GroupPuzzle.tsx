@@ -19,7 +19,7 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
                 <Typography variant="h6">Группа связанных вопросов</Typography>
             </Grid>
-            <Grid item css={theme => ({ marginTop: theme.spacing(2) })}>
+            {/* <Grid item css={theme => ({ marginTop: theme.spacing(2) })}> // TODO: implement later
                 <Typography variant="subtitle1">Условия показа вопроса</Typography>
             </Grid>
             <Grid
@@ -35,7 +35,7 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
                     template={props.template}
                     onTemplateChange={props.onTemplateChange}
                 />
-            </Grid>
+            </Grid>*/}
         </Grid>
     );
 };
