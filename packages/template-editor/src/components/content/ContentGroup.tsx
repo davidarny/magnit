@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ClickableBlock } from "../block";
+import { SelectableBlockWrapper } from "../block";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "../../entities";
 import { EPuzzleType } from "../puzzle";
@@ -34,7 +34,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
     const isGroup = item.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
     return (
-        <ClickableBlock
+        <SelectableBlockWrapper
             onFocus={onFocus}
             onMouseDown={onFocus}
             onBlur={props.onBlur}
@@ -86,6 +86,6 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                     );
                 })}
             </div>
-        </ClickableBlock>
+        </SelectableBlockWrapper>
     );
 };

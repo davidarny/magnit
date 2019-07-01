@@ -1,1 +1,1 @@
-export * from "./ClickableBlock";
+export * from "./SelectableBlockWrapper";

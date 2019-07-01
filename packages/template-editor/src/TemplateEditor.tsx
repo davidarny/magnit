@@ -9,7 +9,7 @@ import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
-import { ClickableBlock } from "./components/block";
+import { SelectableBlockWrapper } from "./components/block";
 import { Content, ContentSection } from "./components/content";
 
 interface ITemplateEditorProps {
@@ -257,7 +257,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onAddGroup={onToolbarAddGroup}
                 onAddSection={onToolbarAddSection}
             />
-            <ClickableBlock
+            <SelectableBlockWrapper
                 id={template.id}
                 styles={theme => ({
                     paddingTop: theme.spacing(3),
@@ -276,11 +276,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         isFocused={id => id === focusedPuzzleId}
                     />
                 </ContentSection>
-            </ClickableBlock>
+            </SelectableBlockWrapper>
             {template.sections.map((section, index) => {
                 const focused = focusedPuzzleId === section.id;
                 return (
-                    <ClickableBlock
+                    <SelectableBlockWrapper
                         key={section.id}
                         id={section.id}
                         styles={theme => ({
@@ -306,7 +306,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                                 isFocused={id => id === focusedPuzzleId}
                             />
                         </SectionPuzzle>
-                    </ClickableBlock>
+                    </SelectableBlockWrapper>
                 );
             })}
         </EditorContext.Provider>
