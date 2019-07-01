@@ -4,20 +4,18 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button, Grid, IconButton, Radio, TextField } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-interface IRadioAnswerPuzzleProps extends ISpecificPuzzleProps {
+interface IRadioAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;
     template: ITemplate;
     // flag indication this radio should render
     // button which adds new radio when clicked
     addRadioButton: boolean;
-    // if not focused, we don't show add button
-    questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 

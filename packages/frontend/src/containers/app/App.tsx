@@ -100,7 +100,7 @@ const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
                     width: 100%;
                 }
                 body {
-                    background: #e5e5e5;
+                    background: #f6f7fb;
                 }
             `}
         />

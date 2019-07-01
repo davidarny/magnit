@@ -3,10 +3,10 @@
 import * as React from "react";
 import { FormControl, Grid, Input, InputAdornment, InputLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { ISpecificPuzzleProps } from "entities";
+import { IFocusedPuzzleProps } from "entities";
 import { CalendarToday as CalendarIcon } from "@material-ui/icons";
 
-export const DateAnswerPuzzle: React.FC<ISpecificPuzzleProps> = () => {
+export const DateAnswerPuzzle: React.FC<IFocusedPuzzleProps> = () => {
     return (
         <Grid container alignItems="flex-end">
             <Grid item xs={12}>

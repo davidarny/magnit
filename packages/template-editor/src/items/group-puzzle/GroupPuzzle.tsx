@@ -8,8 +8,7 @@ import { Conditions } from "components/conditions";
 
 interface IGroupPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
-
-    isFocused(id: string): boolean;
+    focused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -27,7 +26,7 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
                 css={theme => ({
                     flexGrow: 1,
                     marginTop: theme.spacing(2),
-                    opacity: !props.isFocused(id) ? 0.5 : 1,
+                    opacity: !props.focused ? 0.5 : 1,
                 })}
                 item
             >
