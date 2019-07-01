@@ -1,3 +1,67 @@
 {
-    "extends": ["../../.eslintrc"]
+    "extends": ["../../.eslintrc"],
+    "env": {
+        "node": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2018
+    },
+    "globals": {
+        "Promise": true,
+        "sails": true,
+        "_": true
+    },
+    "rules": {
+        "block-scoped-var": ["error"],
+        "callback-return": ["error", ["done", "proceed", "next", "onwards", "callback", "cb"]],
+        "camelcase": ["warn", { "properties": "never" }],
+        "comma-style": ["warn", "last"],
+        "curly": ["warn"],
+        "eqeqeq": ["error", "always"],
+        "eol-last": ["warn"],
+        "handle-callback-err": ["error"],
+        "indent": [
+            "warn",
+            4,
+            {
+                "SwitchCase": 1,
+                "MemberExpression": "off",
+                "FunctionDeclaration": { "body": 1, "parameters": "off" },
+                "FunctionExpression": { "body": 1, "parameters": "off" },
+                "CallExpression": { "arguments": "off" },
+                "ArrayExpression": 1,
+                "ObjectExpression": 1,
+                "ignoredNodes": ["ConditionalExpression"]
+            }
+        ],
+        "linebreak-style": ["error", "unix"],
+        "no-dupe-keys": ["error"],
+        "no-duplicate-case": ["error"],
+        "no-extra-semi": ["warn"],
+        "no-labels": ["error"],
+        "no-mixed-spaces-and-tabs": [2, "smart-tabs"],
+        "no-redeclare": ["warn"],
+        "no-return-assign": ["error", "always"],
+        "no-sequences": ["error"],
+        "no-trailing-spaces": ["warn"],
+        "no-undef": ["off"],
+        "no-unexpected-multiline": ["warn"],
+        "no-unreachable": ["warn"],
+        "no-unused-vars": [
+            "warn",
+            {
+                "caughtErrors": "all",
+                "caughtErrorsIgnorePattern": "^unused($|[A-Z].*$)",
+                "argsIgnorePattern": "^unused($|[A-Z].*$)",
+                "varsIgnorePattern": "^unused($|[A-Z].*$)"
+            }
+        ],
+        "no-use-before-define": ["error", { "functions": false }],
+        "one-var": ["warn", "never"],
+        "prefer-arrow-callback": ["warn", { "allowNamedFunctions": true }],
+        "quotes": ["warn", "double", { "avoidEscape": false, "allowTemplateLiterals": true }],
+        "semi": ["warn", "always"],
+        "semi-spacing": ["warn", { "before": false, "after": true }],
+        "semi-style": ["warn", "last"]
+    }
 }

@@ -1,15 +1,21 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { Grid, TextField } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { ISpecificPuzzleProps } from "entities";
+import { IFocusedPuzzleProps } from "entities";
+import { InputField } from "../../components/fields";
 
-export const TextAnswerPuzzle: React.FC<ISpecificPuzzleProps> = () => {
+export const TextAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocused }) => {
     return (
-        <Grid container alignItems="flex-end">
+        <Grid
+            container
+            alignItems="flex-end"
+            style={{ display: questionFocused ? "" : "none" }}
+            css={theme => ({ paddingBottom: theme.spacing(2) })}
+        >
             <Grid item xs={12}>
-                <TextField type="text" fullWidth label="Текстовый ответ" disabled />
+                <InputField type="text" fullWidth placeholder="Ответ" />
             </Grid>
         </Grid>
     );

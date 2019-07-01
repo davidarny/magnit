@@ -71,6 +71,10 @@ export interface ISpecificPuzzleProps {
     index: number;
 }
 
+export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {
+    questionFocused: boolean;
+}
+
 export * from "./EValidationType";
 export * from "./EOperatorType";
 export * from "./EConditionType";

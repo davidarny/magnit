@@ -4,33 +4,29 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ETerminals, IPuzzle, ITemplate } from "./entities";
-import { Grid, Paper, TextField } from "@material-ui/core";
 import { SectionPuzzle } from "./items/section-puzzle";
-import { GroupPuzzle } from "./items/group-puzzle";
-import { QuestionPuzzle } from "./items/question-puzzle";
-import {
-    EPuzzleType,
-    ICheckboxComponentProps,
-    ICommonComponentProps,
-    IDropdownComponentProps,
-    IRadioComponentProps,
-    ITitledComponentProps,
-    Puzzle,
-    PuzzleToolbar,
-} from "./components/puzzle";
-import { TextAnswerPuzzle } from "./items/text-answer-puzzle";
+import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
-import { NumericAnswerPuzzle } from "./items/numeric-answer-puzzle";
-import { RadioAnswerPuzzle } from "./items/radio-answer-puzzle";
 import _ from "lodash";
-import { CheckboxAnswerPuzzle } from "./items/checkbox-answer-puzzle";
-import { DropdownAnswerPuzzle } from "./items/dropdown-asnwer-puzzle";
-import { DateAnswerPuzzle } from "./items/date-answer-puzzle";
+import { ClickableBlock } from "./components/block";
+import { Content, ContentSection } from "./components/content";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
 }
+
+export interface IEditorContext {
+    template: ITemplate;
+
+    onTemplateChange(template: ITemplate): void;
+
+    onAddAnswerPuzzle(id: string): void;
+
+    onDeleteAnswerPuzzle(id: string): void;
+}
+
+export const EditorContext = React.createContext<IEditorContext>(_.stubObject());
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [template, setTemplate] = useState<ITemplate>(
@@ -246,173 +242,73 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
-    const components = {
-        [EPuzzleType.GROUP]: (props: ICommonComponentProps) => (
-            <GroupPuzzle
-                template={template}
-                isFocused={id => id === focusedPuzzleId}
-                onTemplateChange={onTemplateChange}
-                {...props}
-            />
-        ),
-        [EPuzzleType.QUESTION]: (props: ITitledComponentProps) => (
-            <QuestionPuzzle
-                template={template}
-                isFocused={id => id === focusedPuzzleId}
-                onTemplateChange={onTemplateChange}
-                {...props}
-            />
-        ),
-        [EPuzzleType.TEXT_ANSWER]: (props: ICommonComponentProps) => (
-            <TextAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.DATE_ANSWER]: (props: ICommonComponentProps) => (
-            <DateAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.NUMERIC_ANSWER]: (props: ICommonComponentProps) => (
-            <NumericAnswerPuzzle {...props} />
-        ),
-        [EPuzzleType.RADIO_ANSWER]: (props: IRadioComponentProps) => (
-            <RadioAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddRadioButton={onAddAnswerPuzzle}
-                onDeleteRadioButton={onDeleteAnswerPuzzle}
-            />
-        ),
-        [EPuzzleType.CHECKBOX_ANSWER]: (props: ICheckboxComponentProps) => (
-            <CheckboxAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddCheckboxButton={onAddAnswerPuzzle}
-                onDeleteCheckboxButton={onDeleteAnswerPuzzle}
-            />
-        ),
-        [EPuzzleType.DROPDOWN_ANSWER]: (props: IDropdownComponentProps) => (
-            <DropdownAnswerPuzzle
-                template={template}
-                {...props}
-                onTemplateChange={onTemplateChange}
-                onAddDropdownButton={onAddAnswerPuzzle}
-                onDeleteDropdownButton={onDeleteAnswerPuzzle}
-            />
-        ),
-    };
-
     return (
-        <React.Fragment>
+        <EditorContext.Provider
+            value={{
+                template,
+                onTemplateChange,
+                onAddAnswerPuzzle,
+                onDeleteAnswerPuzzle,
+            }}
+        >
             <PuzzleToolbar
                 top={toolbarTopPosition}
                 onAddClick={onToolbarAddQuestion}
                 onAddGroup={onToolbarAddGroup}
                 onAddSection={onToolbarAddSection}
             />
-            <Paper
-                css={theme => ({
-                    paddingTop: theme.spacing(4),
-                    paddingBottom: template.puzzles.some(
-                        puzzle => puzzle.puzzleType === EPuzzleType.GROUP
-                    )
-                        ? theme.spacing(0)
-                        : theme.spacing(4),
-                })}
+            <ClickableBlock
                 id={template.id}
+                styles={theme => ({
+                    paddingTop: theme.spacing(3),
+                    marginBottom: theme.spacing(2),
+                })}
+                focused={focusedPuzzleId === template.id}
                 onFocus={onPuzzleFocus.bind(undefined, template.id)}
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
-                elevation={focusedPuzzleId === template.id ? 16 : 0}
             >
-                <Grid container direction="column">
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                    >
-                        <TextField
-                            fullWidth
-                            label="Название шаблона"
-                            defaultValue={template.title}
-                        />
-                    </Grid>
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                    >
-                        <TextField
-                            fullWidth
-                            label="Описание шаблона (необязательно)"
-                            defaultValue={template.description}
-                        />
-                    </Grid>
-                    <Grid item>
-                        <Puzzle
-                            puzzles={template.puzzles}
-                            index={0}
-                            components={components}
-                            onFocus={onPuzzleFocus}
-                            onBlur={onPuzzleBlur}
-                            isFocused={id => id === focusedPuzzleId}
-                            isInFocusedChain={id => focusedPuzzleChain.includes(id)}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper>
+                <ContentSection template={template} focused={focusedPuzzleId === template.id}>
+                    <Content
+                        puzzles={template.puzzles}
+                        onFocus={onPuzzleFocus}
+                        onBlur={onPuzzleBlur}
+                        isFocused={id => id === focusedPuzzleId}
+                    />
+                </ContentSection>
+            </ClickableBlock>
             {template.sections.map((section, index) => {
+                const focused = focusedPuzzleId === section.id;
                 return (
-                    <div
+                    <ClickableBlock
                         key={section.id}
                         id={section.id}
+                        styles={theme => ({
+                            marginTop: theme.spacing(4),
+                            marginBottom: theme.spacing(2),
+                            paddingTop: theme.spacing(2),
+                        })}
                         onFocus={onPuzzleFocus.bind(null, section.id)}
                         onMouseDown={onPuzzleFocus.bind(null, section.id)}
                         onBlur={onPuzzleBlur}
+                        focused={focused}
                     >
-                        <div css={theme => ({ margin: theme.spacing(4) })} />
-                        <Grid
-                            container
-                            direction="column"
-                            css={theme => ({ marginBottom: theme.spacing(2) })}
+                        <SectionPuzzle
+                            title={section.title}
+                            id={section.id}
+                            index={index}
+                            focused={focused}
                         >
-                            <Grid item>
-                                <Grid container alignItems="flex-end">
-                                    <SectionPuzzle
-                                        title={section.title}
-                                        id={section.id}
-                                        index={index}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                        <Grid container>
-                            <Paper
-                                css={theme => ({
-                                    width: "100%",
-                                    ":empty": {
-                                        minHeight: theme.spacing(32),
-                                    },
-                                })}
-                                elevation={focusedPuzzleId === section.id ? 16 : 0}
-                            >
-                                <Puzzle
-                                    puzzles={section.puzzles}
-                                    index={index}
-                                    components={components}
-                                    onFocus={onPuzzleFocus}
-                                    onBlur={onPuzzleBlur}
-                                    isFocused={id => id === focusedPuzzleId}
-                                    isInFocusedChain={id => focusedPuzzleChain.includes(id)}
-                                />
-                            </Paper>
-                        </Grid>
-                    </div>
+                            <Content
+                                puzzles={section.puzzles}
+                                onFocus={onPuzzleFocus}
+                                onBlur={onPuzzleBlur}
+                                isFocused={id => id === focusedPuzzleId}
+                            />
+                        </SectionPuzzle>
+                    </ClickableBlock>
                 );
             })}
-        </React.Fragment>
+        </EditorContext.Provider>
     );
 };

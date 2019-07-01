@@ -19,39 +19,45 @@ SET row_security = off;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_right_hand_puzzle_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_left_hand_puzzle_fkey;
-ALTER TABLE ONLY public.users DROP CONSTRAINT users_object_id_fkey;
+ALTER TABLE ONLY public.users DROP CONSTRAINT users_branch_id_fkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
+ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_user_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
 ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
-ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_pkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_template_id_fkey;
 ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_task_id_fkey;
 ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_template_id_fkey;
 ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_template_id_fkey;
 ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_section_id_fkey;
-ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_region_fkey;
+ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_branch_id_fkey;
 ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_task_id_fkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_question_puzzle_fkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_puzzle_id_fkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_answer_puzzle_fkey;
+ALTER TABLE ONLY public.branches DROP CONSTRAINT branches_region_id_fkey;
 ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_puzzle_id_fkey;
 ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_pkey;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
 ALTER TABLE ONLY public.templates DROP CONSTRAINT templates_pkey;
 ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_pkey;
+ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_pkey;
+ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_pkey;
 ALTER TABLE ONLY public.tariffs DROP CONSTRAINT tariffs_pkey;
 ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_pkey;
 ALTER TABLE ONLY public.regions DROP CONSTRAINT regions_pkey;
+ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_uuid_key;
 ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_pkey;
 ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_pkey;
 ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_pkey;
 ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_pkey;
+ALTER TABLE ONLY public.branches DROP CONSTRAINT branches_pkey;
 ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_pkey;
 ALTER TABLE public.validations ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.templates ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.task_templates ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tasks ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.task_users ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.task_templates ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.tariffs ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.sections ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.regions ALTER COLUMN id DROP DEFAULT;
@@ -59,6 +65,7 @@ ALTER TABLE public.puzzles ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.objects ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.notifications ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.conditions ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE public.branches ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE public.answers ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE public.validations_id_seq;
 DROP TABLE public.validations;
@@ -68,6 +75,7 @@ DROP SEQUENCE public.templates_id_seq;
 DROP TABLE public.templates;
 DROP SEQUENCE public.tasks_id_seq;
 DROP TABLE public.tasks;
+DROP SEQUENCE public.task_users_id_seq;
 DROP TABLE public.task_users;
 DROP SEQUENCE public.task_templates_id_seq;
 DROP TABLE public.task_templates;
@@ -85,10 +93,13 @@ DROP SEQUENCE public.notifications_id_seq;
 DROP TABLE public.notifications;
 DROP SEQUENCE public.conditions_id_seq;
 DROP TABLE public.conditions;
+DROP SEQUENCE public.branches_id_seq;
+DROP TABLE public.branches;
 DROP SEQUENCE public.answers_id_seq;
 DROP TABLE public.answers;
 DROP TYPE public.validation_action_type;
 DROP TYPE public.unit_type;
+DROP TYPE public.status_type;
 DROP TYPE public.puzzle_type;
 DROP TYPE public.operator_type;
 DROP TYPE public.input_type;
@@ -146,7 +157,12 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 --
 
 CREATE TYPE public.condition_action_type AS ENUM (
-    'chosen_answer'
+    'chosen_answer',
+    'given_answer',
+    'equal',
+    'not_equal',
+    'more_than',
+    'less_than'
 );
 
 
@@ -181,8 +197,8 @@ ALTER TYPE public.input_type OWNER TO postgres;
 --
 
 CREATE TYPE public.operator_type AS ENUM (
-    'less',
-    'more',
+    'less_than',
+    'more_than',
     'equal',
     'less_or_equal',
     'more_or_equal'
@@ -196,17 +212,36 @@ ALTER TYPE public.operator_type OWNER TO postgres;
 --
 
 CREATE TYPE public.puzzle_type AS ENUM (
+    'group',
     'question',
-    'numeric_answer',
-    'string_answer',
     'radio_answer',
-    'input_answer',
+    'checkbox_answer',
     'dropdown_answer',
-    'group'
+    'reference_answer',
+    'upload_files',
+    'date_answer',
+    'text_answer',
+    'numeric_answer'
 );
 
 
 ALTER TYPE public.puzzle_type OWNER TO postgres;
+
+--
+-- Name: status_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.status_type AS ENUM (
+    'assigned',
+    'inactive',
+    'inprogress',
+    'oncheck',
+    'overdue',
+    'completed'
+);
+
+
+ALTER TYPE public.status_type OWNER TO postgres;
 
 --
 -- Name: unit_type; Type: TYPE; Schema: public; Owner: postgres
@@ -273,6 +308,43 @@ ALTER TABLE public.answers_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE public.answers_id_seq OWNED BY public.answers.id;
+
+
+--
+-- Name: branches; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.branches (
+    id integer NOT NULL,
+    name text,
+    region_id integer,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.branches OWNER TO postgres;
+
+--
+-- Name: branches_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.branches_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.branches_id_seq OWNER TO postgres;
+
+--
+-- Name: branches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.branches_id_seq OWNED BY public.branches.id;
 
 
 --
@@ -359,8 +431,7 @@ ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 CREATE TABLE public.objects (
     id integer NOT NULL,
     name text,
-    region integer,
-    branch text,
+    branch_id integer,
     address text,
     format text,
     created_at timestamp without time zone,
@@ -398,7 +469,7 @@ ALTER SEQUENCE public.objects_id_seq OWNED BY public.objects.id;
 
 CREATE TABLE public.puzzles (
     id integer NOT NULL,
-    uuid uuid UNIQUE,
+    uuid uuid,
     template_id integer,
     section_id integer,
     parent_id integer,
@@ -566,7 +637,7 @@ CREATE TABLE public.task_templates (
 ALTER TABLE public.task_templates OWNER TO postgres;
 
 --
--- Name: tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: task_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.task_templates_id_seq
@@ -586,11 +657,13 @@ ALTER TABLE public.task_templates_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE public.task_templates_id_seq OWNED BY public.task_templates.id;
 
+
 --
 -- Name: task_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.task_users (
+    id integer NOT NULL,
     task_id integer,
     users_id integer,
     taken boolean,
@@ -600,6 +673,28 @@ CREATE TABLE public.task_users (
 
 
 ALTER TABLE public.task_users OWNER TO postgres;
+
+--
+-- Name: task_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.task_users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.task_users_id_seq OWNER TO postgres;
+
+--
+-- Name: task_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.task_users_id_seq OWNED BY public.task_users.id;
+
 
 --
 -- Name: tasks; Type: TABLE; Schema: public; Owner: postgres
@@ -612,6 +707,8 @@ CREATE TABLE public.tasks (
     departure_date timestamp without time zone,
     deadline_date timestamp without time zone,
     object_id integer,
+    user_id integer,
+    status public.status_type,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -687,7 +784,7 @@ CREATE TABLE public.users (
     login text,
     name text,
     "position" text,
-    object_id integer,
+    branch_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -768,6 +865,13 @@ ALTER TABLE ONLY public.answers ALTER COLUMN id SET DEFAULT nextval('public.answ
 
 
 --
+-- Name: branches id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.branches ALTER COLUMN id SET DEFAULT nextval('public.branches_id_seq'::regclass);
+
+
+--
 -- Name: conditions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -817,17 +921,24 @@ ALTER TABLE ONLY public.tariffs ALTER COLUMN id SET DEFAULT nextval('public.tari
 
 
 --
--- Name: tasks id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
-
-
---
 -- Name: task_templates id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.task_templates ALTER COLUMN id SET DEFAULT nextval('public.task_templates_id_seq'::regclass);
+
+
+--
+-- Name: task_users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_users ALTER COLUMN id SET DEFAULT nextval('public.task_users_id_seq'::regclass);
+
+
+--
+-- Name: tasks id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
 
 
 --
@@ -860,6 +971,14 @@ COPY public.answers (id, puzzle_id, answer, answer_type, created_at, updated_at)
 
 
 --
+-- Data for Name: branches; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.branches (id, name, region_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
 -- Data for Name: conditions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -879,7 +998,7 @@ COPY public.notifications (id, task_id, message) FROM stdin;
 -- Data for Name: objects; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.objects (id, name, region, branch, address, format, created_at, updated_at) FROM stdin;
+COPY public.objects (id, name, branch_id, address, format, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -927,7 +1046,7 @@ COPY public.task_templates (id, task_id, template_id, created_at, updated_at) FR
 -- Data for Name: task_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.task_users (task_id, users_id, taken, created_at, updated_at) FROM stdin;
+COPY public.task_users (id, task_id, users_id, taken, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -935,7 +1054,7 @@ COPY public.task_users (task_id, users_id, taken, created_at, updated_at) FROM s
 -- Data for Name: tasks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tasks (id, name, description, departure_date, deadline_date, object_id, created_at, updated_at) FROM stdin;
+COPY public.tasks (id, name, description, departure_date, deadline_date, object_id, user_id, status, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -951,7 +1070,7 @@ COPY public.templates (id, title, description, created_at, updated_at) FROM stdi
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, login, name, "position", object_id, created_at, updated_at) FROM stdin;
+COPY public.users (id, login, name, "position", branch_id, created_at, updated_at) FROM stdin;
 \.
 
 
@@ -968,6 +1087,13 @@ COPY public.validations (id, puzzle_id, "order", operator_type, validation_type,
 --
 
 SELECT pg_catalog.setval('public.answers_id_seq', 1, false);
+
+
+--
+-- Name: branches_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.branches_id_seq', 1, false);
 
 
 --
@@ -1020,17 +1146,24 @@ SELECT pg_catalog.setval('public.tariffs_id_seq', 1, false);
 
 
 --
--- Name: tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.tasks_id_seq', 1, false);
-
-
---
 -- Name: task_templates_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.task_templates_id_seq', 1, false);
+
+
+--
+-- Name: task_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.task_users_id_seq', 1, false);
+
+
+--
+-- Name: tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tasks_id_seq', 1, false);
 
 
 --
@@ -1060,6 +1193,14 @@ SELECT pg_catalog.setval('public.validations_id_seq', 1, false);
 
 ALTER TABLE ONLY public.answers
     ADD CONSTRAINT answers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: branches branches_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.branches
+    ADD CONSTRAINT branches_pkey PRIMARY KEY (id);
 
 
 --
@@ -1095,6 +1236,14 @@ ALTER TABLE ONLY public.puzzles
 
 
 --
+-- Name: puzzles puzzles_uuid_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.puzzles
+    ADD CONSTRAINT puzzles_uuid_key UNIQUE (uuid);
+
+
+--
 -- Name: regions regions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1119,19 +1268,27 @@ ALTER TABLE ONLY public.tariffs
 
 
 --
+-- Name: task_templates task_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_templates
+    ADD CONSTRAINT task_templates_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: task_users task_users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.task_users
+    ADD CONSTRAINT task_users_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tasks
     ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
-
-
---
--- Name: tasks task_templates_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.task_templates
-    ADD CONSTRAINT task_templates_pkey PRIMARY KEY (id);
 
 
 --
@@ -1167,6 +1324,14 @@ ALTER TABLE ONLY public.answers
 
 
 --
+-- Name: branches branches_region_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.branches
+    ADD CONSTRAINT branches_region_id_fkey FOREIGN KEY (region_id) REFERENCES public.regions(id);
+
+
+--
 -- Name: conditions conditions_answer_puzzle_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1199,11 +1364,11 @@ ALTER TABLE ONLY public.notifications
 
 
 --
--- Name: objects objects_region_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: objects objects_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.objects
-    ADD CONSTRAINT objects_region_fkey FOREIGN KEY (region) REFERENCES public.regions(id) ON DELETE CASCADE;
+    ADD CONSTRAINT objects_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id);
 
 
 --
@@ -1219,7 +1384,7 @@ ALTER TABLE ONLY public.puzzles
 --
 
 ALTER TABLE ONLY public.puzzles
-    ADD CONSTRAINT puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
+    ADD CONSTRAINT puzzles_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id) ON DELETE CASCADE;
 
 
 --
@@ -1227,7 +1392,7 @@ ALTER TABLE ONLY public.puzzles
 --
 
 ALTER TABLE ONLY public.sections
-    ADD CONSTRAINT sections_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
+    ADD CONSTRAINT sections_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id) ON DELETE CASCADE;
 
 
 --
@@ -1235,7 +1400,7 @@ ALTER TABLE ONLY public.sections
 --
 
 ALTER TABLE ONLY public.task_templates
-    ADD CONSTRAINT task_templates_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id)ON DELETE CASCADE;
+    ADD CONSTRAINT task_templates_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -1243,7 +1408,7 @@ ALTER TABLE ONLY public.task_templates
 --
 
 ALTER TABLE ONLY public.task_templates
-    ADD CONSTRAINT task_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id)ON DELETE CASCADE;
+    ADD CONSTRAINT task_templates_template_id_fkey FOREIGN KEY (template_id) REFERENCES public.templates(id) ON DELETE CASCADE;
 
 
 --
@@ -1251,7 +1416,7 @@ ALTER TABLE ONLY public.task_templates
 --
 
 ALTER TABLE ONLY public.task_users
-    ADD CONSTRAINT task_users_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id)ON DELETE CASCADE;
+    ADD CONSTRAINT task_users_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -1259,7 +1424,7 @@ ALTER TABLE ONLY public.task_users
 --
 
 ALTER TABLE ONLY public.task_users
-    ADD CONSTRAINT task_users_users_id_fkey FOREIGN KEY (users_id) REFERENCES public.users(id)ON DELETE CASCADE;
+    ADD CONSTRAINT task_users_users_id_fkey FOREIGN KEY (users_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -1271,11 +1436,19 @@ ALTER TABLE ONLY public.tasks
 
 
 --
--- Name: users users_object_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: tasks tasks_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tasks
+    ADD CONSTRAINT tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users users_branch_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_object_id_fkey FOREIGN KEY (object_id) REFERENCES public.objects(id) ON DELETE CASCADE;
+    ADD CONSTRAINT users_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.branches(id) ON DELETE CASCADE;
 
 
 --
@@ -1321,6 +1494,20 @@ GRANT ALL ON TABLE public.answers TO magnit;
 --
 
 GRANT ALL ON SEQUENCE public.answers_id_seq TO magnit;
+
+
+--
+-- Name: TABLE branches; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.branches TO magnit;
+
+
+--
+-- Name: SEQUENCE branches_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.branches_id_seq TO magnit;
 
 
 --

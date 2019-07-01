@@ -2,22 +2,21 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Grid, IconButton, TextField } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
-import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
+import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
+import { jsx } from "@emotion/core";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { InputField } from "../../components/fields";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-interface ICheckboxAnswerPuzzleProps extends ISpecificPuzzleProps {
+interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;
     template: ITemplate;
     // flag indication this checkbox should render
     // button which adds new checkbox when clicked
     addCheckboxButton: boolean;
-    // if not focused, we don't show add button
-    questionFocused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 
@@ -55,54 +54,61 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
         props.onDeleteCheckboxButton(props.id);
     }
 
+    if (!props.questionFocused) {
+        return (
+            <Grid container alignItems="center">
+                <Grid item>
+                    <Checkbox css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                </Grid>
+                <Grid item>
+                    <Typography variant="body1">{label}</Typography>
+                </Grid>
+            </Grid>
+        );
+    }
+
     return (
         <React.Fragment>
-            <Grid container alignItems="center">
-                <Grid item xs={1}>
+            <Grid container alignItems="flex-end" spacing={2}>
+                <Grid item>
                     <Checkbox
                         disabled
-                        checked
-                        css={css`
-                            padding-left: 0;
-                        `}
+                        css={theme => ({
+                            marginLeft: `-${theme.spacing()}`,
+                            paddingBottom: theme.spacing(0.5),
+                        })}
                     />
                 </Grid>
-                <Grid item xs={10}>
-                    <TextField fullWidth value={label} onChange={onLabelChange} />
+                <Grid item xs style={{ paddingLeft: 0 }}>
+                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                     <Grid container justify="flex-end">
-                        <Grid item>
-                            <IconButton onClick={onDeleteCheckboxButton}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Grid>
+                        <IconButton onClick={onDeleteCheckboxButton} style={{ padding: 0 }}>
+                            <DeleteIcon />
+                        </IconButton>
                     </Grid>
                 </Grid>
             </Grid>
-            {props.addCheckboxButton && props.questionFocused && (
-                <Grid container alignItems="center">
-                    <Grid item xs={1} css={theme => ({ marginTop: theme.spacing(2) })}>
+            {props.addCheckboxButton && (
+                <Grid container alignItems="flex-end" spacing={2}>
+                    <Grid item>
                         <Checkbox
                             disabled
-                            checked
-                            css={css`
-                                padding-left: 0;
-                            `}
+                            css={theme => ({
+                                marginLeft: `-${theme.spacing()}`,
+                                paddingBottom: theme.spacing(0.5),
+                            })}
                         />
                     </Grid>
-                    <Grid item xs={11} css={theme => ({ marginTop: theme.spacing(2) })}>
-                        <Button
-                            variant="contained"
-                            size="small"
-                            css={css`
-                                text-transform: none;
-                            `}
-                            onClick={onAddCheckboxButton}
-                        >
-                            Добавить вариант
-                        </Button>
+                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                        <InputField
+                            fullWidth
+                            placeholder={"Добавить вариант"}
+                            onChange={onAddCheckboxButton}
+                        />
                     </Grid>
+                    <Grid item />
                 </Grid>
             )}
         </React.Fragment>

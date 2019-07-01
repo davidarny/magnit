@@ -3,14 +3,19 @@
 import * as React from "react";
 import { FormControl, Grid, Input, InputAdornment, InputLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { ISpecificPuzzleProps } from "entities";
+import { IFocusedPuzzleProps } from "entities";
 import { CalendarToday as CalendarIcon } from "@material-ui/icons";
 
-export const DateAnswerPuzzle: React.FC<ISpecificPuzzleProps> = () => {
+export const DateAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocused }) => {
     return (
-        <Grid container alignItems="flex-end">
+        <Grid
+            container
+            alignItems="flex-end"
+            style={{ display: questionFocused ? "" : "none" }}
+            css={theme => ({ paddingBottom: theme.spacing(2) })}
+        >
             <Grid item xs={12}>
-                <FormControl disabled>
+                <FormControl>
                     <InputLabel htmlFor="date-answer-puzzle">День, месяц, год</InputLabel>
                     <Input
                         id="date-answer-puzzle"

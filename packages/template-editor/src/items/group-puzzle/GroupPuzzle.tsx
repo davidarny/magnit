@@ -8,8 +8,7 @@ import { Conditions } from "components/conditions";
 
 interface IGroupPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
-
-    isFocused(id: string): boolean;
+    focused: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -20,14 +19,14 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
                 <Typography variant="h6">Группа связанных вопросов</Typography>
             </Grid>
-            <Grid item css={theme => ({ marginTop: theme.spacing(2) })}>
+            {/* <Grid item css={theme => ({ marginTop: theme.spacing(2) })}> // TODO: implement later
                 <Typography variant="subtitle1">Условия показа вопроса</Typography>
             </Grid>
             <Grid
                 css={theme => ({
                     flexGrow: 1,
                     marginTop: theme.spacing(2),
-                    opacity: !props.isFocused(id) ? 0.5 : 1,
+                    opacity: !props.focused ? 0.5 : 1,
                 })}
                 item
             >
@@ -36,7 +35,7 @@ export const GroupPuzzle: React.FC<IGroupPuzzleProps> = ({ id, index, ...props }
                     template={props.template}
                     onTemplateChange={props.onTemplateChange}
                 />
-            </Grid>
+            </Grid>*/}
         </Grid>
     );
 };

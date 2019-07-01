@@ -84,7 +84,7 @@ CREATE TABLE "conditions" (
   "question_puzzle" int,
   "action_type" "condition_action_type",
   "answer_puzzle" int,
-	"condition_type" "condition_type"
+  "condition_type" "condition_type"
 );
 
 CREATE TABLE "validations" (

@@ -25,14 +25,18 @@ export const CreateTemplate: React.FC = () => {
                 </Grid>
             </SectionTitle>
             <Grid
-                item
                 css={theme => ({
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
                 })}
             >
-                <TemplateEditor initialState={template} />
+                <TemplateEditor
+                    initialState={template}
+                    css={theme => ({
+                        background: theme.colors.main,
+                    })}
+                />
             </Grid>
         </SectionLayout>
     );

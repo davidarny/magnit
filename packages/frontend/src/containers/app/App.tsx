@@ -57,7 +57,6 @@ const App: React.FC = () => {
                     <Sidebar />
                 </Grid>
                 <Grid
-                    item
                     css={css`
                         margin-left: var(--section-left-margin);
                         width: 100%;
@@ -100,7 +99,7 @@ const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
                     width: 100%;
                 }
                 body {
-                    background: #e5e5e5;
+                    background: #f6f7fb;
                 }
             `}
         />
