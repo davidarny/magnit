@@ -1,9 +1,12 @@
+/** @jsx jsx */
+
 import * as React from "react";
 import { ClickableBlock } from "../block";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "../../entities";
 import { EPuzzleType } from "../puzzle";
 import { ContentItem } from "./ContentItem";
+import { ContentConditions } from "./ContentConditions";
 
 interface IContentGroupProps {
     index: number;
@@ -85,6 +88,11 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                         />
                     );
                 })}
+                <ContentConditions
+                    puzzleId={item.id}
+                    focused={focused}
+                    puzzleType={item.puzzleType}
+                />
             </div>
         </ClickableBlock>
     );

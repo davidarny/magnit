@@ -1,6 +1,6 @@
 import { jsx } from "@emotion/core";
 import { ITemplate } from "../../entities";
-import { InputField } from "../fields";
+import { InputField } from "@magnit/components";
 import Grid from "@material-ui/core/Grid";
 import * as React from "react";
 

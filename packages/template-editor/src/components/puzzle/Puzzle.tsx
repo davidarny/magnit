@@ -87,7 +87,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                 onFocus={onFocus}
                                 onMouseDown={onFocus}
                                 onBlur={props.onBlur}
-                                styles={theme => ({
+                                styles={(theme) => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
@@ -116,7 +116,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                             <ClickableBlock
                                 key={puzzle.id}
                                 id={puzzle.id}
-                                styles={theme => ({
+                                styles={(theme) => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 2 : 0),

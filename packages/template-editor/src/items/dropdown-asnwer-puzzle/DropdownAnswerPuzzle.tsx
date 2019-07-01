@@ -7,7 +7,7 @@ import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "../../components/fields";
+import { InputField } from "@magnit/components";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 

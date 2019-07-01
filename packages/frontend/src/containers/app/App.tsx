@@ -54,7 +54,9 @@ const App: React.FC = () => {
             />
             <Grid container>
                 <Grid item>
-                    <Sidebar />
+                    <Router primary={false}>
+                        <Sidebar path="*" />
+                    </Router>
                 </Grid>
                 <Grid
                     css={css`

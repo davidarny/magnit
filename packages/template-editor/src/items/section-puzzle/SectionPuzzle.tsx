@@ -5,7 +5,7 @@ import { Fragment } from "react";
 import { ISpecificPuzzleProps } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { InputField } from "../../components/fields";
+import { InputField } from "@magnit/components";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     title: string;

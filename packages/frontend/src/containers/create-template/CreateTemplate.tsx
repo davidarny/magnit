@@ -5,9 +5,10 @@ import * as React from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
-import { TemplateEditor, CustomButton, CheckIcon } from "@magnit/template-editor";
+import { TemplateEditor } from "@magnit/template-editor";
+import { CustomButton } from "@magnit/components";
 import template from "./template";
-import { Button } from "components/button";
+import { CheckIcon } from "@magnit/icons";
 
 export const CreateTemplate: React.FC = () => {
     return (
@@ -16,8 +17,8 @@ export const CreateTemplate: React.FC = () => {
                 <Grid item>
                     <CustomButton
                         variant="contained"
-                        title={"Сохранить"}
-                        buttonColor={"blue"}
+                        title="Сохранить"
+                        buttonColor="blue"
                         icon={<CheckIcon />}
                     />
                 </Grid>

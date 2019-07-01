@@ -259,7 +259,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             />
             <ClickableBlock
                 id={template.id}
-                styles={theme => ({
+                styles={(theme)=> ({
                     paddingTop: theme.spacing(3),
                     marginBottom: theme.spacing(2),
                 })}
@@ -283,7 +283,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     <ClickableBlock
                         key={section.id}
                         id={section.id}
-                        styles={theme => ({
+                        styles={(theme) => ({
                             marginTop: theme.spacing(4),
                             marginBottom: theme.spacing(2),
                             paddingTop: theme.spacing(2),

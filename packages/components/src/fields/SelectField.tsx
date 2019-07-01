@@ -1,5 +1,4 @@
 import { SelectProps } from "@material-ui/core/Select";
-import { ETerminals } from "../../entities";
 import { jsx } from "@emotion/core";
 import { FormControl, Input, Select } from "@material-ui/core";
 
@@ -52,7 +51,7 @@ export const SelectField: React.FC<SelectProps> = ({
             })}
         >
             <Select
-                value={value || ETerminals.EMPTY}
+                value={value || ""}
                 input={<Input id={id} />}
                 onChange={onChange}
                 {...rest}

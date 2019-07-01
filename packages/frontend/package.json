@@ -39,7 +39,7 @@
     "scripts": {
         "clean": "rimraf build",
         "analyze": "source-map-explorer build/static/js/*.js",
-        "start": "react-scripts start",
+        "start": "cross-env SKIP_PREFLIGHT_CHECK=true react-scripts start",
         "build": "lerna run build:lib --stream && react-scripts build",
         "test": "react-scripts test --passWithNoTests",
         "eject": "react-scripts eject"

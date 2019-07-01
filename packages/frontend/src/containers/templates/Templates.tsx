@@ -6,14 +6,14 @@ import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { CenteredSectionItem } from "components/centered-section-item";
-import { Add as AddIcon } from "@material-ui/icons";
 import { Link } from "@reach/router";
-import { Button } from "../../components/button";
+import { CustomButton } from "@magnit/components";
+import { AddIcon } from "@magnit/icons";
 
 export const Templates: React.FC = () => {
     return (
         <SectionLayout>
-            <SectionTitle title="Список шаблонов" />
+            <SectionTitle title="Список шаблонов"/>
             <CenteredSectionItem>
                 <Grid container justify="center" alignContent="center" direction="column">
                     <Grid item css={theme => ({ marginBottom: theme.spacing(3) })}>
@@ -32,13 +32,12 @@ export const Templates: React.FC = () => {
                     <Grid item>
                         <Grid container justify="center" alignContent="center">
                             <Grid item>
-                                <Button component={Link} to="/templates/create">
-                                    <AddIcon
-                                        alignmentBaseline="middle"
-                                        css={theme => ({ marginRight: theme.spacing() })}
-                                    />
-                                    <span>Создать шаблон</span>
-                                </Button>
+                                <CustomButton
+                                    component={Link}
+                                    to="/templates/create"
+                                    icon={<AddIcon/>}
+                                    title={"Создать шаблон"}
+                                />
                             </Grid>
                         </Grid>
                     </Grid>

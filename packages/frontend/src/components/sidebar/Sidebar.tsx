@@ -4,18 +4,22 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
-import { ReportsIcon, TasksIcon, TemplatesIcon } from "icons";
-import { CustomButton, PlusIcon } from "@magnit/template-editor";
+import { AddIcon, ReportsIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
+import { CustomButton } from "@magnit/components";
+import { RouteComponentProps } from "@reach/router";
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
     return (
-        <Drawer variant="permanent" open={true} id="drawer"
-                css={{
-                    "> div": {
-                        border: "none",
-                        boxShadow: "4px 0 15px rgba(207, 217, 227, 0.4)",
-                    },
-                }}
+        <Drawer
+            variant="permanent"
+            open={true}
+            id="drawer"
+            css={{
+                "> div": {
+                    border: "none",
+                    boxShadow: "4px 0 15px rgba(207, 217, 227, 0.4)",
+                },
+            }}
         >
             <div
                 css={{
@@ -23,11 +27,20 @@ export const Sidebar: React.FC = () => {
                     width: 88,
                 }}
             >
-                <Grid container justify="center" alignItems="center" id="logo" css={{ width: 88, height: 96 }}>
-                    <Grid item css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}>
+                <Grid
+                    container
+                    justify="center"
+                    alignItems="center"
+                    id="logo"
+                    css={{ width: 88, height: 96 }}
+                >
+                    <Grid
+                        item
+                        css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}
+                    >
                         <Link to="/">
                             <CustomButton
-                                icon={<PlusIcon/>}
+                                icon={<AddIcon />}
                                 buttonColor={"blue"}
                                 onlyIcon={true}
                                 sizeIcon={40}
@@ -73,7 +86,7 @@ export const Sidebar: React.FC = () => {
                                     <ListItemIcon>
                                         <Grid container justify="center" alignItems="center">
                                             <Grid item>
-                                                <Icon/>
+                                                <Icon />
                                             </Grid>
                                         </Grid>
                                     </ListItemIcon>

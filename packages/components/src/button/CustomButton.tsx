@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { ButtonProps } from "@material-ui/core/Button";
 import _ from "lodash";
+import * as React from "react";
 
 export interface ICustomButtonProps {
     title?: string;
@@ -9,11 +9,17 @@ export interface ICustomButtonProps {
     buttonColor?: string;
     onlyIcon?: boolean;
     sizeIcon?: number;
+    component?: React.ReactNode;
+    to?: string;
+    variant?: "text" | "outlined" | "contained";
+    color?: "inherit" | "primary" | "secondary" | "default";
+
+    onClick?(): void;
 }
 
-export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
+export const CustomButton: React.FC<ICustomButtonProps> = ({
                                                                              title = "",
-                                                                             icon = "check",
+                                                                             icon = "",
                                                                              buttonColor = "blue",
                                                                              onlyIcon = false,
                                                                              sizeIcon = 24,
@@ -57,7 +63,7 @@ export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
         },
         blueWithout: {
             color: "#2F97FF",
-            border: "1px solid #2F97FF",
+            border: "1px solid #2F97FF !important",
             background: "none !important",
             hover: {
                 boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
@@ -99,7 +105,7 @@ export const CustomButton: React.FC<ICustomButtonProps & ButtonProps> = ({
             <div
                 css={{
                     position: "absolute",
-                    top: onlyIcon ? -1 : 8,
+                    top: onlyIcon ? -1 : 7,
                     left: onlyIcon ? -1 : 12,
                     "svg": {
                         width: sizeIcon,
