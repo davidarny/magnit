@@ -48,7 +48,7 @@ export const getFactory = (type: EPuzzleType): IPuzzleFactory => {
         case EPuzzleType.NUMERIC_ANSWER:
             return new NumericAnswerFactory();
         default:
-            console.warn(`Current type (${type}) factory is not exist`);
+            console.warn(`Current type (${type}) factory does not exist`);
             return new DefaultFactory();
     }
 };

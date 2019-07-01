@@ -1,6 +1,9 @@
+/** @jsx jsx */
+
 import { TextField } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { TextFieldProps } from "@material-ui/core/TextField";
+import * as React from "react";
 
 export interface IInputField {
     isSimpleMode?: boolean;
