@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import { jsx } from "@emotion/core";
 
 export class RadioAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
+    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (
@@ -15,7 +15,9 @@ export class RadioAnswerFactory implements IPuzzleFactory {
                         {...context}
                         onAddRadioButton={onAddAnswerPuzzle}
                         onDeleteRadioButton={onDeleteAnswerPuzzle}
-                        addRadioButton={!!focused}
+                        addRadioButton={
+                            !!parentItem && parentItem.puzzles.length - 1 === rest.index
+                        }
                     />
                 )}
             </EditorContext.Consumer>

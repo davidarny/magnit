@@ -1,1 +1,1 @@
-export * from "./Block";
+export * from "./ClickableBlock";
