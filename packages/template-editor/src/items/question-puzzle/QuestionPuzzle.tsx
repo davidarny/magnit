@@ -31,7 +31,6 @@ const answerTypes = [
 ];
 
 export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
-    const [conditionsEnabled, setConditionsEnabled] = useState(false);
     const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
     const [questionTitle, setQuestionTitle] = useState(props.title);
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
@@ -83,10 +82,6 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
         templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(templateSnapshot.current);
     }, [answersType, questionTitle, template]);
-
-    function onConditionsCheckboxChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setConditionsEnabled(event.target.checked);
-    }
 
     function onAnswerTypeChange(event: TChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
@@ -150,38 +145,6 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     </Grid>
                 </Grid>
             </Grid>
-            {/*<Grid item xs={12}> // TODO: implement later
-                {props.focused && (
-                    <FormControlLabel
-                        css={theme => ({ marginTop: theme.spacing(2) })}
-                        control={
-                            <Checkbox
-                                checked={conditionsEnabled}
-                                onChange={onConditionsCheckboxChange}
-                                color="primary"
-                            />
-                        }
-                        label="Условия показа группы"
-                    />
-                )}
-            </Grid>
-            {conditionsEnabled && (
-                <Grid
-                    xs={12}
-                    css={theme => ({
-                        marginTop: theme.spacing(2),
-                        opacity: !props.focused ? 0.5 : 1,
-                        pointerEvents: !props.focused ? "none" : "initial",
-                    })}
-                    item
-                >
-                    <Conditions
-                        puzzleId={id}
-                        template={template}
-                        onTemplateChange={props.onTemplateChange}
-                    />
-                </Grid>
-            )}*/}
         </Grid>
     );
 };
