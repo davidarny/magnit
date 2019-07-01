@@ -7,6 +7,7 @@ import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { TemplateEditor, CustomButton, CheckIcon } from "@magnit/template-editor";
 import template from "./template";
+import { Button } from "components/button";
 
 export const CreateTemplate: React.FC = () => {
     return (

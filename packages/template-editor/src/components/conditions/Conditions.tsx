@@ -143,6 +143,10 @@ export const Conditions: React.FC<IConditionsProps> = ({ puzzleId, template, ...
     }, [conditions, template]);
 
     function onConditionDelete(id: string) {
+        // do not allow to delete if only one condition present
+        if (conditions.length === 1) {
+            return;
+        }
         setConditions([...conditions.filter(condition => condition.id !== id)]);
     }
 

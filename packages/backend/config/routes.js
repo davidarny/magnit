@@ -15,4 +15,5 @@ module.exports.routes = {
     "PUT /v1/templates/:id": "v1/admin/edit-template",
     "DELETE /v1/templates/:id": "v1/admin/delete-template",
     "GET /v1/objects": "v1/admin/get-objects",
+    "GET /v1/users": "v1/admin/get-users",
 };

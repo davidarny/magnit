@@ -6,6 +6,10 @@ module.exports = {
             type: "number",
         },
 
+        user_id: {
+            type: "number",
+        },
+
         name: {
             type: "string",
             columnType: "text",

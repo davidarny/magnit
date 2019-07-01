@@ -6,7 +6,7 @@ import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "./EPuzzleType";
-import { Block } from "../block";
+import { ClickableBlock } from "../block";
 
 export interface ICommonComponentProps {
     index: number;
@@ -81,7 +81,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
                         return (
-                            <Block
+                            <ClickableBlock
                                 key={puzzle.id}
                                 id={puzzle.id}
                                 onFocus={onFocus}
@@ -108,12 +108,12 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     {props.components[EPuzzleType.GROUP](commonComponentProps)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
-                            </Block>
+                            </ClickableBlock>
                         );
                     }
                     case EPuzzleType.QUESTION: {
                         return (
-                            <Block
+                            <ClickableBlock
                                 key={puzzle.id}
                                 id={puzzle.id}
                                 styles={theme => ({
@@ -142,7 +142,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     onMouseDown={onFocus}
                                     {...props}
                                 />
-                            </Block>
+                            </ClickableBlock>
                         );
                     }
                     case EPuzzleType.TEXT_ANSWER:
