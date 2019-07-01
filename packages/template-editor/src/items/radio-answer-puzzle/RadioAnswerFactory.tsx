@@ -1,3 +1,5 @@
+/** @jsx jsx */
+
 import { RadioAnswerPuzzle } from "./RadioAnswerPuzzle";
 import { EditorContext, IEditorContext } from "../../TemplateEditor";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";

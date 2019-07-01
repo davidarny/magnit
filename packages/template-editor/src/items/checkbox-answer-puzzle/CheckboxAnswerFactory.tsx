@@ -1,3 +1,5 @@
+/** @jsx jsx */
+
 import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
 import { ReactNode } from "react";
 import { EditorContext, IEditorContext } from "../../TemplateEditor";

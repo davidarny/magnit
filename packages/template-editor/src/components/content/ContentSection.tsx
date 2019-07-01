@@ -1,3 +1,5 @@
+/** @jsx jsx */
+
 import { jsx } from "@emotion/core";
 import { ITemplate } from "../../entities";
 import { InputField } from "../fields";

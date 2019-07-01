@@ -1,3 +1,5 @@
+/** @jsx jsx */
+
 import * as React from "react";
 import { SelectableBlockWrapper } from "../block";
 import { jsx } from "@emotion/core";
