@@ -56,7 +56,14 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
 
     if (!props.questionFocused) {
         return (
-            <Grid container alignItems="center">
+            <Grid
+                container
+                alignItems="center"
+                css={(theme) => ({
+                    marginTop: "8px !important",
+                    marginBottom: "8px !important",
+                })}
+            >
                 <Grid item>
                     <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
@@ -69,7 +76,14 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
 
     return (
         <React.Fragment>
-            <Grid container alignItems="flex-end" spacing={2}>
+            <Grid
+                container
+                alignItems="flex-end"
+                spacing={2}
+                css={(theme) => ({
+                    marginTop: "-8px !important",
+                })}
+            >
                 <Grid item>
                     <Radio
                         disabled
@@ -92,7 +106,15 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             </Grid>
 
             {props.addRadioButton && (
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={(theme) => ({
+                        marginTop: "-16px !important",
+                        marginBottom: "8px !important",
+                    })}
+                >
                     <Grid item>
                         <Radio
                             disabled
@@ -104,7 +126,6 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     </Grid>
                     <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
                         <InputField
-                            disabled
                             fullWidth
                             placeholder={"Добавить вариант"}
                             onChange={onAddRadioButton}

@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { ETerminals, IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
-import { FormControl, Grid, Input, MenuItem, Select, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
@@ -120,7 +120,15 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
     return (
         <Grid container direction="column">
             <Grid item xs={12}>
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={(theme) => ({
+                        marginTop: "8px !important",
+                        marginBottom: "8px !important",
+                    })}
+                >
                     <Grid item>
                         <Typography style={{ fontSize: 18, marginBottom: 2 }}>
                             {props.index + 1}.
@@ -147,19 +155,6 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                                 </MenuItem>
                             ))}
                         </SelectField>
-                        {/* <FormControl fullWidth>
-                            <Select
-                                value={answersType}
-                                input={<Input id="question-puzzle-type" />}
-                                onChange={onAnswerTypeChange}
-                            >
-                                {answerTypes.map(({ label, type }, index) => (
-                                    <MenuItem value={type} key={index}>
-                                        {label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>*/}
                     </Grid>
                 </Grid>
             </Grid>

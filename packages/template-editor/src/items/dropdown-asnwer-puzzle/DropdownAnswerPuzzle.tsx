@@ -56,7 +56,16 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
 
     if (!props.questionFocused) {
         return (
-            <Grid container direction="column" css={theme => ({ paddingLeft: theme.spacing(2) })}>
+            <Grid
+                container
+                direction="column"
+                css={theme => ({
+                    paddingLeft: theme.spacing(2),
+                    marginLeft: "8px !important",
+                    marginTop: "8px !important",
+                    marginBottom: "8px !important",
+                })}
+            >
                 <Grid item>
                     <Typography variant="body1">
                         <Typography
@@ -76,7 +85,15 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
 
     return (
         <React.Fragment>
-            <Grid container alignItems="flex-end" spacing={2}>
+            <Grid
+                container
+                alignItems="flex-end"
+                spacing={2}
+                css={(theme) => ({
+                    marginTop: "-8px !important",
+                    marginLeft: "8px !important",
+                })}
+            >
                 <Grid item>
                     <Typography style={{ fontSize: 18, marginBottom: 2 }}>
                         {props.index + 1}.
@@ -95,7 +112,16 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
             </Grid>
 
             {props.addDropdownButton && props.questionFocused && (
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={theme => ({
+                        marginTop: "-16px !important",
+                        marginBottom: "8px !important",
+                        marginLeft: "8px !important",
+                    })}
+                >
                     <Grid item>
                         <Typography style={{ fontSize: 18, marginBottom: 2 }}>
                             {props.index + 2}.

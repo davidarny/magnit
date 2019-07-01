@@ -56,9 +56,15 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
 
     if (!props.questionFocused) {
         return (
-            <Grid container alignItems="center">
+            <Grid
+                container
+                alignItems="center"
+                css={(theme) => ({
+                    marginTop: "8px !important",
+                })}
+            >
                 <Grid item>
-                    <Checkbox css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                    <Checkbox css={theme => ({ marginLeft: `-${theme.spacing()}` })} disabled/>
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>
@@ -69,7 +75,14 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
 
     return (
         <React.Fragment>
-            <Grid container alignItems="flex-end" spacing={2}>
+            <Grid
+                container
+                alignItems="flex-end"
+                spacing={2}
+                css={(theme) => ({
+                    marginTop: "-8px !important",
+                })}
+            >
                 <Grid item>
                     <Checkbox
                         disabled
@@ -80,18 +93,26 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     />
                 </Grid>
                 <Grid item xs style={{ paddingLeft: 0 }}>
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                    <InputField fullWidth placeholder={label} onChange={onLabelChange}/>
                 </Grid>
                 <Grid item>
                     <Grid container justify="flex-end">
                         <IconButton onClick={onDeleteCheckboxButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
+                            <DeleteIcon/>
                         </IconButton>
                     </Grid>
                 </Grid>
             </Grid>
             {props.addCheckboxButton && (
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={(theme) => ({
+                        marginTop: "-16px !important",
+                        marginBottom: "8px !important",
+                    })}
+                >
                     <Grid item>
                         <Checkbox
                             disabled
@@ -108,7 +129,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                             onChange={onAddCheckboxButton}
                         />
                     </Grid>
-                    <Grid item />
+                    <Grid item/>
                 </Grid>
             )}
         </React.Fragment>

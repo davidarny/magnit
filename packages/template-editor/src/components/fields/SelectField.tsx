@@ -40,7 +40,7 @@ export const SelectField: React.FC<SelectProps> = ({
                         color: theme.colors.black,
                         height: "100%",
                         div: {
-                            padding: "6px 15px",
+                            padding: "6px 30px",
                             lineHeight: "36px",
                         },
                     },
