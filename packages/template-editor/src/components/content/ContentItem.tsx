@@ -4,7 +4,7 @@ import * as React from "react";
 import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "components/puzzle";
 import { IPuzzle } from "entities";
-import { getFactory } from "services/item";
+import { getPuzzleFactory } from "services/item";
 
 interface IContentItem {
     puzzle: IPuzzle;
@@ -18,8 +18,8 @@ interface IContentItem {
 }
 
 export const ContentItem: React.FC<IContentItem> = ({ puzzle, parentPuzzle, ...props }) => {
-    const factory = getFactory(puzzle.puzzleType);
-    const view = factory.createItem({
+    const factory = getPuzzleFactory(puzzle.puzzleType);
+    const view = factory.createPuzzle({
         focused: !!props.active,
         puzzle: puzzle,
         index: props.index,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -40,7 +41,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             puzzle.title = label;
         });
         props.onTemplateChange({ ...template });
-    }, [label, props, template]);
+    }, [label]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -58,7 +59,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
         return (
             <Grid container alignItems="center">
                 <Grid item>
-                    <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                    <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>

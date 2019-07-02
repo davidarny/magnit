@@ -7,7 +7,7 @@ import { EditorContext, IEditorContext } from "TemplateEditor";
 import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    createItem({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (

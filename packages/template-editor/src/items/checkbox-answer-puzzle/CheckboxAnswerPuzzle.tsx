@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -40,7 +41,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
             puzzle.title = label;
         });
         props.onTemplateChange({ ...props.template });
-    }, [label, props]);
+    }, [label]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -58,7 +59,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
         return (
             <Grid container alignItems="center">
                 <Grid item>
-                    <Checkbox css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                    <Checkbox disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>

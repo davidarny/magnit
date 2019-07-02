@@ -14,7 +14,7 @@ import { RadioAnswerFactory } from "items/radio-answer-puzzle";
 import { NumericAnswerFactory } from "items/numeric-answer-puzzle";
 
 export interface IPuzzleFactory {
-    createItem(params: IPuzzleFactoryProps): React.ReactNode;
+    createPuzzle(params: IPuzzleFactoryProps): React.ReactNode;
 }
 
 export interface IPuzzleFactoryProps {
@@ -25,12 +25,12 @@ export interface IPuzzleFactoryProps {
 }
 
 class DefaultFactory implements IPuzzleFactory {
-    createItem({ puzzle }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle }: IPuzzleFactoryProps): React.ReactNode {
         return <div key={puzzle.id} />;
     }
 }
 
-export function getFactory(type: EPuzzleType): IPuzzleFactory {
+export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
     switch (type) {
         case EPuzzleType.QUESTION:
             return new QuestionFactory();

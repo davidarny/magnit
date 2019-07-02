@@ -7,7 +7,7 @@ import { EditorContext, IEditorContext } from "TemplateEditor";
 import { DropdownAnswerPuzzle } from "./DropdownAnswerPuzzle";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {
-    createItem({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         const addDropdownButton = !!parentPuzzle && parentPuzzle.puzzles.length - 1 === rest.index;
         return (
             <EditorContext.Consumer>

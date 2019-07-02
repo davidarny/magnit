@@ -7,7 +7,7 @@ import { GroupPuzzle } from "./GroupPuzzle";
 import { EditorContext } from "TemplateEditor";
 
 export class GroupFactory implements IPuzzleFactory {
-    createItem({ puzzle, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return <EditorContext.Consumer>{() => <GroupPuzzle />}</EditorContext.Consumer>;
     }
 }

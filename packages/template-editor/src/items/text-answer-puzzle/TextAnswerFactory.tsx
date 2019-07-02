@@ -7,7 +7,7 @@ import { EditorContext } from "TemplateEditor";
 import { TextAnswerPuzzle } from "./TextAnswerPuzzle";
 
 export class TextAnswerFactory implements IPuzzleFactory {
-    createItem({ puzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
                 {() => (

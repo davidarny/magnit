@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -40,7 +41,7 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
             puzzle.title = label;
         });
         props.onTemplateChange({ ...props.template });
-    }, [label, props]);
+    }, [label]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
