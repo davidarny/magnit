@@ -9,3 +9,5 @@ export * from "./SectionIcon";
 export * from "./CopyIcon";
 export * from "./ImageIcon";
 export * from "./TrashIcon";
+export * from "./ExecutorIcon";
+export * from "./ObjectIcon";

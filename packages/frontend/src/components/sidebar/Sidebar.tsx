@@ -4,7 +4,14 @@ import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
-import { AddIcon, ReportsIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
+import {
+    AddIcon,
+    ReportsIcon,
+    TasksIcon,
+    TemplatesIcon,
+    ExecutorIcon,
+    ObjectIcon,
+} from "@magnit/icons";
 import { CustomButton } from "@magnit/components";
 import _ from "lodash";
 
@@ -56,6 +63,8 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                     {[
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
+                        { text: "Объекты", icon: ObjectIcon, to: "/object" },
+                        { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
                         { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
                     ].map(({ text, icon: Icon, to }) => {
                         const isActive = _.get(location, "pathname", "").indexOf(to) !== -1;
