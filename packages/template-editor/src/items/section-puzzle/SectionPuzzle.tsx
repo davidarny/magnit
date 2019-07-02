@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { Fragment } from "react";
 import { ISpecificPuzzleProps } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
@@ -21,7 +20,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
     children,
 }) => {
     return (
-        <Fragment>
+        <React.Fragment>
             <Grid
                 container
                 alignItems="flex-end"
@@ -52,11 +51,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
                         Раздел {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid
-                    item
-                    xs
-                    css={{ marginLeft: "130px !important" }}
-                >
+                <Grid item xs css={{ marginLeft: "130px !important" }}>
                     <Grid
                         item
                         css={theme => ({
@@ -103,6 +98,6 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
             <Grid container direction="column">
                 {children}
             </Grid>
-        </Fragment>
+        </React.Fragment>
     );
 };

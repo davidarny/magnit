@@ -1,16 +1,16 @@
-import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
-import { ReactNode } from "react";
-import { EditorContext, IEditorContext } from "../../TemplateEditor";
-import { DateAnswerPuzzle } from "./DateAnswerPuzzle";
+/** @jsx jsx */
+
+import * as React from "react";
 import { jsx } from "@emotion/core";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
+import { EditorContext } from "TemplateEditor";
+import { DateAnswerPuzzle } from "./DateAnswerPuzzle";
 
 export class DateAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, index }: IPuzzleFactoryProps): ReactNode {
+    createPuzzle({ puzzle, focused, index }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
-                {(context: IEditorContext) => (
-                    <DateAnswerPuzzle questionFocused={!!focused} id={item.id} index={index} />
-                )}
+                {() => <DateAnswerPuzzle questionFocused={focused} id={puzzle.id} index={index} />}
             </EditorContext.Consumer>
         );
     }

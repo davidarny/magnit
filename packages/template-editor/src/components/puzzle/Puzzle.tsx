@@ -6,7 +6,7 @@ import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "./EPuzzleType";
-import { ClickableBlock } from "../block";
+import { SelectableBlockWrapper } from "components/block";
 
 export interface ICommonComponentProps {
     index: number;
@@ -81,13 +81,13 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                 switch (puzzle.puzzleType) {
                     case EPuzzleType.GROUP: {
                         return (
-                            <ClickableBlock
+                            <SelectableBlockWrapper
                                 key={puzzle.id}
                                 id={puzzle.id}
                                 onFocus={onFocus}
                                 onMouseDown={onFocus}
                                 onBlur={props.onBlur}
-                                styles={(theme) => ({
+                                styles={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 4 : 0),
@@ -108,15 +108,15 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     {props.components[EPuzzleType.GROUP](commonComponentProps)}
                                 </PuzzleWrapper>
                                 <Puzzle puzzles={puzzle.puzzles} index={props.index} {...props} />
-                            </ClickableBlock>
+                            </SelectableBlockWrapper>
                         );
                     }
                     case EPuzzleType.QUESTION: {
                         return (
-                            <ClickableBlock
+                            <SelectableBlockWrapper
                                 key={puzzle.id}
                                 id={puzzle.id}
-                                styles={(theme) => ({
+                                styles={theme => ({
                                     position: "relative",
                                     paddingTop: theme.spacing(2),
                                     marginTop: theme.spacing(index === 0 ? 2 : 0),
@@ -142,7 +142,7 @@ export const Puzzle: React.FC<IPuzzleProps> = ({ puzzles, ...props }) => {
                                     onMouseDown={onFocus}
                                     {...props}
                                 />
-                            </ClickableBlock>
+                            </SelectableBlockWrapper>
                         );
                     }
                     case EPuzzleType.TEXT_ANSWER:

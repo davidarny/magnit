@@ -12,6 +12,7 @@ const theme = {
         small: "0.7em",
         smaller: "0.75em",
         normal: "1em",
+        medium: "1.15em",
         larger: "1.25em",
         large: "1.5em",
         xLarge: "1.75em",
@@ -59,7 +60,7 @@ ReactDOM.render(
             <App />
         </ThemeProvider>
     </JssProvider>,
-    document.getElementById("root"),
+    document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change

@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { jsx } from "@emotion/core";
-import { EditorContext, IEditorContext } from "../../TemplateEditor";
-import { Conditions } from "../conditions";
-import { EPuzzleType } from "../puzzle";
+import { EditorContext, IEditorContext } from "TemplateEditor";
+import { Conditions } from "components/conditions";
+import { EPuzzleType } from "components/puzzle";
 
 interface IContentConditionsProps {
     puzzleId: string;
@@ -12,11 +12,8 @@ interface IContentConditionsProps {
     puzzleType: EPuzzleType;
 }
 
-export const ContentConditions: React.FC<IContentConditionsProps> = ({
-    puzzleId,
-    focused,
-    puzzleType,
-}) => {
+export const ContentConditions: React.FC<IContentConditionsProps> = props => {
+    const { puzzleId, focused, puzzleType } = props;
     if (!focused) {
         return null;
     }

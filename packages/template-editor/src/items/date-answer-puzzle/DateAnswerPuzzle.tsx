@@ -11,11 +11,13 @@ export const DateAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocuse
         <Grid
             container
             alignItems="flex-end"
-            style={{ display: questionFocused ? "" : "none" }}
-            css={theme => ({ paddingBottom: theme.spacing(2) })}
+            css={theme => ({
+                paddingBottom: theme.spacing(2),
+                display: questionFocused ? "" : "none",
+            })}
         >
             <Grid item xs={12}>
-                <FormControl>
+                <FormControl disabled>
                     <InputLabel htmlFor="date-answer-puzzle">День, месяц, год</InputLabel>
                     <Input
                         id="date-answer-puzzle"

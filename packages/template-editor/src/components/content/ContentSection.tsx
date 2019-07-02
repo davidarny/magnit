@@ -1,8 +1,10 @@
-import { jsx } from "@emotion/core";
-import { ITemplate } from "../../entities";
-import { InputField } from "@magnit/components";
-import Grid from "@material-ui/core/Grid";
+/** @jsx jsx */
+
 import * as React from "react";
+import { jsx } from "@emotion/core";
+import { ITemplate } from "entities";
+import { InputField } from "@magnit/components";
+import { Grid } from "@material-ui/core";
 
 interface IContentSectionProps {
     template: ITemplate;

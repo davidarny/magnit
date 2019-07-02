@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -89,25 +90,28 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={(theme) => ({
+                css={theme => ({
                     marginTop: `${theme.spacing(-1)} !important`,
                     marginLeft: `${theme.spacing()} !important`,
                 })}
             >
                 <Grid item>
-                    <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                    <Typography
+                        css={theme => ({
+                            fontSize: theme.fontSize.medium,
+                            marginBottom: theme.spacing(0.25),
+                        })}
+                    >
                         {props.index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs style={{ paddingLeft: 0 }}>
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                <Grid item xs>
+                    <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item>
-                    <Grid container justify="flex-end">
-                        <IconButton onClick={onDeleteDropdownButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Grid>
+                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                    <IconButton onClick={onDeleteDropdownButton}>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
 
@@ -123,15 +127,27 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                     })}
                 >
                     <Grid item>
-                        <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                        <Typography
+                            css={theme => ({
+                                fontSize: theme.fontSize.medium,
+                                marginBottom: theme.spacing(0.25),
+                            })}
+                        >
                             {props.index + 2}.
                         </Typography>
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                    <Grid
+                        item
+                        xs
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onChange={onAddDropdownButton}
+                            onClick={onAddDropdownButton}
                         />
                     </Grid>
                     <Grid item />

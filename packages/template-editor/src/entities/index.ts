@@ -3,6 +3,7 @@ import { EOperatorType } from "./EOperatorType";
 import { EConditionType } from "./EConditionType";
 import { EActionType } from "./EActionType";
 import { EPuzzleType } from "components/puzzle";
+import * as React from "react";
 
 interface ITitled {
     title: string;
@@ -74,6 +75,13 @@ export interface ISpecificPuzzleProps {
 export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {
     questionFocused: boolean;
 }
+
+interface TChangeParam {
+    name?: string;
+    value: unknown;
+}
+
+export type TChangeEvent = React.ChangeEvent<TChangeParam>;
 
 export * from "./EValidationType";
 export * from "./EOperatorType";

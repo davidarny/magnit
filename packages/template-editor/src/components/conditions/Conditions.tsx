@@ -19,8 +19,9 @@ import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
-import { CustomButton, InputField, SelectField } from "@magnit/components";
+import { CustomButton, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
+import { getConditionService } from "services/condition";
 
 interface IConditionsProps {
     puzzleId: string;
@@ -32,12 +33,8 @@ interface IConditionsProps {
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export const Conditions: React.FC<IConditionsProps> = ({
-    puzzleId,
-    template,
-    puzzleType,
-    ...props
-}) => {
+export const Conditions: React.FC<IConditionsProps> = props => {
+    const { puzzleId, template, puzzleType } = props;
     const [conditions, setConditions] = useState<ICondition[]>([
         {
             id: uuid(),
@@ -181,6 +178,7 @@ export const Conditions: React.FC<IConditionsProps> = ({
 
     const title =
         puzzleType === EPuzzleType.GROUP ? "Условия показа группы" : "Условия показа вопроса";
+
     return (
         <Grid
             css={theme => ({
@@ -241,9 +239,6 @@ export const Conditions: React.FC<IConditionsProps> = ({
                         });
                     }
 
-                    // const getConditionType = R.prop("conditionType");
-                    // const getActionType = R.prop("actionType");
-                    // const getAnswerPuzzleType = R.prop("puzzleType");
                     const questionAnswers = answers.filter(answer => {
                         const question = questions.find(
                             question => question.id === condition.questionPuzzle
@@ -257,14 +252,20 @@ export const Conditions: React.FC<IConditionsProps> = ({
                         puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
                     };
 
-                    const conditionLiteral = getConditionLiteral(index, condition.conditionType);
+                    const conditionService = getConditionService({
+                        index,
+                        condition,
+                        puzzleType: questionAnswersHead.puzzleType,
+                    });
 
                     const isFirstRow = index === 0;
                     return (
                         <React.Fragment key={condition.id}>
                             {isFirstRow && (
                                 <Grid item>
-                                    <Typography>{conditionLiteral}</Typography>
+                                    <Typography>
+                                        {conditionService.getConditionLiteral()}
+                                    </Typography>
                                 </Grid>
                             )}
                             <Grid
@@ -353,13 +354,13 @@ export const Conditions: React.FC<IConditionsProps> = ({
                                             onChange={onActionTypeChange}
                                             placeholder={"Выберите значение"}
                                         >
-                                            {getActionVariants(questionAnswersHead.puzzleType)}
+                                            {conditionService.getActionVariants()}
                                         </SelectField>
                                     )}
                                 </Grid>
                                 <Grid item xs={2}>
                                     {!!condition.questionPuzzle &&
-                                        getAnswerPuzzle(condition, answers, questions)(
+                                        conditionService.getAnswerPuzzle(answers, questions)(
                                             condition.actionType === EActionType.CHOSEN_ANSWER
                                                 ? onAnswerPuzzleChange
                                                 : onValueChange
@@ -398,136 +399,3 @@ export const Conditions: React.FC<IConditionsProps> = ({
         </Grid>
     );
 };
-
-function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
-    switch (puzzleType) {
-        case EPuzzleType.TEXT_ANSWER:
-        case EPuzzleType.NUMERIC_ANSWER:
-        case EPuzzleType.DATE_ANSWER:
-            return [
-                <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
-                    {getActionLiteral(EActionType.EQUAL)}
-                </MenuItem>,
-                <MenuItem key={EActionType.LESS_THAN} value={EActionType.LESS_THAN}>
-                    {getActionLiteral(EActionType.LESS_THAN)}
-                </MenuItem>,
-                <MenuItem key={EActionType.MORE_THAN} value={EActionType.MORE_THAN}>
-                    {getActionLiteral(EActionType.MORE_THAN)}
-                </MenuItem>,
-                <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
-                    {getActionLiteral(EActionType.NOT_EQUAL)}
-                </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
-                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
-                </MenuItem>,
-            ];
-        case EPuzzleType.DROPDOWN_ANSWER:
-        case EPuzzleType.RADIO_ANSWER:
-        case EPuzzleType.CHECKBOX_ANSWER:
-            return [
-                <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
-                    {getActionLiteral(EActionType.CHOSEN_ANSWER)}
-                </MenuItem>,
-                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
-                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
-                </MenuItem>,
-            ];
-        default:
-            return [
-                <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
-                    {getActionLiteral(EActionType.GIVEN_ANSWER)}
-                </MenuItem>,
-            ];
-    }
-}
-
-function getAnswerPuzzle(
-    condition: ICondition,
-    answers: IPuzzle[],
-    questions: IPuzzle[]
-):
-    | ((onValueChange: (event: TChangeEvent) => void) => React.ReactNode)
-    | (() => React.ReactNode)
-    | ((onAnswerPuzzleChange: (event: TChangeEvent) => void) => React.ReactNode) {
-    switch (condition.actionType) {
-        case EActionType.CHOSEN_ANSWER:
-            return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
-                return (
-                    <SelectField
-                        id={"answer-puzzle"}
-                        fullWidth={true}
-                        value={condition.answerPuzzle || ETerminals.EMPTY}
-                        onChange={onAnswerPuzzleChange}
-                        placeholder={"Выберите ответ"}
-                    >
-                        {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
-                        {answers.length !== 0 &&
-                            answers
-                                .filter(answer => {
-                                    // find which question references to current condition
-                                    const currentQuestion = questions.find(
-                                        question => condition.questionPuzzle === question.id
-                                    );
-                                    if (!currentQuestion) {
-                                        return false;
-                                    }
-                                    // check if current answer is referenced to found question
-                                    // if true then this answer is transition-referenced
-                                    // to current condition
-                                    // condition -> question -> answer ~ condition -> answer
-                                    return currentQuestion.puzzles.some(
-                                        puzzle => puzzle.id === answer.id
-                                    );
-                                })
-                                .map(answer => {
-                                    return (
-                                        <MenuItem key={answer.id} value={answer.id}>
-                                            {answer.title}
-                                        </MenuItem>
-                                    );
-                                })}
-                    </SelectField>
-                );
-            };
-        case EActionType.EQUAL:
-        case EActionType.LESS_THAN:
-        case EActionType.MORE_THAN:
-        case EActionType.NOT_EQUAL:
-            return (onValueChange: (event: TChangeEvent) => void) => {
-                return (
-                    <InputField
-                        value={condition.value}
-                        onChange={onValueChange}
-                        placeholder="Ответ"
-                        isSimpleMode={true}
-                        css={theme => ({ marginTop: theme.spacing(-2) })}
-                    />
-                );
-            };
-        case EActionType.GIVEN_ANSWER:
-        default:
-            return () => <React.Fragment />;
-    }
-}
-
-function getActionLiteral(actionType: EActionType): string {
-    return {
-        [EActionType.CHOSEN_ANSWER]: "Выбран ответ",
-        [EActionType.NOT_EQUAL]: "Не равно",
-        [EActionType.MORE_THAN]: "Больше чем",
-        [EActionType.LESS_THAN]: "Меньше чем",
-        [EActionType.EQUAL]: "Равно",
-        [EActionType.GIVEN_ANSWER]: "Дан ответ",
-        [EActionType.NONE]: ETerminals.EMPTY,
-    }[actionType];
-}
-
-function getConditionLiteral(index: number, conditionType: EConditionType): string {
-    if (index === 0) {
-        return "Если";
-    }
-    return {
-        [EConditionType.AND]: "И",
-        [EConditionType.OR]: "Или",
-    }[conditionType];
-}

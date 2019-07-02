@@ -1,15 +1,20 @@
-import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
-import { ReactNode } from "react";
-import { EditorContext, IEditorContext } from "../../TemplateEditor";
-import { NumericAnswerPuzzle } from "./NumericAnswerPuzzle";
+/** @jsx jsx */
+
+import * as React from "react";
 import { jsx } from "@emotion/core";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
+import { EditorContext } from "TemplateEditor";
+import { NumericAnswerPuzzle } from "./NumericAnswerPuzzle";
 
 export class NumericAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
+    createPuzzle({ puzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
-                {(context: IEditorContext) => (
-                    <NumericAnswerPuzzle {...{ id: item.id, questionFocused: focused }} {...rest} />
+                {() => (
+                    <NumericAnswerPuzzle
+                        {...{ id: puzzle.id, questionFocused: focused }}
+                        {...rest}
+                    />
                 )}
             </EditorContext.Consumer>
         );

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
@@ -65,7 +66,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 })}
             >
                 <Grid item>
-                    <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} disabled />
+                    <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>
@@ -80,7 +81,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={theme => ({ marginTop: `${theme.spacing()} !important` )}}
+                css={theme => ({ marginTop: `${theme.spacing()} !important` })}
             >
                 <Grid item>
                     <Radio
@@ -92,14 +93,12 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     />
                 </Grid>
                 <Grid item xs style={{ paddingLeft: 0 }}>
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                    <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item>
-                    <Grid container justify="flex-end">
-                        <IconButton onClick={onDeleteRadioButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Grid>
+                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                    <IconButton onClick={onDeleteRadioButton}>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
 
@@ -122,11 +121,19 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                             })}
                         />
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                    <Grid
+                        item
+                        xs
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onChange={onAddRadioButton}
+                            onClick={onAddRadioButton}
                         />
                     </Grid>
                     <Grid item />

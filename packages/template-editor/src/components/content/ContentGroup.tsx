@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { ClickableBlock } from "../block";
+import { SelectableBlockWrapper } from "components/block";
 import { jsx } from "@emotion/core";
-import { IPuzzle } from "../../entities";
-import { EPuzzleType } from "../puzzle";
+import { IPuzzle } from "entities";
+import { EPuzzleType } from "components/puzzle";
 import { ContentItem } from "./ContentItem";
 import { ContentConditions } from "./ContentConditions";
 
@@ -18,17 +18,11 @@ interface IContentGroupProps {
     onFocus(id: string): void;
 
     onBlur(event: React.SyntheticEvent): void;
-
-    onMouseDown?(): void;
 }
 
-export const ContentGroup: React.FC<IContentGroupProps> = ({
-    isFocused,
-    item,
-    children,
-    parentItem,
-    ...props
-}) => {
+export const ContentGroup: React.FC<IContentGroupProps> = props => {
+    const { isFocused, item, parentItem } = props;
+
     function onFocus(): void {
         props.onFocus(item.id);
     }
@@ -37,7 +31,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
     const isGroup = item.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
     return (
-        <ClickableBlock
+        <SelectableBlockWrapper
             onFocus={onFocus}
             onMouseDown={onFocus}
             onBlur={props.onBlur}
@@ -59,10 +53,12 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                 }}
             >
                 <ContentItem
-                    item={item}
-                    parentItem={parentItem}
+                    puzzle={item}
+                    parentPuzzle={parentItem}
                     index={props.index}
                     active={focused}
+                    onFocus={onFocus}
+                    onBlur={props.onBlur}
                 />
                 {item.puzzles.map((puzzle, index) => {
                     if (puzzle.puzzleType === EPuzzleType.QUESTION) {
@@ -80,11 +76,13 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                     }
                     return (
                         <ContentItem
-                            item={puzzle}
+                            puzzle={puzzle}
                             index={index}
                             active={focused}
+                            onFocus={onFocus}
+                            onBlur={props.onBlur}
                             key={puzzle.id}
-                            parentItem={item}
+                            parentPuzzle={item}
                         />
                     );
                 })}
@@ -94,6 +92,6 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                     puzzleType={item.puzzleType}
                 />
             </div>
-        </ClickableBlock>
+        </SelectableBlockWrapper>
     );
 };

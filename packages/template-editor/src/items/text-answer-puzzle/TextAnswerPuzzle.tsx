@@ -11,11 +11,13 @@ export const TextAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocuse
         <Grid
             container
             alignItems="flex-end"
-            style={{ display: questionFocused ? "" : "none" }}
-            css={theme => ({ paddingBottom: theme.spacing(2) })}
+            css={theme => ({
+                paddingBottom: theme.spacing(2),
+                display: questionFocused ? "" : "none",
+            })}
         >
             <Grid item xs={12}>
-                <InputField type="text" fullWidth placeholder="Ответ" />
+                <InputField disabled type="text" fullWidth placeholder="Ответ" />
             </Grid>
         </Grid>
     );

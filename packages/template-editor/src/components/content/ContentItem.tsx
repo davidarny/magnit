@@ -1,27 +1,38 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
-import { PuzzleWrapper } from "../puzzle/PuzzleWrapper";
 import * as React from "react";
-import { IPuzzle } from "../../entities";
-import { getFactory } from "../../services/item";
+import { jsx } from "@emotion/core";
+import { PuzzleWrapper } from "components/puzzle";
+import { IPuzzle } from "entities";
+import { getPuzzleFactory } from "services/item";
 
 interface IContentItem {
-    item: IPuzzle;
-    parentItem?: IPuzzle;
+    puzzle: IPuzzle;
+    parentPuzzle?: IPuzzle;
     index: number;
     active?: boolean;
 
-    onMouseDown?(): void;
+    onFocus(): void;
+
+    onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ContentItem: React.FC<IContentItem> = ({ item, parentItem, ...props }) => {
-    const factory = getFactory(item.puzzleType);
-    const view = factory.createItem({
+export const ContentItem: React.FC<IContentItem> = ({ puzzle, parentPuzzle, ...props }) => {
+    const factory = getPuzzleFactory(puzzle.puzzleType);
+    const view = factory.createPuzzle({
         focused: !!props.active,
-        item: item,
+        puzzle: puzzle,
         index: props.index,
-        parentItem,
+        parentPuzzle: parentPuzzle,
     });
-    return <PuzzleWrapper>{view}</PuzzleWrapper>;
+    return (
+        <PuzzleWrapper
+            id={puzzle.id}
+            onFocus={props.onFocus}
+            onMouseDown={props.onFocus}
+            onBlur={props.onBlur}
+        >
+            {view}
+        </PuzzleWrapper>
+    );
 };

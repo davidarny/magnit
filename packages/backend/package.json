@@ -11,7 +11,8 @@
         "sails": "^1.2.2",
         "sails-hook-orm": "^2.1.1",
         "sails-hook-sockets": "^2.0.0",
-        "sails-postgresql": "^1.0.2"
+        "sails-postgresql": "^1.0.2",
+        "mocha": "^6.1.4"
     },
     "scripts": {
         "start": "cross-env NODE_ENV=production node app.js",

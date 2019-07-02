@@ -1,18 +1,15 @@
+/** @jsx jsx */
+
+import * as React from "react";
 import { TextField } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { TextFieldProps } from "@material-ui/core/TextField";
 
 export interface IInputField {
     isSimpleMode?: boolean;
 }
 
-export const InputField: React.FC<IInputField & TextFieldProps> = ({
-    placeholder,
-    defaultValue,
-    fullWidth,
-    isSimpleMode = false,
-    ...rest
-}) => {
+export const InputField: React.FC<IInputField & React.ComponentProps<typeof TextField>> = props => {
+    const { fullWidth, placeholder, defaultValue, isSimpleMode, ...rest } = props;
     return (
         <TextField
             fullWidth={fullWidth}
