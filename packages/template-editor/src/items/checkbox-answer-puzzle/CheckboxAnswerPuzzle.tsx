@@ -63,11 +63,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                 css={theme => ({ marginTop: `${theme.spacing()} !important` })}
             >
                 <Grid item>
-                    <Checkbox
-                        disabled
-                        css={theme => ({ marginLeft: `-${theme.spacing()}` })}
-                        disabled
-                    />
+                    <Checkbox disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>

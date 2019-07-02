@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { Grid } from "@material-ui/core";
 import { IFocusedPuzzleProps } from "entities";
 import { InputField } from "@magnit/components";
 
