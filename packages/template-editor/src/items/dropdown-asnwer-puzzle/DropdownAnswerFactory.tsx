@@ -7,15 +7,15 @@ import { EditorContext, IEditorContext } from "TemplateEditor";
 import { DropdownAnswerPuzzle } from "./DropdownAnswerPuzzle";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {
-    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
-        const addDropdownButton = !!parentItem && parentItem.puzzles.length - 1 === rest.index;
+    createItem({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+        const addDropdownButton = !!parentPuzzle && parentPuzzle.puzzles.length - 1 === rest.index;
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (
                     <DropdownAnswerPuzzle
                         {...rest}
                         {...context}
-                        {...{ id: item.id, title: item.title, questionFocused: focused }}
+                        {...{ id: puzzle.id, title: puzzle.title, questionFocused: focused }}
                         onAddDropdownButton={onAddAnswerPuzzle}
                         onDeleteDropdownButton={onDeleteAnswerPuzzle}
                         addDropdownButton={addDropdownButton}

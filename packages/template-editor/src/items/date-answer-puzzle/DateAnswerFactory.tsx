@@ -7,10 +7,10 @@ import { EditorContext } from "TemplateEditor";
 import { DateAnswerPuzzle } from "./DateAnswerPuzzle";
 
 export class DateAnswerFactory implements IPuzzleFactory {
-    createItem({ item, focused, index }: IPuzzleFactoryProps): React.ReactNode {
+    createItem({ puzzle, focused, index }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
-                {() => <DateAnswerPuzzle questionFocused={focused} id={item.id} index={index} />}
+                {() => <DateAnswerPuzzle questionFocused={focused} id={puzzle.id} index={index} />}
             </EditorContext.Consumer>
         );
     }

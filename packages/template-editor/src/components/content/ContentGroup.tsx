@@ -53,8 +53,8 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                 }}
             >
                 <ContentItem
-                    item={item}
-                    parentItem={parentItem}
+                    puzzle={item}
+                    parentPuzzle={parentItem}
                     index={props.index}
                     active={focused}
                     onFocus={onFocus}
@@ -76,13 +76,13 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     }
                     return (
                         <ContentItem
-                            item={puzzle}
+                            puzzle={puzzle}
                             index={index}
                             active={focused}
                             onFocus={onFocus}
                             onBlur={props.onBlur}
                             key={puzzle.id}
-                            parentItem={item}
+                            parentPuzzle={item}
                         />
                     );
                 })}

@@ -20,13 +20,13 @@ export interface IPuzzleFactory {
 export interface IPuzzleFactoryProps {
     index: number;
     focused: boolean;
-    item: IPuzzle;
-    parentItem?: IPuzzle;
+    puzzle: IPuzzle;
+    parentPuzzle?: IPuzzle;
 }
 
 class DefaultFactory implements IPuzzleFactory {
-    createItem({ item }: IPuzzleFactoryProps): React.ReactNode {
-        return <div key={item.id} />;
+    createItem({ puzzle }: IPuzzleFactoryProps): React.ReactNode {
+        return <div key={puzzle.id} />;
     }
 }
 
