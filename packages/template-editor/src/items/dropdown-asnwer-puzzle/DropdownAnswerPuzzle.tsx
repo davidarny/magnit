@@ -61,9 +61,9 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                 direction="column"
                 css={theme => ({
                     paddingLeft: theme.spacing(2),
-                    marginLeft: "8px !important",
-                    marginTop: "8px !important",
-                    marginBottom: "8px !important",
+                    marginLeft: `${theme.spacing()} !important`,
+                    marginTop: `${theme.spacing()} !important`,
+                    marginBottom: `${theme.spacing()} !important`,
                 })}
             >
                 <Grid item>
@@ -90,8 +90,8 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                 alignItems="flex-end"
                 spacing={2}
                 css={(theme) => ({
-                    marginTop: "-8px !important",
-                    marginLeft: "8px !important",
+                    marginTop: `${theme.spacing(-1)} !important`,
+                    marginLeft: `${theme.spacing()} !important`,
                 })}
             >
                 <Grid item>
@@ -117,9 +117,9 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: "-16px !important",
-                        marginBottom: "8px !important",
-                        marginLeft: "8px !important",
+                        marginTop: `${theme.spacing(-2)} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
+                        marginLeft: `${theme.spacing()} !important`,
                     })}
                 >
                     <Grid item>

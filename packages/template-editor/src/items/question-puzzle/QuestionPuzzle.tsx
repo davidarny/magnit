@@ -119,8 +119,8 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: "8px !important",
-                        marginBottom: "8px !important",
+                        marginTop: `${theme.spacing()} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
                     <Grid item>

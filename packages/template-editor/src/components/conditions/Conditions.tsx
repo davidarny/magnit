@@ -389,7 +389,7 @@ export const Conditions: React.FC<IConditionsProps> = ({
                             buttonColor={"blueWithout"}
                             css={theme => ({
                                 width: 290,
-                                marginLeft: 4,
+                                marginLeft: theme.spacing(0.5),
                             })}
                         />
                     </Grid>

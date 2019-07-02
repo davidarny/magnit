@@ -59,9 +59,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
             <Grid
                 container
                 alignItems="center"
-                css={(theme) => ({
-                    marginTop: "8px !important",
-                })}
+                css={(theme) => ({ marginTop: `${theme.spacing()} !important` })}
             >
                 <Grid item>
                     <Checkbox css={theme => ({ marginLeft: `-${theme.spacing()}` })} disabled/>
@@ -79,9 +77,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={(theme) => ({
-                    marginTop: "-8px !important",
-                })}
+                css={(theme) => ({ marginTop: `${theme.spacing(-1)} !important` })}
             >
                 <Grid item>
                     <Checkbox
@@ -109,8 +105,8 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     alignItems="flex-end"
                     spacing={2}
                     css={(theme) => ({
-                        marginTop: "-16px !important",
-                        marginBottom: "8px !important",
+                        marginTop: `-${theme.spacing(-2)} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
                     <Grid item>

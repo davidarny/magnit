@@ -60,8 +60,8 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 container
                 alignItems="center"
                 css={theme => ({
-                    marginTop: "8px !important",
-                    marginBottom: "8px !important",
+                    marginTop: `${theme.spacing()} !important`,
+                    marginBottom: `${theme.spacing()} !important`,
                 })}
             >
                 <Grid item>
@@ -80,9 +80,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={theme => ({
-                    marginTop: "-8px !important",
-                })}
+                css={theme => ({ marginTop: `${theme.spacing()} !important` )}}
             >
                 <Grid item>
                     <Radio
@@ -111,8 +109,8 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: "-16px !important",
-                        marginBottom: "8px !important",
+                        marginTop: `${theme.spacing(-2)} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
                     <Grid item>

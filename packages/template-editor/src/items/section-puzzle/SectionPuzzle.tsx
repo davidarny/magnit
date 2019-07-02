@@ -55,9 +55,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
                 <Grid
                     item
                     xs
-                    css={{
-                        marginLeft: "130px !important",
-                    }}
+                    css={{ marginLeft: "130px !important" }}
                 >
                     <Grid
                         item

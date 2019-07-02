@@ -16,7 +16,6 @@ import { CustomButton } from "@magnit/components";
 import _ from "lodash";
 
 export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
-    console.log(location);
     return (
         <Drawer
             variant="permanent"
