@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -40,7 +40,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             puzzle.title = label;
         });
         props.onTemplateChange({ ...template });
-    }, [label]);
+    }, [label, props, template]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -80,14 +80,12 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     />
                 </Grid>
                 <Grid item xs style={{ paddingLeft: 0 }}>
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                    <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item>
-                    <Grid container justify="flex-end">
-                        <IconButton onClick={onDeleteRadioButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Grid>
+                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                    <IconButton onClick={onDeleteRadioButton}>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
 
@@ -112,10 +110,9 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                         })}
                     >
                         <InputField
-                            disabled
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onChange={onAddRadioButton}
+                            onClick={onAddRadioButton}
                         />
                     </Grid>
                     <Grid item />

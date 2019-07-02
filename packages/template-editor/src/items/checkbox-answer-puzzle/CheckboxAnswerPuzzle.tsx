@@ -40,7 +40,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
             puzzle.title = label;
         });
         props.onTemplateChange({ ...props.template });
-    }, [label]);
+    }, [label, props]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -80,14 +80,12 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     />
                 </Grid>
                 <Grid item xs style={{ paddingLeft: 0 }}>
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                    <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item>
-                    <Grid container justify="flex-end">
-                        <IconButton onClick={onDeleteCheckboxButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Grid>
+                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                    <IconButton onClick={onDeleteCheckboxButton}>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
             {props.addCheckboxButton && (
@@ -113,7 +111,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onChange={onAddCheckboxButton}
+                            onClick={onAddCheckboxButton}
                         />
                     </Grid>
                     <Grid item />

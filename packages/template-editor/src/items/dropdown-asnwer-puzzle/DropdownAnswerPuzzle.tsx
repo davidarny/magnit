@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -40,7 +40,7 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
             puzzle.title = label;
         });
         props.onTemplateChange({ ...props.template });
-    }, [label]);
+    }, [label, props]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -87,21 +87,13 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                         {props.index + 1}.
                     </Typography>
                 </Grid>
-                <Grid
-                    item
-                    xs
-                    css={css`
-                        padding-left: 0;
-                    `}
-                >
-                    <InputField fullWidth placeholder={label} onChange={onLabelChange} />
+                <Grid item xs>
+                    <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
-                <Grid item>
-                    <Grid container justify="flex-end">
-                        <IconButton onClick={onDeleteDropdownButton} style={{ padding: 0 }}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Grid>
+                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                    <IconButton onClick={onDeleteDropdownButton}>
+                        <DeleteIcon />
+                    </IconButton>
                 </Grid>
             </Grid>
 
@@ -122,14 +114,13 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                         xs
                         css={theme => ({
                             paddingTop: "0 !important",
-                            paddingLeft: "0 !important",
                             paddingRight: theme.spacing(4),
                         })}
                     >
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onChange={onAddDropdownButton}
+                            onClick={onAddDropdownButton}
                         />
                     </Grid>
                     <Grid item />
