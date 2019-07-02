@@ -1,14 +1,15 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
-import { Link } from "@reach/router";
+import { Link, RouteComponentProps } from "@reach/router";
 import { AddIcon, ReportsIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
 import { CustomButton } from "@magnit/components";
-import { RouteComponentProps } from "@reach/router";
+import _ from "lodash";
 
-export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
+export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
+    console.log(location);
     return (
         <Drawer
             variant="permanent"
@@ -56,55 +57,87 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
                         { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
-                    ].map(({ text, icon: Icon, to }) => (
-                        <ListItem
-                            component={Link}
-                            to={to}
-                            key={text}
-                            css={theme => ({
-                                position: "relative",
-                                padding: `${theme.spacing(3)} 0`,
-                                ":visited": { color: theme.colors.blue },
-                                ":hover, :active": { color: theme.colors.black },
-                                ":before": {
-                                    context: "",
+                    ].map(({ text, icon: Icon, to }) => {
+                        const isActive = _.get(location, "pathname", "").indexOf(to) !== -1;
+                        return (
+                            <ListItem
+                                component={Link}
+                                to={to}
+                                key={text}
+                                css={theme => ({
+                                    position: "relative",
+                                    padding: `${theme.spacing(3)} 0`,
                                     display: "block",
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: 3,
-                                    height: 64,
-                                    borderTopRightRadius: 3,
-                                    borderBottomRightRadius: 3,
-                                    backgroundColor: "#2F97FF",
-                                    boxShadow: "1px 0 rgba(47, 151, 255, 0.4)",
-                                },
-                            })}
-                        >
-                            <Grid container direction="column" justify="center" alignItems="center">
-                                <Grid item>
-                                    <ListItemIcon>
-                                        <Grid container justify="center" alignItems="center">
-                                            <Grid item>
-                                                <Icon />
-                                            </Grid>
-                                        </Grid>
-                                    </ListItemIcon>
-                                </Grid>
-                                <Grid item>
-                                    <Typography
+                                    ":visited": { color: theme.colors.blue },
+                                    ":hover, :active": { color: theme.colors.black },
+                                })}
+                            >
+                                <Grid
+                                    container
+                                    direction="column"
+                                    justify="center"
+                                    alignItems="center"
+                                    css={theme => ({
+                                        position: "relative",
+                                        ":hover": {
+                                            div: {
+                                                ":first-child": {
+                                                    backgroundColor: theme.colors.blue,
+                                                },
+                                            },
+                                        },
+                                    })}
+                                >
+                                    <Grid
+                                        item
                                         css={theme => ({
-                                            color: theme.colors.darkGray,
-                                            fontSize: theme.fontSize.small,
-                                            fontWeight: 500,
+                                            display: "block",
+                                            position: "absolute",
+                                            top: -3,
+                                            left: 0,
+                                            width: 3,
+                                            height: 64,
+                                            borderTopRightRadius: 3,
+                                            borderBottomRightRadius: 3,
+                                            background: isActive ? theme.colors.blue : "none",
+                                            boxShadow: isActive
+                                                ? "1px 0 rgba(47, 151, 255, 0.4)"
+                                                : "none",
                                         })}
+                                    ></Grid>
+                                    <Grid
+                                        item
+                                        css={css`
+                                            div {
+                                                background: none !important;
+                                            }
+                                        `}
                                     >
-                                        {text}
-                                    </Typography>
+                                        <ListItemIcon>
+                                            <Grid container justify="center" alignItems="center">
+                                                <Grid item>
+                                                    <Icon isActive={isActive} />
+                                                </Grid>
+                                            </Grid>
+                                        </ListItemIcon>
+                                    </Grid>
+                                    <Grid item>
+                                        <Typography
+                                            css={theme => ({
+                                                color: isActive
+                                                    ? theme.colors.blue
+                                                    : theme.colors.darkGray,
+                                                fontSize: theme.fontSize.small,
+                                                fontWeight: 500,
+                                            })}
+                                        >
+                                            {text}
+                                        </Typography>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </ListItem>
-                    ))}
+                            </ListItem>
+                        );
+                    })}
                 </List>
             </div>
         </Drawer>

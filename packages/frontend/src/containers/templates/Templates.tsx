@@ -13,7 +13,7 @@ import { AddIcon } from "@magnit/icons";
 export const Templates: React.FC = () => {
     return (
         <SectionLayout>
-            <SectionTitle title="Список шаблонов"/>
+            <SectionTitle title="Список шаблонов" />
             <CenteredSectionItem>
                 <Grid container justify="center" alignContent="center" direction="column">
                     <Grid item css={theme => ({ marginBottom: theme.spacing(3) })}>
@@ -35,8 +35,11 @@ export const Templates: React.FC = () => {
                                 <CustomButton
                                     component={Link}
                                     to="/templates/create"
-                                    icon={<AddIcon/>}
+                                    icon={<AddIcon />}
                                     title={"Создать шаблон"}
+                                    css={theme => ({
+                                        width: 180,
+                                    })}
                                 />
                             </Grid>
                         </Grid>

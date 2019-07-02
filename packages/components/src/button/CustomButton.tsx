@@ -18,13 +18,13 @@ export interface ICustomButtonProps {
 }
 
 export const CustomButton: React.FC<ICustomButtonProps> = ({
-                                                                             title = "",
-                                                                             icon = "",
-                                                                             buttonColor = "blue",
-                                                                             onlyIcon = false,
-                                                                             sizeIcon = 24,
-                                                                             ...rest
-                                                                         }) => {
+    title = "",
+    icon = "",
+    buttonColor = "blue",
+    onlyIcon = false,
+    sizeIcon = 24,
+    ...rest
+}) => {
     const buttons = {
         main: {
             transaction: "0.25s",
@@ -106,8 +106,8 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
                 css={{
                     position: "absolute",
                     top: onlyIcon ? -1 : 7,
-                    left: onlyIcon ? -1 : 12,
-                    "svg": {
+                    left: onlyIcon ? -1 : 10,
+                    svg: {
                         width: sizeIcon,
                         height: sizeIcon,
                     },
@@ -115,7 +115,14 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
             >
                 {icon}
             </div>
-            <span>{title}</span>
+            <span
+                css={{
+                    fontSize: 14,
+                    lineHeight: "15px",
+                }}
+            >
+                {title}
+            </span>
         </Button>
     );
 };
