@@ -9,6 +9,8 @@
         "build:frontend": "lerna run --scope @magnit/frontend build --stream",
         "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
         "deploy:frontend": "yarn build:frontend && gh-pages -d packages/frontend/build -b release/frontend",
+        "watch:lib": "lerna run watch:lib --stream",
+        "build:lib": "lerna run build:lib --stream",
         "commit": "git-cz"
     },
     "devDependencies": {

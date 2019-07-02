@@ -7,4 +7,5 @@ yarn-error.log
 
 dist/
 build/
-/package-lock.json
+
+package-lock.json

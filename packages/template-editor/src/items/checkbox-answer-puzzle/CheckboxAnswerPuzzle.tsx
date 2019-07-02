@@ -101,7 +101,15 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                             })}
                         />
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                    <Grid
+                        item
+                        xs
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}

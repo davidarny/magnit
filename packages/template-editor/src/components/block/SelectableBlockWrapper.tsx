@@ -2,20 +2,17 @@
 
 import * as React from "react";
 import { jsx } from "@emotion/core";
-import Paper, { PaperProps } from "@material-ui/core/Paper";
+import { Paper } from "@material-ui/core";
 import { CSSProperties } from "react";
 
-export interface ISelectableBlockWrapperProps extends PaperProps {
+export interface ISelectableBlockWrapperProps {
     focused?: boolean;
     styles?: (theme: any) => CSSProperties;
 }
 
-export const SelectableBlockWrapper: React.FC<ISelectableBlockWrapperProps> = ({
-    children,
-    focused = false,
-    styles = () => {},
-    ...rest
-}) => {
+export const SelectableBlockWrapper: React.FC<
+    ISelectableBlockWrapperProps & React.ComponentProps<typeof Paper>
+> = ({ children, focused = false, styles = () => {}, ...rest }) => {
     return (
         <Paper
             css={theme => ({

@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { ITemplate } from "../../entities";
 import { InputField } from "../fields";
-import Grid from "@material-ui/core/Grid";
+import { Grid } from "@material-ui/core";
 import * as React from "react";
 
 interface IContentSectionProps {

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -78,11 +78,22 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
         <React.Fragment>
             <Grid container alignItems="flex-end" spacing={2}>
                 <Grid item>
-                    <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                    <Typography
+                        css={theme => ({
+                            fontSize: theme.fontSize.medium,
+                            marginBottom: theme.spacing(0.25),
+                        })}
+                    >
                         {props.index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs style={{ paddingLeft: 0 }}>
+                <Grid
+                    item
+                    xs
+                    css={css`
+                        padding-left: 0;
+                    `}
+                >
                     <InputField fullWidth placeholder={label} onChange={onLabelChange} />
                 </Grid>
                 <Grid item>
@@ -97,11 +108,24 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
             {props.addDropdownButton && props.questionFocused && (
                 <Grid container alignItems="flex-end" spacing={2}>
                     <Grid item>
-                        <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                        <Typography
+                            css={theme => ({
+                                fontSize: theme.fontSize.medium,
+                                marginBottom: theme.spacing(0.25),
+                            })}
+                        >
                             {props.index + 2}.
                         </Typography>
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                    <Grid
+                        item
+                        xs
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}

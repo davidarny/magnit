@@ -18,8 +18,6 @@ interface IContentGroupProps {
     onFocus(id: string): void;
 
     onBlur(event: React.SyntheticEvent): void;
-
-    onMouseDown?(): void;
 }
 
 export const ContentGroup: React.FC<IContentGroupProps> = ({
@@ -63,6 +61,8 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                     parentItem={parentItem}
                     index={props.index}
                     active={focused}
+                    onFocus={onFocus}
+                    onBlur={props.onBlur}
                 />
                 {item.puzzles.map((puzzle, index) => {
                     if (puzzle.puzzleType === EPuzzleType.QUESTION) {
@@ -83,6 +83,8 @@ export const ContentGroup: React.FC<IContentGroupProps> = ({
                             item={puzzle}
                             index={index}
                             active={focused}
+                            onFocus={onFocus}
+                            onBlur={props.onBlur}
                             key={puzzle.id}
                             parentItem={item}
                         />

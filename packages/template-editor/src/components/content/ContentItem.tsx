@@ -12,7 +12,9 @@ interface IContentItem {
     index: number;
     active?: boolean;
 
-    onMouseDown?(): void;
+    onFocus(): void;
+
+    onBlur(event: React.SyntheticEvent): void;
 }
 
 export const ContentItem: React.FC<IContentItem> = ({ item, parentItem, ...props }) => {
@@ -23,5 +25,14 @@ export const ContentItem: React.FC<IContentItem> = ({ item, parentItem, ...props
         index: props.index,
         parentItem,
     });
-    return <PuzzleWrapper>{view}</PuzzleWrapper>;
+    return (
+        <PuzzleWrapper
+            id={item.id}
+            onFocus={props.onFocus}
+            onMouseDown={props.onFocus}
+            onBlur={props.onBlur}
+        >
+            {view}
+        </PuzzleWrapper>
+    );
 };

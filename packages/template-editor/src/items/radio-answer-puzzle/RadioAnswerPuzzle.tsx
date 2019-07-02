@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -102,7 +102,15 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                             })}
                         />
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0, paddingRight: 32 }}>
+                    <Grid
+                        item
+                        xs
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                            paddingRight: theme.spacing(4),
+                        })}
+                    >
                         <InputField
                             disabled
                             fullWidth
