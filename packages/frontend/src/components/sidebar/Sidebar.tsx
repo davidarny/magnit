@@ -23,7 +23,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
             }}
         >
             <div
-                css={{
+                style={{
                     boxShadow: "none",
                     width: 88,
                 }}
@@ -93,6 +93,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                         css={theme => ({
                                             display: "block",
                                             position: "absolute",
+                                            transition: "0.25s",
                                             top: -3,
                                             left: 0,
                                             width: 3,
@@ -104,7 +105,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                                 ? "1px 0 rgba(47, 151, 255, 0.4)"
                                                 : "none",
                                         })}
-                                    ></Grid>
+                                    />
                                     <Grid
                                         item
                                         css={css`

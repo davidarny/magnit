@@ -5,17 +5,13 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
-    FormControl,
     FormControlLabel,
     Grid,
-    Input,
-    InputLabel,
+    IconButton,
     MenuItem,
     Radio,
     RadioGroup,
-    Select,
     Typography,
-    IconButton,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
 import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
@@ -23,7 +19,7 @@ import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
-import { InputField, CustomButton } from "@magnit/components";
+import { CustomButton, InputField, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 
 interface IConditionsProps {
@@ -64,7 +60,7 @@ export const Conditions: React.FC<IConditionsProps> = ({
             conditions.forEach((condition, index, array) => {
                 let hasDependentQuestionChanged = false;
                 const dependentQuestion = questions.find(
-                    question => question.id === condition.questionPuzzle,
+                    question => question.id === condition.questionPuzzle
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
@@ -250,7 +246,7 @@ export const Conditions: React.FC<IConditionsProps> = ({
                     // const getAnswerPuzzleType = R.prop("puzzleType");
                     const questionAnswers = answers.filter(answer => {
                         const question = questions.find(
-                            question => question.id === condition.questionPuzzle,
+                            question => question.id === condition.questionPuzzle
                         );
                         if (!question) {
                             return false;
@@ -287,13 +283,33 @@ export const Conditions: React.FC<IConditionsProps> = ({
                                         >
                                             <FormControlLabel
                                                 value={EConditionType.AND}
-                                                control={<Radio color="primary" />}
+                                                control={
+                                                    <Radio
+                                                        css={theme => ({
+                                                            color: `${theme.colors.blue} !important`,
+                                                            ":hover": {
+                                                                backgroundColor:
+                                                                    "#2f97ff14 !important",
+                                                            },
+                                                        })}
+                                                    />
+                                                }
                                                 label="И"
                                                 labelPlacement="end"
                                             />
                                             <FormControlLabel
                                                 value={EConditionType.OR}
-                                                control={<Radio color="primary" />}
+                                                control={
+                                                    <Radio
+                                                        css={theme => ({
+                                                            color: `${theme.colors.blue} !important`,
+                                                            ":hover": {
+                                                                backgroundColor:
+                                                                    "#2f97ff14 !important",
+                                                            },
+                                                        })}
+                                                    />
+                                                }
                                                 label="Или"
                                                 labelPlacement="end"
                                             />
@@ -303,48 +319,42 @@ export const Conditions: React.FC<IConditionsProps> = ({
                             </Grid>
                             {isFirstRow && (
                                 <Grid item xs={4}>
-                                    <FormControl fullWidth>
-                                        <InputLabel htmlFor="question-puzzle">
-                                            Выберите вопрос
-                                        </InputLabel>
-                                        <Select
-                                            value={condition.questionPuzzle || ETerminals.EMPTY}
-                                            input={<Input id="question-puzzle" />}
-                                            onChange={onQuestionPuzzleChange}
-                                        >
-                                            {questions.length === 0 && (
-                                                <MenuItem>Нет доступных вариантов</MenuItem>
-                                            )}
-                                            {questions.map(questionToChoseFrom => {
-                                                return (
-                                                    <MenuItem
-                                                        key={questionToChoseFrom.id}
-                                                        value={questionToChoseFrom.id}
-                                                    >
-                                                        {questionToChoseFrom.title}
-                                                    </MenuItem>
-                                                );
-                                            })}
-                                        </Select>
-                                    </FormControl>
+                                    <SelectField
+                                        id={"question-puzzle"}
+                                        fullWidth={true}
+                                        value={condition.questionPuzzle || ETerminals.EMPTY}
+                                        onChange={onQuestionPuzzleChange}
+                                        placeholder={"Выберите вопрос"}
+                                    >
+                                        {questions.length === 0 && (
+                                            <MenuItem>Нет доступных вариантов</MenuItem>
+                                        )}
+                                        {questions.map(questionToChoseFrom => {
+                                            return (
+                                                <MenuItem
+                                                    key={questionToChoseFrom.id}
+                                                    value={questionToChoseFrom.id}
+                                                >
+                                                    {questionToChoseFrom.title}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </SelectField>
                                 </Grid>
                             )}
 
                             <React.Fragment>
                                 <Grid item xs={3}>
                                     {!!condition.questionPuzzle && (
-                                        <FormControl fullWidth>
-                                            <InputLabel htmlFor="action-type">
-                                                Выберите значение
-                                            </InputLabel>
-                                            <Select
-                                                value={condition.actionType || ETerminals.EMPTY}
-                                                input={<Input id="action-type" />}
-                                                onChange={onActionTypeChange}
-                                            >
-                                                {getActionVariants(questionAnswersHead.puzzleType)}
-                                            </Select>
-                                        </FormControl>
+                                        <SelectField
+                                            id={"action-type"}
+                                            fullWidth={true}
+                                            value={condition.actionType || ETerminals.EMPTY}
+                                            onChange={onActionTypeChange}
+                                            placeholder={"Выберите значение"}
+                                        >
+                                            {getActionVariants(questionAnswersHead.puzzleType)}
+                                        </SelectField>
                                     )}
                                 </Grid>
                                 <Grid item xs={2}>
@@ -352,7 +362,7 @@ export const Conditions: React.FC<IConditionsProps> = ({
                                         getAnswerPuzzle(condition, answers, questions)(
                                             condition.actionType === EActionType.CHOSEN_ANSWER
                                                 ? onAnswerPuzzleChange
-                                                : onValueChange,
+                                                : onValueChange
                                         )}
                                 </Grid>
                             </React.Fragment>
@@ -375,10 +385,11 @@ export const Conditions: React.FC<IConditionsProps> = ({
                             color="primary"
                             onClick={onAddCondition}
                             title={"Добавить внутреннее условие"}
-                            icon={<AddIcon isActive={true}/>}
+                            icon={<AddIcon isActive={true} />}
                             buttonColor={"blueWithout"}
-                            css={(theme) => ({
+                            css={theme => ({
                                 width: 290,
+                                marginLeft: 4,
                             })}
                         />
                     </Grid>
@@ -433,7 +444,7 @@ function getActionVariants(puzzleType: EPuzzleType): React.ReactNode {
 function getAnswerPuzzle(
     condition: ICondition,
     answers: IPuzzle[],
-    questions: IPuzzle[],
+    questions: IPuzzle[]
 ):
     | ((onValueChange: (event: TChangeEvent) => void) => React.ReactNode)
     | (() => React.ReactNode)
@@ -442,41 +453,40 @@ function getAnswerPuzzle(
         case EActionType.CHOSEN_ANSWER:
             return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
                 return (
-                    <FormControl fullWidth>
-                        <InputLabel htmlFor="answer-puzzle">Выберите ответ</InputLabel>
-                        <Select
-                            onChange={onAnswerPuzzleChange}
-                            value={condition.answerPuzzle || ETerminals.EMPTY}
-                            input={<Input id="answer-puzzle" />}
-                        >
-                            {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
-                            {answers.length !== 0 &&
-                                answers
-                                    .filter(answer => {
-                                        // find which question references to current condition
-                                        const currentQuestion = questions.find(
-                                            question => condition.questionPuzzle === question.id,
-                                        );
-                                        if (!currentQuestion) {
-                                            return false;
-                                        }
-                                        // check if current answer is referenced to found question
-                                        // if true then this answer is transition-referenced
-                                        // to current condition
-                                        // condition -> question -> answer ~ condition -> answer
-                                        return currentQuestion.puzzles.some(
-                                            puzzle => puzzle.id === answer.id,
-                                        );
-                                    })
-                                    .map(answer => {
-                                        return (
-                                            <MenuItem key={answer.id} value={answer.id}>
-                                                {answer.title}
-                                            </MenuItem>
-                                        );
-                                    })}
-                        </Select>
-                    </FormControl>
+                    <SelectField
+                        id={"answer-puzzle"}
+                        fullWidth={true}
+                        value={condition.answerPuzzle || ETerminals.EMPTY}
+                        onChange={onAnswerPuzzleChange}
+                        placeholder={"Выберите ответ"}
+                    >
+                        {answers.length === 0 && <MenuItem>Нет доступных вариантов</MenuItem>}
+                        {answers.length !== 0 &&
+                            answers
+                                .filter(answer => {
+                                    // find which question references to current condition
+                                    const currentQuestion = questions.find(
+                                        question => condition.questionPuzzle === question.id
+                                    );
+                                    if (!currentQuestion) {
+                                        return false;
+                                    }
+                                    // check if current answer is referenced to found question
+                                    // if true then this answer is transition-referenced
+                                    // to current condition
+                                    // condition -> question -> answer ~ condition -> answer
+                                    return currentQuestion.puzzles.some(
+                                        puzzle => puzzle.id === answer.id
+                                    );
+                                })
+                                .map(answer => {
+                                    return (
+                                        <MenuItem key={answer.id} value={answer.id}>
+                                            {answer.title}
+                                        </MenuItem>
+                                    );
+                                })}
+                    </SelectField>
                 );
             };
         case EActionType.EQUAL:

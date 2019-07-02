@@ -59,13 +59,13 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             <Grid
                 container
                 alignItems="center"
-                css={(theme) => ({
+                css={theme => ({
                     marginTop: "8px !important",
                     marginBottom: "8px !important",
                 })}
             >
                 <Grid item>
-                    <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
+                    <Radio css={theme => ({ marginLeft: `-${theme.spacing()}` })} disabled />
                 </Grid>
                 <Grid item>
                     <Typography variant="body1">{label}</Typography>
@@ -80,7 +80,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={(theme) => ({
+                css={theme => ({
                     marginTop: "-8px !important",
                 })}
             >
@@ -110,7 +110,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     container
                     alignItems="flex-end"
                     spacing={2}
-                    css={(theme) => ({
+                    css={theme => ({
                         marginTop: "-16px !important",
                         marginBottom: "8px !important",
                     })}

@@ -118,7 +118,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     container
                     alignItems="flex-end"
                     spacing={2}
-                    css={(theme) => ({
+                    css={theme => ({
                         marginTop: "8px !important",
                         marginBottom: "8px !important",
                     })}
@@ -140,7 +140,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                         <SelectField
                             id={"question-puzzle-type"}
                             fullWidth={true}
-                            value={answersType}
+                            value={answersType || ETerminals.EMPTY}
                             onChange={onAnswerTypeChange}
                         >
                             {answerTypes.map(({ label, type }, index) => (
