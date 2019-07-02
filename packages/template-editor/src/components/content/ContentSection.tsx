@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
-import { ITemplate } from "../../entities";
-import { InputField } from "../fields";
-import { Grid } from "@material-ui/core";
 import * as React from "react";
+import { jsx } from "@emotion/core";
+import { ITemplate } from "entities";
+import { InputField } from "components/fields";
+import { Grid } from "@material-ui/core";
 
 interface IContentSectionProps {
     template: ITemplate;

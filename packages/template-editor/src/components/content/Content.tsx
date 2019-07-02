@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { jsx } from "@emotion/core";
-import { IPuzzle } from "../../entities";
+import { IPuzzle } from "entities";
 import { ContentGroup } from "./ContentGroup";
 
 interface IContentProps {

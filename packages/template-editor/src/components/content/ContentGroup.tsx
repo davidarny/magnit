@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { SelectableBlockWrapper } from "../block";
+import { SelectableBlockWrapper } from "components/block";
 import { jsx } from "@emotion/core";
-import { IPuzzle } from "../../entities";
-import { EPuzzleType } from "../puzzle";
+import { IPuzzle } from "entities";
+import { EPuzzleType } from "components/puzzle";
 import { ContentItem } from "./ContentItem";
 import { ContentConditions } from "./ContentConditions";
 
@@ -20,13 +20,9 @@ interface IContentGroupProps {
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ContentGroup: React.FC<IContentGroupProps> = ({
-    isFocused,
-    item,
-    children,
-    parentItem,
-    ...props
-}) => {
+export const ContentGroup: React.FC<IContentGroupProps> = props => {
+    const { isFocused, item, parentItem } = props;
+
     function onFocus(): void {
         props.onFocus(item.id);
     }

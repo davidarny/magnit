@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
-import { PuzzleWrapper } from "../puzzle/PuzzleWrapper";
 import * as React from "react";
-import { IPuzzle } from "../../entities";
-import { getFactory } from "../../services/item";
+import { jsx } from "@emotion/core";
+import { PuzzleWrapper } from "components/puzzle";
+import { IPuzzle } from "entities";
+import { getFactory } from "services/item";
 
 interface IContentItem {
     item: IPuzzle;

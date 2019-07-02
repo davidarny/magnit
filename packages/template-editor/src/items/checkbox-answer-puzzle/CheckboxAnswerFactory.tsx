@@ -1,13 +1,13 @@
 /** @jsx jsx */
 
-import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
-import { ReactNode } from "react";
-import { EditorContext, IEditorContext } from "../../TemplateEditor";
-import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
+import * as React from "react";
 import { jsx } from "@emotion/core";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
+import { EditorContext, IEditorContext } from "TemplateEditor";
+import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): ReactNode {
+    createItem({ item, parentItem, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (

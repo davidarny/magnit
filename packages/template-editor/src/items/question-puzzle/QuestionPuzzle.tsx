@@ -9,7 +9,7 @@ import { jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
-import { InputField } from "../../components/fields";
+import { InputField } from "components/fields";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;

@@ -1,19 +1,13 @@
 /** @jsx jsx */
 
-import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
-import { ReactNode } from "react";
 import { jsx } from "@emotion/core";
+import * as React from "react";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { GroupPuzzle } from "./GroupPuzzle";
-import { EditorContext, IEditorContext } from "../../TemplateEditor";
+import { EditorContext } from "TemplateEditor";
 
 export class GroupFactory implements IPuzzleFactory {
-    createItem({ item, ...rest }: IPuzzleFactoryProps): ReactNode {
-        return (
-            <EditorContext.Consumer>
-                {({ template, onTemplateChange }: IEditorContext) => (
-                    <GroupPuzzle {...rest} {...{ template, onTemplateChange, id: item.id }} />
-                )}
-            </EditorContext.Consumer>
-        );
+    createItem({ item, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+        return <EditorContext.Consumer>{() => <GroupPuzzle />}</EditorContext.Consumer>;
     }
 }

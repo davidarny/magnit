@@ -1,11 +1,10 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { Fragment } from "react";
 import { ISpecificPuzzleProps } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { InputField } from "../../components/fields";
+import { InputField } from "components/fields";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     title: string;
@@ -19,7 +18,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
     children,
 }) => {
     return (
-        <Fragment>
+        <React.Fragment>
             <Grid
                 container
                 alignItems="flex-end"
@@ -60,6 +59,6 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
             <Grid container direction="column">
                 {children}
             </Grid>
-        </Fragment>
+        </React.Fragment>
     );
 };

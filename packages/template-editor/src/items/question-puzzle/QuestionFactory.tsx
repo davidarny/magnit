@@ -1,13 +1,13 @@
 /** @jsx jsx */
 
-import { QuestionPuzzle } from "./QuestionPuzzle";
+import * as React from "react";
 import { jsx } from "@emotion/core";
-import { IPuzzleFactory, IPuzzleFactoryProps } from "../../services/item";
+import { QuestionPuzzle } from "./QuestionPuzzle";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { EditorContext, IEditorContext } from "index";
-import { ReactNode } from "react";
 
 export class QuestionFactory implements IPuzzleFactory {
-    createItem({ item, ...rest }: IPuzzleFactoryProps): ReactNode {
+    createItem({ item, ...rest }: IPuzzleFactoryProps): React.ReactNode {
         return (
             <EditorContext.Consumer>
                 {({ template, onTemplateChange }: IEditorContext) => (

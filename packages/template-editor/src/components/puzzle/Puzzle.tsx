@@ -6,7 +6,7 @@ import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "./PuzzleWrapper";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "./EPuzzleType";
-import { SelectableBlockWrapper } from "../block";
+import { SelectableBlockWrapper } from "components/block";
 
 export interface ICommonComponentProps {
     index: number;
