@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { jsx } from "@emotion/core";
 import { Grid } from "@material-ui/core";
+import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps } from "entities";
-import { InputField } from "components/fields";
+import { InputField } from "@magnit/components";
 
 export const NumericAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocused }) => {
     return (
@@ -17,7 +17,18 @@ export const NumericAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFoc
             })}
         >
             <Grid item xs={12}>
-                <InputField disabled type="number" fullWidth placeholder="Ответ" />
+                <InputField
+                    disabled
+                    type="number"
+                    fullWidth
+                    placeholder="Ответ"
+                    css={theme => ({
+                        "input::-webkit-inner-spin-button, input::-webkit-outer-spin-button": {
+                            margin: 0,
+                            display: "none",
+                        },
+                    })}
+                />
             </Grid>
         </Grid>
     );

@@ -42,6 +42,7 @@ const theme = {
         red: "#FF6A89",
         violet: "#8F7EE5",
         yellow: "#FFF5BE",
+        white: "#FFFFFF",
     },
 
     boxShadow: {

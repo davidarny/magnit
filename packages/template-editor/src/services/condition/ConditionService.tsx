@@ -9,7 +9,8 @@ import {
 } from "./IConditionsService";
 import { EPuzzleType } from "components/puzzle";
 import { EActionType, EConditionType, ETerminals, IPuzzle, TChangeEvent } from "entities";
-import { FormControl, Input, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
+import { FormControl, Input, InputLabel, MenuItem } from "@material-ui/core";
+import { InputField, SelectField } from "@magnit/components";
 
 export class ConditionService implements IConditionsService {
     constructor(private readonly options: IConditionsServiceOptions) {}
@@ -76,7 +77,7 @@ export class ConditionService implements IConditionsService {
                     return (
                         <FormControl fullWidth>
                             <InputLabel htmlFor="answer-puzzle">Выберите ответ</InputLabel>
-                            <Select
+                            <SelectField
                                 onChange={onAnswerPuzzleChange}
                                 value={condition.answerPuzzle || ETerminals.EMPTY}
                                 input={<Input id="answer-puzzle" />}
@@ -109,7 +110,7 @@ export class ConditionService implements IConditionsService {
                                                 </MenuItem>
                                             );
                                         })}
-                            </Select>
+                            </SelectField>
                         </FormControl>
                     );
                 };
@@ -119,7 +120,7 @@ export class ConditionService implements IConditionsService {
             case EActionType.NOT_EQUAL:
                 return (onValueChange: (event: TChangeEvent) => void) => {
                     return (
-                        <TextField
+                        <InputField
                             value={condition.value}
                             onChange={onValueChange}
                             css={theme => ({ marginTop: theme.spacing(-2) })}

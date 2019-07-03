@@ -3,7 +3,7 @@
 import * as React from "react";
 import { jsx } from "@emotion/core";
 import { ITemplate } from "entities";
-import { InputField } from "components/fields";
+import { InputField } from "@magnit/components";
 import { Grid } from "@material-ui/core";
 
 interface IContentSectionProps {
@@ -39,7 +39,8 @@ export const ContentSection: React.FC<IContentSectionProps> = ({ children, templ
                 css={theme => ({
                     paddingLeft: theme.spacing(4),
                     paddingRight: theme.spacing(4),
-                    paddingBottom: theme.spacing(2),
+                    paddingBottom: theme.spacing(4),
+                    paddingTop: theme.spacing(2),
                 })}
             >
                 <InputField

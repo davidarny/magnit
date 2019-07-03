@@ -4,12 +4,12 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { ETerminals, IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
-import { FormControl, Grid, Input, MenuItem, Select, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
-import { InputField } from "components/fields";
+import { InputField, SelectField } from "@magnit/components";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -114,7 +114,15 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
     return (
         <Grid container direction="column">
             <Grid item xs={12}>
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={theme => ({
+                        marginTop: `${theme.spacing()} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
+                    })}
+                >
                     <Grid item>
                         <Typography
                             css={theme => ({
@@ -134,19 +142,18 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                         />
                     </Grid>
                     <Grid item xs={3}>
-                        <FormControl fullWidth>
-                            <Select
-                                value={answersType}
-                                input={<Input id="question-puzzle-type" />}
-                                onChange={onAnswerTypeChange}
-                            >
-                                {answerTypes.map(({ label, type }, index) => (
-                                    <MenuItem value={type} key={index}>
-                                        {label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        <SelectField
+                            id={"question-puzzle-type"}
+                            fullWidth={true}
+                            value={answersType || ETerminals.EMPTY}
+                            onChange={onAnswerTypeChange}
+                        >
+                            {answerTypes.map(({ label, type }, index) => (
+                                <MenuItem value={type} key={index}>
+                                    {label}
+                                </MenuItem>
+                            ))}
+                        </SelectField>
                     </Grid>
                 </Grid>
             </Grid>

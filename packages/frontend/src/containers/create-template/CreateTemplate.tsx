@@ -5,23 +5,22 @@ import * as React from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
-import { Check as CheckIcon } from "@material-ui/icons";
 import { TemplateEditor } from "@magnit/template-editor";
+import { CustomButton } from "@magnit/components";
 import template from "./template";
-import { Button } from "components/button";
+import { CheckIcon } from "@magnit/icons";
 
 export const CreateTemplate: React.FC = () => {
     return (
         <SectionLayout>
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button>
-                        <CheckIcon
-                            css={theme => ({ marginRight: theme.spacing() })}
-                            alignmentBaseline="middle"
-                        />
-                        <span>Сохранить</span>
-                    </Button>
+                    <CustomButton
+                        variant="contained"
+                        title="Сохранить"
+                        variants="blue"
+                        icon={<CheckIcon />}
+                    />
                 </Grid>
             </SectionTitle>
             <Grid
