@@ -8,12 +8,15 @@ import {
     TGetAnswerPuzzleResult,
 } from "./IConditionsService";
 import { EPuzzleType } from "components/puzzle";
-import { EActionType, EConditionType, ETerminals, IPuzzle, TChangeEvent } from "entities";
-import { FormControl, Input, InputLabel, MenuItem } from "@material-ui/core";
+import { EActionType, ETerminals, IPuzzle, TChangeEvent } from "entities";
+import { FormControl, MenuItem } from "@material-ui/core";
 import { InputField, SelectField } from "@magnit/components";
+import { ServiceImpl } from "./ServiceImpl";
 
-export class ConditionService implements IConditionsService {
-    constructor(private readonly options: IConditionsServiceOptions) {}
+export class ConditionService extends ServiceImpl implements IConditionsService {
+    constructor(protected readonly options: IConditionsServiceOptions) {
+        super({ conditionType: options.condition.conditionType, ...options });
+    }
 
     private static getActionLiteral(actionType: EActionType): string {
         return {
@@ -75,43 +78,38 @@ export class ConditionService implements IConditionsService {
             case EActionType.CHOSEN_ANSWER:
                 return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
                     return (
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="answer-puzzle">Выберите ответ</InputLabel>
-                            <SelectField
-                                onChange={onAnswerPuzzleChange}
-                                value={condition.answerPuzzle || ETerminals.EMPTY}
-                                input={<Input id="answer-puzzle" />}
-                            >
-                                {answers.length === 0 && (
-                                    <MenuItem>Нет доступных вариантов</MenuItem>
-                                )}
-                                {answers.length !== 0 &&
-                                    answers
-                                        .filter(answer => {
-                                            // find which question references to current condition
-                                            const currentQuestion = questions.find(
-                                                question => condition.questionPuzzle === question.id
-                                            );
-                                            if (!currentQuestion) {
-                                                return false;
-                                            }
-                                            // check if current answer is referenced to found question
-                                            // if true then this answer is transition-referenced
-                                            // to current condition
-                                            // condition -> question -> answer ~ condition -> answer
-                                            return currentQuestion.puzzles.some(
-                                                puzzle => puzzle.id === answer.id
-                                            );
-                                        })
-                                        .map(answer => {
-                                            return (
-                                                <MenuItem key={answer.id} value={answer.id}>
-                                                    {answer.title}
-                                                </MenuItem>
-                                            );
-                                        })}
-                            </SelectField>
-                        </FormControl>
+                        <SelectField
+                            fullWidth
+                            placeholder="Выберите ответ"
+                            onChange={onAnswerPuzzleChange}
+                            value={condition.answerPuzzle || ETerminals.EMPTY}
+                        >
+                            {answers.length !== 0 &&
+                                answers
+                                    .filter(answer => {
+                                        // find which question references to current condition
+                                        const currentQuestion = questions.find(
+                                            question => condition.questionPuzzle === question.id
+                                        );
+                                        if (!currentQuestion) {
+                                            return false;
+                                        }
+                                        // check if current answer is referenced to found question
+                                        // if true then this answer is transition-referenced
+                                        // to current condition
+                                        // condition -> question -> answer ~ condition -> answer
+                                        return currentQuestion.puzzles.some(
+                                            puzzle => puzzle.id === answer.id
+                                        );
+                                    })
+                                    .map(answer => {
+                                        return (
+                                            <MenuItem key={answer.id} value={answer.id}>
+                                                {answer.title}
+                                            </MenuItem>
+                                        );
+                                    })}
+                        </SelectField>
                     );
                 };
             case EActionType.EQUAL:
@@ -121,10 +119,11 @@ export class ConditionService implements IConditionsService {
                 return (onValueChange: (event: TChangeEvent) => void) => {
                     return (
                         <InputField
+                            fullWidth
                             value={condition.value}
                             onChange={onValueChange}
                             css={theme => ({ marginTop: theme.spacing(-2) })}
-                            label="Ответ"
+                            placeholder="Ответ"
                         />
                     );
                 };
@@ -132,15 +131,5 @@ export class ConditionService implements IConditionsService {
             default:
                 return () => <React.Fragment />;
         }
-    }
-
-    getConditionLiteral(): string {
-        if (this.options.index === 0) {
-            return "Если";
-        }
-        return {
-            [EConditionType.AND]: "И",
-            [EConditionType.OR]: "Или",
-        }[this.options.condition.conditionType];
     }
 }

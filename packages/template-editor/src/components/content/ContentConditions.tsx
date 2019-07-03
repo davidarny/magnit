@@ -3,7 +3,7 @@
 import * as React from "react";
 import { css, jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "TemplateEditor";
-import { Conditions } from "components/conditions";
+import { Conditions, Validations } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
 import { Grid, Tab, Tabs } from "@material-ui/core";
 import { useState } from "react";
@@ -109,7 +109,18 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                             })}
                         >
                             {tab === 0 && (
-                                <Conditions {...{ puzzleId, onTemplateChange, template }} />
+                                <Conditions
+                                    puzzleId={puzzleId}
+                                    onTemplateChange={onTemplateChange}
+                                    template={template}
+                                />
+                            )}
+                            {tab === 1 && (
+                                <Validations
+                                    puzzleId={puzzleId}
+                                    onTemplateChange={onTemplateChange}
+                                    template={template}
+                                />
                             )}
                         </Grid>
                     </Grid>

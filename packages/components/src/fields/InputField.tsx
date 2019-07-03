@@ -16,16 +16,14 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
             placeholder={placeholder}
             defaultValue={defaultValue}
             css={theme => ({
-                minHeight: theme.spacing(6),
-                height: "100%",
+                height: theme.spacing(6),
                 input: {
                     position: "absolute",
                     bottom: 0,
-                    fontFamily: "Roboto",
                     color: theme.colors.black,
                 },
                 div: {
-                    minHeight: theme.spacing(6),
+                    height: theme.spacing(6),
                     ":before": {
                         borderBottom: isSimpleMode
                             ? "none !important"

@@ -35,18 +35,19 @@ interface IWithDescription {
 
 export interface ICondition extends IOrdered, IWithId {
     questionPuzzle: IPuzzle["id"];
-    answerPuzzle: IPuzzle["id"];
-    value: string;
+    answerPuzzle?: IPuzzle["id"];
+    value?: string;
     actionType: EActionType;
     conditionType: EConditionType;
 }
 
-interface IValidation extends IOrdered {
+export interface IValidation extends IOrdered, IWithId {
     leftHandPuzzle: IPuzzle["id"];
     rightHandPuzzle?: IPuzzle["id"];
     value?: number;
     operatorType: EOperatorType;
     validationType: EValidationType;
+    conditionType: EConditionType;
     errorMessage: string;
 }
 

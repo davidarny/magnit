@@ -5,7 +5,7 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { ETerminals, IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
@@ -98,9 +98,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     <Typography variant="body1">
                         <Typography
                             component="span"
-                            css={theme => ({
-                                paddingRight: theme.spacing(),
-                            })}
+                            css={theme => ({ paddingRight: theme.spacing() })}
                         >
                             {props.index + 1}.
                         </Typography>
@@ -133,7 +131,13 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                             {props.index + 1}.
                         </Typography>
                     </Grid>
-                    <Grid item xs style={{ paddingLeft: 0 }}>
+                    <Grid
+                        item
+                        xs
+                        css={css`
+                            padding-left: 0;
+                        `}
+                    >
                         <InputField
                             fullWidth
                             placeholder="Название вопроса"

@@ -14,16 +14,24 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
+import {
+    EConditionType,
+    EOperatorType,
+    ETerminals,
+    EValidationType,
+    IPuzzle,
+    ITemplate,
+    IValidation,
+} from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
-import { CustomButton, SelectField } from "@magnit/components";
+import { CustomButton, InputField, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { getConditionService } from "services/condition";
+import { getValidationService } from "services/condition";
 
-interface IConditionsProps {
+interface IValidationsProps {
     puzzleId: string;
     template: ITemplate;
 
@@ -32,21 +40,20 @@ interface IConditionsProps {
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export const Conditions: React.FC<IConditionsProps> = props => {
+export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template } = props;
-    const [conditions, setConditions] = useState<ICondition[]>([
+    const [validations, setValidations] = useState<IValidation[]>([
         {
             id: uuid(),
             order: 0,
-            questionPuzzle: ETerminals.EMPTY,
-            answerPuzzle: ETerminals.EMPTY,
-            value: ETerminals.EMPTY,
-            actionType: EActionType.NONE,
+            leftHandPuzzle: ETerminals.EMPTY,
+            errorMessage: ETerminals.EMPTY,
+            operatorType: EOperatorType.NONE,
+            validationType: EValidationType.NONE,
             conditionType: EConditionType.OR,
         },
     ]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
-    const [answers, setAnswers] = useState<IPuzzle[]>([]);
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const isParentPuzzleGroup = useRef(false);
 
@@ -72,10 +79,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         // track if template is changed
         // outside of this component
         if (!_.isEqual(template, templateSnapshot.current)) {
-            conditions.forEach((condition, index, array) => {
+            validations.forEach((validation, index, array) => {
                 let hasDependentQuestionChanged = false;
                 const dependentQuestion = questions.find(
-                    question => question.id === condition.questionPuzzle
+                    question => question.id === validation.rightHandPuzzle
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
@@ -95,10 +102,11 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         hasDependentQuestionChanged = !_.isEqual(dependentQuestion, puzzle);
                     });
                     if (hasDependentQuestionChanged) {
-                        condition.answerPuzzle = ETerminals.EMPTY;
-                        condition.value = ETerminals.EMPTY;
-                        condition.actionType = EActionType.NONE;
-                        array[index] = { ...condition };
+                        validation.rightHandPuzzle = undefined;
+                        validation.value = undefined;
+                        validation.operatorType = EOperatorType.NONE;
+                        validation.validationType = EValidationType.NONE;
+                        array[index] = { ...validation };
                     }
                 }
             });
@@ -106,8 +114,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
-        answers.length = 0;
-        traverse(template, (value: any) => {
+        traverse(template, (value: any, parent: any) => {
+            if (value === null) {
+                console.log("%c%s", "color:" + "#006DFF", "", value, parent);
+            }
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
             }
@@ -142,26 +152,13 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         !isGroupParent
                     ) {
                         questions.push(puzzle);
-                        return;
-                    }
-                    // if puzzle is one of answers types
-                    // then it's allowed to be selected as an answerPuzzle
-                    const excludedPuzzleTypes = [
-                        EPuzzleType.GROUP,
-                        EPuzzleType.QUESTION,
-                        EPuzzleType.UPLOAD_FILES,
-                    ];
-                    if (!excludedPuzzleTypes.includes(puzzle.puzzleType)) {
-                        answers.push(puzzle);
-                        return;
                     }
                 });
             });
-            // set conditions of current puzzle
-            puzzle.puzzles[index].conditions = [...conditions];
+            // set validations of current puzzle
+            puzzle.puzzles[index].validations = [...validations];
         });
         setQuestions(_.cloneDeep(questions));
-        setAnswers(_.cloneDeep(answers));
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
         if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
@@ -170,40 +167,44 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         }
         templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(templateSnapshot.current);
-    }, [conditions, template]);
+    }, [validations, template]);
 
-    function onConditionDelete(id: string) {
-        // do not allow to delete if only one condition present
-        if (conditions.length === 1) {
+    function onDeleteValidation(id: string) {
+        // do not allow to delete if only one validation present
+        if (validations.length === 1) {
             return;
         }
-        setConditions([...conditions.filter(condition => condition.id !== id)]);
+        setValidations([...validations.filter(validation => validation.id !== id)]);
     }
 
-    function onConditionChange(id: string, nextCondition: Partial<ICondition>): void {
-        const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
-        conditions[changedConditionIdx] = { ...conditions[changedConditionIdx], ...nextCondition };
-        setConditions([...conditions]);
+    function onValidationChange(id: string, nextValidation: Partial<IValidation>): void {
+        const changedValidationIdx = validations.findIndex(validation => validation.id === id);
+        validations[changedValidationIdx] = {
+            ...validations[changedValidationIdx],
+            ...nextValidation,
+        };
+        setValidations([...validations]);
     }
 
-    function onAddCondition(): void {
+    function onAddValidation(): void {
         if (
             questions.length === 0 ||
-            (conditions.length !== 0 && !conditions.some(condition => !!condition.questionPuzzle))
+            (validations.length !== 0 &&
+                !validations.some(validation => !!validation.leftHandPuzzle))
         ) {
             return;
         }
-        const conditionsHead = _.head(conditions) || { questionPuzzle: ETerminals.EMPTY };
-        conditions.push({
+        const validationsHead = _.head(validations) || { leftHandPuzzle: ETerminals.EMPTY };
+        validations.push({
             id: uuid(),
-            order: conditions.length - 1,
-            questionPuzzle: conditionsHead.questionPuzzle,
-            answerPuzzle: ETerminals.EMPTY,
-            value: ETerminals.EMPTY,
-            actionType: EActionType.NONE,
+            order: validations.length - 1,
+            leftHandPuzzle: validationsHead.leftHandPuzzle,
+            validationType: EValidationType.NONE,
+            operatorType: EOperatorType.NONE,
+            errorMessage: ETerminals.EMPTY,
             conditionType: EConditionType.OR,
         });
-        setConditions([...conditions]);
+        setValidations([...validations]);
     }
 
     return (
@@ -215,82 +216,75 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             `}
             alignItems="center"
         >
-            {conditions.map((condition, index) => {
-                function onQuestionPuzzleChange(event: TChangeEvent): void {
-                    // reset conditions length when question changed
-                    conditions.length = 1;
-                    // reset first condition fields when question changed
+            {validations.map((validation, index) => {
+                function onLeftHandPuzzleChange(event: TChangeEvent): void {
+                    // reset validations length when question changed
+                    validations.length = 1;
+                    // reset first validation fields when question changed
                     // and change questionPuzzle
-                    onConditionChange(condition.id, {
-                        answerPuzzle: ETerminals.EMPTY,
-                        value: ETerminals.EMPTY,
-                        actionType: EActionType.NONE,
-                        questionPuzzle: event.target.value as string,
+                    onValidationChange(validation.id, {
+                        leftHandPuzzle: event.target.value as string,
+                        validationType: EValidationType.NONE,
+                        operatorType: EOperatorType.NONE,
+                        conditionType: EConditionType.OR,
+                        errorMessage: ETerminals.EMPTY,
                     });
                 }
 
-                function onActionTypeChange(event: TChangeEvent): void {
-                    onConditionChange(condition.id, {
-                        actionType: event.target.value as EActionType,
+                function onOperatorTypeChange(event: TChangeEvent): void {
+                    onValidationChange(validation.id, {
+                        operatorType: event.target.value as EOperatorType,
                     });
                 }
 
-                function onAnswerPuzzleChange(event: TChangeEvent): void {
-                    onConditionChange(condition.id, {
-                        answerPuzzle: event.target.value as string,
+                function onRightHandPuzzleChange(event: TChangeEvent): void {
+                    onValidationChange(validation.id, {
+                        rightHandPuzzle: event.target.value as string,
                     });
                 }
 
                 function onValueChange(event: TChangeEvent): void {
-                    onConditionChange(condition.id, {
-                        value: event.target.value as string,
+                    onValidationChange(validation.id, {
+                        value: event.target.value as number,
+                    });
+                }
+
+                function onValidationTypeChange(event: TChangeEvent): void {
+                    onValidationChange(validation.id, {
+                        validationType: event.target.value as EValidationType,
                     });
                 }
 
                 function onConditionTypeChange(event: unknown, value: unknown): void {
-                    onConditionChange(condition.id, {
+                    onValidationChange(validation.id, {
                         conditionType: value as EConditionType,
                     });
                 }
 
-                const questionAnswers = answers.filter(answer => {
-                    const question = questions.find(
-                        question => question.id === condition.questionPuzzle
-                    );
-                    if (!question) {
-                        return false;
-                    }
-                    return question.puzzles.some(puzzle => puzzle.id === answer.id);
-                });
-                const questionAnswersHead = _.head(questionAnswers) || {
-                    puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
-                };
-
-                const conditionService = getConditionService({
+                const validationService = getValidationService({
                     index,
-                    condition,
-                    puzzleType: questionAnswersHead.puzzleType,
-                    conditionType: condition.conditionType,
+                    validation,
+                    conditionType: validation.conditionType,
                 });
 
                 const isFirstRow = index === 0;
 
                 return (
-                    <React.Fragment key={condition.id}>
+                    <React.Fragment key={validation.id}>
                         {isFirstRow && (
                             <Grid item>
-                                <Typography>{conditionService.getConditionLiteral()}</Typography>
+                                <Typography>{validationService.getConditionLiteral()}</Typography>
                             </Grid>
                         )}
                         <Grid
-                            xs={isFirstRow ? "auto" : 4}
+                            xs={isFirstRow ? "auto" : 3}
                             item
                             css={theme => ({ marginLeft: isFirstRow ? 0 : theme.spacing(9) })}
                         >
                             {!isFirstRow && (
                                 <React.Fragment>
                                     <RadioGroup
-                                        value={condition.conditionType}
+                                        value={validation.conditionType}
                                         onChange={onConditionTypeChange}
                                         row
                                     >
@@ -329,12 +323,12 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                             )}
                         </Grid>
                         {isFirstRow && (
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                                 <SelectField
-                                    id={"question-puzzle"}
+                                    id={"left-hand-puzzle"}
                                     fullWidth={true}
-                                    value={condition.questionPuzzle || ETerminals.EMPTY}
-                                    onChange={onQuestionPuzzleChange}
+                                    value={validation.leftHandPuzzle || ETerminals.EMPTY}
+                                    onChange={onLeftHandPuzzleChange}
                                     placeholder={"Выберите вопрос"}
                                 >
                                     {questions.map(questionToChoseFrom => {
@@ -350,31 +344,45 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                 </SelectField>
                             </Grid>
                         )}
-                        <Grid item xs={3}>
-                            {!!condition.questionPuzzle && (
+                        <Grid item xs={2}>
+                            {!!validation.leftHandPuzzle && (
                                 <SelectField
-                                    id={"action-type"}
+                                    id={"operator-type"}
                                     fullWidth={true}
-                                    value={condition.actionType || ETerminals.EMPTY}
-                                    onChange={onActionTypeChange}
+                                    value={validation.operatorType || ETerminals.EMPTY}
+                                    onChange={onOperatorTypeChange}
                                     placeholder={"Выберите значение"}
                                 >
-                                    {conditionService.getActionVariants()}
+                                    {validationService.getOperatorVariants()}
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs={2}>
-                            {!!condition.questionPuzzle &&
-                                conditionService.getAnswerPuzzle(answers, questions)(
-                                    condition.actionType === EActionType.CHOSEN_ANSWER
-                                        ? onAnswerPuzzleChange
+                        <Grid item xs={3}>
+                            {!!validation.leftHandPuzzle && (
+                                <SelectField
+                                    id={"validation-type"}
+                                    fullWidth={true}
+                                    value={validation.validationType || ETerminals.EMPTY}
+                                    onChange={onValidationTypeChange}
+                                    placeholder={"Выберите значение"}
+                                >
+                                    {validationService.getValidationVariants()}
+                                </SelectField>
+                            )}
+                        </Grid>
+                        <Grid item xs>
+                            {!!validation.leftHandPuzzle &&
+                                validationService.getRightHandPuzzle(questions)(
+                                    validation.validationType ===
+                                        EValidationType.COMPARE_WITH_ANSWER
+                                        ? onRightHandPuzzleChange
                                         : onValueChange
                                 )}
                         </Grid>
-                        <Grid item xs={2}>
+                        <Grid item xs>
                             <Grid container justify="flex-end">
                                 <Grid item>
-                                    <IconButton onClick={() => onConditionDelete(condition.id)}>
+                                    <IconButton onClick={() => onDeleteValidation(validation.id)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Grid>
@@ -387,7 +395,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 <CustomButton
                     variant="outlined"
                     color="primary"
-                    onClick={onAddCondition}
+                    onClick={onAddValidation}
                     title={"Добавить внутреннее условие"}
                     icon={<AddIcon isActive={true} />}
                     scheme={"blueOutline"}
@@ -396,6 +404,23 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         marginLeft: theme.spacing(0.5),
                     })}
                 />
+            </Grid>
+            <Grid item xs={12}>
+                <Grid container>
+                    <Grid
+                        item
+                        xs
+                        css={css`
+                            display: flex;
+                            align-items: center;
+                        `}
+                    >
+                        <Typography variant="subtitle1">То</Typography>
+                    </Grid>
+                    <Grid item xs={11} css={theme => ({ marginRight: theme.spacing(2) })}>
+                        <InputField fullWidth />
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     );
