@@ -14,6 +14,8 @@ interface IPuzzleToolbarProps {
     onAddGroup?(): void;
 
     onAddSection?(): void;
+
+    onDeletePuzzle?(): void;
 }
 
 export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0, ...props }) => {
@@ -21,9 +23,9 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
         { label: "Добавить вопрос", icon: <QuestionIcon />, action: props.onAddClick },
         { label: "Добавить группу", icon: <GroupIcon />, action: props.onAddGroup },
         { label: "Добавить раздел", icon: <SectionIcon />, action: props.onAddSection },
-        { label: "Скопировать", icon: <CopyIcon />, action: void 0 },
-        { label: "Добавить фото", icon: <ImageIcon />, action: void 0 },
-        { label: "Удалить элемент", icon: <TrashIcon />, action: void 0 },
+        { label: "Скопировать", icon: <CopyIcon /> },
+        { label: "Добавить фото", icon: <ImageIcon /> },
+        { label: "Удалить элемент", icon: <TrashIcon />, action: props.onDeletePuzzle },
     ];
 
     return (

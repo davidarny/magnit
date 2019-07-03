@@ -227,7 +227,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return;
             }
             const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(child => child.id === id);
-            console.log("%c%s", "color:" + "#094349", "index", indexOfPuzzleToDelete);
             puzzle.puzzles.splice(indexOfPuzzleToDelete, 1);
             // re-calculate order
             puzzle.puzzles = puzzle.puzzles.map((element, index) => {
@@ -236,6 +235,47 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     ...element,
                 };
             });
+        });
+        setTemplate({ ...template });
+    }
+
+    function onDeletePuzzle(): void {
+        traverse(template, (value: any) => {
+            if (typeof value !== "object" || !("id" in value)) {
+                return;
+            }
+            const focusedPuzzleId = _.head(focusedPuzzleChain);
+            const puzzle = value as IPuzzle | ITemplate;
+            if ("puzzles" in puzzle) {
+                if (puzzle.puzzles.some(child => child.id === focusedPuzzleId)) {
+                    const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(
+                        child => child.id === focusedPuzzleId
+                    );
+                    puzzle.puzzles.splice(indexOfPuzzleToDelete, 1);
+                    // re-calculate order
+                    puzzle.puzzles = puzzle.puzzles.map((element, index) => {
+                        return {
+                            order: index,
+                            ...element,
+                        };
+                    });
+                }
+            }
+            if ("sections" in puzzle) {
+                if (puzzle.sections.some(child => child.id === focusedPuzzleId)) {
+                    const indexOfPuzzleToDelete = puzzle.sections.findIndex(
+                        child => child.id === focusedPuzzleId
+                    );
+                    puzzle.sections.splice(indexOfPuzzleToDelete, 1);
+                    // re-calculate order
+                    puzzle.sections = puzzle.sections.map((element, index) => {
+                        return {
+                            order: index,
+                            ...element,
+                        };
+                    });
+                }
+            }
         });
         setTemplate({ ...template });
     }
@@ -256,6 +296,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onAddClick={onToolbarAddQuestion}
                 onAddGroup={onToolbarAddGroup}
                 onAddSection={onToolbarAddSection}
+                onDeletePuzzle={onDeletePuzzle}
             />
             <SelectableBlockWrapper
                 id={template.id}
