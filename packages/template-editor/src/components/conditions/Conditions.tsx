@@ -52,6 +52,25 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
+    const isParentPuzzleGroup = useRef(false);
+
+    // check if parent of current puzzle is GROUP
+    // if so we apply special rule when finding questions to reference
+    useEffect(() => {
+        traverse(template, (value: any, parent: any) => {
+            if (typeof value !== "object" || !("puzzles" in value)) {
+                return;
+            }
+            if (typeof parent !== "object" || !("puzzles" in parent)) {
+                return;
+            }
+            const puzzle = value as IPuzzle;
+            const parentPuzzle = parent as IPuzzle;
+            const isGroupParent =
+                "puzzleType" in parentPuzzle && parentPuzzle.puzzleType === EPuzzleType.GROUP;
+            isParentPuzzleGroup.current = "id" in puzzle && puzzle.id === puzzleId && isGroupParent;
+        });
+    }, [template]);
 
     useEffect(() => {
         // track if template is changed
@@ -106,14 +125,26 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             // in order to find all possible siblings above
             // so that scope of questionPuzzle is always all puzzles above the current
             _.range(0, index).forEach(i => {
-                traverse(puzzle.puzzles[i], (value: any) => {
+                traverse(puzzle.puzzles[i], (value: any, parent: any) => {
                     if (typeof value !== "object" || !("puzzleType" in value)) {
                         return;
                     }
                     const puzzle = value as IPuzzle;
+                    // check if parent of current item is GROUP puzzle
+                    const isGroupParent =
+                        parent &&
+                        typeof parent === "object" &&
+                        "puzzleType" in parent &&
+                        parent.puzzleType === EPuzzleType.GROUP &&
+                        !isParentPuzzleGroup.current;
                     // if puzzle is question and has non-empty title
                     // then it's allowed to be selected as a questionPuzzle
-                    if (puzzle.puzzleType === EPuzzleType.QUESTION && puzzle.title.length > 0) {
+                    // disallow referencing to questions in GROUPS
+                    if (
+                        puzzle.puzzleType === EPuzzleType.QUESTION &&
+                        puzzle.title.length > 0 &&
+                        !isGroupParent
+                    ) {
                         questions.push(puzzle);
                         return;
                     }

@@ -1,16 +1,18 @@
-export function traverse(object: any | any[], callback?: (...args: any[]) => void): void {
+type TCallback = (...args: any[]) => void;
+
+export function traverse(object: any | any[], callback?: TCallback, parent?: any | any[]): void {
     if (isArray(object)) {
-        callback && callback(object);
-        object.forEach(x => traverse(x, callback));
+        callback && callback(object, parent);
+        object.forEach(prop => traverse(prop, callback, parent));
     } else if (isObject(object)) {
-        callback && callback(object);
+        callback && callback(object, parent);
         for (const key in object) {
             if (object.hasOwnProperty(key)) {
-                traverse(object[key], callback);
+                traverse(object[key], callback, object);
             }
         }
     } else {
-        callback && callback(object);
+        callback && callback(object, parent);
     }
 }
 
