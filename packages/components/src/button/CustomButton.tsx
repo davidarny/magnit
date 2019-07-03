@@ -6,9 +6,9 @@ import * as React from "react";
 export interface ICustomButtonProps {
     title?: string;
     icon?: React.ReactNode;
-    buttonColor?: string;
-    onlyIcon?: boolean;
-    sizeIcon?: number;
+    variants?: string;
+    iconOnly?: boolean;
+    iconSize?: number;
     component?: React.ReactNode;
     to?: string;
     variant?: "text" | "outlined" | "contained";
@@ -20,14 +20,14 @@ export interface ICustomButtonProps {
 export const CustomButton: React.FC<ICustomButtonProps> = ({
     title = "",
     icon = "",
-    buttonColor = "blue",
-    onlyIcon = false,
-    sizeIcon = 24,
+    variants = "blue",
+    iconOnly = false,
+    iconSize = 24,
     ...rest
 }) => {
     const buttons = {
         main: {
-            transaction: "0.25s",
+            transition: "0.25s",
             borderRadius: 40,
             width: 160,
             height: 40,
@@ -61,7 +61,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
                 boxShadow: "0 8px 24px rgba(143, 126, 229, 0.5) !important",
             },
         },
-        blueWithout: {
+        blueOutline: {
             color: "#2F97FF",
             border: "1px solid #2F97FF !important",
             background: "none !important",
@@ -69,7 +69,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
                 boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
             },
         },
-        greyWithout: {
+        greyOutline: {
             color: "#AAB4BE",
             border: "1px solid #AAB4BE",
             background: "none !important",
@@ -79,12 +79,12 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
         },
     };
 
-    const scheme = _.get(buttons, buttonColor);
+    const scheme = _.get(buttons, variants);
 
     return (
         <Button
             css={{
-                transaction: buttons.main.transaction,
+                transaction: buttons.main.transition,
                 borderRadius: buttons.main.borderRadius,
                 width: buttons.main.width,
                 height: buttons.main.height,
@@ -104,12 +104,11 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
         >
             <div
                 css={{
-                    position: "absolute",
-                    top: onlyIcon ? -1 : 7,
-                    left: onlyIcon ? -1 : 10,
+                    margin: iconOnly ? "-6px 0 0 0" : "0 5px 0 -20px",
+                    height: iconSize,
                     svg: {
-                        width: sizeIcon,
-                        height: sizeIcon,
+                        width: iconSize,
+                        height: iconSize,
                     },
                 }}
             >

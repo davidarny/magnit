@@ -49,9 +49,9 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         <Link to="/">
                             <CustomButton
                                 icon={<AddIcon />}
-                                buttonColor={"blue"}
-                                onlyIcon={true}
-                                sizeIcon={40}
+                                variants={"blue"}
+                                iconOnly={true}
+                                iconSize={40}
                                 css={{
                                     width: 40,
                                 }}
@@ -86,16 +86,14 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                     direction="column"
                                     justify="center"
                                     alignItems="center"
-                                    css={theme => ({
-                                        position: "relative",
-                                        ":hover": {
-                                            div: {
-                                                ":first-child": {
-                                                    backgroundColor: theme.colors.blue,
-                                                },
-                                            },
-                                        },
-                                    })}
+                                    css={css`
+                                        position: relative;
+                                        :hover {
+                                            div:first-of-type {
+                                                background-color: #2F97FF
+                                            }
+                                        }
+                                    `}
                                 >
                                     <Grid
                                         item
