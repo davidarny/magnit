@@ -12,7 +12,6 @@ Table section {
 
 Table puzzle {
  id int [pk]
- template_id int [ref: > template.id]
  section_id int [ref: > section.id]
  parent_id int [ref: > puzzle.id]
  title varchar

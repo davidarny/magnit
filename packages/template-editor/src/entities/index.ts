@@ -50,7 +50,7 @@ interface IValidation extends IOrdered {
     errorMessage: string;
 }
 
-export interface ITemplate extends ITitled, IWithId, IWithPuzzles<IPuzzle>, IWithDescription {
+export interface ITemplate extends ITitled, IWithId, IWithDescription {
     sections: ISection[];
 }
 

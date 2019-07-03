@@ -33,7 +33,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         props.initialState || {
             id: uuid(),
             sections: [],
-            puzzles: [],
             title: ETerminals.EMPTY,
             description: ETerminals.EMPTY,
         }
@@ -82,8 +81,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
                 return;
             }
-            // do not allow to add question in section, question, answer, etc...
-            if ("puzzleType" in value && !whitelist.includes(value.puzzleType)) {
+            // do not allow to add question in template, section, question, answer, etc...
+            if (
+                !("puzzles" in value) ||
+                ("puzzleType" in value && !whitelist.includes(value.puzzleType))
+            ) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -114,24 +116,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }
 
     function onToolbarAddGroup(): void {
-        traverse(template, (value: any) => {
-            if (!focusedPuzzleChain.length) {
+        // if we are focused in template
+        // adding to first section if exists
+        if (template.sections.every(section => !focusedPuzzleChain.includes(section.id))) {
+            const firstSection = _.head(template.sections);
+            if (!firstSection) {
                 return;
             }
-            if (typeof value !== "object" || !("id" in value)) {
-                return;
-            }
-            const focusedPuzzleId = _.head(focusedPuzzleChain);
-            if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
-                return;
-            }
-            // do not allow to add group in group, question, etc...
-            if ("puzzleType" in value) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
-            puzzle.puzzles.push({
+            const prevPuzzle = firstSection.puzzles[firstSection.puzzles.length - 1];
+            firstSection.puzzles.push({
                 id: uuid(),
                 puzzles: [],
                 validations: [],
@@ -141,7 +134,26 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-        });
+        }
+        // else adding to section which is in focused puzzle chain
+        else {
+            template.sections.forEach(section => {
+                if (!focusedPuzzleChain.includes(section.id)) {
+                    return;
+                }
+                const prevPuzzle = section.puzzles[section.puzzles.length - 1];
+                section.puzzles.push({
+                    id: uuid(),
+                    puzzles: [],
+                    validations: [],
+                    conditions: [],
+                    description: ETerminals.EMPTY,
+                    title: ETerminals.EMPTY,
+                    puzzleType: EPuzzleType.GROUP,
+                    order: (prevPuzzle || { order: -1 }).order + 1,
+                });
+            });
+        }
         setTemplate({ ...template });
     }
 
@@ -309,14 +321,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
             >
-                <ContentSection template={template} focused={focusedPuzzleId === template.id}>
-                    <Content
-                        puzzles={template.puzzles}
-                        onFocus={onPuzzleFocus}
-                        onBlur={onPuzzleBlur}
-                        isFocused={id => id === focusedPuzzleId}
-                    />
-                </ContentSection>
+                <ContentSection template={template} focused={focusedPuzzleId === template.id} />
             </SelectableBlockWrapper>
             {template.sections.map((section, index) => {
                 const focused = focusedPuzzleId === section.id;
