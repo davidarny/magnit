@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -92,7 +92,13 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                         })}
                     />
                 </Grid>
-                <Grid item xs style={{ paddingLeft: 0 }}>
+                <Grid
+                    item
+                    xs
+                    css={css`
+                        padding-left: 0;
+                    `}
+                >
                     <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>

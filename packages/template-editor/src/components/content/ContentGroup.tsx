@@ -46,11 +46,11 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
             <div
                 css={theme => ({
                     paddingLeft: !!parentItem ? theme.spacing(4) : 0,
-                })}
-                style={{
+                    paddingTop: theme.spacing(),
+                    paddingBottom: theme.spacing(),
                     borderTop: hasBorder ? "1px dashed #AAB4BE" : "none",
                     borderBottom: hasBorder ? "1px dashed #AAB4BE" : "none",
-                }}
+                })}
             >
                 <ContentItem
                     puzzle={item}

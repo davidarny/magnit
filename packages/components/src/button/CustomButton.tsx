@@ -80,17 +80,17 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
         <Button
             css={{
                 ...variants.main,
+                ...variant,
                 textTransform: "none",
                 position: "relative",
-                ...variant,
                 boxShadow: "none",
                 ":hover": { ...(variant.hover ? variant.hover : {}) },
+                ...(iconOnly ? { padding: 0 } : {}),
             }}
             {...rest}
         >
             <div
                 css={{
-                    margin: iconOnly ? "-6px 0 0 0" : "0 5px 0 -20px",
                     height: iconSize,
                     svg: {
                         width: iconSize,

@@ -29,17 +29,20 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
             }}
         >
             <div
-                style={{
+                css={theme => ({
                     boxShadow: "none",
-                    width: 88,
-                }}
+                    width: theme.spacing(11),
+                })}
             >
                 <Grid
                     container
                     justify="center"
                     alignItems="center"
                     id="logo"
-                    css={{ width: 88, height: 96 }}
+                    css={theme => ({
+                        width: theme.spacing(11),
+                        height: theme.spacing(12),
+                    })}
                 >
                     <Grid
                         item
