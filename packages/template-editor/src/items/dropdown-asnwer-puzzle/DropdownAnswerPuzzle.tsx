@@ -8,7 +8,7 @@ import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "components/fields";
+import { InputField } from "@magnit/components";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -57,7 +57,16 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
 
     if (!props.questionFocused) {
         return (
-            <Grid container direction="column" css={theme => ({ paddingLeft: theme.spacing(2) })}>
+            <Grid
+                container
+                direction="column"
+                css={theme => ({
+                    paddingLeft: theme.spacing(2),
+                    marginLeft: `${theme.spacing()} !important`,
+                    marginTop: `${theme.spacing()} !important`,
+                    marginBottom: `${theme.spacing()} !important`,
+                })}
+            >
                 <Grid item>
                     <Typography variant="body1">
                         <Typography
@@ -77,7 +86,15 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
 
     return (
         <React.Fragment>
-            <Grid container alignItems="flex-end" spacing={2}>
+            <Grid
+                container
+                alignItems="flex-end"
+                spacing={2}
+                css={theme => ({
+                    marginTop: `${theme.spacing(-1)} !important`,
+                    marginLeft: `${theme.spacing()} !important`,
+                })}
+            >
                 <Grid item>
                     <Typography
                         css={theme => ({
@@ -99,7 +116,16 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
             </Grid>
 
             {props.addDropdownButton && props.questionFocused && (
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={theme => ({
+                        marginTop: `${theme.spacing(-2)} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
+                        marginLeft: `${theme.spacing()} !important`,
+                    })}
+                >
                     <Grid item>
                         <Typography
                             css={theme => ({

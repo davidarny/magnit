@@ -22,6 +22,7 @@ export const DateAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFocuse
                     <Input
                         id="date-answer-puzzle"
                         type="text"
+                        disabled
                         endAdornment={
                             <InputAdornment position="end">
                                 <CalendarIcon />

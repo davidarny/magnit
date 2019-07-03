@@ -14,6 +14,7 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
             item
             css={css`
                 height: var(--section-title-height);
+                box-shadow: 0 6px 20px rgba(220, 227, 235, 0.3);
             `}
         >
             <Paper
@@ -22,8 +23,8 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
                     height: 100%;
                     display: flex;
                     align-items: center;
+                    box-shadow: none !important;
                 `}
-                elevation={0}
             >
                 <Grid
                     container

@@ -8,7 +8,7 @@ import { jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "components/fields";
+import { InputField } from "@magnit/components";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -57,7 +57,14 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
 
     if (!props.questionFocused) {
         return (
-            <Grid container alignItems="center">
+            <Grid
+                container
+                alignItems="center"
+                css={theme => ({
+                    marginTop: `${theme.spacing()} !important`,
+                    marginBottom: `${theme.spacing()} !important`,
+                })}
+            >
                 <Grid item>
                     <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
@@ -70,7 +77,12 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
 
     return (
         <React.Fragment>
-            <Grid container alignItems="flex-end" spacing={2}>
+            <Grid
+                container
+                alignItems="flex-end"
+                spacing={2}
+                css={theme => ({ marginTop: `${theme.spacing()} !important` })}
+            >
                 <Grid item>
                     <Radio
                         disabled
@@ -91,7 +103,15 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             </Grid>
 
             {props.addRadioButton && (
-                <Grid container alignItems="flex-end" spacing={2}>
+                <Grid
+                    container
+                    alignItems="flex-end"
+                    spacing={2}
+                    css={theme => ({
+                        marginTop: `${theme.spacing(-2)} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
+                    })}
+                >
                     <Grid item>
                         <Radio
                             disabled

@@ -5,17 +5,12 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
-    Button,
-    FormControl,
     FormControlLabel,
     Grid,
     IconButton,
-    Input,
-    InputLabel,
     MenuItem,
     Radio,
     RadioGroup,
-    Select,
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -24,6 +19,8 @@ import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
+import { CustomButton, SelectField } from "@magnit/components";
+import { AddIcon } from "@magnit/icons";
 import { getConditionService } from "services/condition";
 
 interface IConditionsProps {
@@ -318,13 +315,33 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                         >
                                             <FormControlLabel
                                                 value={EConditionType.AND}
-                                                control={<Radio color="primary" />}
+                                                control={
+                                                    <Radio
+                                                        css={theme => ({
+                                                            color: `${theme.colors.blue} !important`,
+                                                            ":hover": {
+                                                                backgroundColor:
+                                                                    "#2f97ff14 !important",
+                                                            },
+                                                        })}
+                                                    />
+                                                }
                                                 label="И"
                                                 labelPlacement="end"
                                             />
                                             <FormControlLabel
                                                 value={EConditionType.OR}
-                                                control={<Radio color="primary" />}
+                                                control={
+                                                    <Radio
+                                                        css={theme => ({
+                                                            color: `${theme.colors.blue} !important`,
+                                                            ":hover": {
+                                                                backgroundColor:
+                                                                    "#2f97ff14 !important",
+                                                            },
+                                                        })}
+                                                    />
+                                                }
                                                 label="Или"
                                                 labelPlacement="end"
                                             />
@@ -334,48 +351,42 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                             </Grid>
                             {isFirstRow && (
                                 <Grid item xs={4}>
-                                    <FormControl fullWidth>
-                                        <InputLabel htmlFor="question-puzzle">
-                                            Выберите вопрос
-                                        </InputLabel>
-                                        <Select
-                                            value={condition.questionPuzzle || ETerminals.EMPTY}
-                                            input={<Input id="question-puzzle" />}
-                                            onChange={onQuestionPuzzleChange}
-                                        >
-                                            {questions.length === 0 && (
-                                                <MenuItem>Нет доступных вариантов</MenuItem>
-                                            )}
-                                            {questions.map(questionToChoseFrom => {
-                                                return (
-                                                    <MenuItem
-                                                        key={questionToChoseFrom.id}
-                                                        value={questionToChoseFrom.id}
-                                                    >
-                                                        {questionToChoseFrom.title}
-                                                    </MenuItem>
-                                                );
-                                            })}
-                                        </Select>
-                                    </FormControl>
+                                    <SelectField
+                                        id={"question-puzzle"}
+                                        fullWidth={true}
+                                        value={condition.questionPuzzle || ETerminals.EMPTY}
+                                        onChange={onQuestionPuzzleChange}
+                                        placeholder={"Выберите вопрос"}
+                                    >
+                                        {questions.length === 0 && (
+                                            <MenuItem>Нет доступных вариантов</MenuItem>
+                                        )}
+                                        {questions.map(questionToChoseFrom => {
+                                            return (
+                                                <MenuItem
+                                                    key={questionToChoseFrom.id}
+                                                    value={questionToChoseFrom.id}
+                                                >
+                                                    {questionToChoseFrom.title}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </SelectField>
                                 </Grid>
                             )}
 
                             <React.Fragment>
                                 <Grid item xs={3}>
                                     {!!condition.questionPuzzle && (
-                                        <FormControl fullWidth>
-                                            <InputLabel htmlFor="action-type">
-                                                Выберите значение
-                                            </InputLabel>
-                                            <Select
-                                                value={condition.actionType || ETerminals.EMPTY}
-                                                input={<Input id="action-type" />}
-                                                onChange={onActionTypeChange}
-                                            >
-                                                {conditionService.getActionVariants()}
-                                            </Select>
-                                        </FormControl>
+                                        <SelectField
+                                            id={"action-type"}
+                                            fullWidth={true}
+                                            value={condition.actionType || ETerminals.EMPTY}
+                                            onChange={onActionTypeChange}
+                                            placeholder={"Выберите значение"}
+                                        >
+                                            {conditionService.getActionVariants()}
+                                        </SelectField>
                                     )}
                                 </Grid>
                                 <Grid item xs={2}>
@@ -401,14 +412,18 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 })}
                 <Grid container style={{ marginTop: 10 }}>
                     <Grid css={theme => ({ marginLeft: theme.spacing(9) })}>
-                        <Button
-                            size="small"
+                        <CustomButton
                             variant="outlined"
                             color="primary"
                             onClick={onAddCondition}
-                        >
-                            + Добавить внутреннее условие
-                        </Button>
+                            title={"Добавить внутреннее условие"}
+                            icon={<AddIcon isActive={true} />}
+                            variants={"blueOutline"}
+                            css={theme => ({
+                                width: 290,
+                                marginLeft: theme.spacing(0.5),
+                            })}
+                        />
                     </Grid>
                 </Grid>
             </Grid>

@@ -1,5 +1,5 @@
 {
-    "name": "@magnit/template-editor",
+    "name": "@magnit/components",
     "version": "0.1.0",
     "main": "dist/index.js",
     "module": "dist/index.js",
@@ -14,11 +14,8 @@
         "@emotion/core": "^10.0.10",
         "@material-ui/core": "^4.1.1",
         "@material-ui/icons": "^4.2.0",
-        "@types/lodash": "^4.14.134",
-        "lodash": "^4.17.11",
         "react": "^16.8.6",
-        "react-dom": "^16.8.6",
-        "uuid": "^3.3.2"
+        "react-dom": "^16.8.6"
     },
     "devDependencies": {
         "@babel/core": "^7.4.5",
@@ -37,7 +34,6 @@
         "webpack-node-externals": "^1.7.2"
     },
     "dependencies": {
-        "@magnit/icons": "^0.1.0",
-        "@magnit/components": "^0.1.0"
+        "@types/lodash": "^4.14.134"
     }
 }

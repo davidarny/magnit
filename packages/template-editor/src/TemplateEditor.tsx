@@ -340,8 +340,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         focused={focused}
                     >
                         <SectionPuzzle
-                            title={section.title}
                             id={section.id}
+                            title={section.title}
+                            description={""}
                             index={index}
                             focused={focused}
                         >
