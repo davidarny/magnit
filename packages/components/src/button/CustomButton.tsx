@@ -8,7 +8,7 @@ import _ from "lodash";
 export interface ICustomButtonProps {
     title?: string;
     icon?: React.ReactNode;
-    variants?: string;
+    scheme?: string;
     iconOnly?: boolean;
     iconSize?: number;
     component?: React.ReactNode;
@@ -19,25 +19,18 @@ export interface ICustomButtonProps {
     onClick?(): void;
 }
 
-export const CustomButton: React.FC<ICustomButtonProps> = ({
-    title = "",
-    icon = "",
-    variants = "blue",
-    iconOnly = false,
-    iconSize = 24,
-    ...rest
-}) => {
-    const buttons = {
+export const CustomButton: React.FC<ICustomButtonProps> = props => {
+    const { title = "", icon = "", scheme = "blue", iconSize = 24, iconOnly, ...rest } = props;
+    const variants = {
         main: {
             transition: "0.25s",
             borderRadius: 40,
             width: 160,
             height: 40,
-            minWidth: 40,
         },
         icon: {
-            height: 24,
-            width: 24,
+            height: iconSize,
+            width: iconSize,
         },
         blue: {
             color: "#FFFFFF",
@@ -81,26 +74,17 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
         },
     };
 
-    const scheme = _.get(buttons, variants);
+    const variant = _.get(variants, scheme);
 
     return (
         <Button
             css={{
-                transaction: buttons.main.transition,
-                borderRadius: buttons.main.borderRadius,
-                width: buttons.main.width,
-                height: buttons.main.height,
-                minWidth: buttons.main.minWidth,
+                ...variants.main,
                 textTransform: "none",
                 position: "relative",
-
-                color: _.get(scheme, "color"),
-                border: _.get(scheme, "border"),
-                background: _.get(scheme, "background"),
+                ...variant,
                 boxShadow: "none",
-                ":hover": {
-                    boxShadow: _.get(scheme, "hover.boxShadow"),
-                },
+                ":hover": { ...(variant.hover ? variant.hover : {}) },
             }}
             {...rest}
         >
@@ -117,10 +101,10 @@ export const CustomButton: React.FC<ICustomButtonProps> = ({
                 {icon}
             </div>
             <span
-                css={{
-                    fontSize: 14,
-                    lineHeight: "15px",
-                }}
+                css={theme => ({
+                    fontSize: theme.fontSize.normal,
+                    lineHeight: theme.spacing(2),
+                })}
             >
                 {title}
             </span>

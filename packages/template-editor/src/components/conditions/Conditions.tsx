@@ -397,7 +397,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         onClick={onAddCondition}
                         title={"Добавить внутреннее условие"}
                         icon={<AddIcon isActive={true} />}
-                        variants={"blueOutline"}
+                        scheme={"blueOutline"}
                         css={theme => ({
                             width: 290,
                             marginLeft: theme.spacing(0.5),

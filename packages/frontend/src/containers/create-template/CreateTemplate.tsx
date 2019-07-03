@@ -18,7 +18,7 @@ export const CreateTemplate: React.FC = () => {
                     <CustomButton
                         variant="contained"
                         title="Сохранить"
-                        variants="blue"
+                        scheme="blue"
                         icon={<CheckIcon />}
                     />
                 </Grid>

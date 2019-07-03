@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
@@ -37,7 +37,9 @@ export const Templates: React.FC = () => {
                                     to="/templates/create"
                                     icon={<AddIcon />}
                                     title={"Создать шаблон"}
-                                    css={theme => ({ width: 180 })}
+                                    css={css`
+                                        width: 180px;
+                                    `}
                                 />
                             </Grid>
                         </Grid>

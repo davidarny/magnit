@@ -48,12 +48,10 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         <Link to="/">
                             <CustomButton
                                 icon={<AddIcon />}
-                                variants={"blue"}
+                                scheme={"blue"}
                                 iconOnly={true}
                                 iconSize={40}
-                                css={{
-                                    width: 40,
-                                }}
+                                css={theme => ({ width: theme.spacing(5) })}
                             />
                         </Link>
                     </Grid>
