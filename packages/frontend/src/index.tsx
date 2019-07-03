@@ -33,10 +33,8 @@ const theme = {
         primary: "#2F97FF",
         secondary: "#8A94A2",
         default: "#000000",
-        blue: "#2F97FF",
         black: "#3F4752",
         light: "#F6F7FB",
-        darkGray: "#8A94A1",
         gray: "#AAB4BE",
         lightGray: "#DEE5EF",
         green: "#0CDAAC",
@@ -46,9 +44,9 @@ const theme = {
         yellow: "#FFF5BE",
     },
 
-    boxShadows: {
-        primary: "",
+    boxShadow: {
         secondary: "0 0 16px rgba(192, 201, 211, 0.8)",
+        indicator: "1px 0px 3px rgba(47, 151, 255, 0.4)",
         default: "none",
     },
 };

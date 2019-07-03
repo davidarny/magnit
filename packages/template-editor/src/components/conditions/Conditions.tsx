@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -29,7 +29,6 @@ import { getConditionService } from "services/condition";
 interface IConditionsProps {
     puzzleId: string;
     template: ITemplate;
-    puzzleType: EPuzzleType;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -37,7 +36,7 @@ interface IConditionsProps {
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const { puzzleId, template, puzzleType } = props;
+    const { puzzleId, template } = props;
     const [conditions, setConditions] = useState<ICondition[]>([
         {
             id: uuid(),
@@ -210,206 +209,187 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         setConditions([...conditions]);
     }
 
-    const title =
-        puzzleType === EPuzzleType.GROUP ? "Условия показа группы" : "Условия показа вопроса";
-
     return (
         <Grid
-            css={theme => ({
-                paddingLeft: theme.spacing(4),
-                paddingRight: theme.spacing(4),
-                marginTop: theme.spacing(2),
-            })}
+            container
+            spacing={2}
+            css={css`
+                margin-bottom: 0;
+            `}
+            alignItems="flex-end"
         >
-            <Grid
-                container
-                style={{
-                    background: "#F6F7FB",
-                    padding: "24px 16px",
-                }}
-                spacing={2}
-                alignItems="flex-end"
-            >
-                <Grid container>
-                    <Typography variant="subtitle1" style={{ fontWeight: 500 }}>
-                        {title}
-                    </Typography>
-                </Grid>
-                {conditions.map((condition, index) => {
-                    function onQuestionPuzzleChange(event: TChangeEvent): void {
-                        // reset conditions length when question changed
-                        conditions.length = 1;
-                        // reset first condition fields when question changed
-                        // and change questionPuzzle
-                        onConditionChange(condition.id, {
-                            answerPuzzle: ETerminals.EMPTY,
-                            value: ETerminals.EMPTY,
-                            actionType: EActionType.NONE,
-                            questionPuzzle: event.target.value as string,
-                        });
-                    }
-
-                    function onActionTypeChange(event: TChangeEvent): void {
-                        onConditionChange(condition.id, {
-                            actionType: event.target.value as EActionType,
-                        });
-                    }
-
-                    function onAnswerPuzzleChange(event: TChangeEvent): void {
-                        onConditionChange(condition.id, {
-                            answerPuzzle: event.target.value as string,
-                        });
-                    }
-
-                    function onValueChange(event: TChangeEvent): void {
-                        onConditionChange(condition.id, {
-                            value: event.target.value as string,
-                        });
-                    }
-
-                    function onConditionTypeChange(event: unknown, value: unknown): void {
-                        onConditionChange(condition.id, {
-                            conditionType: value as EConditionType,
-                        });
-                    }
-
-                    const questionAnswers = answers.filter(answer => {
-                        const question = questions.find(
-                            question => question.id === condition.questionPuzzle
-                        );
-                        if (!question) {
-                            return false;
-                        }
-                        return question.puzzles.some(puzzle => puzzle.id === answer.id);
+            {conditions.map((condition, index) => {
+                function onQuestionPuzzleChange(event: TChangeEvent): void {
+                    // reset conditions length when question changed
+                    conditions.length = 1;
+                    // reset first condition fields when question changed
+                    // and change questionPuzzle
+                    onConditionChange(condition.id, {
+                        answerPuzzle: ETerminals.EMPTY,
+                        value: ETerminals.EMPTY,
+                        actionType: EActionType.NONE,
+                        questionPuzzle: event.target.value as string,
                     });
-                    const questionAnswersHead = _.head(questionAnswers) || {
-                        puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
-                    };
+                }
 
-                    const conditionService = getConditionService({
-                        index,
-                        condition,
-                        puzzleType: questionAnswersHead.puzzleType,
+                function onActionTypeChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        actionType: event.target.value as EActionType,
                     });
+                }
 
-                    const isFirstRow = index === 0;
-                    return (
-                        <React.Fragment key={condition.id}>
-                            {isFirstRow && (
-                                <Grid item>
-                                    <Typography>
-                                        {conditionService.getConditionLiteral()}
-                                    </Typography>
-                                </Grid>
-                            )}
-                            <Grid
-                                xs={isFirstRow ? "auto" : 4}
-                                item
-                                style={{
-                                    marginLeft: isFirstRow ? 0 : 70,
-                                }}
-                            >
-                                {!isFirstRow && (
-                                    <React.Fragment>
-                                        <RadioGroup
-                                            value={condition.conditionType}
-                                            onChange={onConditionTypeChange}
-                                            row
-                                        >
-                                            <FormControlLabel
-                                                value={EConditionType.AND}
-                                                control={<Radio color="primary" />}
-                                                label="И"
-                                                labelPlacement="end"
-                                            />
-                                            <FormControlLabel
-                                                value={EConditionType.OR}
-                                                control={<Radio color="primary" />}
-                                                label="Или"
-                                                labelPlacement="end"
-                                            />
-                                        </RadioGroup>
-                                    </React.Fragment>
-                                )}
+                function onAnswerPuzzleChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        answerPuzzle: event.target.value as string,
+                    });
+                }
+
+                function onValueChange(event: TChangeEvent): void {
+                    onConditionChange(condition.id, {
+                        value: event.target.value as string,
+                    });
+                }
+
+                function onConditionTypeChange(event: unknown, value: unknown): void {
+                    onConditionChange(condition.id, {
+                        conditionType: value as EConditionType,
+                    });
+                }
+
+                const questionAnswers = answers.filter(answer => {
+                    const question = questions.find(
+                        question => question.id === condition.questionPuzzle
+                    );
+                    if (!question) {
+                        return false;
+                    }
+                    return question.puzzles.some(puzzle => puzzle.id === answer.id);
+                });
+                const questionAnswersHead = _.head(questionAnswers) || {
+                    puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+                };
+
+                const conditionService = getConditionService({
+                    index,
+                    condition,
+                    puzzleType: questionAnswersHead.puzzleType,
+                });
+
+                const isFirstRow = index === 0;
+                return (
+                    <React.Fragment key={condition.id}>
+                        {isFirstRow && (
+                            <Grid item>
+                                <Typography>{conditionService.getConditionLiteral()}</Typography>
                             </Grid>
-                            {isFirstRow && (
-                                <Grid item xs={4}>
+                        )}
+                        <Grid
+                            xs={isFirstRow ? "auto" : 4}
+                            item
+                            style={{
+                                marginLeft: isFirstRow ? 0 : 70,
+                            }}
+                        >
+                            {!isFirstRow && (
+                                <React.Fragment>
+                                    <RadioGroup
+                                        value={condition.conditionType}
+                                        onChange={onConditionTypeChange}
+                                        row
+                                    >
+                                        <FormControlLabel
+                                            value={EConditionType.AND}
+                                            control={<Radio color="primary" />}
+                                            label="И"
+                                            labelPlacement="end"
+                                        />
+                                        <FormControlLabel
+                                            value={EConditionType.OR}
+                                            control={<Radio color="primary" />}
+                                            label="Или"
+                                            labelPlacement="end"
+                                        />
+                                    </RadioGroup>
+                                </React.Fragment>
+                            )}
+                        </Grid>
+                        {isFirstRow && (
+                            <Grid item xs={4}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="question-puzzle">
+                                        Выберите вопрос
+                                    </InputLabel>
+                                    <Select
+                                        value={condition.questionPuzzle || ETerminals.EMPTY}
+                                        input={<Input id="question-puzzle" />}
+                                        onChange={onQuestionPuzzleChange}
+                                    >
+                                        {questions.length === 0 && (
+                                            <MenuItem>Нет доступных вариантов</MenuItem>
+                                        )}
+                                        {questions.map(questionToChoseFrom => {
+                                            return (
+                                                <MenuItem
+                                                    key={questionToChoseFrom.id}
+                                                    value={questionToChoseFrom.id}
+                                                >
+                                                    {questionToChoseFrom.title}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        )}
+
+                        <React.Fragment>
+                            <Grid item xs={3}>
+                                {!!condition.questionPuzzle && (
                                     <FormControl fullWidth>
-                                        <InputLabel htmlFor="question-puzzle">
-                                            Выберите вопрос
+                                        <InputLabel htmlFor="action-type">
+                                            Выберите значение
                                         </InputLabel>
                                         <Select
-                                            value={condition.questionPuzzle || ETerminals.EMPTY}
-                                            input={<Input id="question-puzzle" />}
-                                            onChange={onQuestionPuzzleChange}
+                                            value={condition.actionType || ETerminals.EMPTY}
+                                            input={<Input id="action-type" />}
+                                            onChange={onActionTypeChange}
                                         >
-                                            {questions.length === 0 && (
-                                                <MenuItem>Нет доступных вариантов</MenuItem>
-                                            )}
-                                            {questions.map(questionToChoseFrom => {
-                                                return (
-                                                    <MenuItem
-                                                        key={questionToChoseFrom.id}
-                                                        value={questionToChoseFrom.id}
-                                                    >
-                                                        {questionToChoseFrom.title}
-                                                    </MenuItem>
-                                                );
-                                            })}
+                                            {conditionService.getActionVariants()}
                                         </Select>
                                     </FormControl>
-                                </Grid>
-                            )}
-
-                            <React.Fragment>
-                                <Grid item xs={3}>
-                                    {!!condition.questionPuzzle && (
-                                        <FormControl fullWidth>
-                                            <InputLabel htmlFor="action-type">
-                                                Выберите значение
-                                            </InputLabel>
-                                            <Select
-                                                value={condition.actionType || ETerminals.EMPTY}
-                                                input={<Input id="action-type" />}
-                                                onChange={onActionTypeChange}
-                                            >
-                                                {conditionService.getActionVariants()}
-                                            </Select>
-                                        </FormControl>
-                                    )}
-                                </Grid>
-                                <Grid item xs={2}>
-                                    {!!condition.questionPuzzle &&
-                                        conditionService.getAnswerPuzzle(answers, questions)(
-                                            condition.actionType === EActionType.CHOSEN_ANSWER
-                                                ? onAnswerPuzzleChange
-                                                : onValueChange
-                                        )}
-                                </Grid>
-                            </React.Fragment>
+                                )}
+                            </Grid>
                             <Grid item xs={2}>
-                                <Grid container justify="flex-end">
-                                    <Grid item>
-                                        <IconButton onClick={() => onConditionDelete(condition.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Grid>
-                                </Grid>
+                                {!!condition.questionPuzzle &&
+                                    conditionService.getAnswerPuzzle(answers, questions)(
+                                        condition.actionType === EActionType.CHOSEN_ANSWER
+                                            ? onAnswerPuzzleChange
+                                            : onValueChange
+                                    )}
                             </Grid>
                         </React.Fragment>
-                    );
-                })}
-                <Grid container style={{ marginTop: 10 }}>
-                    <Grid css={theme => ({ marginLeft: theme.spacing(9) })}>
-                        <Button
-                            size="small"
-                            variant="outlined"
-                            color="primary"
-                            onClick={onAddCondition}
-                        >
-                            + Добавить внутреннее условие
-                        </Button>
-                    </Grid>
+                        <Grid item xs={2}>
+                            <Grid container justify="flex-end">
+                                <Grid item>
+                                    <IconButton onClick={() => onConditionDelete(condition.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </React.Fragment>
+                );
+            })}
+            <Grid container style={{ marginTop: 10 }}>
+                <Grid css={theme => ({ marginLeft: theme.spacing(9) })}>
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        onClick={onAddCondition}
+                    >
+                        + Добавить внутреннее условие
+                    </Button>
                 </Grid>
             </Grid>
         </Grid>
