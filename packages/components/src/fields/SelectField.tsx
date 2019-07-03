@@ -47,9 +47,11 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                 classes={{ select: "select", icon: "icon", root: "root" }}
                 {...rest}
             >
-                <MenuItem disabled value="" css={theme => ({ color: theme.colors.secondary })}>
-                    {placeholder}
-                </MenuItem>
+                {placeholder && (
+                    <MenuItem disabled value="" css={theme => ({ color: theme.colors.secondary })}>
+                        {placeholder}
+                    </MenuItem>
+                )}
                 {children}
             </Select>
         </FormControl>
