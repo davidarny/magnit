@@ -37,9 +37,7 @@ export const Templates: React.FC = () => {
                                     to="/templates/create"
                                     icon={<AddIcon />}
                                     title={"Создать шаблон"}
-                                    css={theme => ({
-                                        width: 180,
-                                    })}
+                                    css={theme => ({ width: 180 })}
                                 />
                             </Grid>
                         </Grid>

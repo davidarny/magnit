@@ -3,7 +3,14 @@
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { QuestionIcon, GroupIcon, SectionIcon, ImageIcon, TrashIcon, CopyIcon } from "@magnit/icons";
+import {
+    QuestionIcon,
+    GroupIcon,
+    SectionIcon,
+    ImageIcon,
+    TrashIcon,
+    CopyIcon,
+} from "@magnit/icons";
 
 interface IPuzzleToolbarProps {
     right?: number;
@@ -34,8 +41,7 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 marginBottom: theme.spacing(4),
                 top: 0,
                 transform: `translateY(${top}px)`,
-                willChange: "transform",
-                transition: "transform 0.3s ease-in-out",
+                transition: "transform 0.3s ease-in-out !important",
                 boxShadow: "0px 0px 16px #bfc8d2 !important",
             })}
             className="toolbar"

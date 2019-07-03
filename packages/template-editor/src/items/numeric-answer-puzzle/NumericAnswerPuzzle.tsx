@@ -11,15 +11,18 @@ export const NumericAnswerPuzzle: React.FC<IFocusedPuzzleProps> = ({ questionFoc
         <Grid
             container
             alignItems="flex-end"
-            style={{ display: questionFocused ? "" : "none" }}
-            css={theme => ({ paddingBottom: theme.spacing(2) })}
+            css={theme => ({
+                paddingBottom: theme.spacing(2),
+                display: questionFocused ? "" : "none",
+            })}
         >
             <Grid item xs={12}>
                 <InputField
+                    disabled
                     type="number"
                     fullWidth
                     placeholder="Ответ"
-                    css={(theme) => ({
+                    css={theme => ({
                         "input::-webkit-inner-spin-button, input::-webkit-outer-spin-button": {
                             margin: 0,
                             display: "none",

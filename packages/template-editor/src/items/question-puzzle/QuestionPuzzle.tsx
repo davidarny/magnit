@@ -119,12 +119,17 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: "8px !important",
-                        marginBottom: "8px !important",
+                        marginTop: `${theme.spacing()} !important`,
+                        marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
                     <Grid item>
-                        <Typography style={{ fontSize: 18, marginBottom: 2 }}>
+                        <Typography
+                            css={theme => ({
+                                fontSize: theme.fontSize.medium,
+                                marginBottom: theme.spacing(0.25),
+                            })}
+                        >
                             {props.index + 1}.
                         </Typography>
                     </Grid>
