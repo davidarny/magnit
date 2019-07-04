@@ -7,7 +7,6 @@ import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { TemplateEditor } from "@magnit/template-editor";
 import { CustomButton } from "@magnit/components";
-import template from "./template";
 import { CheckIcon } from "@magnit/icons";
 
 export const CreateTemplate: React.FC = () => {
@@ -30,12 +29,7 @@ export const CreateTemplate: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TemplateEditor
-                    initialState={template}
-                    css={theme => ({
-                        background: theme.colors.main,
-                    })}
-                />
+                <TemplateEditor css={theme => ({ background: theme.colors.main })} />
             </Grid>
         </SectionLayout>
     );
