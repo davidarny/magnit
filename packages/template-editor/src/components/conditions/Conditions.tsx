@@ -26,6 +26,7 @@ import { getConditionService } from "services/condition";
 interface IConditionsProps {
     puzzleId: string;
     template: ITemplate;
+    disabled?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -33,7 +34,7 @@ interface IConditionsProps {
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const { puzzleId, template } = props;
+    const { puzzleId, template, disabled = false } = props;
     const [conditions, setConditions] = useState<ICondition[]>([
         {
             id: uuid(),
@@ -53,6 +54,9 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     // check if parent of current puzzle is GROUP
     // if so we apply special rule when finding questions to reference
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
         traverse(template, (value: any, parent: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
@@ -66,9 +70,12 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 "puzzleType" in parentPuzzle && parentPuzzle.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = "id" in puzzle && puzzle.id === puzzleId && isGroupParent;
         });
-    }, [template]);
+    }, [template, props.disabled]);
 
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
         // track if template is changed
         // outside of this component
         if (!_.isEqual(template, templateSnapshot.current)) {
@@ -170,7 +177,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         }
         templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(template);
-    }, [conditions, template]);
+    }, [conditions, template, props.disabled]);
 
     function onConditionDelete(id: string) {
         // do not allow to delete if only one condition present
@@ -357,7 +364,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                     fullWidth={true}
                                     value={condition.actionType || ETerminals.EMPTY}
                                     onChange={onActionTypeChange}
-                                    placeholder={"Выберите значение"}
+                                    placeholder={"Тип сравнения"}
                                 >
                                     {conditionService.getActionVariants()}
                                 </SelectField>

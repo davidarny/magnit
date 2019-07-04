@@ -5,7 +5,7 @@ import { jsx } from "@emotion/core";
 import { FormControl, Input, MenuItem, Select } from "@material-ui/core";
 
 export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props => {
-    const { children, fullWidth, id, placeholder = "", ...rest } = props;
+    const { children, fullWidth, id, placeholder = "", displayEmpty = true, ...rest } = props;
 
     return (
         <FormControl
@@ -16,13 +16,16 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                 background: theme.colors.white,
                 border: `1px solid ${theme.colors.lightGray}`,
                 transition: "border 0.25s ease-in-out",
+                cursor: "pointer",
                 ":hover, :active": {
-                    border: `1px solid ${theme.colors.primary}`,
+                    border: props.disabled
+                        ? `1px solid ${theme.colors.lightGray}`
+                        : `1px solid ${theme.colors.primary}`,
                 },
             })}
         >
             <Select
-                displayEmpty
+                displayEmpty={displayEmpty}
                 input={
                     <Input
                         css={theme => ({
@@ -41,6 +44,7 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                         top: "50%",
                         transform: "translateY(-50%)",
                         right: theme.spacing(),
+                        opacity: props.disabled ? 0.5 : 1,
                     },
                 })}
                 classes={{ select: "select", icon: "icon", root: "root" }}

@@ -108,6 +108,7 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                         >
                             <div css={{ display: tab === 0 ? "block" : "none" }}>
                                 <Conditions
+                                    disabled={tab !== 0}
                                     puzzleId={puzzleId}
                                     onTemplateChange={onTemplateChange}
                                     template={template}
@@ -115,6 +116,7 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                             </div>
                             <div css={{ display: tab === 1 ? "block" : "none" }}>
                                 <Validations
+                                    disabled={tab !== 1}
                                     puzzleId={puzzleId}
                                     onTemplateChange={onTemplateChange}
                                     template={template}

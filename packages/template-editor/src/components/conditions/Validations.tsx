@@ -34,6 +34,7 @@ import { getValidationService } from "services/condition";
 interface IValidationsProps {
     puzzleId: string;
     template: ITemplate;
+    disabled?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -41,7 +42,7 @@ interface IValidationsProps {
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const Validations: React.FC<IValidationsProps> = props => {
-    const { puzzleId, template } = props;
+    const { puzzleId, template, disabled = false } = props;
     const [validations, setValidations] = useState<IValidation[]>([
         {
             id: uuid(),
@@ -54,12 +55,16 @@ export const Validations: React.FC<IValidationsProps> = props => {
         },
     ]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
+    const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const isParentPuzzleGroup = useRef(false);
 
     // check if parent of current puzzle is GROUP
     // if so we apply special rule when finding questions to reference
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
         traverse(template, (value: any, parent: any) => {
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
@@ -73,9 +78,32 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 "puzzleType" in parentPuzzle && parentPuzzle.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = "id" in puzzle && puzzle.id === puzzleId && isGroupParent;
         });
-    }, [template]);
+    }, [template, props.disabled]);
+
+    // get current question
+    useEffect(() => {
+        if (disabled) {
+            return;
+        }
+        traverse(template, (value: any) => {
+            if (typeof value !== "object" || !("puzzles" in value)) {
+                return;
+            }
+            const puzzle = value as IPuzzle;
+            if (!("id" in puzzle) || puzzle.id !== puzzleId) {
+                return;
+            }
+            setCurrentQuestion(puzzle);
+            setValidations([
+                ...validations.map(validation => ({ ...validation, leftHandPuzzle: puzzle.id })),
+            ]);
+        });
+    }, [template, props.disabled]);
 
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
         // track if template is changed
         // outside of this component
         if (!_.isEqual(template, templateSnapshot.current)) {
@@ -167,7 +195,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         }
         templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(templateSnapshot.current);
-    }, [validations, template]);
+    }, [validations, template, props.disabled]);
 
     function onDeleteValidation(id: string) {
         // do not allow to delete if only one validation present
@@ -194,11 +222,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
         ) {
             return;
         }
-        const validationsHead = _.head(validations) || { leftHandPuzzle: ETerminals.EMPTY };
         validations.push({
             id: uuid(),
             order: validations.length - 1,
-            leftHandPuzzle: validationsHead.leftHandPuzzle,
+            leftHandPuzzle: (currentQuestion && currentQuestion.id) || ETerminals.EMPTY,
             validationType: EValidationType.NONE,
             operatorType: EOperatorType.NONE,
             errorMessage: ETerminals.EMPTY,
@@ -217,20 +244,6 @@ export const Validations: React.FC<IValidationsProps> = props => {
             alignItems="center"
         >
             {validations.map((validation, index) => {
-                function onLeftHandPuzzleChange(event: TChangeEvent): void {
-                    // reset validations length when question changed
-                    validations.length = 1;
-                    // reset first validation fields when question changed
-                    // and change questionPuzzle
-                    onValidationChange(validation.id, {
-                        leftHandPuzzle: event.target.value as string,
-                        validationType: EValidationType.NONE,
-                        operatorType: EOperatorType.NONE,
-                        conditionType: EConditionType.OR,
-                        errorMessage: ETerminals.EMPTY,
-                    });
-                }
-
                 function onOperatorTypeChange(event: TChangeEvent): void {
                     onValidationChange(validation.id, {
                         operatorType: event.target.value as EOperatorType,
@@ -322,25 +335,19 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 </React.Fragment>
                             )}
                         </Grid>
-                        {isFirstRow && (
+                        {isFirstRow && currentQuestion && (
                             <Grid item xs={3}>
                                 <SelectField
                                     id={"left-hand-puzzle"}
-                                    fullWidth={true}
-                                    value={validation.leftHandPuzzle || ETerminals.EMPTY}
-                                    onChange={onLeftHandPuzzleChange}
+                                    fullWidth
+                                    value={currentQuestion.id || ETerminals.EMPTY}
                                     placeholder={"Выберите вопрос"}
+                                    disabled
+                                    displayEmpty={false}
                                 >
-                                    {questions.map(questionToChoseFrom => {
-                                        return (
-                                            <MenuItem
-                                                key={questionToChoseFrom.id}
-                                                value={questionToChoseFrom.id}
-                                            >
-                                                {questionToChoseFrom.title}
-                                            </MenuItem>
-                                        );
-                                    })}
+                                    <MenuItem key={currentQuestion.id} value={currentQuestion.id}>
+                                        {currentQuestion.title}
+                                    </MenuItem>
                                 </SelectField>
                             </Grid>
                         )}
@@ -348,7 +355,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                             {!!validation.leftHandPuzzle && (
                                 <SelectField
                                     id={"operator-type"}
-                                    fullWidth={true}
+                                    fullWidth
                                     value={validation.operatorType || ETerminals.EMPTY}
                                     onChange={onOperatorTypeChange}
                                     placeholder={"Выберите значение"}
@@ -361,10 +368,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
                             {!!validation.leftHandPuzzle && (
                                 <SelectField
                                     id={"validation-type"}
-                                    fullWidth={true}
+                                    fullWidth
                                     value={validation.validationType || ETerminals.EMPTY}
                                     onChange={onValidationTypeChange}
-                                    placeholder={"Выберите значение"}
+                                    placeholder={"Тип сравнения"}
                                 >
                                     {validationService.getValidationVariants()}
                                 </SelectField>
