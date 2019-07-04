@@ -1,23 +1,24 @@
 /** @jsx jsx */
 
 import * as React from "react";
+import { useState } from "react";
 import { jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "TemplateEditor";
 import { Conditions, Validations } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
 import { Grid, Tab, Tabs } from "@material-ui/core";
-import { useState } from "react";
 
 interface IContentConditionsProps {
     puzzleId: string;
     focused: boolean;
     puzzleType: EPuzzleType;
+    answerType?: EPuzzleType;
 }
 
 export const ContentConditions: React.FC<IContentConditionsProps> = props => {
     const [tab, setTab] = useState(0);
 
-    const { puzzleId, focused, puzzleType } = props;
+    const { puzzleId, focused, puzzleType, answerType } = props;
 
     function onTabChange(event: React.ChangeEvent<{}>, nextTab: number): void {
         setTab(nextTab);
@@ -79,7 +80,7 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                                     })}
                                     label={conditionsTitle}
                                 />
-                                {!!validationsTitle && (
+                                {!!validationsTitle && answerType === EPuzzleType.NUMERIC_ANSWER && (
                                     <Tab
                                         label={validationsTitle}
                                         css={theme => ({
@@ -114,7 +115,14 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                                     template={template}
                                 />
                             </div>
-                            <div css={{ display: tab === 1 ? "block" : "none" }}>
+                            <div
+                                css={{
+                                    display:
+                                        tab === 1 && answerType === EPuzzleType.NUMERIC_ANSWER
+                                            ? "block"
+                                            : "none",
+                                }}
+                            >
                                 <Validations
                                     disabled={tab !== 1}
                                     puzzleId={puzzleId}

@@ -7,6 +7,7 @@ import { IPuzzle } from "entities";
 import { EPuzzleType } from "components/puzzle";
 import { ContentItem } from "./ContentItem";
 import { ContentConditions } from "./ContentConditions";
+import _ from "lodash";
 
 interface IContentGroupProps {
     index: number;
@@ -91,6 +92,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     puzzleId={item.id}
                     focused={focused}
                     puzzleType={item.puzzleType}
+                    answerType={_.get(_.head(item.puzzles), "puzzleType")}
                 />
             </div>
         </SelectableBlockWrapper>
