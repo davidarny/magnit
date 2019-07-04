@@ -39,7 +39,6 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
             onBlur={props.onBlur}
             focused={focused}
             css={theme => ({
-                position: "relative",
                 paddingTop: theme.spacing(2),
                 paddingBottom: theme.spacing(2),
                 zIndex: focused ? 1300 : 0,

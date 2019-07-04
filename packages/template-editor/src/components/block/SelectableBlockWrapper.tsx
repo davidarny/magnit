@@ -19,10 +19,11 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
             {...rest}
             css={theme => ({
                 boxShadow: focused
-                    ? `0px 0px ${theme.spacing(2)} ${theme.colors.shadowGray} !important`
+                    ? `0px 0px ${theme.spacing(2)} ${theme.colors.shadowGray}`
                     : "none",
-                overflow: "hidden",
                 position: "relative",
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
                 ...css(theme),
             })}
             square={false}
@@ -30,8 +31,9 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
             <div
                 css={theme => ({
                     position: "absolute",
-                    width: theme.spacing(),
-                    left: 0,
+                    width: theme.spacing(0.5),
+                    left: theme.spacing(-0.5),
+                    borderRadius: `${theme.radius(0.5)} 0 0 ${theme.radius(0.5)}`,
                     top: 0,
                     bottom: 0,
                     backgroundColor: theme.colors.primary,

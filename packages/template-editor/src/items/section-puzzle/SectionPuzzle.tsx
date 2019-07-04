@@ -12,13 +12,8 @@ interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     description: string;
 }
 
-export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
-    title,
-    description,
-    index,
-    focused,
-    children,
-}) => {
+export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
+    const { title, description, index, focused, children } = props;
     return (
         <React.Fragment>
             <Grid
@@ -29,29 +24,23 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = ({
                 css={theme => ({
                     paddingLeft: theme.spacing(4),
                     paddingRight: theme.spacing(4),
+                    paddingBottom: theme.spacing(),
                     position: "relative",
                 })}
-                style={{
-                    paddingBottom: 10,
-                }}
             >
                 <Grid
                     item
-                    css={{
+                    css={theme => ({
                         position: "absolute",
-                        top: 10,
-                        left: 30,
-                    }}
+                        top: theme.spacing(),
+                        left: theme.spacing(4),
+                    })}
                 >
-                    <Typography
-                        style={{
-                            fontSize: 26,
-                        }}
-                    >
+                    <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
                         Раздел {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs css={{ marginLeft: "130px !important" }}>
+                <Grid item xs css={theme => ({ marginLeft: `${theme.spacing(16)} !important` })}>
                     <Grid
                         item
                         css={theme => ({
