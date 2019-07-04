@@ -20,7 +20,14 @@ export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, id, ...
             id={id}
             container
             direction="column"
-            css={theme => ({ paddingLeft: theme.spacing(4), paddingRight: theme.spacing(4) })}
+            css={theme => ({
+                paddingLeft: theme.spacing(4),
+                paddingRight: theme.spacing(4),
+                // need for correct toolbar positioning
+                // see https://github.com/DavidArutiunian/magnit/issues/46
+                marginTop: theme.spacing(-3),
+                paddingTop: theme.spacing(4),
+            })}
             onFocus={props.onFocus}
             onMouseDown={props.onFocus}
             onBlur={props.onBlur}

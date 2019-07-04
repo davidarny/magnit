@@ -38,7 +38,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
             onMouseDown={onFocus}
             onBlur={props.onBlur}
             focused={focused}
-            styles={theme => ({
+            css={theme => ({
                 position: "relative",
                 paddingTop: theme.spacing(2),
                 paddingBottom: theme.spacing(2),
@@ -50,8 +50,8 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     paddingLeft: !!parentPuzzle ? theme.spacing(4) : 0,
                     paddingTop: theme.spacing(),
                     paddingBottom: theme.spacing(),
-                    borderTop: hasBorder ? "1px dashed #AAB4BE" : "none",
-                    borderBottom: hasBorder ? "1px dashed #AAB4BE" : "none",
+                    borderTop: hasBorder ? `1px dashed ${theme.colors.gray}` : "none",
+                    borderBottom: hasBorder ? `1px dashed ${theme.colors.gray}` : "none",
                 })}
             >
                 <ContentItem

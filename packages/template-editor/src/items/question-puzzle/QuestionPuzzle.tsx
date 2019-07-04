@@ -94,7 +94,15 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
 
     if (!props.focused) {
         return (
-            <Grid container direction="column">
+            <Grid
+                container
+                direction="column"
+                css={theme => ({
+                    // need for correct toolbar positioning
+                    // see https://github.com/DavidArutiunian/magnit/issues/46
+                    marginTop: theme.spacing(-2),
+                })}
+            >
                 <Grid item>
                     <Typography variant="body1">
                         <Typography
@@ -118,8 +126,10 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: `${theme.spacing()} !important`,
                         marginBottom: `${theme.spacing()} !important`,
+                        // need for correct toolbar positioning
+                        // see https://github.com/DavidArutiunian/magnit/issues/46
+                        marginTop: `${theme.spacing(-2)} !important`,
                     })}
                 >
                     <Grid item>

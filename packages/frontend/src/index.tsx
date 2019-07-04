@@ -35,6 +35,7 @@ const theme = {
         default: "#000000",
         black: "#3F4752",
         light: "#F6F7FB",
+        shadowGray: "#BFC8D2",
         gray: "#AAB4BE",
         lightGray: "#DEE5EF",
         green: "#0CDAAC",

@@ -314,7 +314,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             />
             <SelectableBlockWrapper
                 id={template.id}
-                styles={theme => ({
+                css={theme => ({
                     paddingTop: theme.spacing(3),
                     marginBottom: theme.spacing(2),
                 })}
@@ -332,7 +332,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     <SelectableBlockWrapper
                         key={section.id}
                         id={section.id}
-                        styles={theme => ({
+                        css={theme => ({
                             marginTop: theme.spacing(4),
                             marginBottom: theme.spacing(2),
                             paddingTop: theme.spacing(2),
