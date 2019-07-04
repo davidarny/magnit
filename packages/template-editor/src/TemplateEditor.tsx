@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { ETerminals, IPuzzle, ITemplate } from "./entities";
+import { ETerminals, IPuzzle, ITemplate, ETemplateType } from "./entities";
 import { SectionPuzzle } from "./items/section-puzzle";
 import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
 import uuid from "uuid/v4";
@@ -11,7 +11,6 @@ import { traverse } from "./services/json";
 import _ from "lodash";
 import { SelectableBlockWrapper } from "./components/block";
 import { Content, ContentSection } from "./components/content";
-import { ETemplateType } from "./entities/ETemplateType";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
