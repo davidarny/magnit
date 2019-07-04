@@ -21,12 +21,13 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
             variant="permanent"
             open={true}
             id="drawer"
-            css={{
-                "> div": {
+            css={theme => ({
+                ".paper": {
                     border: "none",
-                    boxShadow: "4px 0 15px rgba(207, 217, 227, 0.4)",
+                    boxShadow: `${theme.spacing(0.5)} 0 ${theme.spacing(2)} ${theme.colors.gray}40`,
                 },
-            }}
+            })}
+            classes={{ paper: "paper" }}
         >
             <div
                 css={theme => ({
@@ -86,14 +87,14 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                     direction="column"
                                     justify="center"
                                     alignItems="center"
-                                    css={css`
-                                        position: relative;
-                                        :hover {
-                                            div:first-of-type {
-                                                background-color: #2f97ff;
-                                            }
-                                        }
-                                    `}
+                                    css={theme => ({
+                                        position: "relative",
+                                        ":hover": {
+                                            "div:first-of-type": {
+                                                background: theme.colors.primary,
+                                            },
+                                        },
+                                    })}
                                 >
                                     <Grid
                                         item
@@ -101,15 +102,15 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                             display: "block",
                                             position: "absolute",
                                             transition: "0.25s",
-                                            top: -3,
+                                            top: theme.spacing(-0.5),
                                             left: 0,
-                                            width: 3,
-                                            height: 64,
-                                            borderTopRightRadius: 3,
-                                            borderBottomRightRadius: 3,
-                                            background: isActive ? theme.colors.blue : "none",
+                                            width: theme.spacing(0.5),
+                                            height: theme.spacing(8),
+                                            borderTopRightRadius: theme.radius(0.5),
+                                            borderBottomRightRadius: theme.radius(0.5),
+                                            background: isActive ? theme.colors.primary : "none",
                                             boxShadow: isActive
-                                                ? "1px 0 rgba(47, 151, 255, 0.4)"
+                                                ? `1px 0 ${theme.colors.shadowBlue}40`
                                                 : "none",
                                         })}
                                     />
@@ -133,8 +134,8 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                         <Typography
                                             css={theme => ({
                                                 color: isActive
-                                                    ? theme.colors.blue
-                                                    : theme.colors.darkGray,
+                                                    ? theme.colors.primary
+                                                    : theme.colors.gray,
                                                 fontSize: theme.fontSize.small,
                                                 fontWeight: 500,
                                             })}

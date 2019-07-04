@@ -24,7 +24,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
                 css={theme => ({
                     paddingLeft: theme.spacing(4),
                     paddingRight: theme.spacing(4),
-                    paddingBottom: theme.spacing(),
+                    paddingBottom: theme.spacing(2),
                     position: "relative",
                 })}
             >
