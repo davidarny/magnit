@@ -5,7 +5,7 @@ import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
 import { IIconProps } from "./IIconProps";
 
-export const CopyIcon: React.FC<IIconProps> = ({ size = 24 }) => {
+export const CopyIcon: React.FC<IIconProps> = ({ size = 30 }) => {
     return (
         <SvgIcon
             width={size}
@@ -18,14 +18,14 @@ export const CopyIcon: React.FC<IIconProps> = ({ size = 24 }) => {
             `}
         >
             <path
-                d="M3.5 14.5V2.5H14"
+                d="M4.375 18.125V3.125H17.5"
                 stroke="#2F97FF"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
             <path
-                d="M6.75 5.75H18C18.6904 5.75 19.25 6.30964 19.25 7V19C19.25 19.6904 18.6904 20.25 18 20.25H8C7.30964 20.25 6.75 19.6904 6.75 19V5.75Z"
+                d="M8.25 7H23C23.6904 7 24.25 7.55964 24.25 8.25V24.25C24.25 24.9404 23.6904 25.5 23 25.5H9.5C8.80964 25.5 8.25 24.9404 8.25 24.25V7Z"
                 stroke="#2F97FF"
                 strokeWidth="1.5"
             />
