@@ -21,7 +21,7 @@ export const Loading: React.FC = () => {
             `}
         >
             <Grid item>
-                <CircularProgress />
+                <CircularProgress css={theme => ({ color: theme.colors.primary })} />
             </Grid>
         </Grid>
     );
