@@ -1,5 +1,6 @@
 {
     "title": "Ведомость работ",
+    "type": "light",
     "sections": [
         {
             "order": 0,

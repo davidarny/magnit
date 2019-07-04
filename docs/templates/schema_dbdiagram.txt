@@ -1,6 +1,7 @@
 Table template {
  id int [pk]
  title varchar
+ type template_type
 }
 
 Table section {
@@ -74,6 +75,11 @@ enum validation_action_type {
 enum input_type {
   string
   number
+}
+
+enum template_type {
+  light
+  complex
 }
 
 enum operator_type {
