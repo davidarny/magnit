@@ -169,7 +169,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             return;
         }
         templateSnapshot.current = _.cloneDeep(template);
-        props.onTemplateChange(templateSnapshot.current);
+        props.onTemplateChange(template);
     }, [conditions, template]);
 
     function onConditionDelete(id: string) {

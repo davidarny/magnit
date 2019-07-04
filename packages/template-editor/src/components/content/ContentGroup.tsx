@@ -30,6 +30,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
     const focused = isFocused(item.id);
     const isGroup = item.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
+
     return (
         <SelectableBlockWrapper
             onFocus={onFocus}

@@ -5,7 +5,8 @@ import { jsx } from "@emotion/core";
 import { FormControl, Input, MenuItem, Select } from "@material-ui/core";
 
 export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props => {
-    const { children, fullWidth, value, id, onChange, placeholder = "", ...rest } = props;
+    const { children, fullWidth, id, placeholder = "", ...rest } = props;
+
     return (
         <FormControl
             fullWidth={fullWidth}
@@ -21,7 +22,6 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
             })}
         >
             <Select
-                value={value}
                 displayEmpty
                 input={
                     <Input
@@ -35,7 +35,6 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                         id={id}
                     />
                 }
-                onChange={onChange}
                 css={theme => ({
                     ".select:focus": { background: theme.colors.white },
                     ".icon": {

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "TemplateEditor";
 import { Conditions, Validations } from "components/conditions";
 import { EPuzzleType } from "components/puzzle";
@@ -18,9 +18,6 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
     const [tab, setTab] = useState(0);
 
     const { puzzleId, focused, puzzleType } = props;
-    if (!focused) {
-        return null;
-    }
 
     function onTabChange(event: React.ChangeEvent<{}>, nextTab: number): void {
         setTab(nextTab);
@@ -42,6 +39,7 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                             marginTop: theme.spacing(2),
                             paddingLeft: theme.spacing(4),
                             paddingRight: theme.spacing(4),
+                            display: focused ? "flex" : "none",
                         })}
                     >
                         <Grid
@@ -108,20 +106,20 @@ export const ContentConditions: React.FC<IContentConditionsProps> = props => {
                                 background: theme.colors.light,
                             })}
                         >
-                            {tab === 0 && (
+                            <div css={{ display: tab === 0 ? "block" : "none" }}>
                                 <Conditions
                                     puzzleId={puzzleId}
                                     onTemplateChange={onTemplateChange}
                                     template={template}
                                 />
-                            )}
-                            {tab === 1 && (
+                            </div>
+                            <div css={{ display: tab === 1 ? "block" : "none" }}>
                                 <Validations
                                     puzzleId={puzzleId}
                                     onTemplateChange={onTemplateChange}
                                     template={template}
                                 />
-                            )}
+                            </div>
                         </Grid>
                     </Grid>
                 );
