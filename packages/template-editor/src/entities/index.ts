@@ -4,6 +4,7 @@ import { EConditionType } from "./EConditionType";
 import { EActionType } from "./EActionType";
 import { EPuzzleType } from "components/puzzle";
 import * as React from "react";
+import { ETemplateType } from "./ETemplateType";
 
 interface ITitled {
     title: string;
@@ -53,6 +54,7 @@ export interface IValidation extends IOrdered, IWithId {
 
 export interface ITemplate extends ITitled, IWithId, IWithDescription {
     sections: ISection[];
+    type: ETemplateType;
 }
 
 export interface ISection extends IOrdered, ITitled, IWithPuzzles<IPuzzle>, IWithId {}
@@ -89,3 +91,4 @@ export * from "./EOperatorType";
 export * from "./EConditionType";
 export * from "./EActionType";
 export * from "./ETerminals";
+export * from "./ETemplateType";

@@ -11,6 +11,7 @@ import { traverse } from "./services/json";
 import _ from "lodash";
 import { SelectableBlockWrapper } from "./components/block";
 import { Content, ContentSection } from "./components/content";
+import { ETemplateType } from "./entities/ETemplateType";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -35,6 +36,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             sections: [],
             title: ETerminals.EMPTY,
             description: ETerminals.EMPTY,
+            type: ETemplateType.LIGHT,
         }
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
@@ -323,7 +325,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
                 onBlur={onPuzzleBlur}
             >
-                <ContentSection template={template} focused={focusedPuzzleId === template.id} />
+                <ContentSection
+                    template={template}
+                    focused={focusedPuzzleId === template.id}
+                    onTemplateChange={onTemplateChange}
+                />
             </SelectableBlockWrapper>
             {template.sections.map((section, index) => {
                 const focused = focusedPuzzleId === section.id;
