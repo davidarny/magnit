@@ -28,12 +28,13 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                 displayEmpty={displayEmpty}
                 input={
                     <Input
+                        disableUnderline
                         css={theme => ({
                             border: "none",
                             height: "100%",
-                            ":before, :after": { display: "none" },
                             background: "transparent",
                             padding: `0 ${theme.spacing(2)}`,
+                            cursor: "pointer",
                         })}
                         id={id}
                     />
