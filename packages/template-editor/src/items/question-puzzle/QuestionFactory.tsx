@@ -1,22 +1,25 @@
 /** @jsx jsx */
 
 import * as React from "react";
+import { useContext } from "react";
 import { jsx } from "@emotion/core";
 import { QuestionPuzzle } from "./QuestionPuzzle";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import { EditorContext, IEditorContext } from "index";
+import { EditorContext } from "TemplateEditor";
 
 export class QuestionFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, ...props }: IPuzzleFactoryProps): React.ReactNode {
+        const context = useContext(EditorContext);
+        const { template, onTemplateChange } = context;
+
         return (
-            <EditorContext.Consumer>
-                {({ template, onTemplateChange }: IEditorContext) => (
-                    <QuestionPuzzle
-                        {...rest}
-                        {...{ template, onTemplateChange, id: puzzle.id, title: puzzle.title }}
-                    />
-                )}
-            </EditorContext.Consumer>
+            <QuestionPuzzle
+                {...props}
+                template={template!}
+                id={puzzle.id}
+                title={puzzle.title}
+                onTemplateChange={onTemplateChange}
+            />
         );
     }
 }

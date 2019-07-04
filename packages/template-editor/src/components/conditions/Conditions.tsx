@@ -48,6 +48,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     ]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
+
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const isParentPuzzleGroup = useRef(false);
 

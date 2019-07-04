@@ -33,6 +33,7 @@ const answerTypes = [
 export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
     const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
     const [questionTitle, setQuestionTitle] = useState(props.title);
+
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const answerTypeSnapshot = useRef<EPuzzleType>((ETerminals.EMPTY as unknown) as EPuzzleType);
 

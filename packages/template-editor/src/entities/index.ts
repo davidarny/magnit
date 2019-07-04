@@ -74,7 +74,7 @@ export interface ISpecificPuzzleProps {
 }
 
 export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {
-    questionFocused: boolean;
+    focused: boolean;
 }
 
 interface TChangeParam {

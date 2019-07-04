@@ -55,7 +55,7 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
         props.onDeleteCheckboxButton(props.id);
     }
 
-    if (!props.questionFocused) {
+    if (!props.focused) {
         return (
             <Grid
                 container

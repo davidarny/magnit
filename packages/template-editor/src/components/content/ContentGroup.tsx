@@ -11,8 +11,8 @@ import _ from "lodash";
 
 interface IContentGroupProps {
     index: number;
-    item: IPuzzle;
-    parentItem?: IPuzzle;
+    puzzle: IPuzzle;
+    parentPuzzle?: IPuzzle;
 
     isFocused(id: string): boolean;
 
@@ -22,14 +22,14 @@ interface IContentGroupProps {
 }
 
 export const ContentGroup: React.FC<IContentGroupProps> = props => {
-    const { isFocused, item, parentItem } = props;
+    const { isFocused, puzzle, parentPuzzle } = props;
 
     function onFocus(): void {
-        props.onFocus(item.id);
+        props.onFocus(puzzle.id);
     }
 
-    const focused = isFocused(item.id);
-    const isGroup = item.puzzleType === EPuzzleType.GROUP;
+    const focused = isFocused(puzzle.id);
+    const isGroup = puzzle.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
 
     return (
@@ -47,7 +47,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
         >
             <div
                 css={theme => ({
-                    paddingLeft: !!parentItem ? theme.spacing(4) : 0,
+                    paddingLeft: !!parentPuzzle ? theme.spacing(4) : 0,
                     paddingTop: theme.spacing(),
                     paddingBottom: theme.spacing(),
                     borderTop: hasBorder ? "1px dashed #AAB4BE" : "none",
@@ -55,44 +55,44 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                 })}
             >
                 <ContentItem
-                    puzzle={item}
-                    parentPuzzle={parentItem}
+                    puzzle={puzzle}
+                    parentPuzzle={parentPuzzle}
                     index={props.index}
                     active={focused}
                     onFocus={onFocus}
                     onBlur={props.onBlur}
                 />
-                {item.puzzles.map((puzzle, index) => {
+                {puzzle.puzzles.map((puzzle, index) => {
                     if (puzzle.puzzleType === EPuzzleType.QUESTION) {
                         return (
                             <ContentGroup
                                 key={puzzle.id}
-                                item={puzzle}
+                                puzzle={puzzle}
                                 onFocus={props.onFocus}
                                 onBlur={props.onBlur}
                                 isFocused={isFocused}
-                                index={index}
-                                parentItem={item}
+                                index={props.index + index}
+                                parentPuzzle={puzzle}
                             />
                         );
                     }
                     return (
                         <ContentItem
                             puzzle={puzzle}
-                            index={index}
+                            index={props.index + index}
                             active={focused}
                             onFocus={onFocus}
                             onBlur={props.onBlur}
                             key={puzzle.id}
-                            parentPuzzle={item}
+                            parentPuzzle={puzzle}
                         />
                     );
                 })}
                 <ContentConditions
-                    puzzleId={item.id}
+                    puzzleId={puzzle.id}
                     focused={focused}
-                    puzzleType={item.puzzleType}
-                    answerType={_.get(_.head(item.puzzles), "puzzleType")}
+                    puzzleType={puzzle.puzzleType}
+                    answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
                 />
             </div>
         </SelectableBlockWrapper>

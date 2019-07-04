@@ -26,7 +26,7 @@ export interface IEditorContext {
     onDeleteAnswerPuzzle(id: string): void;
 }
 
-export const EditorContext = React.createContext<IEditorContext>(_.stubObject());
+export const EditorContext = React.createContext<IEditorContext>(({} as unknown) as IEditorContext);
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [template, setTemplate] = useState<ITemplate>(
@@ -296,12 +296,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     return (
         <EditorContext.Provider
-            value={{
-                template,
-                onTemplateChange,
-                onAddAnswerPuzzle,
-                onDeleteAnswerPuzzle,
-            }}
+            value={
+                ({
+                    template,
+                    onTemplateChange,
+                    onAddAnswerPuzzle,
+                    onDeleteAnswerPuzzle,
+                } as unknown) as IEditorContext
+            }
         >
             <PuzzleToolbar
                 top={toolbarTopPosition}
@@ -325,6 +327,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             </SelectableBlockWrapper>
             {template.sections.map((section, index) => {
                 const focused = focusedPuzzleId === section.id;
+
                 return (
                     <SelectableBlockWrapper
                         key={section.id}

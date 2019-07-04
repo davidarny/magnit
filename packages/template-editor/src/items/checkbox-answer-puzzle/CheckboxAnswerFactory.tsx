@@ -3,26 +3,29 @@
 import * as React from "react";
 import { jsx } from "@emotion/core";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import { EditorContext, IEditorContext } from "TemplateEditor";
+import { EditorContext } from "TemplateEditor";
 import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
+import { useContext } from "react";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, parentPuzzle, focused, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    createPuzzle({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+        const context = useContext(EditorContext);
+        const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
+
+        const addCheckboxButton =
+            !!props.parentPuzzle && props.parentPuzzle.puzzles.length - 1 === props.index;
+
         return (
-            <EditorContext.Consumer>
-                {({ onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...context }: IEditorContext) => (
-                    <CheckboxAnswerPuzzle
-                        {...context}
-                        {...rest}
-                        {...{ id: puzzle.id, title: puzzle.title, questionFocused: focused }}
-                        onAddCheckboxButton={onAddAnswerPuzzle}
-                        onDeleteCheckboxButton={onDeleteAnswerPuzzle}
-                        addCheckboxButton={
-                            !!parentPuzzle && parentPuzzle.puzzles.length - 1 === rest.index
-                        }
-                    />
-                )}
-            </EditorContext.Consumer>
+            <CheckboxAnswerPuzzle
+                {...rest}
+                {...props}
+                id={puzzle.id}
+                title={puzzle.title}
+                focused={focused}
+                onAddCheckboxButton={onAddAnswerPuzzle}
+                onDeleteCheckboxButton={onDeleteAnswerPuzzle}
+                addCheckboxButton={addCheckboxButton}
+            />
         );
     }
 }

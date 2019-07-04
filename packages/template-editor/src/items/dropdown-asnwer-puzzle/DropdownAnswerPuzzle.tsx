@@ -55,7 +55,7 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
         props.onDeleteDropdownButton(props.id);
     }
 
-    if (!props.questionFocused) {
+    if (!props.focused) {
         return (
             <Grid
                 container
@@ -115,7 +115,7 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                 </Grid>
             </Grid>
 
-            {props.addDropdownButton && props.questionFocused && (
+            {props.addDropdownButton && props.focused && (
                 <Grid
                     container
                     alignItems="flex-end"

@@ -22,7 +22,7 @@ export const Content: React.FC<IContentProps> = ({ puzzles, ...props }) => {
                 return (
                     <ContentGroup
                         key={puzzle.id}
-                        item={puzzle}
+                        puzzle={puzzle}
                         onFocus={props.onFocus}
                         onBlur={props.onBlur}
                         isFocused={props.isFocused}

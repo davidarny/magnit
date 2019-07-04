@@ -55,7 +55,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
         props.onDeleteRadioButton(props.id);
     }
 
-    if (!props.questionFocused) {
+    if (!props.focused) {
         return (
             <Grid
                 container
