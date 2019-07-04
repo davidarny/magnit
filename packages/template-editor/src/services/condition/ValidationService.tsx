@@ -64,7 +64,7 @@ export class ValidationService extends ServiceImpl implements IValidationService
                     return (
                         <SelectField
                             fullWidth
-                            placeholder="Выберите ответ"
+                            placeholder="Выберите вопрос"
                             onChange={onRightHandPuzzleChange}
                             value={validation.rightHandPuzzle || ETerminals.EMPTY}
                         >
