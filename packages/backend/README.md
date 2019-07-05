@@ -1,14 +1,14 @@
-## **Recommended software versions:**
+## Requirements
 
--   PostgreSQL >= 10.8
+-   [PostgreSQL](https://www.postgresql.org/) ≥ 10.x
 
--   node.js >= 10.15.2
+-   [Node.js](https://nodejs.org/en/) ≥ 10.x
 
--   sails.js >= 1.1.0
+-   [Sails.js](https://sailsjs.com/) ≥ 1.1.0
 
--   mocha >= 6.0.2 (for running tests)
+-   [Mocha](https://mochajs.org/) ≥ 6.x (for tests)
 
-## **Usage**
+## Usage
 
 1. Create file `local.js` in folder `config` and fill it in by example `stuff/local_example.js`
 2. Create file `bootstrap.js` in folder `config` and fill it in by example `stuff/bootstrap_example.js`
