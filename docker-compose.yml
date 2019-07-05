@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+    frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile.frontend
+        restart: unless-stopped
+        networks:
+            - magnit
+        ports:
+            - ${FRONTEND_PORT:-80}:80
+        volumes:
+            - devel:/devel
+
+    backend:
+        build:
+            context: .
+            dockerfile: Dockerfile.backend
+            args:
+                - BACKEND_CONFIG=${BACKEND_CONFIG}
+        restart: unless-stopped
+        networks:
+            - magnit
+        ports:
+            - ${BACKEND_PORT:-1337}:1337
+        volumes:
+            - devel:/devel
+
+    db:
+        image: postgres:11-alpine
+        environment:
+            - POSTGRES_USER=magnit
+            - POSTGRES_DB=magnit
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
+        volumes:
+            - ${POSTGRES_DATA_DIR:-/magnit/postgres/data}:/var/lib/postgresql/data
+            - ./packages/backend/migrations:/docker-entrypoint-initdb.d
+        ports:
+            - 5432:5432
+        networks:
+            - magnit
+
+volumes:
+    devel:
+
+networks:
+    magnit:

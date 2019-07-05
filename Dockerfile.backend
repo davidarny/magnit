@@ -1,0 +1,12 @@
+FROM node:10-alpine
+
+WORKDIR /devel
+
+COPY . .
+RUN find ./packages ! -name "backend" -type d -exec rm -rf {} +
+
+RUN yarn install
+
+COPY ${BACKEND_CONFIG} .
+
+ENTRYPOINT ["yarn", "start:backend"]

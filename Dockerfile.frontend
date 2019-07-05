@@ -1,0 +1,24 @@
+# build step
+FROM node:10-alpine AS build
+
+WORKDIR /devel
+
+COPY . .
+RUN rm -rf ./packages/backend
+
+RUN yarn install
+
+RUN yarn build:frontend
+
+# serve step
+FROM nginx:alpine AS serve
+
+WORKDIR /var/www/magnit
+
+COPY --from=build /devel/packages/frontend/build .
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
