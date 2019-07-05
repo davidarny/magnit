@@ -1,0 +1,10 @@
+{
+    "host": "<host url>:1337",
+    "hostname": "<host name>",
+    "postgresql_db": "<db name>",
+    "postgresql_user": "<user name>",
+    "postgresql_host": "<db host name>",
+    "postgresql_password": "<db password>",
+    "postgresql_port": 5432,
+    "secret": "<secret>"
+}

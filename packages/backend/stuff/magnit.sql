@@ -105,6 +105,7 @@ DROP TYPE public.operator_type;
 DROP TYPE public.input_type;
 DROP TYPE public.condition_type;
 DROP TYPE public.condition_action_type;
+DROP TYPE public.template_type;
 DROP EXTENSION "uuid-ossp";
 DROP EXTENSION plpgsql;
 DROP SCHEMA public;
@@ -243,6 +244,18 @@ CREATE TYPE public.status_type AS ENUM (
 
 
 ALTER TYPE public.status_type OWNER TO magnit;
+
+--
+-- Name: template_type; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.template_type AS ENUM (
+    'light',
+    'complex'
+);
+
+
+ALTER TYPE public.template_type OWNER TO postgres;
 
 --
 -- Name: unit_type; Type: TYPE; Schema: public; Owner: postgres
@@ -745,6 +758,7 @@ ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
 
 CREATE TABLE public.templates (
     id integer NOT NULL,
+    type public.template_type,
     title text,
     description text,
     created_at timestamp without time zone,
@@ -1063,7 +1077,7 @@ COPY public.tasks (id, name, description, departure_date, deadline_date, object_
 -- Data for Name: templates; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.templates (id, title, description, created_at, updated_at) FROM stdin;
+COPY public.templates (id, type, title, description, created_at, updated_at) FROM stdin;
 \.
 
 
