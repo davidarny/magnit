@@ -31,6 +31,7 @@ module.exports = {
                 return exits.notFound({ success: 0, message: "template does not exist" });
             }
 
+            json.type = template.type;
             json.title = template.title;
             json.description = template.description;
 

@@ -12,5 +12,11 @@ module.exports = {
             columnType: "text",
             allowNull: true,
         },
+
+        type: {
+            type: "string",
+            columnType: "text",
+            allowNull: true,
+        },
     },
 };

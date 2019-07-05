@@ -1,0 +1,10 @@
+{
+    "host": "http://localhost:1337",
+    "hostname": "localhost",
+    "postgresql_db": "magnit",
+    "postgresql_user": "magnit",
+    "postgresql_host": "localhost",
+    "postgresql_password": "quasar19",
+    "postgresql_port": 5432,
+    "secret": "F692E792E3C39B3C7AA4998FED427"
+}
