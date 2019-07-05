@@ -1,12 +1,13 @@
 FROM node:10-alpine
 
+ENV BACKEND_CONFIG_DIR=.
+
 WORKDIR /devel
 
 COPY . .
-RUN find ./packages ! -name "backend" -type d -exec rm -rf {} +
-
-RUN yarn install
 
 COPY ${BACKEND_CONFIG_DIR} /devel
+
+RUN yarn install && cd packages/backend && npm i
 
 ENTRYPOINT ["yarn", "start:backend"]
