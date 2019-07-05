@@ -1,5 +1,6 @@
 {
     "title": "Ведомость работ",
+    "type": "complex",
     "sections": [
         {
             "order": 0,

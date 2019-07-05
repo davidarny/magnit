@@ -42,6 +42,7 @@ module.exports = {
             }
 
             let criteria = {
+                type: template.type,
                 title: template.title,
                 description: template.description,
             };

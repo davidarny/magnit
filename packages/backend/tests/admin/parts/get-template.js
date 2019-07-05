@@ -25,6 +25,7 @@ module.exports = function(options) {
 
                     const template = JSON.parse(body.template);
 
+                    assert.equal(template.type, "complex");
                     assert.equal(template.title, "Ведомость работ");
                     assert.equal(template.description, null);
 

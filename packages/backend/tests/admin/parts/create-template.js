@@ -160,6 +160,7 @@ module.exports = function(options) {
 
         const templates = await Template.find();
         assert.equal(templates.length, 1);
+        assert.equal(templates[0].type, "complex");
         assert.equal(templates[0].title, "Ведомость работ");
         assert.equal(templates[0].description, null);
 
