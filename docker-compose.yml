@@ -32,7 +32,6 @@ services:
             - POSTGRES_DB=magnit
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
         volumes:
-            #            - ${POSTGRES_DATA_DIR:-/magnit/postgres/data}:/var/lib/postgresql/data
             - ./packages/backend/stuff:/docker-entrypoint-initdb.d
         ports:
             - 5432:5432
