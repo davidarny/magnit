@@ -18,7 +18,7 @@ services:
             context: .
             dockerfile: Dockerfile.backend
             args:
-                - BACKEND_CONFIG=${BACKEND_CONFIG}
+                - BACKEND_CONFIG_DIR=${BACKEND_CONFIG_DIR}
         restart: unless-stopped
         networks:
             - magnit

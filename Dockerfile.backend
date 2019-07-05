@@ -7,6 +7,6 @@ RUN find ./packages ! -name "backend" -type d -exec rm -rf {} +
 
 RUN yarn install
 
-COPY ${BACKEND_CONFIG} .
+COPY ${BACKEND_CONFIG_DIR} /devel
 
 ENTRYPOINT ["yarn", "start:backend"]
