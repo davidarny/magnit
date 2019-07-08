@@ -1,52 +1,53 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Grid, AppBar, Tabs, Tab } from "@material-ui/core";
+import { Grid, Paper } from "@material-ui/core";
 import * as React from "react";
-import { Link, RouteComponentProps } from "@reach/router";
-import { useState } from "react";
-import { RouteMatcher } from "components/route-matcher";
+import { RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-
-enum ETabIndex {
-    ALL = 0,
-    NEW,
-    SENT,
-    IN_PROGRESS,
-    DONE,
-    REJECTED,
-    OVERDUE,
-    DEACTIVATED,
-}
+import {
+    IColumn,
+    InputField,
+    ITab,
+    SelectField,
+    TableWrapper,
+    TabsWrapper,
+} from "@magnit/components";
 
 enum ETabPath {
-    ALL = "all",
-    NEW = "new",
-    SENT = "sent",
     IN_PROGRESS = "in-progress",
+    CHECKED = "checked",
+    DRAFT = "draft",
     DONE = "done",
-    REJECTED = "rejected",
-    OVERDUE = "overdue",
-    DEACTIVATED = "deactivated",
 }
 
-export const Tasks: React.FC<RouteComponentProps> = () => {
-    const [tabIndex, setTabIndex] = useState(0);
-    const tabTitleByPath = {
-        [ETabPath.ALL]: "Все",
-        [ETabPath.NEW]: "Новые",
-        [ETabPath.SENT]: "Отправленные",
-        [ETabPath.IN_PROGRESS]: "В работе",
-        [ETabPath.DONE]: "Выполненные",
-        [ETabPath.REJECTED]: "Отозванные",
-        [ETabPath.OVERDUE]: "Просроченные",
-        [ETabPath.DEACTIVATED]: "Деактивированные",
-    };
+const tabs: ITab[] = [
+    { value: ETabPath.IN_PROGRESS, label: "В работе" },
+    { value: ETabPath.CHECKED, label: "На проверке" },
+    { value: ETabPath.DRAFT, label: "Черновики" },
+    { value: ETabPath.DONE, label: "Завершенные" },
+];
 
+const columns: IColumn[] = [
+    { id: "title", label: "Название задания" },
+    { id: "region", label: "Регион" },
+    { id: "office_part", label: "Филиал" },
+    { id: "address", label: "Адрес объекта" },
+    { id: "step", label: "Этап" },
+    { id: "date", label: "Срок выполнения" },
+];
+
+const data = [
+    { title: "aaa", region: "12313", address: "1111", step: 1 },
+    { title: "aaa", region: "12313", address: "1111", step: 2 },
+    { title: "aaa", region: "12313", address: "1111", step: 3 },
+];
+
+export const Tasks: React.FC<RouteComponentProps> = () => {
     return (
         <SectionLayout>
-            <RouteMatcher
+            {/* <RouteMatcher
                 routes={[
                     {
                         paths: ["", ETabPath.ALL],
@@ -81,54 +82,40 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                         render: () => setTabIndex(ETabIndex.DEACTIVATED),
                     },
                 ]}
-            />
+            />*/}
             <SectionTitle title="Список заданий" />
-            <Grid item>
-                <AppBar position="static">
-                    <Tabs value={tabIndex} css={theme => ({ paddingLeft: theme.spacing(4) })}>
-                        <Tab
-                            to={ETabPath.ALL}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.ALL]}
-                        />
-                        <Tab
-                            to={ETabPath.NEW}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.NEW]}
-                        />
-                        <Tab
-                            to={ETabPath.SENT}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.SENT]}
-                        />
-                        <Tab
-                            to={ETabPath.IN_PROGRESS}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.IN_PROGRESS]}
-                        />
-                        <Tab
-                            to={ETabPath.DONE}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.DONE]}
-                        />
-                        <Tab
-                            to={ETabPath.REJECTED}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.REJECTED]}
-                        />
-                        <Tab
-                            to={ETabPath.OVERDUE}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.OVERDUE]}
-                        />
-                        <Tab
-                            to={ETabPath.DEACTIVATED}
-                            component={Link}
-                            label={tabTitleByPath[ETabPath.DEACTIVATED]}
-                        />
-                    </Tabs>
-                </AppBar>
-            </Grid>
+            <Paper
+                square={true}
+                css={theme => ({
+                    margin: theme.spacing(3),
+                    boxShadow: "0px 0px 15px rgba(207, 217, 227, 0.45) !important",
+                })}
+            >
+                <Grid container direction="row" style={{ marginTop: 18 }}>
+                    <TabsWrapper tabs={tabs}>
+                        <Grid
+                            container
+                            direction="column"
+                            css={theme => ({ padding: theme.spacing(3) })}
+                        >
+                            <Grid container direction="row" spacing={2}>
+                                <Grid item xs>
+                                    <InputField placeholder={"Поиск ..."} fullWidth />
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <SelectField placeholder={"Выберите регион"} fullWidth />
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <SelectField placeholder={"Выберите филиал"} fullWidth />
+                                </Grid>
+                            </Grid>
+                            <Grid item css={theme => ({ padding: theme.spacing(3) })}>
+                                <TableWrapper columns={columns} data={data} />
+                            </Grid>
+                        </Grid>
+                    </TabsWrapper>
+                </Grid>
+            </Paper>
         </SectionLayout>
     );
 };
