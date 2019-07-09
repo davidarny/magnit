@@ -30,7 +30,6 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
         { label: "Добавить вопрос", icon: <QuestionIcon />, action: props.onAddClick },
         { label: "Добавить группу", icon: <GroupIcon />, action: props.onAddGroup },
         { label: "Добавить раздел", icon: <SectionIcon />, action: props.onAddSection },
-        { label: "Скопировать", icon: <CopyIcon /> },
         { label: "Удалить элемент", icon: <TrashIcon />, action: props.onDeletePuzzle },
     ];
 
