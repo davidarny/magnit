@@ -6,10 +6,11 @@ import { jsx } from "@emotion/core";
 
 export interface IInputField {
     isSimpleMode?: boolean;
+    css?: object;
 }
 
 export const InputField: React.FC<IInputField & React.ComponentProps<typeof TextField>> = props => {
-    const { fullWidth, placeholder, defaultValue, isSimpleMode, ...rest } = props;
+    const { fullWidth, placeholder, defaultValue, isSimpleMode, css, ...rest } = props;
     return (
         <TextField
             fullWidth={fullWidth}
@@ -35,6 +36,7 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                             : `2px solid ${theme.colors.primary}`,
                     },
                 },
+                ...(css ? css : {})
             })}
             {...rest}
         />

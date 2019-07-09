@@ -5,7 +5,6 @@ import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
 import {
-    AddIcon,
     ReportsIcon,
     TasksIcon,
     TemplatesIcon,
@@ -13,7 +12,6 @@ import {
     ObjectIcon,
 } from "@magnit/icons";
 import MagnitIcon from "assets/MagnitIcon.png";
-import { CustomButton } from "@magnit/components";
 import _ from "lodash";
 
 export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {

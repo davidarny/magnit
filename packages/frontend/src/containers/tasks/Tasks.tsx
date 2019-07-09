@@ -13,10 +13,16 @@ import {
     SelectField,
     TableWrapper,
     TabsWrapper,
+    CustomButton
 } from "@magnit/components";
-import { CustomButton } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { ETaskStatus } from "entities";
+
+enum ETaskStatus {
+    IN_PROGRESS = "in-progress",
+    CHECKED = "checked",
+    DRAFT = "draft",
+    DONE = "done",
+}
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
@@ -96,7 +102,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                 square={true}
                 css={theme => ({
                     margin: theme.spacing(3),
-                    boxShadow: "0px 0px 15px rgba(207, 217, 227, 0.45) !important",
+                    boxShadow: "0 0 15px rgba(207, 217, 227, 0.45) !important",
                 })}
             >
                 <Grid container direction="row" style={{ marginTop: 18 }}>
@@ -108,13 +114,34 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                         >
                             <Grid container direction="row" spacing={2}>
                                 <Grid item xs>
-                                    <InputField placeholder={"Поиск ..."} fullWidth />
+                                    <InputField
+                                        placeholder={"Поиск ..."}
+                                        fullWidth
+                                        css={theme => ({
+                                            borderRadius: theme.radius(5),
+                                            background: theme.colors.white,
+                                            border: `1px solid ${theme.colors.lightGray}`,
+                                            transition: "border 0.25s ease-in-out",
+                                            cursor: "pointer",
+                                            ":hover, :active": {
+                                                border: `1px solid ${theme.colors.primary}`,
+                                            },
+                                            div: {
+                                                ":before, :after": {
+                                                    border: "none !important",
+                                                },
+                                            },
+                                            input: {
+                                                padding: "13px 25px",
+                                            }
+                                        })}
+                                    />
                                 </Grid>
                                 <Grid item xs={2}>
-                                    <SelectField placeholder={"Выберите регион"} fullWidth />
+                                    <SelectField value={""} placeholder={"Выберите регион"} fullWidth />
                                 </Grid>
                                 <Grid item xs={2}>
-                                    <SelectField placeholder={"Выберите филиал"} fullWidth />
+                                    <SelectField value={""} placeholder={"Выберите филиал"} fullWidth />
                                 </Grid>
                             </Grid>
                             <Grid item css={theme => ({ padding: theme.spacing(3) })}>

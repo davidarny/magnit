@@ -38,7 +38,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             background: "#2F97FF !important",
             hover: {
                 color: "#FFFFFF",
-                boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(25, 140, 255, 0.4) !important",
             },
             active: {
                 background: "#207BD6 !important",
@@ -50,7 +50,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             background: "#0CDAAC !important",
             hover: {
                 color: "#FFFFFF",
-                boxShadow: "0 8px 24px rgba(12, 218, 172, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(12, 218, 172, 0.4) !important",
             },
             active: {
                 background: "#1EC9A3 !important",
@@ -62,7 +62,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             background: "#8F7EE5 !important",
             hover: {
                 color: "#FFFFFF",
-                boxShadow: "0 8px 24px rgba(143, 126, 229, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(143, 126, 229, 0.4) !important",
             },
             active: {
                 background: "#6959B8 !important",
@@ -73,7 +73,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             border: "1px solid #2F97FF !important",
             background: "none !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(25, 140, 255, 0.4) !important",
             },
         },
         redOutline: {
@@ -83,7 +83,7 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             hover: {
                 color: "#FFFFFF",
                 background: "#FF6A89 !important",
-                boxShadow: "0 8px 24px rgba(255, 106, 137, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(255, 106, 137, 0.4) !important",
             },
             active: {
                 color: "#FFFFFF",
