@@ -6,7 +6,7 @@ import { PuzzleWrapper } from "components/puzzle";
 import { IPuzzle } from "entities";
 import { getPuzzleFactory } from "services/item";
 
-interface IContentItem {
+interface IContentItemProps {
     puzzle: IPuzzle;
     parentPuzzle?: IPuzzle;
     index: number;
@@ -17,14 +17,8 @@ interface IContentItem {
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ContentItem: React.FC<IContentItem> = ({ puzzle, parentPuzzle, ...props }) => {
+export const ContentItem: React.FC<IContentItemProps> = ({ puzzle, parentPuzzle, ...props }) => {
     const factory = getPuzzleFactory(puzzle.puzzleType);
-    const view = factory.createPuzzle({
-        focused: !!props.active,
-        puzzle: puzzle,
-        index: props.index,
-        parentPuzzle: parentPuzzle,
-    });
     return (
         <PuzzleWrapper
             id={puzzle.id}
@@ -32,7 +26,12 @@ export const ContentItem: React.FC<IContentItem> = ({ puzzle, parentPuzzle, ...p
             onMouseDown={props.onFocus}
             onBlur={props.onBlur}
         >
-            {view}
+            {factory.create({
+                focused: !!props.active,
+                puzzle: puzzle,
+                index: props.index,
+                parentPuzzle: parentPuzzle,
+            })}
         </PuzzleWrapper>
     );
 };

@@ -8,7 +8,7 @@ import { CheckboxAnswerPuzzle } from "./CheckboxAnswerPuzzle";
 import { useContext } from "react";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 

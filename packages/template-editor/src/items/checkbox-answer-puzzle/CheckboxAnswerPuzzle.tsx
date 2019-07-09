@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -89,7 +89,13 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                         })}
                     />
                 </Grid>
-                <Grid item xs style={{ paddingLeft: 0 }}>
+                <Grid
+                    item
+                    xs
+                    css={css`
+                        padding-left: 0 !important;
+                    `}
+                >
                     <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
@@ -98,13 +104,12 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     </IconButton>
                 </Grid>
             </Grid>
-            {props.addCheckboxButton && (
+            {props.addCheckboxButton && props.focused && (
                 <Grid
                     container
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: `-${theme.spacing(-2)} !important`,
                         marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
@@ -120,11 +125,10 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     <Grid
                         item
                         xs
-                        css={theme => ({
-                            paddingTop: "0 !important",
-                            paddingLeft: "0 !important",
-                            paddingRight: theme.spacing(4),
-                        })}
+                        css={css`
+                            padding-top: 0 !important;
+                            padding-left: 0 !important;
+                        `}
                     >
                         <InputField
                             fullWidth
@@ -132,7 +136,6 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                             onClick={onAddCheckboxButton}
                         />
                     </Grid>
-                    <Grid item />
                 </Grid>
             )}
         </React.Fragment>

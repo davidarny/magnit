@@ -8,7 +8,7 @@ import { EditorContext } from "TemplateEditor";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 
 export class RadioAnswerFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
