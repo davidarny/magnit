@@ -15,6 +15,10 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.backend
+            args:
+                - BACKEND_PORT=${BACKEND_PORT:-1337}
+                - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
+                - SECRET=${SECRET:-magnit}
         restart: unless-stopped
         networks:
             - magnit
