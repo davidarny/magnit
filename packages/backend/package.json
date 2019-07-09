@@ -18,8 +18,5 @@
         "start": "cross-env NODE_ENV=development node app.js",
         "test": "mocha --timeout 30s tests/bootstrap.test.js tests/admin/test.js"
     },
-    "main": "app.js",
-    "engines": {
-        "node": "^10.15"
-    }
+    "main": "app.js"
 }
