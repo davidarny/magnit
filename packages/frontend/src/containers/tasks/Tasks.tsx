@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Grid, Paper } from "@material-ui/core";
 import * as React from "react";
-import { RouteComponentProps } from "@reach/router";
+import { Link, RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import {
@@ -14,6 +14,8 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
+import { CustomButton } from "@magnit/components";
+import { AddIcon } from "@magnit/icons";
 
 enum ETabPath {
     IN_PROGRESS = "in-progress",
@@ -83,7 +85,19 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     },
                 ]}
             />*/}
-            <SectionTitle title="Список заданий" />
+            <SectionTitle title="Список заданий">
+                <Grid item>
+                    <CustomButton
+                        component={Link}
+                        to="/tasks/info"
+                        variant="contained"
+                        title="Создать задание"
+                        scheme="blue"
+                        icon={<AddIcon />}
+                        css={theme => ({ width: 180 })}
+                    />
+                </Grid>
+            </SectionTitle>
             <Paper
                 square={true}
                 css={theme => ({
