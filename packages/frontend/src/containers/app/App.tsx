@@ -17,6 +17,10 @@ const AsyncTaskInfo = Loadable(({
     loader: () => import("containers/task-info").then(module => module.TaskInfo),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+const AsyncCreateTask = Loadable(({
+    loader: () => import("containers/task-info").then(module => module.CreateTask),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncTemplates = Loadable(({
     loader: () => import("containers/templates").then(module => module.Templates),
     loading: Loading,
@@ -71,6 +75,7 @@ const App: React.FC = () => {
                     <Router>
                         <AsyncTasks path="tasks/*" />
                         <AsyncTaskInfo path="tasks/info" />
+                        <AsyncCreateTask path="tasks/create" />
                         <AsyncTemplates path="templates" />
                         <AsyncCreateTemplate path="templates/create" />
                     </Router>

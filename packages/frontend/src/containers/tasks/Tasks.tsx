@@ -13,10 +13,10 @@ import {
     SelectField,
     TableWrapper,
     TabsWrapper,
+    CustomButton,
 } from "@magnit/components";
-import { CustomButton } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { ETaskStatus } from "entities";
+import { ETaskStatus } from "../../entities";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
@@ -83,7 +83,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                 <Grid item>
                     <CustomButton
                         component={Link}
-                        to="/tasks/info"
+                        to="/tasks/create"
                         variant="contained"
                         title="Создать задание"
                         scheme="blue"

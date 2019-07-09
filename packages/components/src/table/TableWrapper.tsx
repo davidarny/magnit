@@ -17,6 +17,8 @@ export interface IColumn {
 interface ITableWrapperProps {
     columns: IColumn[];
     data: object[];
+
+    onRowClick?(): void;
 }
 
 function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {

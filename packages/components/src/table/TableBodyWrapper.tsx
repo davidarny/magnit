@@ -9,9 +9,11 @@ import * as _ from "lodash";
 interface ITableBodyWrapperProps {
     data: object[];
     columns: IColumn[];
+
+    onRowClick?(): void;
 }
 
-export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns }) => {
+export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, onRowClick }) => {
     const getCells = (lineItem: object) => {
         return columns.map((column: IColumn, index) => {
             const label = _.get(lineItem, column.id, null);
@@ -23,7 +25,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns }) 
     return (
         <TableBody>
             {data.map((value, index) => (
-                <TableRow hover key={index}>
+                <TableRow hover key={index} onClick={onRowClick}>
                     {getCells(value)}
                 </TableRow>
             ))}
