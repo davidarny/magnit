@@ -12,6 +12,7 @@ import {
     ExecutorIcon,
     ObjectIcon,
 } from "@magnit/icons";
+import MagnitIcon from "assets/MagnitIcon.png";
 import { CustomButton } from "@magnit/components";
 import _ from "lodash";
 
@@ -50,15 +51,12 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}
                     >
                         <Link to="/">
-                            <CustomButton
-                                icon={<AddIcon />}
-                                scheme={"blue"}
-                                iconOnly={true}
-                                iconSize={40}
-                                css={theme => ({
-                                    width: theme.spacing(5),
-                                    minWidth: theme.spacing(5),
-                                })}
+                            <img
+                                src={MagnitIcon}
+                                css={css`
+                                max-width: 60px;
+                            `}
+                                alt="Магнит"
                             />
                         </Link>
                     </Grid>
