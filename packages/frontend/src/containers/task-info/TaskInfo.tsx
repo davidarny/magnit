@@ -25,15 +25,38 @@ const steps = [
 ];
 
 export const TaskInfo: FC = () => {
+    const parts = [
+        { title: "Документы", status: "Не загружены" },
+        { title: "Ведомость работ", status: "Заполнен" },
+        { title: "Бриф", status: "Заполнен" },
+        { title: "Инженерное заключение", status: "Заполнен" },
+        { title: "Смета", status: "Сформирована" },
+    ];
+
     return (
         <SectionLayout>
             <SectionTitle title="Информация о задании">
                 <Grid item>
                     <CustomButton
                         variant="contained"
-                        title="Редактировать"
-                        scheme="blue"
+                        title="Завершить"
+                        scheme="green"
                         icon={<CheckIcon />}
+                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
+                    />
+                    <CustomButton
+                        variant="contained"
+                        title="Отправить"
+                        scheme="violet"
+                        icon={<CheckIcon />}
+                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
+                    />
+                    <CustomButton
+                        variant="contained"
+                        title="Редактировать"
+                        scheme="blueOutline"
+                        icon={<CheckIcon />}
+                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
                 </Grid>
             </SectionTitle>
@@ -47,26 +70,11 @@ export const TaskInfo: FC = () => {
                 <SelectableBlockWrapper
                     css={theme => ({
                         padding: theme.spacing(3),
+                        zIndex: 1300,
                     })}
                     focused
                 >
-                    <Grid container spacing={2}>
-                        <Grid
-                            item
-                            xs={12}
-                            css={theme => ({
-                                paddingLeft: theme.spacing(4),
-                                paddingRight: theme.spacing(4),
-                            })}
-                        >
-                            <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                                Хардкорное задание для суровых прорабов
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <div>На проверке</div>
-                        </Grid>
-                    </Grid>
+                    {getBlockHead("Хардкорное задание для суровых прорабов", "На проверке")}
 
                     <Grid container spacing={2}>
                         <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
@@ -91,6 +99,11 @@ export const TaskInfo: FC = () => {
                         </Grid>
                     </Grid>
                 </SelectableBlockWrapper>
+                {parts.map(part => (
+                    <SelectableBlockWrapper css={theme => ({ padding: theme.spacing(3) })}>
+                        {getBlockHead(part.title, part.status)}
+                    </SelectableBlockWrapper>
+                ))}
             </Grid>
         </SectionLayout>
     );
@@ -108,14 +121,29 @@ function getMainInfoData(title: string, value: string): ReactNode {
             >
                 {title}
             </Typography>
-            <Typography
-                css={theme => ({ color: theme.colors.black })}
-                style={{
-                    fontSize: 17,
-                }}
-            >
+            <Typography css={theme => ({ color: theme.colors.black })} style={{ fontSize: 17 }}>
                 {value}
             </Typography>
+        </Grid>
+    );
+}
+
+function getBlockHead(title: string, status: string): ReactNode {
+    return (
+        <Grid container spacing={2} key={title}>
+            <Grid
+                item
+                xs={12}
+                css={theme => ({
+                    paddingLeft: theme.spacing(4),
+                    paddingRight: theme.spacing(4),
+                })}
+            >
+                <Typography css={theme => ({ fontSize: theme.fontSize.large })}>{title}</Typography>
+            </Grid>
+            <Grid item>
+                <div>{status}</div>
+            </Grid>
         </Grid>
     );
 }

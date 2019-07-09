@@ -16,19 +16,13 @@ import {
 } from "@magnit/components";
 import { CustomButton } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-
-enum ETabPath {
-    IN_PROGRESS = "in-progress",
-    CHECKED = "checked",
-    DRAFT = "draft",
-    DONE = "done",
-}
+import { ETaskStatus } from "entities";
 
 const tabs: ITab[] = [
-    { value: ETabPath.IN_PROGRESS, label: "В работе" },
-    { value: ETabPath.CHECKED, label: "На проверке" },
-    { value: ETabPath.DRAFT, label: "Черновики" },
-    { value: ETabPath.DONE, label: "Завершенные" },
+    { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
+    { value: ETaskStatus.CHECKED, label: "На проверке" },
+    { value: ETaskStatus.DRAFT, label: "Черновики" },
+    { value: ETaskStatus.DONE, label: "Завершенные" },
 ];
 
 const columns: IColumn[] = [
