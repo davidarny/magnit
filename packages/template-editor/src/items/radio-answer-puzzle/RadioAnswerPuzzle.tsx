@@ -111,6 +111,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
+                        paddingTop: theme.spacing(),
                         marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
