@@ -61,15 +61,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         }
         const { top } = element.getBoundingClientRect();
         setToolbarTopPosition(window.scrollY + top - 128);
-
-        // toggle toolbar will-change property
-        const toolbar = document.querySelector<HTMLDivElement>(".toolbar");
-        if (!toolbar) {
-            return;
-        }
-        toolbar.style.willChange = "transform";
-        const timeout = 300;
-        setTimeout(() => (toolbar.style.willChange = "initial"), timeout);
     }, [focusedPuzzleChain]);
 
     useEffect(() => {

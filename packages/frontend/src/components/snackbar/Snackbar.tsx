@@ -28,7 +28,7 @@ export const Snackbar: React.FC<ISnackbarProps> = ({ messages, error, open, ...p
                 horizontal: "right",
             }}
             open={open}
-            autoHideDuration={5000}
+            autoHideDuration={2500}
             onClose={props.onClose}
         >
             <SnackbarContent

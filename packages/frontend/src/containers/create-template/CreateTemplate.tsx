@@ -12,12 +12,14 @@ import { CheckIcon } from "@magnit/icons";
 import { createTemplate } from "services/api/templates";
 import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
+import { Redirect } from "@reach/router";
 
 export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<object>({});
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
+    const [redirect, setRedirect] = useState(false);
 
     function onTemplateChange(template: object) {
         setTemplate(template);
@@ -26,6 +28,9 @@ export const CreateTemplate: React.FC = () => {
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
             return;
+        }
+        if (!error) {
+            setRedirect(true);
         }
         setOpen(false);
         // wait till animation ends
@@ -43,6 +48,7 @@ export const CreateTemplate: React.FC = () => {
 
     return (
         <SectionLayout>
+            {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
                     <CustomButton
@@ -59,6 +65,9 @@ export const CreateTemplate: React.FC = () => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
+                    opacity: open ? 0.5 : 1,
+                    transition: "opacity 0.3s ease-in-out",
+                    pointerEvents: open ? "none" : "initial",
                 })}
             >
                 <TemplateEditor
