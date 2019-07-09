@@ -55,7 +55,10 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                 scheme={"blue"}
                                 iconOnly={true}
                                 iconSize={40}
-                                css={theme => ({ width: theme.spacing(5) })}
+                                css={theme => ({
+                                    width: theme.spacing(5),
+                                    minWidth: theme.spacing(5),
+                                })}
                             />
                         </Link>
                     </Grid>
