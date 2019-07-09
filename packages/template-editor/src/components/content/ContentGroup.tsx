@@ -78,7 +78,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     return (
                         <ContentItem
                             puzzle={childPuzzle}
-                            index={props.index + index}
+                            index={index}
                             active={focused}
                             onFocus={onFocus}
                             onBlur={props.onBlur}
