@@ -15,8 +15,6 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.backend
-            args:
-                - BACKEND_CONFIG_DIR=${BACKEND_CONFIG_DIR}
         restart: unless-stopped
         networks:
             - magnit
@@ -27,17 +25,15 @@ services:
 
     db:
         image: postgres:11-alpine
+        restart: unless-stopped
         environment:
             - POSTGRES_USER=magnit
             - POSTGRES_DB=magnit
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
         volumes:
             - ./packages/backend/stuff:/docker-entrypoint-initdb.d
-        ports:
-            - 5432:5432
         networks:
             - magnit
 
 networks:
     magnit:
-        name: magnit
