@@ -3,9 +3,9 @@
 import { Tab, Tabs } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { FC, Fragment, useState } from "react";
-import { RouteMatcher } from "components/route-matcher";
+import { useState } from "react";
 import { Link } from "@reach/router";
+import { RouteMatcher } from "route-matcher";
 
 export interface ITab {
     value: string;
@@ -14,26 +14,28 @@ export interface ITab {
 
 interface ITabsWrapperProps {
     tabs: ITab[];
+    baseUrl?: string; // to handle nested paths
 }
 
-export const TabsWrapper: FC<ITabsWrapperProps> = ({ children, tabs }) => {
+export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", children }) => {
     const [tab, setTab] = useState(0);
 
-    function onTabChange(event: React.ChangeEvent<{}>, nextTabValue: number): void {
-        setTab(nextTabValue);
+    function getBaseUrlPath(value: string): string {
+        return `${baseUrl ? baseUrl + "/" : ""}${value}`;
     }
 
     return (
-        <Fragment>
+        <React.Fragment>
             <RouteMatcher
                 routes={tabs.map(({ value }, index) => ({
-                    path: value,
+                    ...(index === 0
+                        ? { paths: [getBaseUrlPath(""), getBaseUrlPath(value)] }
+                        : { path: getBaseUrlPath(value) }),
                     render: () => setTab(index),
                 }))}
             />
             <Tabs
                 value={tab}
-                onChange={onTabChange}
                 css={theme => ({
                     borderBottom: `1px solid ${theme.colors.lightGray}`,
                     width: "100%",
@@ -47,26 +49,28 @@ export const TabsWrapper: FC<ITabsWrapperProps> = ({ children, tabs }) => {
                 })}
                 classes={{ indicator: "indicator" }}
             >
-                {tabs.map(({ label, value }: ITab, index) => (
-                    <Tab
-                        component={Link}
-                        to={value}
-                        key={index}
-                        css={theme => ({
-                            textTransform: "none",
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                            paddingLeft: theme.spacing(3),
-                            paddingRight: theme.spacing(3),
-                            maxWidth: "max-content",
-                            fontSize: theme.fontSize.normal,
-                            letterSpacing: "normal",
-                        })}
-                        label={label}
-                    />
-                ))}
+                {tabs.map(({ label, value }: ITab, index) => {
+                    return (
+                        <Tab
+                            component={Link}
+                            to={getBaseUrlPath(value)}
+                            key={index}
+                            css={theme => ({
+                                textTransform: "none",
+                                paddingTop: 0,
+                                paddingBottom: 0,
+                                paddingLeft: theme.spacing(3),
+                                paddingRight: theme.spacing(3),
+                                maxWidth: "max-content",
+                                fontSize: theme.fontSize.normal,
+                                letterSpacing: "normal",
+                            })}
+                            label={label}
+                        />
+                    );
+                })}
             </Tabs>
             {children}
-        </Fragment>
+        </React.Fragment>
     );
 };

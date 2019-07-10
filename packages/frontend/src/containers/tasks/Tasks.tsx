@@ -35,61 +35,81 @@ const columns: IColumn[] = [
     { id: "date", label: "Срок выполнения" },
 ];
 
-const data: object[] = [
-    { title: "aaa", region: "12313", address: "1111", step: 1 },
-    { title: "aaa", region: "12313", address: "1111", step: 2 },
-    { title: "aaa", region: "12313", address: "1111", step: 3 },
+const rows: object[] = [
+    {
+        title: "Задание 1",
+        region: "Марий Эл",
+        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+        step: 1,
+    },
+    {
+        title: "Задание 2",
+        region: "Марий Эл",
+        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+        step: 2,
+    },
+    {
+        title: "Задание 3",
+        region: "Марий Эл",
+        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+        step: 3,
+    },
 ];
 
 export const Tasks: React.FC<RouteComponentProps> = () => {
-    const hasTableItems = !!data.length;
-    
+    const hasTableItems = !!rows.length;
+
     return (
         <SectionLayout>
             <SectionTitle title="Список заданий">
                 <Grid item hidden={!hasTableItems}>
                     <CustomButton
                         component={Link}
-                        to="/tasks/create"
+                        to="create"
                         variant="contained"
                         title="Создать задание"
                         scheme="blue"
                         icon={<AddIcon />}
                         css={css`
-                                width: 180px;
-                            `}
+                            width: 180px;
+                        `}
                     />
                 </Grid>
             </SectionTitle>
             {!hasTableItems && (
                 <EmptyList
-                    title={"Заданий нет"}
-                    actionName={"Создать задание"}
+                    title="Заданий нет"
+                    actionName="Создать задание"
                     button={
                         <CustomButton
                             component={Link}
-                            to="/tasks/create"
+                            to="create"
                             icon={<AddIcon />}
-                            title={"Создать задание"}
+                            title="Создать задание"
                             css={css`
                                 width: 180px;
                             `}
                         />
                     }
-                    description={"Для создания задания нажмите кнопку"}
+                    description="Для создания задания нажмите кнопку"
                 />
             )}
-
             {hasTableItems && (
                 <Paper
                     square={true}
                     css={theme => ({
                         margin: theme.spacing(3),
-                        boxShadow: `0px 0px ${theme.spacing(2)} #ced9e2 !important`,
+                        boxShadow: `0px 0px ${theme.spacing(2)} ${
+                            theme.colors.lightGray
+                        } !important`,
                     })}
                 >
-                    <Grid container direction="row" style={{ marginTop: 18 }}>
-                        <TabsWrapper tabs={tabs}>
+                    <Grid
+                        container
+                        direction="row"
+                        css={theme => ({ marginTop: theme.spacing(2) })}
+                    >
+                        <TabsWrapper tabs={tabs} baseUrl="tasks">
                             <Grid
                                 container
                                 direction="column"
@@ -97,17 +117,17 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                             >
                                 <Grid container direction="row" spacing={2}>
                                     <Grid item xs>
-                                        <InputField placeholder={"Поиск ..."} fullWidth />
+                                        <InputField placeholder="Поиск ..." fullWidth />
                                     </Grid>
                                     <Grid item xs={2}>
-                                        <SelectField placeholder={"Выберите регион"} fullWidth />
+                                        <SelectField placeholder="Выберите регион" fullWidth />
                                     </Grid>
                                     <Grid item xs={2}>
-                                        <SelectField placeholder={"Выберите филиал"} fullWidth />
+                                        <SelectField placeholder="Выберите филиал" fullWidth />
                                     </Grid>
                                 </Grid>
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
-                                    <TableWrapper columns={columns} data={data} />
+                                    <TableWrapper columns={columns} data={rows} />
                                 </Grid>
                             </Grid>
                         </TabsWrapper>

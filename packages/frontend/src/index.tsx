@@ -44,6 +44,7 @@ const theme = {
         red: "#FF6A89",
         violet: "#8F7EE5",
         yellow: "#FFF5BE",
+        darkYellow: "#FFBC3C",
         white: "#FFFFFF",
     },
 

@@ -14,14 +14,6 @@ interface ITableBodyWrapperProps {
 }
 
 export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, onRowClick }) => {
-    const getCells = (lineItem: object) => {
-        return columns.map((column: IColumn, index) => {
-            const label = _.get(lineItem, column.id, null);
-            const value = !_.isNull(label) ? label : "(не задано)";
-            return <TableCell key={index}>{value}</TableCell>;
-        });
-    };
-
     return (
         <TableBody>
             {data.map((value, index) => (

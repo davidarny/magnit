@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { FC, ReactNode } from "react";
+import * as React from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid, Typography } from "@material-ui/core";
@@ -14,7 +14,7 @@ import {
 } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 
-export const CreateTask: FC = () => {
+export const CreateTask: React.FC = () => {
     const parts = [{ title: "Документы" }];
 
     return (
@@ -57,44 +57,40 @@ export const CreateTask: FC = () => {
                                 Основная информация
                             </Typography>
                         </Grid>
-                        {renderFieldContainer(
-                            "Название задания",
-                            <InputField placeholder={"Введите название задания"} fullWidth />
-                        )}
-                        {renderFieldContainer(
-                            "Этап задания",
-                            <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
+                        <TaskFieldContainer label="Название задания">
+                            <InputField placeholder="Введите название задания" fullWidth />
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Этап задания">
+                            <Grid container direction="row" alignItems="flex-end" spacing={2}>
                                 <Grid item xs>
-                                    <InputField placeholder={"Введите название этапа"} fullWidth />
+                                    <InputField placeholder="Введите название этапа" fullWidth />
                                 </Grid>
                                 <Grid item>
-                                    <DateField placeholder={"Срок выполнения"} />
+                                    <DateField placeholder="Срок выполнения" />
                                 </Grid>
                             </Grid>
-                        )}
-                        {renderFieldContainer(
-                            "Местоположение",
-                            <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Местоположение">
+                            <Grid container direction="row" alignItems="flex-end" spacing={2}>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Регион"} fullWidth />
+                                    <SelectField placeholder="Регион" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Филиал"} fullWidth />
+                                    <SelectField placeholder="Филиал" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Формат"} fullWidth />
+                                    <SelectField placeholder="Формат" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Адрес"} fullWidth />
+                                    <SelectField placeholder="Адрес" fullWidth />
                                 </Grid>
                             </Grid>
-                        )}
-                        {renderFieldContainer(
-                            "Исполнитель",
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Исполнитель">
                             <Grid item xs={4}>
-                                <SelectField placeholder={"Выберите исполнителя"} fullWidth />
+                                <SelectField placeholder="Выберите исполнителя" fullWidth />
                             </Grid>
-                        )}
+                        </TaskFieldContainer>
                     </Grid>
                 </SelectableBlockWrapper>
                 {parts.map((part, index) => (
@@ -109,12 +105,11 @@ export const CreateTask: FC = () => {
                                 </Typography>
                             </Grid>
                             <Grid item xs={12}>
-                                {renderFieldContainer(
-                                    "Шаблон",
+                                <TaskFieldContainer label="Шаблон">
                                     <Grid item xs={3}>
-                                        <SelectField placeholder={"Выбрать шаблон"} fullWidth />
+                                        <SelectField placeholder="Выбрать шаблон" fullWidth />
                                     </Grid>
-                                )}
+                                </TaskFieldContainer>
                             </Grid>
                         </Grid>
                     </SelectableBlockWrapper>
@@ -124,21 +119,25 @@ export const CreateTask: FC = () => {
     );
 };
 
-function renderFieldContainer(label: string, content: ReactNode): ReactNode {
+interface ITaskFieldProps {
+    label: string;
+}
+
+const TaskFieldContainer: React.FC<ITaskFieldProps> = ({ label, children }) => {
     return (
         <Grid
             container
-            direction={"row"}
+            direction="row"
             spacing={2}
-            alignItems={"flex-end"}
-            style={{ marginTop: 10 }}
+            alignItems="flex-start"
+            css={theme => ({ marginTop: theme.spacing() })}
         >
-            <Grid item xs={2}>
-                <Typography component={"span"}>{label}</Typography>
+            <Grid item xs={2} css={theme => ({ marginTop: theme.spacing(2) })}>
+                <Typography component="span">{label}</Typography>
             </Grid>
             <Grid item xs>
-                {content}
+                {children}
             </Grid>
         </Grid>
     );
-}
+};

@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { FC, ReactNode } from "react";
+import * as React from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { jsx, css } from "@emotion/core";
 import {
     CustomButton,
     DateField,
@@ -14,7 +14,7 @@ import {
 } from "@magnit/components";
 import { AddIcon, CheckIcon } from "@magnit/icons";
 
-export const EditTask: FC = () => {
+export const EditTask: React.FC = () => {
     const parts = [{ title: "Документы" }];
 
     return (
@@ -57,8 +57,7 @@ export const EditTask: FC = () => {
                                 Основная информация
                             </Typography>
                         </Grid>
-                        {renderFieldContainer(
-                            "Название задания",
+                        <TaskFieldContainer label="Название задания">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
                                 <Grid item xs>
                                     <InputField
@@ -67,9 +66,8 @@ export const EditTask: FC = () => {
                                     />
                                 </Grid>
                             </Grid>
-                        )}
-                        {renderFieldContainer(
-                            "Этап задания",
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Этап задания">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
                                 <Grid item xs>
                                     <InputField placeholder={"Введите название этапа"} fullWidth />
@@ -78,7 +76,7 @@ export const EditTask: FC = () => {
                                     <DateField placeholder={"Срок выполнения"} />
                                 </Grid>
                                 <Grid container>
-                                    <Grid item xs style={{ marginLeft: 7 }}>
+                                    <Grid item xs css={theme => ({ marginLeft: theme.spacing() })}>
                                         <CustomButton
                                             variant="outlined"
                                             title="Добавить этап"
@@ -91,9 +89,8 @@ export const EditTask: FC = () => {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        )}
-                        {renderFieldContainer(
-                            "Местоположение",
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Местоположение">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
                                 <Grid item xs>
                                     <SelectField placeholder={"Регион"} fullWidth />
@@ -108,13 +105,12 @@ export const EditTask: FC = () => {
                                     <SelectField placeholder={"Адрес"} fullWidth />
                                 </Grid>
                             </Grid>
-                        )}
-                        {renderFieldContainer(
-                            "Исполнитель",
+                        </TaskFieldContainer>
+                        <TaskFieldContainer label="Исполнитель">
                             <Grid item xs={4}>
                                 <SelectField placeholder={"Выберите исполнителя"} fullWidth />
                             </Grid>
-                        )}
+                        </TaskFieldContainer>
                     </Grid>
                 </SelectableBlockWrapper>
                 {parts.map((part, index) => (
@@ -129,12 +125,12 @@ export const EditTask: FC = () => {
                                 </Typography>
                             </Grid>
                             <Grid item xs={12}>
-                                {renderFieldContainer(
-                                    "Шаблон",
+                                <TaskFieldContainer label="Шаблон">
+                                    {" "}
                                     <Grid item xs={3}>
                                         <SelectField placeholder={"Выбрать шаблон"} fullWidth />
                                     </Grid>
-                                )}
+                                </TaskFieldContainer>
                             </Grid>
                         </Grid>
                     </SelectableBlockWrapper>
@@ -144,21 +140,25 @@ export const EditTask: FC = () => {
     );
 };
 
-function renderFieldContainer(label: string, content: ReactNode): ReactNode {
+interface ITaskFieldProps {
+    label: string;
+}
+
+const TaskFieldContainer: React.FC<ITaskFieldProps> = ({ label, children }) => {
     return (
         <Grid
             container
             direction={"row"}
             spacing={2}
             alignItems={"flex-start"}
-            style={{ marginTop: 10 }}
+            css={theme => ({ marginTop: theme.spacing() })}
         >
-            <Grid item xs={2} style={{ marginTop: 20 }}>
+            <Grid item xs={2} css={theme => ({ marginTop: theme.spacing(2) })}>
                 <Typography component={"span"}>{label}</Typography>
             </Grid>
             <Grid item xs>
-                {content}
+                {children}
             </Grid>
         </Grid>
     );
-}
+};

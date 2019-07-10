@@ -5,11 +5,11 @@ import { jsx } from "@emotion/core";
 import { FormControl, Input, MenuItem, Select } from "@material-ui/core";
 
 export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props => {
-    const { children, fullWidth, id, placeholder = "", displayEmpty = true, ...rest } = props;
+    const { children, placeholder = "", value = "", displayEmpty = true, ...rest } = props;
 
     return (
         <FormControl
-            fullWidth={fullWidth}
+            fullWidth={props.fullWidth}
             css={theme => ({
                 height: theme.spacing(6),
                 borderRadius: theme.radius(5),
@@ -25,8 +25,13 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
             })}
         >
             <Select
-                displayEmpty={displayEmpty}
-                placeholder={placeholder}
+                {...(placeholder && !value
+                    ? {
+                          value,
+                          displayEmpty,
+                          placeholder,
+                      }
+                    : { value })}
                 input={
                     <Input
                         disableUnderline
@@ -36,8 +41,8 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                             background: "transparent",
                             padding: `0 ${theme.spacing(2)}`,
                             cursor: "pointer",
+                            color: !value ? theme.colors.gray : "initial",
                         })}
-                        id={id}
                     />
                 }
                 css={theme => ({
@@ -49,7 +54,11 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                         opacity: props.disabled ? 0.5 : 1,
                     },
                 })}
-                classes={{ select: "select", icon: "icon", root: "root" }}
+                classes={{
+                    select: "select",
+                    icon: "icon",
+                    root: "root",
+                }}
                 {...rest}
             >
                 {placeholder && (

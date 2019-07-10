@@ -1,11 +1,10 @@
 /** @jsx jsx */
 
-import { Table, TablePagination, Grid, IconButton } from "@material-ui/core";
-import { FC, Fragment, ReactElement } from "react";
-import { jsx } from "@emotion/core";
+import * as React from "react";
+import { Grid, Table, TablePagination } from "@material-ui/core";
+import { css, jsx } from "@emotion/core";
 import { TableHeader } from "./TableHeader";
 import { TableBodyWrapper } from "./TableBodyWrapper";
-import { TablePaginationActionsProps } from "@material-ui/core/TablePagination/TablePaginationActions";
 import * as _ from "lodash";
 
 export interface IColumn {
@@ -21,43 +20,35 @@ interface ITableWrapperProps {
     onRowClick?(): void;
 }
 
-export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
+export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) => {
     return (
-        <Fragment>
+        <React.Fragment>
             <Table>
                 <TableHeader headers={columns} />
                 <TableBodyWrapper data={data} columns={columns} />
             </Table>
             <TablePagination
+                component="div"
                 count={data.length}
                 page={0}
                 rowsPerPage={20}
-                onChangePage={(event, page) => void 0}
-                labelDisplayedRows={({ from, to, count }) => (
-                    <Grid container xs>{`${from} из ${count}`}</Grid>
-                )}
+                labelDisplayedRows={PaginationLabel}
                 labelRowsPerPage={""}
-                SelectProps={{
-                    style: { display: "none" },
-                }}
-                ActionsComponent={tablePaginationActions}
-                style={{
-                    width: "100%",
-                }}
+                SelectProps={{ style: { display: "none" } }}
+                onChangePage={_.noop}
+                css={css`
+                    width: 100%;
+                `}
             />
-        </Fragment>
+        </React.Fragment>
     );
 };
 
-function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
-    const pagesCount = Math.max(0, Math.ceil(props.count / props.rowsPerPage) - 1);
-    return (
-        <Grid container alignItems={"flex-end"}>
-            {_.range(1, pagesCount).map((page, index) => (
-                <Grid item key={index}>
-                    <IconButton>{page}</IconButton>
-                </Grid>
-            ))}
-        </Grid>
-    );
+interface IPaginationLabelProps {
+    from: number;
+    count: number;
 }
+
+const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
+    return <span>{`${from} из ${count}`}</span>;
+};

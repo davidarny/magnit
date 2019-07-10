@@ -6,13 +6,15 @@ import { useContext, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
-import { TemplateEditor } from "@magnit/template-editor";
+import { TemplateEditor, traverse } from "@magnit/template-editor";
 import { CustomButton } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { createTemplate } from "services/api/templates";
 import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
 import { Redirect } from "@reach/router";
+import _ from "lodash";
+import { toSnakeCase } from "services/string";
 
 export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
@@ -38,6 +40,16 @@ export const CreateTemplate: React.FC = () => {
     }
 
     function onTemplateSave() {
+        // conver all props to snake_case before saving
+        traverse(template, (object: any) => {
+            if (_.isObject(object)) {
+                _.mapKeys(object, (value: any, key: string) => {
+                    delete (object as { [key: string]: any })[key];
+                    (object as { [key: string]: any })[toSnakeCase(key)] = value;
+                });
+            }
+        });
+        console.log(template);
         createTemplate(context.courier, template)
             .then(() => setOpen(true))
             .catch(() => {

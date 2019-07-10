@@ -3,16 +3,16 @@
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { CenteredSectionItem } from "components/centered-section-item";
-import { FC, ReactNode } from "react";
+import * as React from "react";
 
 interface IEmptyListProps {
     title: string;
-    button: ReactNode;
+    button: React.ReactNode;
     actionName: string;
     description?: string;
 }
 
-export const EmptyList: FC<IEmptyListProps> = ({ title, button, actionName, description }) => {
+export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, description, ...props }) => {
     return (
         <CenteredSectionItem>
             <Grid container justify="center" alignContent="center" direction="column">
@@ -20,11 +20,11 @@ export const EmptyList: FC<IEmptyListProps> = ({ title, button, actionName, desc
                     <Typography
                         component="div"
                         align="center"
-                        style={{
-                            fontWeight: 500,
-                            fontSize: 30,
-                        }}
-                        css={theme => ({ color: theme.colors.black })}
+                        css={theme => ({
+                            color: theme.colors.black,
+                            fontWeight: 300,
+                            fontSize: theme.fontSize.xLarge,
+                        })}
                     >
                         <span>{title}</span>
                     </Typography>
@@ -33,11 +33,13 @@ export const EmptyList: FC<IEmptyListProps> = ({ title, button, actionName, desc
                     <Typography
                         component="div"
                         align="center"
-                        css={theme => ({ color: theme.colors.secondary })}
-                        style={{ fontSize: 22 }}
+                        css={theme => ({
+                            color: theme.colors.secondary,
+                            fontSize: theme.colors.larger,
+                        })}
                     >
                         <div>{description || "Для создания нажмите кнопку"}</div>
-                        <div>{actionName}</div>
+                        <div>{props.actionName}</div>
                     </Typography>
                 </Grid>
                 <Grid item>
