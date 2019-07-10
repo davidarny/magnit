@@ -11,6 +11,8 @@ const theme = {
     fontSize: {
         small: "0.7em",
         smaller: "0.75em",
+        xsNormal: "0.8em",
+        sNormal: "0.85em",
         normal: "1em",
         medium: "1.15em",
         larger: "1.25em",

@@ -3,9 +3,9 @@
 import { Tab, Tabs } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import * as React from "react";
+import { RouteMatcher } from "route-matcher";
 import { useState } from "react";
 import { Link } from "@reach/router";
-import { RouteMatcher } from "route-matcher";
 
 export interface ITab {
     value: string;
@@ -44,6 +44,8 @@ export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", c
                         boxShadow: theme.boxShadow.indicator,
                         borderTopLeftRadius: theme.radius(0.5),
                         borderTopRightRadius: theme.radius(0.5),
+                        borderBottom: `1px solid ${theme.colors.lightGray}`,
+                        width: "100%",
                         height: "3px",
                     },
                 })}

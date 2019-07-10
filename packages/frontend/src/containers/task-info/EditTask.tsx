@@ -66,6 +66,7 @@ export const EditTask: React.FC = () => {
                                     />
                                 </Grid>
                             </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Этап задания">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
@@ -89,6 +90,7 @@ export const EditTask: React.FC = () => {
                                     </Grid>
                                 </Grid>
                             </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Местоположение">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
@@ -105,11 +107,13 @@ export const EditTask: React.FC = () => {
                                     <SelectField placeholder={"Адрес"} fullWidth />
                                 </Grid>
                             </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Исполнитель">
                             <Grid item xs={4}>
                                 <SelectField placeholder={"Выберите исполнителя"} fullWidth />
                             </Grid>
+                            ,
                         </TaskFieldContainer>
                     </Grid>
                 </SelectableBlockWrapper>
@@ -130,6 +134,7 @@ export const EditTask: React.FC = () => {
                                     <Grid item xs={3}>
                                         <SelectField placeholder={"Выбрать шаблон"} fullWidth />
                                     </Grid>
+                                    ,
                                 </TaskFieldContainer>
                             </Grid>
                         </Grid>

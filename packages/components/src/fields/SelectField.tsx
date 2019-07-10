@@ -39,9 +39,15 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                             border: "none",
                             height: "100%",
                             background: "transparent",
-                            padding: `0 ${theme.spacing(2)}`,
+                            padding: `0 ${theme.spacing(2.5)}`,
                             cursor: "pointer",
                             color: !value ? theme.colors.gray : "initial",
+                            fontWeight: props.value ? 400 : 300,
+                            div: {
+                                div: {
+                                    padding: `${theme.spacing(1.5)} 0 ${theme.spacing()}`,
+                                },
+                            },
                         })}
                     />
                 }
@@ -62,7 +68,13 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                 {...rest}
             >
                 {placeholder && (
-                    <MenuItem disabled value="" css={theme => ({ color: theme.colors.secondary })}>
+                    <MenuItem
+                        disabled
+                        value=""
+                        css={theme => ({
+                            color: theme.colors.secondary,
+                        })}
+                    >
                         {placeholder}
                     </MenuItem>
                 )}

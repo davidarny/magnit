@@ -35,7 +35,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                 component="div"
                 count={data.length}
                 page={0}
-                rowsPerPage={20}
+                rowsPerPage={15}
                 labelDisplayedRows={PaginationLabel}
                 ActionsComponent={ActionComponent}
                 labelRowsPerPage={""}
@@ -45,6 +45,59 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                     width: "100%",
                     marginTop: theme.spacing(2),
                     position: "relative",
+                    display: "flex",
+                    border: "none",
+                    div: {
+                        paddingLeft: 0,
+                        width: "100%",
+                        div: {
+                            ":nth-of-type(1)": {
+                                display: "none",
+                            },
+                            ":nth-of-type(3)": {
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                div: {
+                                    display: "flex",
+                                    width: 32,
+                                    height: 32,
+                                    marginLeft: 8,
+                                    button: {
+                                        display: "flex",
+                                        margin: "0 0 0 auto",
+                                        padding: 0,
+                                        width: "100%",
+                                        color: theme.colors.secondary,
+                                        background: theme.colors.white,
+                                        transition: "0.25s",
+                                        span: {
+                                            display: "block",
+                                            fontSize: 14,
+                                            textAlign: "center",
+                                            width: "100%",
+                                        },
+                                        ":hover, :active": {
+                                            color: theme.colors.white,
+                                            background: theme.colors.primary,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        span: {
+                            ":nth-of-type(1)": {
+                                display: "none",
+                            },
+                            ":nth-of-type(2)": {
+                                display: "block",
+                                marginRight: "auto",
+                                width: "calc(100% / 2)",
+                                span: {
+                                    display: "block",
+                                },
+                            },
+                        },
+                    },
                 })}
             />
         </React.Fragment>
@@ -74,10 +127,14 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
             <Grid item>
                 <IconButton
                     css={theme => ({
-                        width: theme.spacing(6),
-                        height: theme.spacing(6),
+                        width: theme.spacing(4),
+                        height: theme.spacing(4),
                         fontSize: theme.fontSize.normal,
                         marginLeft: theme.spacing(2),
+                        svg: {
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                        },
                     })}
                 >
                     <LeftArrowIcon />
@@ -87,9 +144,12 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                 <Grid item key={index}>
                     <IconButton
                         css={theme => ({
-                            width: theme.spacing(6),
-                            height: theme.spacing(6),
-                            fontSize: theme.fontSize.normal,
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                            fontSize: 14,
+                            lineHeight: 1.5,
+                            color: theme.colors.secondary,
+                            background: theme.colors.white,
                         })}
                     >
                         {page}
@@ -99,10 +159,14 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
             <Grid item>
                 <IconButton
                     css={theme => ({
-                        width: theme.spacing(6),
-                        height: theme.spacing(6),
+                        width: theme.spacing(4),
+                        height: theme.spacing(4),
                         fontSize: theme.fontSize.normal,
                         marginRight: theme.spacing(2),
+                        svg: {
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                        },
                     })}
                 >
                     <RightArrowIcon />
@@ -118,14 +182,5 @@ interface IPaginationLabelProps {
 }
 
 const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
-    return (
-        <span
-            css={css`
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-            `}
-        >{`${from} из ${count}`}</span>
-    );
+    return <span>{`${from} из ${count}`}</span>;
 };

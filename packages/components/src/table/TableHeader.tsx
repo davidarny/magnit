@@ -14,8 +14,26 @@ export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
         <TableHead>
             <TableRow>
                 {headers.map(header => (
-                    <TableCell key={header.id}>
-                        <TableSortLabel>{header.label}</TableSortLabel>
+                    <TableCell
+                        key={header.id}
+                        css={theme => ({
+                            borderBottomColor: theme.colors.light,
+                        })}
+                    >
+                        <TableSortLabel
+                            css={theme => ({
+                                fontSize: theme.fontSize.xsNormal,
+                                lineHeight: 1.5,
+                                fontWeight: 500,
+                                color: theme.colors.secondary,
+                                transition: "0.25s",
+                                ":hover": {
+                                    color: theme.colors.black,
+                                },
+                            })}
+                        >
+                            {header.label}
+                        </TableSortLabel>
                     </TableCell>
                 ))}
             </TableRow>

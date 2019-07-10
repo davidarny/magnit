@@ -4,15 +4,8 @@ import { css, jsx } from "@emotion/core";
 import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
-import {
-    AddIcon,
-    ReportsIcon,
-    TasksIcon,
-    TemplatesIcon,
-    ExecutorIcon,
-    ObjectIcon,
-} from "@magnit/icons";
-import { CustomButton } from "@magnit/components";
+import { ReportsIcon, TasksIcon, TemplatesIcon, ExecutorIcon, ObjectIcon } from "@magnit/icons";
+import MagnitIcon from "assets/MagnitIcon.png";
 import _ from "lodash";
 
 export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
@@ -50,12 +43,12 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}
                     >
                         <Link to="/">
-                            <CustomButton
-                                icon={<AddIcon />}
-                                scheme={"blue"}
-                                iconOnly={true}
-                                iconSize={40}
-                                css={theme => ({ width: theme.spacing(5) })}
+                            <img
+                                src={MagnitIcon}
+                                css={css`
+                                    max-width: 60px;
+                                `}
+                                alt="Магнит"
                             />
                         </Link>
                     </Grid>

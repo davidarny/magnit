@@ -37,7 +37,11 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             border: "1px solid #2F97FF",
             background: "#2F97FF !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
+                color: "#FFFFFF",
+                boxShadow: "0 4px 8px rgba(25, 140, 255, 0.4) !important",
+            },
+            active: {
+                background: "#207BD6 !important",
             },
         },
         green: {
@@ -45,7 +49,11 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             border: "1px solid #0CDAAC",
             background: "#0CDAAC !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(12, 218, 172, 0.5) !important",
+                color: "#FFFFFF",
+                boxShadow: "0 4px 8px rgba(12, 218, 172, 0.4) !important",
+            },
+            active: {
+                background: "#1EC9A3 !important",
             },
         },
         violet: {
@@ -53,7 +61,11 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             border: "1px solid #8F7EE5",
             background: "#8F7EE5 !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(143, 126, 229, 0.5) !important",
+                color: "#FFFFFF",
+                boxShadow: "0 4px 8px rgba(143, 126, 229, 0.4) !important",
+            },
+            active: {
+                background: "#6959B8 !important",
             },
         },
         blueOutline: {
@@ -61,15 +73,21 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             border: "1px solid #2F97FF !important",
             background: "none !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(25, 140, 255, 0.5) !important",
+                boxShadow: "0 4px 8px rgba(25, 140, 255, 0.4) !important",
             },
         },
-        greyOutline: {
-            color: "#AAB4BE",
+        redOutline: {
+            color: "#FF6A89",
             border: "1px solid #AAB4BE",
             background: "none !important",
             hover: {
-                boxShadow: "0 8px 24px rgba(170, 180, 190, 0.5) !important",
+                color: "#FFFFFF",
+                background: "#FF6A89 !important",
+                boxShadow: "0 4px 8px rgba(255, 106, 137, 0.4) !important",
+            },
+            active: {
+                color: "#FFFFFF",
+                background: "#DE3659 !important",
             },
         },
     };
@@ -85,18 +103,21 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
                 position: "relative",
                 boxShadow: "none",
                 ":hover": { ...(variant.hover ? variant.hover : {}) },
+                ":active": { ...(variant.active ? variant.active : {}) },
                 ...(iconOnly ? { padding: 0 } : {}),
             }}
             {...rest}
         >
             <div
-                css={{
+                css={theme => ({
                     height: iconSize,
+                    marginLeft: iconOnly ? 0 : theme.spacing(-2),
+                    marginRight: iconOnly ? 0 : theme.spacing(),
                     svg: {
                         width: iconSize,
                         height: iconSize,
                     },
-                }}
+                })}
             >
                 {icon}
             </div>

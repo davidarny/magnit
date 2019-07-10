@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx, css, Global } from "@emotion/core";
+import { css, Global, jsx } from "@emotion/core";
 import React, { useEffect, useRef, useState } from "react";
 import { Sidebar } from "components/sidebar";
 import { Grid } from "@material-ui/core";
@@ -8,9 +8,8 @@ import { RouteComponentProps, Router } from "@reach/router";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
 import _ from "lodash";
-import { FetchCourier } from "services/api";
+import { FetchCourier, LoggerMiddleware } from "services/api";
 import { AppContext } from "context";
-import { LoggerMiddleware } from "services/api";
 
 const AsyncTasks = Loadable(({
     loader: () => import("containers/tasks").then(module => module.Tasks),
@@ -88,6 +87,7 @@ const App: React.FC = () => {
                             <AsyncTaskInfo path="tasks/info" />
                             <AsyncCreateTask path="tasks/create" />
                             <AsyncEditTask path="tasks/edit" />
+                            <AsyncTaskInfo path="tasks/info" />
                             <AsyncTemplates path="templates" />
                             <AsyncCreateTemplate path="templates/create" />
                         </Router>

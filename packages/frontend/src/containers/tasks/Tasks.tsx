@@ -58,7 +58,6 @@ const rows: object[] = [
 
 export const Tasks: React.FC<RouteComponentProps> = () => {
     const hasTableItems = !!rows.length;
-
     return (
         <SectionLayout>
             <SectionTitle title="Список заданий">
@@ -117,7 +116,30 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                             >
                                 <Grid container direction="row" spacing={2}>
                                     <Grid item xs>
-                                        <InputField placeholder="Поиск ..." fullWidth />
+                                        <InputField
+                                            placeholder="Поиск ..."
+                                            fullWidth
+                                            css={theme => ({
+                                                borderRadius: theme.radius(5),
+                                                background: theme.colors.white,
+                                                border: `1px solid ${theme.colors.lightGray}`,
+                                                transition: "border 0.25s ease-in-out",
+                                                cursor: "pointer",
+                                                ":hover, :active": {
+                                                    border: `1px solid ${theme.colors.primary}`,
+                                                },
+                                                div: {
+                                                    ":before, :after": {
+                                                        border: "none !important",
+                                                    },
+                                                },
+                                                input: {
+                                                    padding: `${theme.spacing(2)} ${theme.spacing(
+                                                        4
+                                                    )}`,
+                                                },
+                                            })}
+                                        />
                                     </Grid>
                                     <Grid item xs={2}>
                                         <SelectField placeholder="Выберите регион" fullWidth />
