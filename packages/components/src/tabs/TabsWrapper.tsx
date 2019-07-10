@@ -44,14 +44,12 @@ export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", c
                         boxShadow: theme.boxShadow.indicator,
                         borderTopLeftRadius: theme.radius(0.5),
                         borderTopRightRadius: theme.radius(0.5),
+                        borderBottom: `1px solid ${theme.colors.lightGray}`,
+                        width: "100%",
                         height: "3px",
                     },
                 })}
                 classes={{ indicator: "indicator" }}
-                style={{
-                    borderBottom: "1px solid #DEE5EF",
-                    width: "100%",
-                }}
             >
                 {tabs.map(({ label, value }: ITab, index) => {
                     return (
@@ -69,10 +67,9 @@ export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", c
                                 fontSize: theme.fontSize.normal,
                                 letterSpacing: "normal",
                             })}
-                            value={value}
-                        label={label}
-                    />
-                );
+                            label={label}
+                        />
+                    );
                 })}
             </Tabs>
             {children}

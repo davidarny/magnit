@@ -6,7 +6,10 @@ import { css, jsx } from "@emotion/core";
 import { TableHeader } from "./TableHeader";
 import { TableBodyWrapper } from "./TableBodyWrapper";
 import * as _ from "lodash";
-import { KeyboardArrowLeft as LeftArrowIcon, KeyboardArrowRight as RightArrowIcon } from "@material-ui/icons";
+import {
+    KeyboardArrowLeft as LeftArrowIcon,
+    KeyboardArrowRight as RightArrowIcon,
+} from "@material-ui/icons";
 
 export interface IColumn {
     id: string;
@@ -25,8 +28,8 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
     return (
         <React.Fragment>
             <Table>
-                <TableHeader headers={columns}/>
-                <TableBodyWrapper data={data} columns={columns}/>
+                <TableHeader headers={columns} />
+                <TableBodyWrapper data={data} columns={columns} />
             </Table>
             <TablePagination
                 component="div"
@@ -134,7 +137,7 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                         },
                     })}
                 >
-                    <LeftArrowIcon/>
+                    <LeftArrowIcon />
                 </IconButton>
             </Grid>
             {_.range(1, range).map((page, index) => (
@@ -166,7 +169,7 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                         },
                     })}
                 >
-                    <RightArrowIcon/>
+                    <RightArrowIcon />
                 </IconButton>
             </Grid>
         </Grid>
@@ -179,9 +182,5 @@ interface IPaginationLabelProps {
 }
 
 const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
-    return (
-        <span>
-            {`${from} из ${count}`}
-        </span>
-    );
+    return <span>{`${from} из ${count}`}</span>;
 };

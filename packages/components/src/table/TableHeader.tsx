@@ -22,7 +22,7 @@ export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
                     >
                         <TableSortLabel
                             css={theme => ({
-                                fontSize: 12,
+                                fontSize: theme.fontSize.xsNormal,
                                 lineHeight: 1.5,
                                 fontWeight: 500,
                                 color: theme.colors.secondary,

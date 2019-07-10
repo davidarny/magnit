@@ -6,7 +6,15 @@ import * as React from "react";
 import { Link, RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { CustomButton, IColumn, InputField, ITab, SelectField, TableWrapper, TabsWrapper } from "@magnit/components";
+import {
+    CustomButton,
+    IColumn,
+    InputField,
+    ITab,
+    SelectField,
+    TableWrapper,
+    TabsWrapper,
+} from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { ETaskStatus } from "../../entities";
 import { EmptyList } from "components/list";
@@ -60,7 +68,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                         variant="contained"
                         title="Создать задание"
                         scheme="blue"
-                        icon={<AddIcon/>}
+                        icon={<AddIcon />}
                         css={css`
                             width: 180px;
                         `}
@@ -75,7 +83,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                         <CustomButton
                             component={Link}
                             to="create"
-                            icon={<AddIcon/>}
+                            icon={<AddIcon />}
                             title="Создать задание"
                             css={css`
                                 width: 180px;
@@ -126,20 +134,22 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                                                     },
                                                 },
                                                 input: {
-                                                    padding: "13px 25px",
+                                                    padding: `${theme.spacing(2)} ${theme.spacing(
+                                                        4
+                                                    )}`,
                                                 },
                                             })}
                                         />
                                     </Grid>
                                     <Grid item xs={2}>
-                                        <SelectField value={""} placeholder="Выберите регион" fullWidth/>
+                                        <SelectField placeholder="Выберите регион" fullWidth />
                                     </Grid>
                                     <Grid item xs={2}>
-                                        <SelectField value={""} placeholder="Выберите филиал" fullWidth/>
+                                        <SelectField placeholder="Выберите филиал" fullWidth />
                                     </Grid>
                                 </Grid>
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
-                                    <TableWrapper columns={columns} data={rows}/>
+                                    <TableWrapper columns={columns} data={rows} />
                                 </Grid>
                             </Grid>
                         </TabsWrapper>

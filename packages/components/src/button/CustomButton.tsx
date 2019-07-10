@@ -109,15 +109,15 @@ export const CustomButton: React.FC<ICustomButtonProps> = props => {
             {...rest}
         >
             <div
-                css={{
+                css={theme => ({
                     height: iconSize,
-                    marginLeft: iconOnly ? 0 : -15,
-                    marginRight: iconOnly ? 0 : 5,
+                    marginLeft: iconOnly ? 0 : theme.spacing(-2),
+                    marginRight: iconOnly ? 0 : theme.spacing(),
                     svg: {
                         width: iconSize,
                         height: iconSize,
                     },
-                }}
+                })}
             >
                 {icon}
             </div>

@@ -65,7 +65,8 @@ export const EditTask: React.FC = () => {
                                         fullWidth
                                     />
                                 </Grid>
-                            </Grid>,
+                            </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Этап задания">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
@@ -88,7 +89,8 @@ export const EditTask: React.FC = () => {
                                         />
                                     </Grid>
                                 </Grid>
-                            </Grid>,
+                            </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Местоположение">
                             <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
@@ -104,12 +106,14 @@ export const EditTask: React.FC = () => {
                                 <Grid item xs>
                                     <SelectField placeholder={"Адрес"} fullWidth />
                                 </Grid>
-                            </Grid>,
+                            </Grid>
+                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Исполнитель">
                             <Grid item xs={4}>
                                 <SelectField placeholder={"Выберите исполнителя"} fullWidth />
-                            </Grid>,
+                            </Grid>
+                            ,
                         </TaskFieldContainer>
                     </Grid>
                 </SelectableBlockWrapper>
@@ -129,7 +133,8 @@ export const EditTask: React.FC = () => {
                                     {" "}
                                     <Grid item xs={3}>
                                         <SelectField placeholder={"Выбрать шаблон"} fullWidth />
-                                    </Grid>,
+                                    </Grid>
+                                    ,
                                 </TaskFieldContainer>
                             </Grid>
                         </Grid>

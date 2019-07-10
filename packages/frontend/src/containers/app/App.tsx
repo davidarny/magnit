@@ -40,7 +40,7 @@ const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
     const [logoHeight, setLogoHeight] = useState(0);
     const courier = useRef(
-        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()]),
+        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()])
     );
 
     useEffect(() => {
@@ -72,7 +72,7 @@ const App: React.FC = () => {
             <Grid container>
                 <Grid item>
                     <Router primary={false}>
-                        <Sidebar path="*"/>
+                        <Sidebar path="*" />
                     </Router>
                 </Grid>
                 <Grid
@@ -83,13 +83,13 @@ const App: React.FC = () => {
                 >
                     <AppContext.Provider value={{ courier: courier.current }}>
                         <Router>
-                            <AsyncTasks path="tasks/*"/>
-                            <AsyncTaskInfo path="tasks/info"/>
-                            <AsyncCreateTask path="tasks/create"/>
-                            <AsyncEditTask path="tasks/edit"/>
-                            <AsyncTaskInfo path="tasks/info"/>
-                            <AsyncTemplates path="templates"/>
-                            <AsyncCreateTemplate path="templates/create"/>
+                            <AsyncTasks path="tasks/*" />
+                            <AsyncTaskInfo path="tasks/info" />
+                            <AsyncCreateTask path="tasks/create" />
+                            <AsyncEditTask path="tasks/edit" />
+                            <AsyncTaskInfo path="tasks/info" />
+                            <AsyncTemplates path="templates" />
+                            <AsyncCreateTemplate path="templates/create" />
                         </Router>
                     </AppContext.Provider>
                 </Grid>

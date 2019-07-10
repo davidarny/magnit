@@ -45,7 +45,7 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                             fontWeight: props.value ? 400 : 300,
                             div: {
                                 div: {
-                                    padding: "10px 0 7px",
+                                    padding: `${theme.spacing(1.5)} 0 ${theme.spacing()}`,
                                 },
                             },
                         })}
@@ -68,9 +68,13 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                 {...rest}
             >
                 {placeholder && (
-                    <MenuItem disabled value="" css={theme => ({
-                        color: theme.colors.secondary,
-                    })}>
+                    <MenuItem
+                        disabled
+                        value=""
+                        css={theme => ({
+                            color: theme.colors.secondary,
+                        })}
+                    >
                         {placeholder}
                     </MenuItem>
                 )}

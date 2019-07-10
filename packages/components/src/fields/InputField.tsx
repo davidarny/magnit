@@ -6,7 +6,7 @@ import { jsx } from "@emotion/core";
 
 export interface IInputField {
     isSimpleMode?: boolean;
-    css?: object;
+    css?: (theme: any) => React.CSSProperties;
 }
 
 export const InputField: React.FC<IInputField & React.ComponentProps<typeof TextField>> = props => {
@@ -37,7 +37,7 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                             : `2px solid ${theme.colors.primary}`,
                     },
                 },
-                ...(css ? css : {}),
+                ...(css ? css(theme) : {}),
             })}
             {...rest}
         />

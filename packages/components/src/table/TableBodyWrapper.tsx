@@ -26,7 +26,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, on
                                 css={theme => ({
                                     borderBottomColor: theme.colors.light,
                                     color: theme.colors.black,
-                                    fontSize: 14,
+                                    fontSize: theme.fontSize.sNormal,
                                     fontWeight: 400,
                                     lineHeight: 1.5,
                                     cursor: "pointer",
