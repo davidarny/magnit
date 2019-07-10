@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { Grid, Table, TablePagination } from "@material-ui/core";
+import { Table, TablePagination } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { TableHeader } from "./TableHeader";
 import { TableBodyWrapper } from "./TableBodyWrapper";

@@ -143,9 +143,6 @@ export const Validations: React.FC<IValidationsProps> = props => {
         // by traversing whole template tree
         questions.length = 0;
         traverse(template, (value: any, parent: any) => {
-            if (value === null) {
-                console.log("%c%s", "color:" + "#006DFF", "", value, parent);
-            }
             if (typeof value !== "object" || !("puzzles" in value)) {
                 return;
             }

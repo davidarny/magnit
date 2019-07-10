@@ -9,7 +9,7 @@ import {
 } from "./IConditionsService";
 import { EPuzzleType } from "components/puzzle";
 import { EActionType, ETerminals, IPuzzle, TChangeEvent } from "entities";
-import { FormControl, MenuItem } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
 import { InputField, SelectField } from "@magnit/components";
 import { ServiceImpl } from "./ServiceImpl";
 
