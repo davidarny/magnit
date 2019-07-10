@@ -26,7 +26,14 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, on
         <TableBody>
             {data.map((value, index) => (
                 <TableRow hover key={index} onClick={onRowClick}>
-                    {getCells(value)}
+                    {columns.map((column: IColumn, index) => {
+                        const label = _.get(value, column.id, null);
+                        return (
+                            <TableCell key={index}>
+                                {!_.isNull(label) ? label : "(не задано)"}
+                            </TableCell>
+                        );
+                    })}
                 </TableRow>
             ))}
         </TableBody>

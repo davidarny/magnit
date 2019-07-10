@@ -7,7 +7,7 @@ import { SectionLayout } from "components/section-layout";
 import { Link } from "@reach/router";
 import { CustomButton } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { EmptyList } from "../../components/list";
+import { EmptyList } from "components/list";
 
 export const Templates: React.FC = () => {
     return (

@@ -5,6 +5,7 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { FC, Fragment, useState } from "react";
 import { RouteMatcher } from "../route-matcher";
+import { Link } from "@reach/router";
 
 export interface ITab {
     value: string;
@@ -34,6 +35,8 @@ export const TabsWrapper: FC<ITabsWrapperProps> = ({ children, tabs }) => {
                 value={tab}
                 onChange={onTabChange}
                 css={theme => ({
+                    borderBottom: `1px solid ${theme.colors.lightGray}`,
+                    width: "100%",
                     ".indicator": {
                         backgroundColor: theme.colors.primary,
                         boxShadow: theme.boxShadow.indicator,
@@ -43,15 +46,11 @@ export const TabsWrapper: FC<ITabsWrapperProps> = ({ children, tabs }) => {
                     },
                 })}
                 classes={{ indicator: "indicator" }}
-                style={{
-                    borderBottom: "1px solid #DEE5EF",
-                    width: "100%",
-                }}
             >
                 {tabs.map(({ label, value }: ITab, index) => (
                     <Tab
-                        //component={Link}
-                        value={index}
+                        component={Link}
+                        to={value}
                         key={index}
                         css={theme => ({
                             textTransform: "none",

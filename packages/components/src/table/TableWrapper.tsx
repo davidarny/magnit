@@ -21,19 +21,6 @@ interface ITableWrapperProps {
     onRowClick?(): void;
 }
 
-function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
-    const countPages = Math.max(0, Math.ceil(props.count / props.rowsPerPage) - 1);
-    return (
-        <Grid container alignItems={"flex-end"}>
-            {_.range(1, countPages).map((page, index) => (
-                <Grid item key={index}>
-                    <IconButton>{page}</IconButton>
-                </Grid>
-            ))}
-        </Grid>
-    );
-}
-
 export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
     return (
         <Fragment>
@@ -61,3 +48,16 @@ export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
         </Fragment>
     );
 };
+
+function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
+    const pagesCount = Math.max(0, Math.ceil(props.count / props.rowsPerPage) - 1);
+    return (
+        <Grid container alignItems={"flex-end"}>
+            {_.range(1, pagesCount).map((page, index) => (
+                <Grid item key={index}>
+                    <IconButton>{page}</IconButton>
+                </Grid>
+            ))}
+        </Grid>
+    );
+}

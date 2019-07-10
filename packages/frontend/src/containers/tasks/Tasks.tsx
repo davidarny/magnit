@@ -17,7 +17,7 @@ import {
 } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { ETaskStatus } from "../../entities";
-import { EmptyList } from "../../components/list";
+import { EmptyList } from "components/list";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
@@ -82,7 +82,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     square={true}
                     css={theme => ({
                         margin: theme.spacing(3),
-                        boxShadow: "0px 0px 15px rgba(207, 217, 227, 0.45) !important",
+                        boxShadow: `0px 0px ${theme.spacing(2)} #ced9e2 !important`,
                     })}
                 >
                     <Grid container direction="row" style={{ marginTop: 18 }}>
