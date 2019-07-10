@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx, css, Global } from "@emotion/core";
+import { css, Global, jsx } from "@emotion/core";
 import React, { useEffect, useRef, useState } from "react";
 import { Sidebar } from "components/sidebar";
 import { Grid } from "@material-ui/core";
@@ -8,9 +8,8 @@ import { RouteComponentProps, Router } from "@reach/router";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
 import _ from "lodash";
-import { FetchCourier } from "services/api";
+import { FetchCourier, LoggerMiddleware } from "services/api";
 import { AppContext } from "context";
-import { LoggerMiddleware } from "services/api";
 
 const AsyncTasks = Loadable(({
     loader: () => import("containers/tasks").then(module => module.Tasks),
@@ -28,7 +27,7 @@ const AsyncEditTask = Loadable(({
     loader: () => import("containers/task-info").then(module => module.EditTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
- const AsyncTemplates = Loadable(({
+const AsyncTemplates = Loadable(({
     loader: () => import("containers/templates").then(module => module.Templates),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
@@ -41,7 +40,7 @@ const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
     const [logoHeight, setLogoHeight] = useState(0);
     const courier = useRef(
-        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()])
+        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()]),
     );
 
     useEffect(() => {
@@ -73,7 +72,7 @@ const App: React.FC = () => {
             <Grid container>
                 <Grid item>
                     <Router primary={false}>
-                        <Sidebar path="*" />
+                        <Sidebar path="*"/>
                     </Router>
                 </Grid>
                 <Grid
@@ -84,13 +83,13 @@ const App: React.FC = () => {
                 >
                     <AppContext.Provider value={{ courier: courier.current }}>
                         <Router>
-                            <AsyncTasks path="tasks/*" />
-                            <AsyncTaskInfo path="tasks/info" />
-                            <AsyncCreateTask path="tasks/create" />
-                            <AsyncEditTask path="tasks/edit" />
-                            <AsyncTaskInfo path="tasks/info" />
-                        <AsyncTemplates path="templates" />
-                            <AsyncCreateTemplate path="templates/create" />
+                            <AsyncTasks path="tasks/*"/>
+                            <AsyncTaskInfo path="tasks/info"/>
+                            <AsyncCreateTask path="tasks/create"/>
+                            <AsyncEditTask path="tasks/edit"/>
+                            <AsyncTaskInfo path="tasks/info"/>
+                            <AsyncTemplates path="templates"/>
+                            <AsyncCreateTemplate path="templates/create"/>
                         </Router>
                     </AppContext.Provider>
                 </Grid>

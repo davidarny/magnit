@@ -13,6 +13,7 @@ import {
     SelectField,
 } from "@magnit/components";
 import { AddIcon, CheckIcon } from "@magnit/icons";
+import css from "@emotion/css";
 
 export const EditTask: FC = () => {
     const parts = [{ title: "Документы" }];
@@ -66,7 +67,7 @@ export const EditTask: FC = () => {
                                         fullWidth
                                     />
                                 </Grid>
-                            </Grid>
+                            </Grid>,
                         )}
                         {renderFieldContainer(
                             "Этап задания",
@@ -90,7 +91,7 @@ export const EditTask: FC = () => {
                                         />
                                     </Grid>
                                 </Grid>
-                            </Grid>
+                            </Grid>,
                         )}
                         {renderFieldContainer(
                             "Местоположение",
@@ -107,13 +108,13 @@ export const EditTask: FC = () => {
                                 <Grid item xs>
                                     <SelectField placeholder={"Адрес"} fullWidth />
                                 </Grid>
-                            </Grid>
+                            </Grid>,
                         )}
                         {renderFieldContainer(
                             "Исполнитель",
                             <Grid item xs={4}>
                                 <SelectField placeholder={"Выберите исполнителя"} fullWidth />
-                            </Grid>
+                            </Grid>,
                         )}
                     </Grid>
                 </SelectableBlockWrapper>
@@ -133,7 +134,7 @@ export const EditTask: FC = () => {
                                     "Шаблон",
                                     <Grid item xs={3}>
                                         <SelectField placeholder={"Выбрать шаблон"} fullWidth />
-                                    </Grid>
+                                    </Grid>,
                                 )}
                             </Grid>
                         </Grid>

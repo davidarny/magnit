@@ -4,7 +4,7 @@ import { Tab, Tabs } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import * as React from "react";
 import { FC, Fragment, useState } from "react";
-import { RouteMatcher } from "components/route-matcher";
+import { RouteMatcher } from "route-matcher";
 import { Link } from "@reach/router";
 
 export interface ITab {
