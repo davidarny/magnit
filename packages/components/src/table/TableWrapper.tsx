@@ -6,10 +6,7 @@ import { css, jsx } from "@emotion/core";
 import { TableHeader } from "./TableHeader";
 import { TableBodyWrapper } from "./TableBodyWrapper";
 import * as _ from "lodash";
-import {
-    KeyboardArrowLeft as LeftArrowIcon,
-    KeyboardArrowRight as RightArrowIcon,
-} from "@material-ui/icons";
+import { KeyboardArrowLeft as LeftArrowIcon, KeyboardArrowRight as RightArrowIcon } from "@material-ui/icons";
 
 export interface IColumn {
     id: string;
@@ -73,7 +70,6 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                                         span: {
                                             display: "block",
                                             fontSize: 14,
-                                            lineHeight: 1.5,
                                             textAlign: "center",
                                             width: "100%",
                                         },
@@ -93,7 +89,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                                 display: "block",
                                 marginRight: "auto",
                                 width: "calc(100% / 2)",
-                                div: {
+                                span: {
                                     display: "block",
                                 },
                             },
@@ -128,22 +124,29 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
             <Grid item>
                 <IconButton
                     css={theme => ({
-                        width: theme.spacing(6),
-                        height: theme.spacing(6),
+                        width: theme.spacing(4),
+                        height: theme.spacing(4),
                         fontSize: theme.fontSize.normal,
                         marginLeft: theme.spacing(2),
+                        svg: {
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                        },
                     })}
                 >
-                    <LeftArrowIcon />
+                    <LeftArrowIcon/>
                 </IconButton>
             </Grid>
             {_.range(1, range).map((page, index) => (
                 <Grid item key={index}>
                     <IconButton
                         css={theme => ({
-                            width: theme.spacing(6),
-                            height: theme.spacing(6),
-                            fontSize: theme.fontSize.normal,
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                            fontSize: 14,
+                            lineHeight: 1.5,
+                            color: theme.colors.secondary,
+                            background: theme.colors.white,
                         })}
                     >
                         {page}
@@ -153,13 +156,17 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
             <Grid item>
                 <IconButton
                     css={theme => ({
-                        width: theme.spacing(6),
-                        height: theme.spacing(6),
+                        width: theme.spacing(4),
+                        height: theme.spacing(4),
                         fontSize: theme.fontSize.normal,
                         marginRight: theme.spacing(2),
+                        svg: {
+                            width: theme.spacing(4),
+                            height: theme.spacing(4),
+                        },
                     })}
                 >
-                    <RightArrowIcon />
+                    <RightArrowIcon/>
                 </IconButton>
             </Grid>
         </Grid>
@@ -173,13 +180,8 @@ interface IPaginationLabelProps {
 
 const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
     return (
-        <span
-            css={css`
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-            `}
-        >{`${from} из ${count}`}</span>
+        <span>
+            {`${from} из ${count}`}
+        </span>
     );
 };
