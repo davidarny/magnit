@@ -43,6 +43,7 @@ const data: object[] = [
 
 export const Tasks: React.FC<RouteComponentProps> = () => {
     const hasTableItems = !!data.length;
+    
     return (
         <SectionLayout>
             <SectionTitle title="Список заданий">
@@ -54,7 +55,9 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                         title="Создать задание"
                         scheme="blue"
                         icon={<AddIcon />}
-                        css={theme => ({ width: 180 })}
+                        css={css`
+                                width: 180px;
+                            `}
                     />
                 </Grid>
             </SectionTitle>

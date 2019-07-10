@@ -83,7 +83,9 @@ export const EditTask: FC = () => {
                                             variant="outlined"
                                             title="Добавить этап"
                                             scheme="blueOutline"
-                                            css={theme => ({ width: 180 })}
+                                            css={css`
+                                                width: 180px;
+                                            `}
                                             icon={<AddIcon />}
                                         />
                                     </Grid>

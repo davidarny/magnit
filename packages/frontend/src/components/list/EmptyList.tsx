@@ -2,7 +2,7 @@
 
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { CenteredSectionItem } from "../centered-section-item";
+import { CenteredSectionItem } from "components/centered-section-item";
 import { FC, ReactNode } from "react";
 
 interface IEmptyListProps {
