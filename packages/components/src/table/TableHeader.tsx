@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { FC } from "react";
-import { TableCell, TableHead, TableRow, TableSortLabel } from "@material-ui/core";
+import { TableHead, TableRow, TableCell, TableSortLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { IColumn } from "./TableWrapper";
 

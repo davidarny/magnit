@@ -26,6 +26,7 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
         >
             <Select
                 displayEmpty={displayEmpty}
+                placeholder={placeholder}
                 input={
                     <Input
                         disableUnderline

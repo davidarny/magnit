@@ -96,7 +96,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
         return (
             <Grid
                 container
-                direction="column"
+                alignItems="center"
                 css={theme => ({
                     // need for correct toolbar positioning
                     // see https://github.com/DavidArutiunian/magnit/issues/46
@@ -104,14 +104,21 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
                 })}
             >
                 <Grid item>
-                    <Typography variant="body1">
-                        <Typography
-                            component="span"
-                            css={theme => ({ paddingRight: theme.spacing() })}
-                        >
-                            {props.index + 1}.
-                        </Typography>
-                        {questionTitle}
+                    <Typography
+                        component="span"
+                        variant="body1"
+                        css={theme => ({ paddingRight: theme.spacing() })}
+                    >
+                        {props.index + 1}.
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography
+                        variant="body1"
+                        component="span"
+                        css={theme => ({ color: !questionTitle ? theme.colors.gray : "initial" })}
+                    >
+                        {questionTitle || "Название вопроса"}
                     </Typography>
                 </Grid>
             </Grid>

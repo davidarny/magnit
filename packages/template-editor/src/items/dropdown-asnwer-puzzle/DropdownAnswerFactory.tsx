@@ -8,7 +8,7 @@ import { EditorContext } from "TemplateEditor";
 import { DropdownAnswerPuzzle } from "./DropdownAnswerPuzzle";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
         const addDropdownButton =

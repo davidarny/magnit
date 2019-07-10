@@ -17,47 +17,16 @@ export interface IColumn {
 interface ITableWrapperProps {
     columns: IColumn[];
     data: object[];
-}
 
-function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
-    const countPages = Math.max(0, Math.ceil(props.count / props.rowsPerPage));
-    const isOnlyPage = countPages === 1;
-    return (
-        <Grid
-            container
-            alignItems="flex-end"
-            css={theme => ({
-                marginLeft: "auto",
-                width: "calc(100% / 2)",
-                display: `${isOnlyPage ? "none" : "flex"} !important`,
-            })}
-        >
-            {_.range(0, countPages).map((page, index) => (
-                <Grid item key={index}>
-                    <IconButton
-                        css={theme => ({
-                            color: `${
-                                props.page === page ? theme.colors.white : theme.colors.secondary
-                            } !important`,
-                            background: `${
-                                props.page === page ? theme.colors.primary : theme.colors.white
-                            } !important`,
-                        })}
-                    >
-                        {page + 1}
-                    </IconButton>
-                </Grid>
-            ))}
-        </Grid>
-    );
+    onRowClick?(): void;
 }
 
 export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
     return (
         <Fragment>
             <Table>
-                <TableHeader headers={columns} />
-                <TableBodyWrapper data={data} columns={columns} />
+                <TableHeader headers={columns}/>
+                <TableBodyWrapper data={data} columns={columns}/>
             </Table>
             <TablePagination
                 count={data.length}
@@ -133,3 +102,36 @@ export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
         </Fragment>
     );
 };
+
+function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
+    const countPages = Math.max(0, Math.ceil(props.count / props.rowsPerPage));
+    const isOnlyPage = countPages === 1;
+    return (
+        <Grid
+            container
+            alignItems="flex-end"
+            css={theme => ({
+                marginLeft: "auto",
+                width: "calc(100% / 2)",
+                display: `${isOnlyPage ? "none" : "flex"} !important`,
+            })}
+        >
+            {_.range(0, countPages).map((page, index) => (
+                <Grid item key={index}>
+                    <IconButton
+                        css={theme => ({
+                            color: `${
+                                props.page === page ? theme.colors.white : theme.colors.secondary
+                                } !important`,
+                            background: `${
+                                props.page === page ? theme.colors.primary : theme.colors.white
+                                } !important`,
+                        })}
+                    >
+                        {page + 1}
+                    </IconButton>
+                </Grid>
+            ))}
+        </Grid>
+    );
+}

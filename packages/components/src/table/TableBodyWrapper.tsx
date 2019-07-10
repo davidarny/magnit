@@ -9,37 +9,34 @@ import * as _ from "lodash";
 interface ITableBodyWrapperProps {
     data: object[];
     columns: IColumn[];
+
+    onRowClick?(): void;
 }
 
-export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns }) => {
-    const getCells = (lineItem: object) => {
-        return columns.map((column: IColumn, index) => {
-            const label = _.get(lineItem, column.id, null);
-            const value = !_.isNull(label) ? label : "(не задано)";
-            return (
-                <TableCell
-                    key={index}
-                    css={theme => ({
-                        borderBottomColor: theme.colors.light,
-                        color: theme.colors.black,
-                        fontSize: 14,
-                        fontWeight: 400,
-                        lineHeight: 1.5,
-                        cursor: "pointer",
-                    })}
-                    title={value}
-                >
-                    {value}
-                </TableCell>
-            );
-        });
-    };
-
+export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, onRowClick }) => {
     return (
         <TableBody>
             {data.map((value, index) => (
-                <TableRow hover key={index}>
-                    {getCells(value)}
+                <TableRow hover key={index} onClick={onRowClick}>
+                    {columns.map((column: IColumn, index) => {
+                        const label = _.get(value, column.id, null);
+                        return (
+                            <TableCell
+                                key={index}
+                                css={theme => ({
+                                    borderBottomColor: theme.colors.light,
+                                    color: theme.colors.black,
+                                    fontSize: 14,
+                                    fontWeight: 400,
+                                    lineHeight: 1.5,
+                                    cursor: "pointer",
+                                })}
+                                title={label}
+                            >
+                                {!_.isNull(label) ? label : "(не задано)"}
+                            </TableCell>
+                        );
+                    })}
                 </TableRow>
             ))}
         </TableBody>

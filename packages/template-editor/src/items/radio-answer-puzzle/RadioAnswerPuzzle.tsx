@@ -60,16 +60,18 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
             <Grid
                 container
                 alignItems="center"
-                css={theme => ({
-                    marginTop: `${theme.spacing()} !important`,
-                    marginBottom: `${theme.spacing()} !important`,
-                })}
+                css={theme => ({ marginTop: `${theme.spacing()} !important` })}
             >
                 <Grid item>
                     <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
-                    <Typography variant="body1">{label}</Typography>
+                    <Typography
+                        variant="body1"
+                        css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
+                    >
+                        {label || `Вариант ${props.index + 1}`}
+                    </Typography>
                 </Grid>
             </Grid>
         );
@@ -81,7 +83,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 container
                 alignItems="flex-end"
                 spacing={2}
-                css={theme => ({ marginTop: `${theme.spacing()} !important` })}
+                css={theme => ({ marginTop: `${theme.spacing(-1)} !important` })}
             >
                 <Grid item>
                     <Radio
@@ -96,7 +98,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     item
                     xs
                     css={css`
-                        padding-left: 0;
+                        padding-left: 0 !important;
                     `}
                 >
                     <InputField fullWidth value={label} onChange={onLabelChange} />
@@ -108,13 +110,13 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                 </Grid>
             </Grid>
 
-            {props.addRadioButton && (
+            {props.addRadioButton && props.focused && (
                 <Grid
                     container
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: `${theme.spacing(-2)} !important`,
+                        paddingTop: theme.spacing(),
                         marginBottom: `${theme.spacing()} !important`,
                     })}
                 >
@@ -130,11 +132,10 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     <Grid
                         item
                         xs
-                        css={theme => ({
-                            paddingTop: "0 !important",
-                            paddingLeft: "0 !important",
-                            paddingRight: theme.spacing(4),
-                        })}
+                        css={css`
+                            padding-top: 0 !important;
+                            padding-left: 0 !important;
+                        `}
                     >
                         <InputField
                             fullWidth
