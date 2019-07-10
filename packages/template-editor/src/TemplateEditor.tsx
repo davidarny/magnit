@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -14,6 +15,8 @@ import { Content, ContentSection } from "./components/content";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
+
+    onChange?(template: ITemplate): void;
 }
 
 export interface IEditorContext {
@@ -58,16 +61,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         }
         const { top } = element.getBoundingClientRect();
         setToolbarTopPosition(window.scrollY + top - 128);
-
-        // toggle toolbar will-change property
-        const toolbar = document.querySelector<HTMLDivElement>(".toolbar");
-        if (!toolbar) {
-            return;
-        }
-        toolbar.style.willChange = "transform";
-        const timeout = 300;
-        setTimeout(() => (toolbar.style.willChange = "initial"), timeout);
     }, [focusedPuzzleChain]);
+
+    useEffect(() => {
+        if (props.onChange) {
+            props.onChange(template);
+        }
+    }, [template]);
 
     function onToolbarAddQuestion(): void {
         const whitelist = [EPuzzleType.GROUP];

@@ -1,13 +1,16 @@
 /** @jsx jsx */
 
 import { jsx, css, Global } from "@emotion/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Sidebar } from "components/sidebar";
 import { Grid } from "@material-ui/core";
 import { RouteComponentProps, Router } from "@reach/router";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
 import _ from "lodash";
+import { FetchCourier } from "services/api";
+import { AppContext } from "context";
+import { LoggerMiddleware } from "services/api";
 
 const AsyncTasks = Loadable(({
     loader: () => import("containers/tasks").then(module => module.Tasks),
@@ -37,6 +40,9 @@ const AsyncCreateTemplate = Loadable(({
 const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
     const [logoHeight, setLogoHeight] = useState(0);
+    const courier = useRef(
+        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()])
+    );
 
     useEffect(() => {
         const drawer = document.getElementById("drawer");
@@ -76,14 +82,16 @@ const App: React.FC = () => {
                         width: 100%;
                     `}
                 >
-                    <Router>
-                        <AsyncTasks path="tasks/*" />
-                        <AsyncTaskInfo path="tasks/info" />
-                        <AsyncCreateTask path="tasks/create" />
-                        <AsyncEditTask path="tasks/edit" />
-                        <AsyncTemplates path="templates" />
-                        <AsyncCreateTemplate path="templates/create" />
-                    </Router>
+                    <AppContext.Provider value={{ courier: courier.current }}>
+                        <Router>
+                            <AsyncTasks path="tasks/*" />
+                            <AsyncTaskInfo path="tasks/info" />
+                            <AsyncCreateTask path="tasks/create" />
+                            <AsyncEditTask path="tasks/edit" />
+                            <AsyncTemplates path="templates" />
+                            <AsyncCreateTemplate path="templates/create" />
+                        </Router>
+                    </AppContext.Provider>
                 </Grid>
             </Grid>
         </React.Fragment>

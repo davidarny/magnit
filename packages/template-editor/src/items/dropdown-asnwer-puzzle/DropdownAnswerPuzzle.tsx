@@ -4,7 +4,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@material-ui/core";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
@@ -65,18 +65,16 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                     marginLeft: `${theme.spacing()} !important`,
                     marginTop: `${theme.spacing()} !important`,
                     marginBottom: `${theme.spacing()} !important`,
+                    paddingRight: theme.spacing(),
                 })}
             >
                 <Grid item>
-                    <Typography variant="body1">
-                        <Typography
-                            component="span"
-                            css={theme => ({
-                                paddingRight: theme.spacing(),
-                            })}
-                        >
-                            {props.index + 1}.
-                        </Typography>
+                    <Typography variant="body1" component="span">
+                        {props.index + 1}.
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Typography variant="body1" component="span">
                         {label}
                     </Typography>
                 </Grid>
@@ -92,20 +90,28 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                 spacing={2}
                 css={theme => ({
                     marginTop: `${theme.spacing(-1)} !important`,
-                    marginLeft: `${theme.spacing()} !important`,
+                    marginLeft: "0 !important",
                 })}
             >
                 <Grid item>
                     <Typography
                         css={theme => ({
                             fontSize: theme.fontSize.medium,
-                            marginBottom: theme.spacing(0.25),
+                            paddingBottom: theme.spacing(0.25),
+                            marginLeft: `-${theme.spacing()}`,
+                            marginRight: theme.spacing(2),
                         })}
                     >
                         {props.index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs>
+                <Grid
+                    item
+                    xs
+                    css={css`
+                        padding-left: 0 !important;
+                    `}
+                >
                     <InputField fullWidth value={label} onChange={onLabelChange} />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
@@ -121,16 +127,18 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        marginTop: `${theme.spacing(-2)} !important`,
+                        paddingTop: theme.spacing(),
                         marginBottom: `${theme.spacing()} !important`,
-                        marginLeft: `${theme.spacing()} !important`,
+                        marginLeft: "0 !important",
                     })}
                 >
                     <Grid item>
                         <Typography
                             css={theme => ({
                                 fontSize: theme.fontSize.medium,
-                                marginBottom: theme.spacing(0.25),
+                                marginLeft: `-${theme.spacing()}`,
+                                paddingBottom: theme.spacing(0.5),
+                                marginRight: theme.spacing(2),
                             })}
                         >
                             {props.index + 2}.
@@ -139,10 +147,10 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                     <Grid
                         item
                         xs
-                        css={theme => ({
-                            paddingTop: "0 !important",
-                            paddingRight: theme.spacing(4),
-                        })}
+                        css={css`
+                            padding-top: 0 !important;
+                            padding-left: 0 !important;
+                        `}
                     >
                         <InputField
                             fullWidth
@@ -150,7 +158,6 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
                             onClick={onAddDropdownButton}
                         />
                     </Grid>
-                    <Grid item />
                 </Grid>
             )}
         </React.Fragment>

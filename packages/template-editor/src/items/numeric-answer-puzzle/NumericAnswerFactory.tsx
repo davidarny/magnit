@@ -6,7 +6,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { NumericAnswerPuzzle } from "./NumericAnswerPuzzle";
 
 export class NumericAnswerFactory implements IPuzzleFactory {
-    createPuzzle({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
         return <NumericAnswerPuzzle {...props} id={puzzle.id} focused={focused} />;
     }
 }

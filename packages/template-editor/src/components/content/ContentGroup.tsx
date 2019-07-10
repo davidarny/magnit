@@ -61,28 +61,28 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     onFocus={onFocus}
                     onBlur={props.onBlur}
                 />
-                {puzzle.puzzles.map((puzzle, index) => {
-                    if (puzzle.puzzleType === EPuzzleType.QUESTION) {
+                {puzzle.puzzles.map((childPuzzle, index) => {
+                    if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
                         return (
                             <ContentGroup
-                                key={puzzle.id}
-                                puzzle={puzzle}
+                                key={childPuzzle.id}
+                                puzzle={childPuzzle}
                                 onFocus={props.onFocus}
                                 onBlur={props.onBlur}
                                 isFocused={isFocused}
                                 index={props.index + index}
-                                parentPuzzle={puzzle}
+                                parentPuzzle={childPuzzle}
                             />
                         );
                     }
                     return (
                         <ContentItem
-                            puzzle={puzzle}
-                            index={props.index + index}
+                            puzzle={childPuzzle}
+                            index={index}
                             active={focused}
                             onFocus={onFocus}
                             onBlur={props.onBlur}
-                            key={puzzle.id}
+                            key={childPuzzle.id}
                             parentPuzzle={puzzle}
                         />
                     );
