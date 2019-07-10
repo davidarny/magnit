@@ -22,7 +22,25 @@ export const TaskInfo: React.FC = () => {
                     <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
                         до 07.07.2019 (просрочено)
                     </Typography>
-                    <Typography css={theme => ({ fontSize: theme.font.smaller })}>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.smaller })}>
+                        История изменений
+                    </Typography>
+                </Grid>
+            ),
+            completed: true,
+        },
+        {
+            title: (
+                <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
+                    Подготовка технического плана
+                </Typography>
+            ),
+            content: (
+                <Grid container direction={"column"}>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                        до 07.07.2019 (просрочено)
+                    </Typography>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.smaller })}>
                         История изменений
                     </Typography>
                 </Grid>
