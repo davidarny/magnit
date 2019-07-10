@@ -7,7 +7,7 @@ import {
     TGetRightHandPuzzleResult,
 } from "./IValidationService";
 import { ServiceImpl } from "./ServiceImpl";
-import { FormControl, MenuItem } from "@material-ui/core";
+import { MenuItem } from "@material-ui/core";
 import { EOperatorType, ETerminals, EValidationType, IPuzzle, TChangeEvent } from "entities";
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";

@@ -12,15 +12,18 @@ module.exports = {
 
         operator_type: {
             type: "string",
+            allowNull: true,
         },
 
         validation_type: {
             type: "string",
+            allowNull: true,
         },
 
         left_hand_puzzle: {
             type: "string",
             isUUID: true,
+            allowNull: true,
         },
 
         right_hand_puzzle: {
@@ -30,8 +33,7 @@ module.exports = {
         },
 
         value: {
-            type: "number",
-            allowNull: true,
+            type: "ref",
         },
 
         error_message: {

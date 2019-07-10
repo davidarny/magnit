@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
+import * as React from "react";
 import { jsx } from "@emotion/core";
-import { FC, ReactNode } from "react";
 import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
@@ -9,23 +9,27 @@ import { CustomButton, SelectableBlockWrapper, StepperWrapper } from "@magnit/co
 import { CheckIcon } from "@magnit/icons";
 import { ETaskStatus } from "../../entities";
 
-const steps = [
-    {
-        title: (
-            <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                Подготовка технического плана
-            </Typography>
-        ),
-        content: (
-            <Grid container direction={"column"}>
-                <Typography style={{ fontSize: 16 }}>до 07.07.2019 (просрочено)</Typography>
-                <Typography style={{ fontSize: 14 }}>История изменений</Typography>
-            </Grid>
-        ),
-    },
-];
+export const TaskInfo: React.FC = () => {
+    const steps = [
+        {
+            title: (
+                <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
+                    Подготовка технического плана
+                </Typography>
+            ),
+            content: (
+                <Grid container direction={"column"}>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                        до 07.07.2019 (просрочено)
+                    </Typography>
+                    <Typography css={theme => ({ fontSize: theme.font.smaller })}>
+                        История изменений
+                    </Typography>
+                </Grid>
+            ),
+        },
+    ];
 
-export const TaskInfo: FC = () => {
     const parts = [
         { title: "Документы" },
         { title: "Ведомость работ" },
@@ -75,24 +79,29 @@ export const TaskInfo: FC = () => {
                     })}
                     focused
                 >
-                    {getBlockHead("Хардкорное задание для суровых прорабов", ETaskStatus.CHECKED)}
-
+                    <Head
+                        title="Хардкорное задание для суровых прорабов"
+                        status={ETaskStatus.CHECKED}
+                    />
                     <Grid container spacing={2}>
                         <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
                             <Grid container direction={"row"}>
-                                {getMainInfoData("Администратор", "Andrey_555")}
-                                {getMainInfoData("Исполнитель", "Рукастый Иннокентий Петрович")}
+                                <MainInfo title="Администратор" value="Andrey_555" />
+                                <MainInfo
+                                    title="Исполнитель"
+                                    value="Рукастый Иннокентий Петрович"
+                                />
                             </Grid>
                             <Grid
                                 container
                                 direction={"row"}
                                 css={theme => ({ marginTop: theme.spacing(3) })}
                             >
-                                {getMainInfoData(
-                                    "Местоположение",
-                                    "Челябинская область, Челябинск, улица Железная, 5"
-                                )}
-                                {getMainInfoData("Формат объекта", "МК")}
+                                <MainInfo
+                                    title="Местоположение"
+                                    value="Челябинская область, Челябинск, улица Железная, 5"
+                                />
+                                <MainInfo title="Формат объекта" value="МК" />
                             </Grid>
                         </Grid>
                         <Grid item xs>
@@ -102,7 +111,7 @@ export const TaskInfo: FC = () => {
                 </SelectableBlockWrapper>
                 {parts.map(part => (
                     <SelectableBlockWrapper css={theme => ({ padding: theme.spacing(3) })}>
-                        {getBlockHead(part.title)}
+                        <Head title={part.title} />
                     </SelectableBlockWrapper>
                 ))}
             </Grid>
@@ -110,40 +119,59 @@ export const TaskInfo: FC = () => {
     );
 };
 
-function getMainInfoData(title: string, value: string): ReactNode {
+interface IMainInfoProps {
+    title: string;
+    value: string;
+}
+
+const MainInfo: React.FC<IMainInfoProps> = ({ title, value }) => {
     return (
         <Grid item xs>
             <Typography
-                css={theme => ({ color: theme.colors.secondary })}
-                style={{
-                    fontSize: 14,
+                css={theme => ({
+                    color: theme.colors.secondary,
+                    fontSize: theme.fontSize.smaller,
                     textTransform: "uppercase",
-                }}
+                })}
             >
                 {title}
             </Typography>
-            <Typography css={theme => ({ color: theme.colors.black })} style={{ fontSize: 17 }}>
+            <Typography
+                css={theme => ({
+                    fontSize: theme.fontSize.normal,
+                    color: theme.colors.black,
+                })}
+            >
                 {value}
             </Typography>
         </Grid>
     );
+};
+
+interface IHeadProps {
+    title: string;
+    status?: string;
 }
 
-const statusTitle = {
-    [ETaskStatus.IN_PROGRESS]: "В работе",
-    [ETaskStatus.CHECKED]: "На проверке",
-    [ETaskStatus.DONE]: "Завершено",
-    [ETaskStatus.DRAFT]: "Черновик",
-};
+const Head: React.FC<IHeadProps> = ({ title, status }) => {
+    function getTitleByStatus(status: ETaskStatus): string {
+        return {
+            [ETaskStatus.IN_PROGRESS]: "В работе",
+            [ETaskStatus.CHECKED]: "На проверке",
+            [ETaskStatus.DONE]: "Завершено",
+            [ETaskStatus.DRAFT]: "Черновик",
+        }[status];
+    }
 
-const colorByStatus = {
-    [ETaskStatus.IN_PROGRESS]: "#8F7EE5",
-    [ETaskStatus.CHECKED]: "#FFBC3C",
-    [ETaskStatus.DONE]: "#0CDAAC",
-    [ETaskStatus.DRAFT]: "#8A94A2",
-};
+    function getColorByStatus(theme: any, status: ETaskStatus): string {
+        return {
+            [ETaskStatus.IN_PROGRESS]: theme.colors.violet,
+            [ETaskStatus.CHECKED]: theme.colors.darkYellow,
+            [ETaskStatus.DONE]: theme.colors.green,
+            [ETaskStatus.DRAFT]: theme.colors.secondary,
+        }[status];
+    }
 
-function getBlockHead(title: string, status?: string): ReactNode {
     return (
         <Grid container spacing={2} key={title}>
             <Grid
@@ -159,20 +187,22 @@ function getBlockHead(title: string, status?: string): ReactNode {
             {!!status && (
                 <Grid item>
                     <span
-                        style={{
-                            width: 8,
-                            height: 8,
+                        css={theme => ({
+                            width: theme.spacing(),
+                            height: theme.spacing(),
                             borderRadius: "50%",
                             display: "inline-block",
-                            background: colorByStatus[status as ETaskStatus],
+                            background: getColorByStatus(theme, status as ETaskStatus),
                             margin: "2px 10px 2px 0",
-                        }}
+                        })}
                     />
-                    <span style={{ color: colorByStatus[status as ETaskStatus] }}>
-                        {status && statusTitle[status as ETaskStatus]}
+                    <span
+                        css={theme => ({ color: getColorByStatus(theme, status as ETaskStatus) })}
+                    >
+                        {status && getTitleByStatus(status as ETaskStatus)}
                     </span>
                 </Grid>
             )}
         </Grid>
     );
-}
+};

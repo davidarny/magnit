@@ -3,14 +3,7 @@
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import {
-    QuestionIcon,
-    GroupIcon,
-    SectionIcon,
-    ImageIcon,
-    TrashIcon,
-    CopyIcon,
-} from "@magnit/icons";
+import { CopyIcon, GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 
 interface IPuzzleToolbarProps {
     right?: number;

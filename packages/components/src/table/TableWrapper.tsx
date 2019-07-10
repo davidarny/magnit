@@ -1,12 +1,15 @@
 /** @jsx jsx */
 
+import * as React from "react";
 import { Grid, IconButton, Table, TablePagination } from "@material-ui/core";
-import { FC, Fragment, ReactElement } from "react";
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import { TableHeader } from "./TableHeader";
 import { TableBodyWrapper } from "./TableBodyWrapper";
-import { TablePaginationActionsProps } from "@material-ui/core/TablePagination/TablePaginationActions";
 import * as _ from "lodash";
+import {
+    KeyboardArrowLeft as LeftArrowIcon,
+    KeyboardArrowRight as RightArrowIcon,
+} from "@material-ui/icons";
 
 export interface IColumn {
     id: string;
@@ -21,28 +24,27 @@ interface ITableWrapperProps {
     onRowClick?(): void;
 }
 
-export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
+export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) => {
     return (
-        <Fragment>
+        <React.Fragment>
             <Table>
                 <TableHeader headers={columns}/>
                 <TableBodyWrapper data={data} columns={columns}/>
             </Table>
             <TablePagination
+                component="div"
                 count={data.length}
                 page={0}
                 rowsPerPage={15}
-                onChangePage={(event, page) => void 0}
-                labelDisplayedRows={({ from, to, count }) => (
-                    <Grid container xs>{`${from} из ${count}`}</Grid>
-                )}
+                labelDisplayedRows={PaginationLabel}
+                ActionsComponent={ActionComponent}
                 labelRowsPerPage={""}
-                SelectProps={{
-                    style: { display: "none" },
-                }}
-                ActionsComponent={tablePaginationActions}
+                SelectProps={{ style: { display: "none" } }}
+                onChangePage={_.noop}
                 css={theme => ({
                     width: "100%",
+                    marginTop: theme.spacing(2),
+                    position: "relative",
                     display: "flex",
                     border: "none",
                     div: {
@@ -99,39 +101,85 @@ export const TableWrapper: FC<ITableWrapperProps> = ({ columns, data }) => {
                     },
                 })}
             />
-        </Fragment>
+        </React.Fragment>
     );
 };
 
-function tablePaginationActions(props: TablePaginationActionsProps): ReactElement {
-    const countPages = Math.max(0, Math.ceil(props.count / props.rowsPerPage));
-    const isOnlyPage = countPages === 1;
+interface IActionComponentProps {
+    count: number;
+    rowsPerPage: number;
+}
+
+const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }) => {
+    const range = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
+
     return (
         <Grid
             container
-            alignItems="flex-end"
-            css={theme => ({
-                marginLeft: "auto",
-                width: "calc(100% / 2)",
-                display: `${isOnlyPage ? "none" : "flex"} !important`,
-            })}
+            alignItems="center"
+            css={css`
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 0;
+                width: auto;
+            `}
         >
-            {_.range(0, countPages).map((page, index) => (
+            <Grid item>
+                <IconButton
+                    css={theme => ({
+                        width: theme.spacing(6),
+                        height: theme.spacing(6),
+                        fontSize: theme.fontSize.normal,
+                        marginLeft: theme.spacing(2),
+                    })}
+                >
+                    <LeftArrowIcon />
+                </IconButton>
+            </Grid>
+            {_.range(1, range).map((page, index) => (
                 <Grid item key={index}>
                     <IconButton
                         css={theme => ({
-                            color: `${
-                                props.page === page ? theme.colors.white : theme.colors.secondary
-                                } !important`,
-                            background: `${
-                                props.page === page ? theme.colors.primary : theme.colors.white
-                                } !important`,
+                            width: theme.spacing(6),
+                            height: theme.spacing(6),
+                            fontSize: theme.fontSize.normal,
                         })}
                     >
-                        {page + 1}
+                        {page}
                     </IconButton>
                 </Grid>
             ))}
+            <Grid item>
+                <IconButton
+                    css={theme => ({
+                        width: theme.spacing(6),
+                        height: theme.spacing(6),
+                        fontSize: theme.fontSize.normal,
+                        marginRight: theme.spacing(2),
+                    })}
+                >
+                    <RightArrowIcon />
+                </IconButton>
+            </Grid>
         </Grid>
     );
+};
+
+interface IPaginationLabelProps {
+    from: number;
+    count: number;
 }
+
+const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
+    return (
+        <span
+            css={css`
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            `}
+        >{`${from} из ${count}`}</span>
+    );
+};

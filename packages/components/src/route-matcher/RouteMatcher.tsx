@@ -21,7 +21,7 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                         return (
                             <Match path={path} key={path}>
                                 {props => {
-                                    if (!props.match) {
+                                    if (!props.match || !window.location.pathname.includes(path)) {
                                         return;
                                     }
                                     const component = route.render();
@@ -37,7 +37,10 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                     return (
                         <Match path={route.path} key={route.path}>
                             {props => {
-                                if (!props.match) {
+                                if (
+                                    !props.match ||
+                                    !window.location.pathname.includes(route.path!)
+                                ) {
                                     return;
                                 }
                                 const component = route.render();

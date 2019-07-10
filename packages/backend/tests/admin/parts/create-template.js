@@ -179,6 +179,62 @@ module.exports = function(options) {
         };
 
         options.json = { template: "not valid json" };
+        //         options.json = {
+        //   "template":{
+        //      "id":"eaa4ccef-9fec-4902-b80b-b4886e36734a",
+        //      "sections":[
+        //         {
+        //            "id":"b9248cc2-63c7-4a24-b53a-1c75c0ac84a6",
+        //            "puzzles":[
+        //               {
+        //                  "id":"f178bd6b-b201-4520-87fa-306b3aa9562b",
+        //                  "puzzles":[
+        //                     {
+        //                        "id":"bc1863f6-9668-471a-a9ff-2a765c76ebaa",
+        //                        "puzzle_type":"text_answer",
+        //                        "title":"",
+        //                        "description":"",
+        //                        "order":0,
+        //                        "puzzles":[
+        //
+        //                        ],
+        //                        "conditions":[
+        //
+        //                        ],
+        //                        "validations":[
+        //
+        //                        ]
+        //                     }
+        //                  ],
+        //                  "validations":[
+        //
+        //                  ],
+        //                  "conditions":[
+        //                     {
+        //                        "id":"b41c52e9-003c-415c-abda-217428ec575a",
+        //                        "order":0,
+        //                        "question_puzzle":"",
+        //                        "answer_puzzle":"",
+        //                        "value":"",
+        //                        "action_type":"",
+        //                        "condition_type":"or"
+        //                     }
+        //                  ],
+        //                  "title":"2",
+        //                  "description":"",
+        //                  "puzzle_type":"question",
+        //                  "order":0
+        //               }
+        //            ],
+        //            "title":"",
+        //            "order":0
+        //         }
+        //      ],
+        //      "title":"",
+        //      "description":"",
+        //      "type":"light"
+        //   }
+        // };
 
         it("not valid json", done => {
             request(options, async (err, httpResponse, body) => {
