@@ -13,10 +13,12 @@ module.exports = {
         question_puzzle: {
             type: "string",
             isUUID: true,
+            allowNull: true,
         },
 
         action_type: {
             type: "string",
+            allowNull: true,
         },
 
         answer_puzzle: {
@@ -26,8 +28,7 @@ module.exports = {
         },
 
         value: {
-            type: "number",
-            allowNull: true,
+            type: "ref",
         },
 
         condition_type: {
