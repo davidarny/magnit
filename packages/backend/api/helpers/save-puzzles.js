@@ -33,9 +33,9 @@ module.exports = {
                 uuid: puzzle.id,
                 title: puzzle.title,
                 description: puzzle.description,
-                puzzle_type: puzzle.puzzle_type,
+                puzzle_type: puzzle.puzzle_type || null,
                 order: puzzle.order,
-                answer_type: puzzle.answer_type,
+                answer_type: puzzle.answer_type || null,
                 parent_id: puzzleId,
                 template_id: templateId,
                 section_id: sectionId,
@@ -48,10 +48,10 @@ module.exports = {
                     await Condition.create({
                         puzzle_id: newPuzzle.id,
                         order: condition.order,
-                        action_type: condition.action_type,
-                        condition_type: condition.condition_type,
-                        question_puzzle: condition.question_puzzle,
-                        answer_puzzle: condition.answer_puzzle,
+                        action_type: condition.action_type || null,
+                        condition_type: condition.condition_type || null,
+                        question_puzzle: condition.question_puzzle || null,
+                        answer_puzzle: condition.answer_puzzle || null,
                         value: condition.value,
                     });
                 }
@@ -64,10 +64,10 @@ module.exports = {
                     await Validation.create({
                         puzzle_id: newPuzzle.id,
                         order: validation.order,
-                        operator_type: validation.operator_type,
-                        validation_type: validation.validation_type,
-                        left_hand_puzzle: validation.left_hand_puzzle,
-                        right_hand_puzzle: validation.right_hand_puzzle,
+                        operator_type: validation.operator_type || null,
+                        validation_type: validation.validation_type || null,
+                        left_hand_puzzle: validation.left_hand_puzzle || null,
+                        right_hand_puzzle: validation.right_hand_puzzle || null,
                         value: validation.value,
                         error_message: validation.error_message,
                     });

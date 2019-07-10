@@ -268,7 +268,7 @@ CREATE TABLE public.conditions (
     question_puzzle uuid,
     action_type public.condition_action_type,
     answer_puzzle uuid,
-    value integer,
+    value text,
     condition_type public.condition_type,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
