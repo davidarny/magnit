@@ -22,7 +22,7 @@ export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, descriptio
                         align="center"
                         css={theme => ({
                             color: theme.colors.black,
-                            fontWeight: 300,
+                            fontWeight: 500,
                             fontSize: theme.fontSize.xLarge,
                         })}
                     >
