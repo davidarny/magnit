@@ -7,6 +7,7 @@ import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { CustomButton, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
+import { ETaskStatus } from "../../entities";
 
 const steps = [
     {
@@ -26,11 +27,11 @@ const steps = [
 
 export const TaskInfo: FC = () => {
     const parts = [
-        { title: "Документы", status: "Не загружены" },
-        { title: "Ведомость работ", status: "Заполнен" },
-        { title: "Бриф", status: "Заполнен" },
-        { title: "Инженерное заключение", status: "Заполнен" },
-        { title: "Смета", status: "Сформирована" },
+        { title: "Документы" },
+        { title: "Ведомость работ" },
+        { title: "Бриф" },
+        { title: "Инженерное заключение" },
+        { title: "Смета" },
     ];
 
     return (
@@ -74,7 +75,7 @@ export const TaskInfo: FC = () => {
                     })}
                     focused
                 >
-                    {getBlockHead("Хардкорное задание для суровых прорабов", "На проверке")}
+                    {getBlockHead("Хардкорное задание для суровых прорабов", ETaskStatus.CHECKED)}
 
                     <Grid container spacing={2}>
                         <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
@@ -101,7 +102,7 @@ export const TaskInfo: FC = () => {
                 </SelectableBlockWrapper>
                 {parts.map(part => (
                     <SelectableBlockWrapper css={theme => ({ padding: theme.spacing(3) })}>
-                        {getBlockHead(part.title, part.status)}
+                        {getBlockHead(part.title)}
                     </SelectableBlockWrapper>
                 ))}
             </Grid>
@@ -128,7 +129,21 @@ function getMainInfoData(title: string, value: string): ReactNode {
     );
 }
 
-function getBlockHead(title: string, status: string): ReactNode {
+const statusTitle = {
+    [ETaskStatus.IN_PROGRESS]: "В работе",
+    [ETaskStatus.CHECKED]: "На проверке",
+    [ETaskStatus.DONE]: "Завершено",
+    [ETaskStatus.DRAFT]: "Черновик",
+};
+
+const colorByStatus = {
+    [ETaskStatus.IN_PROGRESS]: "#8F7EE5",
+    [ETaskStatus.CHECKED]: "#FFBC3C",
+    [ETaskStatus.DONE]: "#0CDAAC",
+    [ETaskStatus.DRAFT]: "#8A94A2",
+};
+
+function getBlockHead(title: string, status?: string): ReactNode {
     return (
         <Grid container spacing={2} key={title}>
             <Grid
@@ -141,9 +156,23 @@ function getBlockHead(title: string, status: string): ReactNode {
             >
                 <Typography css={theme => ({ fontSize: theme.fontSize.large })}>{title}</Typography>
             </Grid>
-            <Grid item>
-                <div>{status}</div>
-            </Grid>
+            {!!status && (
+                <Grid item>
+                    <span
+                        style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            display: "inline-block",
+                            background: colorByStatus[status as ETaskStatus],
+                            margin: "2px 10px 2px 0",
+                        }}
+                    />
+                    <span style={{ color: colorByStatus[status as ETaskStatus] }}>
+                        {status && statusTitle[status as ETaskStatus]}
+                    </span>
+                </Grid>
+            )}
         </Grid>
     );
 }
