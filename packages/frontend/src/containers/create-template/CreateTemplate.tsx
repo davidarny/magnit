@@ -49,7 +49,6 @@ export const CreateTemplate: React.FC = () => {
                 });
             }
         });
-        console.log(template);
         createTemplate(context.courier, template)
             .then(() => setOpen(true))
             .catch(() => {
