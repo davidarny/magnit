@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { FC } from "react";
-import { TableHead, TableRow, TableCell, TableSortLabel } from "@material-ui/core";
+import { TableCell, TableHead, TableRow, TableSortLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { IColumn } from "./TableWrapper";
 
@@ -14,8 +14,26 @@ export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
         <TableHead>
             <TableRow>
                 {headers.map(header => (
-                    <TableCell key={header.id}>
-                        <TableSortLabel>{header.label}</TableSortLabel>
+                    <TableCell
+                        key={header.id}
+                        css={theme => ({
+                            borderBottomColor: theme.colors.light,
+                        })}
+                    >
+                        <TableSortLabel
+                            css={theme => ({
+                                fontSize: 12,
+                                lineHeight: 1.5,
+                                fontWeight: 500,
+                                color: theme.colors.secondary,
+                                transition: "0.25s",
+                                ":hover": {
+                                    color: theme.colors.black,
+                                },
+                            })}
+                        >
+                            {header.label}
+                        </TableSortLabel>
                     </TableCell>
                 ))}
             </TableRow>
