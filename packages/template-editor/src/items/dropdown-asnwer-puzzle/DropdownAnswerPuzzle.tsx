@@ -59,23 +59,28 @@ export const DropdownAnswerPuzzle: React.FC<IDropdownAnswerPuzzleProps> = ({ ...
         return (
             <Grid
                 container
-                direction="column"
                 css={theme => ({
                     paddingLeft: theme.spacing(2),
-                    marginLeft: `${theme.spacing()} !important`,
-                    marginTop: `${theme.spacing()} !important`,
-                    marginBottom: `${theme.spacing()} !important`,
                     paddingRight: theme.spacing(),
+                    margin: `${theme.spacing()} ${theme.spacing()} ${theme.spacing()} !important`,
                 })}
             >
                 <Grid item>
-                    <Typography variant="body1" component="span">
+                    <Typography
+                        variant="body1"
+                        component="span"
+                        css={theme => ({ paddingRight: theme.spacing() })}
+                    >
                         {props.index + 1}.
                     </Typography>
                 </Grid>
                 <Grid item>
-                    <Typography variant="body1" component="span">
-                        {label}
+                    <Typography
+                        variant="body1"
+                        component="span"
+                        css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
+                    >
+                        {label || `Вариант ${props.index + 1}`}
                     </Typography>
                 </Grid>
             </Grid>

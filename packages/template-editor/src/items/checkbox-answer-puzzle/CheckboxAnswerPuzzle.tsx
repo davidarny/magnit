@@ -66,7 +66,12 @@ export const CheckboxAnswerPuzzle: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...
                     <Checkbox disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
-                    <Typography variant="body1">{label}</Typography>
+                    <Typography
+                        css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
+                        variant="body1"
+                    >
+                        {label || `Вариант ${props.index + 1}`}
+                    </Typography>
                 </Grid>
             </Grid>
         );

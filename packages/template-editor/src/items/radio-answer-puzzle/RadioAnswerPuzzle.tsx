@@ -66,7 +66,12 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
                     <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid item>
-                    <Typography variant="body1">{label}</Typography>
+                    <Typography
+                        variant="body1"
+                        css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
+                    >
+                        {label || `Вариант ${props.index + 1}`}
+                    </Typography>
                 </Grid>
             </Grid>
         );
