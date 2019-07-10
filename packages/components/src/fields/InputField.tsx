@@ -27,7 +27,7 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                     ":before": {
                         borderBottom: isSimpleMode
                             ? "none !important"
-                            : "1px solid rgba(0, 0, 0, 0.42)",
+                            : `1px solid ${theme.colors.default}42`,
                     },
                     ":after": {
                         borderBottom: isSimpleMode

@@ -41,13 +41,7 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
                     </Typography>
                 </Grid>
                 <Grid item xs css={theme => ({ marginLeft: `${theme.spacing(16)} !important` })}>
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                    >
+                    <Grid item>
                         <InputField
                             fullWidth={true}
                             placeholder="Название раздела"
@@ -61,25 +55,18 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
                             }}
                         />
                     </Grid>
-                    <Grid
-                        item
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                            paddingTop: theme.spacing(2),
-                        })}
-                    >
+                    <Grid item css={theme => ({ paddingTop: theme.spacing(2) })}>
                         <InputField
                             fullWidth={true}
                             placeholder="Описание раздела (необязательно)"
                             defaultValue={description}
                             isSimpleMode={!focused}
-                            InputProps={{
-                                style: {
-                                    fontSize: 18,
+                            css={theme => ({
+                                input: {
+                                    fontSize: theme.fontSize.medium,
                                     fontWeight: 300,
                                 },
-                            }}
+                            })}
                         />
                     </Grid>
                 </Grid>
