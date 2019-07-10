@@ -24,7 +24,7 @@ export const CreateTemplate: React.FC = () => {
     const [redirect, setRedirect] = useState(false);
 
     function onTemplateChange(template: object) {
-        setTemplate(template);
+        setTemplate(_.cloneDeep(template));
     }
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
@@ -40,7 +40,7 @@ export const CreateTemplate: React.FC = () => {
     }
 
     function onTemplateSave() {
-        // conver all props to snake_case before saving
+        // convert all props to snake_case before saving
         traverse(template, (object: any) => {
             if (_.isObject(object)) {
                 _.mapKeys(object, (value: any, key: string) => {
