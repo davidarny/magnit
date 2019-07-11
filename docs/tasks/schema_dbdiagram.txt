@@ -1,0 +1,19 @@
+Table task {
+  id int
+  title varchar
+  stage_title varchar
+  stage_due_date datetime
+  location varchar // координаты локации
+  assignee varchar // FK к исполнителю
+}
+
+Table task_document {
+  task_id int [ref: > task.id]
+  template_id int [ref: > template.id]
+}
+
+Table template {
+ id int [pk]
+ title varchar
+ type template_type
+}
