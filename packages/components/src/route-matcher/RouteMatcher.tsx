@@ -21,7 +21,13 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                         return (
                             <Match path={path} key={path}>
                                 {props => {
-                                    if (!props.match || !window.location.pathname.includes(path)) {
+                                    console.log(props, path, window.location.pathname);
+                                    if (
+                                        !props.match ||
+                                        !window.location.pathname
+                                            .replace(/\//g, "")
+                                            .includes(path.replace(/\//g, ""))
+                                    ) {
                                         return;
                                     }
                                     const component = route.render();
@@ -39,7 +45,9 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                             {props => {
                                 if (
                                     !props.match ||
-                                    !window.location.pathname.includes(route.path!)
+                                    !window.location.pathname
+                                        .replace(/\//g, "")
+                                        .includes(route.path!.replace(/\//g, ""))
                                 ) {
                                     return;
                                 }
