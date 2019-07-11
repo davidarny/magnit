@@ -39,7 +39,7 @@ export const QuestionPuzzle: React.FC<IQuestionPuzzleProps> = ({ template, id, .
 
     useEffect(() => {
         traverse(template, (value: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;

@@ -5,8 +5,8 @@ import { SelectableBlockWrapper } from "components/block";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "components/puzzle";
-import { ContentItem } from "./ContentItem";
-import { ContentConditions } from "./ContentConditions";
+import { ItemFactory } from "components/item";
+import { ConditionsWrapper } from "components/conditions";
 import _ from "lodash";
 
 interface IContentGroupProps {
@@ -21,7 +21,7 @@ interface IContentGroupProps {
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ContentGroup: React.FC<IContentGroupProps> = props => {
+export const GroupOfItems: React.FC<IContentGroupProps> = props => {
     const { isFocused, puzzle, parentPuzzle } = props;
 
     function onFocus(): void {
@@ -53,7 +53,7 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     borderBottom: hasBorder ? `1px dashed ${theme.colors.gray}` : "none",
                 })}
             >
-                <ContentItem
+                <ItemFactory
                     puzzle={puzzle}
                     parentPuzzle={parentPuzzle}
                     index={props.index}
@@ -61,33 +61,34 @@ export const ContentGroup: React.FC<IContentGroupProps> = props => {
                     onFocus={onFocus}
                     onBlur={props.onBlur}
                 />
-                {puzzle.puzzles.map((childPuzzle, index) => {
-                    if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
+                {puzzle.puzzles &&
+                    puzzle.puzzles.map((childPuzzle, index) => {
+                        if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
+                            return (
+                                <GroupOfItems
+                                    key={childPuzzle.id}
+                                    puzzle={childPuzzle}
+                                    onFocus={props.onFocus}
+                                    onBlur={props.onBlur}
+                                    isFocused={isFocused}
+                                    index={props.index + index}
+                                    parentPuzzle={childPuzzle}
+                                />
+                            );
+                        }
                         return (
-                            <ContentGroup
-                                key={childPuzzle.id}
+                            <ItemFactory
                                 puzzle={childPuzzle}
-                                onFocus={props.onFocus}
+                                index={index}
+                                active={focused}
+                                onFocus={onFocus}
                                 onBlur={props.onBlur}
-                                isFocused={isFocused}
-                                index={props.index + index}
-                                parentPuzzle={childPuzzle}
+                                key={childPuzzle.id}
+                                parentPuzzle={puzzle}
                             />
                         );
-                    }
-                    return (
-                        <ContentItem
-                            puzzle={childPuzzle}
-                            index={index}
-                            active={focused}
-                            onFocus={onFocus}
-                            onBlur={props.onBlur}
-                            key={childPuzzle.id}
-                            parentPuzzle={puzzle}
-                        />
-                    );
-                })}
-                <ContentConditions
+                    })}
+                <ConditionsWrapper
                     puzzleId={puzzle.id}
                     focused={focused}
                     puzzleType={puzzle.puzzleType}

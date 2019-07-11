@@ -10,14 +10,18 @@ interface ITableBodyWrapperProps {
     data: object[];
     columns: IColumn[];
 
-    onRowClick?(): void;
+    onRowClick?(row?: object): void;
 }
 
-export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, onRowClick }) => {
+export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, ...props }) => {
     return (
         <TableBody>
             {data.map((value, index) => (
-                <TableRow hover key={index} onClick={onRowClick}>
+                <TableRow
+                    hover
+                    key={index}
+                    onClick={() => props.onRowClick && props.onRowClick(value)}
+                >
                     {columns.map((column: IColumn, index) => {
                         const label = _.get(value, column.id, null);
                         return (

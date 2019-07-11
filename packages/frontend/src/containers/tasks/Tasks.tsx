@@ -57,11 +57,12 @@ const rows: object[] = [
 ];
 
 export const Tasks: React.FC<RouteComponentProps> = () => {
-    const hasTableItems = !!rows.length;
+    const empty = !rows.length;
+
     return (
         <SectionLayout>
             <SectionTitle title="Список заданий">
-                <Grid item hidden={!hasTableItems}>
+                <Grid item hidden={empty}>
                     <CustomButton
                         component={Link}
                         to="create"
@@ -75,7 +76,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     />
                 </Grid>
             </SectionTitle>
-            {!hasTableItems && (
+            {empty && (
                 <EmptyList
                     title="Заданий нет"
                     actionName="Создать задание"
@@ -93,7 +94,7 @@ export const Tasks: React.FC<RouteComponentProps> = () => {
                     description="Для создания задания нажмите кнопку"
                 />
             )}
-            {hasTableItems && (
+            {!empty && (
                 <Paper
                     square={true}
                     css={theme => ({

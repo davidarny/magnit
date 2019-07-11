@@ -66,10 +66,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
             return;
         }
         traverse(template, (value: any, parent: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
-            if (typeof parent !== "object" || !("puzzles" in parent)) {
+            if (!_.isObject(parent) || !("puzzles" in parent)) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -86,7 +86,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
             return;
         }
         traverse(template, (value: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -114,7 +114,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
-                        if (typeof value !== "object" || !("puzzles" in value)) {
+                        if (!_.isObject(value) || !("puzzles" in value)) {
                             return;
                         }
                         const puzzle = value as IPuzzle;
@@ -142,8 +142,8 @@ export const Validations: React.FC<IValidationsProps> = props => {
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
-        traverse(template, (value: any, parent: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+        traverse(template, (value: any) => {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -157,7 +157,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
             // so that scope of questionPuzzle is always all puzzles above the current
             _.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any, parent: any) => {
-                    if (typeof value !== "object" || !("puzzleType" in value)) {
+                    if (!_.isObject(value) || !("puzzleType" in value)) {
                         return;
                     }
                     const puzzle = value as IPuzzle;

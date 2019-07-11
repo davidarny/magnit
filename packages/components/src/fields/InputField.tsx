@@ -23,6 +23,8 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                     position: "absolute",
                     bottom: 0,
                     color: theme.colors.black,
+                    boxSizing: "border-box",
+                    height: "100%",
                 },
                 div: {
                     height: theme.spacing(6),

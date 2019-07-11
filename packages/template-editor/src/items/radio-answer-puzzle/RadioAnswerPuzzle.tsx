@@ -9,6 +9,7 @@ import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
 import { InputField } from "@magnit/components";
+import _ from "lodash";
 
 type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
@@ -31,7 +32,7 @@ export const RadioAnswerPuzzle: React.FC<IRadioAnswerPuzzleProps> = ({ template,
 
     useEffect(() => {
         traverse(template, (value: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;

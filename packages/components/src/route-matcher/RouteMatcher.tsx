@@ -21,7 +21,6 @@ export const RouteMatcher: React.FC<IRouteMatcherProps> = ({ routes }) => {
                         return (
                             <Match path={path} key={path}>
                                 {props => {
-                                    console.log(props, path, window.location.pathname);
                                     if (
                                         !props.match ||
                                         !window.location.pathname

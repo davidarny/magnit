@@ -4,7 +4,8 @@ import * as React from "react";
 import { useState } from "react";
 import { jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "TemplateEditor";
-import { Conditions, Validations } from "components/conditions";
+import { Conditions } from "./Conditions";
+import { Validations } from "./Validations";
 import { EPuzzleType } from "components/puzzle";
 import { Grid, Tab, Tabs } from "@material-ui/core";
 
@@ -15,7 +16,7 @@ interface IContentConditionsProps {
     answerType?: EPuzzleType;
 }
 
-export const ContentConditions: React.FC<IContentConditionsProps> = props => {
+export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
     const [tab, setTab] = useState(0);
 
     const { puzzleId, focused, puzzleType, answerType } = props;

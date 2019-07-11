@@ -16,20 +16,17 @@ export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
                 {headers.map(header => (
                     <TableCell
                         key={header.id}
-                        css={theme => ({
-                            borderBottomColor: theme.colors.light,
-                        })}
+                        css={theme => ({ borderBottomColor: theme.colors.light })}
                     >
                         <TableSortLabel
+                            hideSortIcon={!header.sortable}
                             css={theme => ({
-                                fontSize: theme.fontSize.xsNormal,
+                                fontSize: theme.fontSize.sNormal,
                                 lineHeight: 1.5,
                                 fontWeight: 500,
                                 color: theme.colors.secondary,
                                 transition: "0.25s",
-                                ":hover": {
-                                    color: theme.colors.black,
-                                },
+                                ":hover": { color: theme.colors.black },
                             })}
                         >
                             {header.label}

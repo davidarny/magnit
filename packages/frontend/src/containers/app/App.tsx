@@ -35,6 +35,10 @@ const AsyncCreateTemplate = Loadable(({
     loader: () => import("containers/create-template").then(module => module.CreateTemplate),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+const AsyncEditTemplate = Loadable(({
+    loader: () => import("containers/edit-template").then(module => module.EditTemplate),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
 const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
@@ -86,10 +90,11 @@ const App: React.FC = () => {
                             <AsyncTasks path="tasks/*" />
                             <AsyncTaskInfo path="tasks/info" />
                             <AsyncCreateTask path="tasks/create" />
-                            <AsyncEditTask path="tasks/edit" />
-                            <AsyncTaskInfo path="tasks/info" />
+                            <AsyncEditTask path="tasks/edit/:taskId" />
+
                             <AsyncTemplates path="templates" />
                             <AsyncCreateTemplate path="templates/create" />
+                            <AsyncEditTemplate path="templates/edit/:templateId" />
                         </Router>
                     </AppContext.Provider>
                 </Grid>
@@ -108,25 +113,21 @@ interface IGlobalStyleProps {
 const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
     return (
         <Global
-            styles={css`
-                :root {
-                    --section-title-height: ${props.section.titleHeight}px;
-                    --section-left-margin: ${props.section.leftMargin}px;
-                }
-
-                body {
-                    font-family: "Roboto", sans-serif;
-                }
-                html,
-                body {
-                    margin: 0;
-                    height: 100%;
-                    width: 100%;
-                }
-                body {
-                    background: #f6f7fb;
-                }
-            `}
+            styles={theme => ({
+                ":root": {
+                    "--section-title-height": `${props.section.titleHeight}px`,
+                    "--section-left-margin": `${props.section.leftMargin}px`,
+                },
+                body: {
+                    fontFamily: '"Roboto", sans-serif',
+                    background: theme.colors.light,
+                },
+                "html, body": {
+                    margin: 0,
+                    height: "100%",
+                    width: "100%",
+                },
+            })}
         />
     );
 };

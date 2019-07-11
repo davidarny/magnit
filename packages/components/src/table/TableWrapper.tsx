@@ -14,22 +14,22 @@ import {
 export interface IColumn {
     id: string;
     label: string;
-    canSort?: boolean;
+    sortable?: boolean;
 }
 
 interface ITableWrapperProps {
     columns: IColumn[];
     data: object[];
 
-    onRowClick?(): void;
+    onRowClick?(row?: object): void;
 }
 
-export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) => {
+export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...props }) => {
     return (
         <React.Fragment>
             <Table>
                 <TableHeader headers={columns} />
-                <TableBodyWrapper data={data} columns={columns} />
+                <TableBodyWrapper data={data} columns={columns} onRowClick={props.onRowClick} />
             </Table>
             <TablePagination
                 component="div"

@@ -2,25 +2,35 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
-import { TemplateEditor } from "@magnit/template-editor";
+import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { CustomButton } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { createTemplate } from "services/api/templates";
+import { getTemplate, updateTemplate } from "services/api/templates";
 import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
 import { Redirect } from "@reach/router";
 import _ from "lodash";
 
-export const CreateTemplate: React.FC = () => {
+interface IEditTemplateProps {
+    templateId: number;
+}
+
+export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<object>({});
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
     const [redirect, setRedirect] = useState(false);
+
+    useEffect(() => {
+        getTemplate(context.courier, templateId)
+            .then(response => setTemplate(JSON.parse(response.template)))
+            .catch(console.error);
+    }, [context.courier, templateId]);
 
     function onTemplateChange(template: object) {
         setTemplate(_.cloneDeep(template));
@@ -39,7 +49,7 @@ export const CreateTemplate: React.FC = () => {
     }
 
     function onTemplateSave() {
-        createTemplate(context.courier, template)
+        updateTemplate(context.courier, templateId, template)
             .then(() => setOpen(true))
             .catch(() => {
                 setOpen(true);
@@ -50,11 +60,11 @@ export const CreateTemplate: React.FC = () => {
     return (
         <SectionLayout>
             {redirect && <Redirect to={"/templates"} noThrow />}
-            <SectionTitle title="Создание шаблона">
+            <SectionTitle title="Редактирование шаблона">
                 <Grid item>
                     <CustomButton
                         variant="contained"
-                        title="Сохранить"
+                        title="Обновить"
                         scheme="blue"
                         icon={<CheckIcon />}
                         onClick={onTemplateSave}
@@ -71,18 +81,21 @@ export const CreateTemplate: React.FC = () => {
                     pointerEvents: open ? "none" : "initial",
                 })}
             >
-                <TemplateEditor
-                    css={theme => ({ background: theme.colors.main })}
-                    onChange={onTemplateChange}
-                />
+                {!_.isEmpty(template) && (
+                    <TemplateEditor
+                        initialState={(template as unknown) as ITemplate}
+                        css={theme => ({ background: theme.colors.main })}
+                        onChange={onTemplateChange}
+                    />
+                )}
             </Grid>
             <Snackbar
                 open={open}
                 error={error}
                 onClose={onSnackbarClose}
                 messages={{
-                    success: "Шаблон успешно сохранён!",
-                    error: "Ошибка сохранения шаблона!",
+                    success: "Шаблон успешно обновлён!",
+                    error: "Ошибка обновления шаблона!",
                 }}
             />
         </SectionLayout>

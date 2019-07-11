@@ -1,19 +1,44 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { ISpecificPuzzleProps } from "entities";
+import { useEffect, useState } from "react";
+import { ISpecificPuzzleProps, ITemplate } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
+    id: string;
     title: string;
     focused: boolean;
-    description: string;
+    template: ITemplate;
+
+    onTemplateChange(template: ITemplate): void;
 }
 
 export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
-    const { title, description, index, focused, children } = props;
+    const { id, title, index, focused, children, ...rest } = props;
+    const [sectionTitle, setSectionTitle] = useState<string>(title);
+
+    function onSectionTitleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        setSectionTitle(event.target.value);
+    }
+
+    useEffect(() => {
+        rest.onTemplateChange({
+            ...rest.template,
+            sections: rest.template.sections.map(section => {
+                if (section.id === id) {
+                    return {
+                        ...section,
+                        title: sectionTitle,
+                    };
+                }
+                return section;
+            }),
+        });
+    }, [sectionTitle]);
+
     return (
         <React.Fragment>
             <Grid
@@ -47,26 +72,13 @@ export const SectionPuzzle: React.FC<ISectionPuzzleProps> = props => {
                             placeholder="Название раздела"
                             defaultValue={title}
                             isSimpleMode={!focused}
-                            InputProps={{
-                                style: {
-                                    fontSize: 26,
-                                    fontWeight: 500,
-                                },
-                            }}
-                        />
-                    </Grid>
-                    <Grid item css={theme => ({ paddingTop: theme.spacing(2) })}>
-                        <InputField
-                            fullWidth={true}
-                            placeholder="Описание раздела (необязательно)"
-                            defaultValue={description}
-                            isSimpleMode={!focused}
                             css={theme => ({
                                 input: {
-                                    fontSize: theme.fontSize.medium,
-                                    fontWeight: 300,
+                                    fontSize: theme.fontSize.xLarge,
+                                    fontWeight: 500,
                                 },
                             })}
+                            onChange={onSectionTitleChange}
                         />
                     </Grid>
                 </Grid>

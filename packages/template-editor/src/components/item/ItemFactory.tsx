@@ -17,7 +17,7 @@ interface IContentItemProps {
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ContentItem: React.FC<IContentItemProps> = ({ puzzle, parentPuzzle, ...props }) => {
+export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, parentPuzzle, ...props }) => {
     const factory = getPuzzleFactory(puzzle.puzzleType);
     return (
         <PuzzleWrapper

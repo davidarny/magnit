@@ -59,10 +59,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             return;
         }
         traverse(template, (value: any, parent: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !_.has(value, "puzzles")) {
                 return;
             }
-            if (typeof parent !== "object" || !("puzzles" in parent)) {
+            if (!_.isObject(parent) || !_.has(parent, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -87,7 +87,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
-                        if (typeof value !== "object" || !("puzzles" in value)) {
+                        if (!_.isObject(value) || !("puzzles" in value)) {
                             return;
                         }
                         const puzzle = value as IPuzzle;
@@ -116,7 +116,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         questions.length = 0;
         answers.length = 0;
         traverse(template, (value: any) => {
-            if (typeof value !== "object" || !("puzzles" in value)) {
+            if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -130,7 +130,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             // so that scope of questionPuzzle is always all puzzles above the current
             _.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any, parent: any) => {
-                    if (typeof value !== "object" || !("puzzleType" in value)) {
+                    if (!_.isObject(value) || !("puzzleType" in value)) {
                         return;
                     }
                     const puzzle = value as IPuzzle;
