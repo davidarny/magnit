@@ -23,6 +23,8 @@ module.exports = {
         try {
             const id = _.escape(inputs.id);
 
+            const uuidv4 = require("uuid/v4");
+
             let json = {};
 
             let template = await Template.findOne({ id: id });
@@ -44,7 +46,7 @@ module.exports = {
                 for (let i = 0; i < sections.length; i++) {
                     let section = sections[i];
                     json.sections.push({
-                        id: section.id,
+                        id: uuidv4(),
                         title: section.title,
                         description: section.description,
                         order: section.order,

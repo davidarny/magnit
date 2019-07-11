@@ -10,6 +10,8 @@ module.exports = {
     },
 
     fn: async function(inputs, exits) {
+        const uuidv4 = require("uuid/v4");
+
         let puzzles = [];
 
         for (let i = 0; i < inputs.puzzles.length; i++) {
@@ -30,7 +32,7 @@ module.exports = {
                 for (let j = 0; j < conditions.length; j++) {
                     let condition = conditions[j];
                     puzzles[i].conditions.push({
-                        id: condition.id,
+                        id: uuidv4(),
                         order: condition.order,
                         question_puzzle: condition.question_puzzle,
                         answer_puzzle: condition.answer_puzzle,
@@ -47,7 +49,7 @@ module.exports = {
                 for (let j = 0; j < validations.length; j++) {
                     let validation = validations[j];
                     puzzles[i].validations.push({
-                        id: validation.id,
+                        id: uuidv4(),
                         order: validation.order,
                         left_hand_puzzle: validation.left_hand_puzzle,
                         operator_type: validation.operator_type,

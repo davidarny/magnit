@@ -12,11 +12,14 @@
         "sails-hook-orm": "^2.1.1",
         "sails-hook-sockets": "^2.0.0",
         "sails-postgresql": "^1.0.2",
-        "mocha": "^6.1.4"
+        "uuid": "^3.3.2"
     },
     "scripts": {
-        "start": "cross-env NODE_ENV=development node app.js",
+        "start": "cross-env NODE_ENV=production node app.js",
         "test": "mocha --timeout 30s tests/bootstrap.test.js tests/admin/test.js"
     },
-    "main": "app.js"
+    "main": "app.js",
+    "engines": {
+        "node": "^10.15"
+    }
 }
