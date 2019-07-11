@@ -1,1 +1,3 @@
-export * from "./Templates";
+export * from "./TemplateList";
+export * from "./CreateTemplate";
+export * from "./EditTemplate";

@@ -11,32 +11,35 @@ import _ from "lodash";
 import { FetchCourier, LoggerMiddleware } from "services/api";
 import { AppContext } from "context";
 
-const AsyncTasks = Loadable(({
-    loader: () => import("containers/tasks").then(module => module.Tasks),
+// tasks
+const AsyncTasksList = Loadable(({
+    loader: () => import("containers/tasks").then(module => module.TasksList),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
-const AsyncTaskInfo = Loadable(({
-    loader: () => import("containers/task-info").then(module => module.TaskInfo),
+const AsyncViewTask = Loadable(({
+    loader: () => import("containers/tasks").then(module => module.ViewTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncCreateTask = Loadable(({
-    loader: () => import("containers/task-info").then(module => module.CreateTask),
+    loader: () => import("containers/tasks").then(module => module.CreateTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncEditTask = Loadable(({
-    loader: () => import("containers/task-info").then(module => module.EditTask),
+    loader: () => import("containers/tasks").then(module => module.EditTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+
+// templates
 const AsyncTemplates = Loadable(({
-    loader: () => import("containers/templates").then(module => module.Templates),
+    loader: () => import("containers/templates").then(module => module.TemplateList),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncCreateTemplate = Loadable(({
-    loader: () => import("containers/create-template").then(module => module.CreateTemplate),
+    loader: () => import("containers/templates").then(module => module.CreateTemplate),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncEditTemplate = Loadable(({
-    loader: () => import("containers/edit-template").then(module => module.EditTemplate),
+    loader: () => import("containers/templates").then(module => module.EditTemplate),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
@@ -87,11 +90,12 @@ const App: React.FC = () => {
                 >
                     <AppContext.Provider value={{ courier: courier.current }}>
                         <Router>
-                            <AsyncTasks path="tasks/*" />
-                            <AsyncTaskInfo path="tasks/info" />
+                            {/* tasks */}
+                            <AsyncTasksList path="tasks/*" />
+                            <AsyncViewTask path="tasks/view" />
                             <AsyncCreateTask path="tasks/create" />
                             <AsyncEditTask path="tasks/edit/:taskId" />
-
+                            {/* templates */}
                             <AsyncTemplates path="templates" />
                             <AsyncCreateTemplate path="templates/create" />
                             <AsyncEditTemplate path="templates/edit/:templateId" />

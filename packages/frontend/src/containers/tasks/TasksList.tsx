@@ -56,7 +56,7 @@ const rows: object[] = [
     },
 ];
 
-export const Tasks: React.FC<RouteComponentProps> = () => {
+export const TasksList: React.FC<RouteComponentProps> = () => {
     const empty = !rows.length;
 
     return (

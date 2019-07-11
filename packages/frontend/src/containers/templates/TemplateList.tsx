@@ -22,7 +22,7 @@ const columns: IColumn[] = [
     { id: "updatedAt", label: "Дата редактирования" },
 ];
 
-export const Templates: React.FC = () => {
+export const TemplateList: React.FC = () => {
     const context = useContext(AppContext);
     const [rows, setRows] = useState<object[]>([]);
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });

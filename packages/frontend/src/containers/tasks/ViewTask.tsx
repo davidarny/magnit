@@ -9,7 +9,7 @@ import { CustomButton, SelectableBlockWrapper, StepperWrapper } from "@magnit/co
 import { CheckIcon } from "@magnit/icons";
 import { ETaskStatus } from "../../entities";
 
-export const TaskInfo: React.FC = () => {
+export const ViewTask: React.FC = () => {
     const steps = [
         {
             title: (
