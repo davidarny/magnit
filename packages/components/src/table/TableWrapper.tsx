@@ -59,9 +59,9 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                                 justifyContent: "flex-end",
                                 div: {
                                     display: "flex",
-                                    width: 32,
-                                    height: 32,
-                                    marginLeft: 8,
+                                    width: theme.spacing(4),
+                                    height: theme.spacing(4),
+                                    marginLeft: theme.spacing(),
                                     button: {
                                         display: "flex",
                                         margin: "0 0 0 auto",
@@ -71,9 +71,9 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data }) =>
                                         background: theme.colors.white,
                                         transition: "0.25s",
                                         span: {
-                                            display: "block",
-                                            fontSize: 14,
-                                            textAlign: "center",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
                                             width: "100%",
                                         },
                                         ":hover, :active": {
@@ -129,11 +129,10 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                     css={theme => ({
                         width: theme.spacing(4),
                         height: theme.spacing(4),
-                        fontSize: theme.fontSize.normal,
                         marginLeft: theme.spacing(2),
                         svg: {
-                            width: theme.spacing(4),
-                            height: theme.spacing(4),
+                            width: theme.spacing(3),
+                            height: theme.spacing(3),
                         },
                     })}
                 >
@@ -146,8 +145,7 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                         css={theme => ({
                             width: theme.spacing(4),
                             height: theme.spacing(4),
-                            fontSize: 14,
-                            lineHeight: 1.5,
+                            fontSize: theme.fontSize.normal,
                             color: theme.colors.secondary,
                             background: theme.colors.white,
                         })}
@@ -161,11 +159,10 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                     css={theme => ({
                         width: theme.spacing(4),
                         height: theme.spacing(4),
-                        fontSize: theme.fontSize.normal,
                         marginRight: theme.spacing(2),
                         svg: {
-                            width: theme.spacing(4),
-                            height: theme.spacing(4),
+                            width: theme.spacing(3),
+                            height: theme.spacing(3),
                         },
                     })}
                 >
