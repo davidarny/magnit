@@ -5,118 +5,15 @@
 -- Dumped from database version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
 -- Dumped by pg_dump version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
 
-ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_right_hand_puzzle_fkey;
-ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_puzzle_id_fkey;
-ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_left_hand_puzzle_fkey;
-ALTER TABLE ONLY public.users DROP CONSTRAINT users_branch_id_fkey;
-ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_object_id_fkey;
-ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_user_id_fkey;
-ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_users_id_fkey;
-ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_task_id_fkey;
-ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_template_id_fkey;
-ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_task_id_fkey;
-ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_template_id_fkey;
-ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_template_id_fkey;
-ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_section_id_fkey;
-ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_branch_id_fkey;
-ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_task_id_fkey;
-ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_question_puzzle_fkey;
-ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_puzzle_id_fkey;
-ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_answer_puzzle_fkey;
-ALTER TABLE ONLY public.branches DROP CONSTRAINT branches_region_id_fkey;
-ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_puzzle_id_fkey;
-ALTER TABLE ONLY public.validations DROP CONSTRAINT validations_pkey;
-ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
-ALTER TABLE ONLY public.templates DROP CONSTRAINT templates_pkey;
-ALTER TABLE ONLY public.tasks DROP CONSTRAINT tasks_pkey;
-ALTER TABLE ONLY public.task_users DROP CONSTRAINT task_users_pkey;
-ALTER TABLE ONLY public.task_templates DROP CONSTRAINT task_templates_pkey;
-ALTER TABLE ONLY public.tariffs DROP CONSTRAINT tariffs_pkey;
-ALTER TABLE ONLY public.sections DROP CONSTRAINT sections_pkey;
-ALTER TABLE ONLY public.regions DROP CONSTRAINT regions_pkey;
-ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_uuid_key;
-ALTER TABLE ONLY public.puzzles DROP CONSTRAINT puzzles_pkey;
-ALTER TABLE ONLY public.objects DROP CONSTRAINT objects_pkey;
-ALTER TABLE ONLY public.notifications DROP CONSTRAINT notifications_pkey;
-ALTER TABLE ONLY public.conditions DROP CONSTRAINT conditions_pkey;
-ALTER TABLE ONLY public.branches DROP CONSTRAINT branches_pkey;
-ALTER TABLE ONLY public.answers DROP CONSTRAINT answers_pkey;
-ALTER TABLE public.validations ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.users ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.templates ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.tasks ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.task_users ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.task_templates ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.tariffs ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.sections ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.regions ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.puzzles ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.objects ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.notifications ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.conditions ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.branches ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE public.answers ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE public.validations_id_seq;
-DROP TABLE public.validations;
-DROP SEQUENCE public.users_id_seq;
-DROP TABLE public.users;
-DROP SEQUENCE public.templates_id_seq;
-DROP TABLE public.templates;
-DROP SEQUENCE public.tasks_id_seq;
-DROP TABLE public.tasks;
-DROP SEQUENCE public.task_users_id_seq;
-DROP TABLE public.task_users;
-DROP SEQUENCE public.task_templates_id_seq;
-DROP TABLE public.task_templates;
-DROP SEQUENCE public.tariffs_id_seq;
-DROP TABLE public.tariffs;
-DROP SEQUENCE public.sections_id_seq;
-DROP TABLE public.sections;
-DROP SEQUENCE public.regions_id_seq;
-DROP TABLE public.regions;
-DROP SEQUENCE public.puzzles_id_seq;
-DROP TABLE public.puzzles;
-DROP SEQUENCE public.objects_id_seq;
-DROP TABLE public.objects;
-DROP SEQUENCE public.notifications_id_seq;
-DROP TABLE public.notifications;
-DROP SEQUENCE public.conditions_id_seq;
-DROP TABLE public.conditions;
-DROP SEQUENCE public.branches_id_seq;
-DROP TABLE public.branches;
-DROP SEQUENCE public.answers_id_seq;
-DROP TABLE public.answers;
-DROP TYPE public.validation_action_type;
-DROP TYPE public.unit_type;
-DROP TYPE public.status_type;
-DROP TYPE public.puzzle_type;
-DROP TYPE public.operator_type;
-DROP TYPE public.input_type;
-DROP TYPE public.condition_type;
-DROP TYPE public.condition_action_type;
-DROP TYPE public.template_type;
-DROP EXTENSION "uuid-ossp";
-DROP EXTENSION plpgsql;
-DROP SCHEMA public;
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA public;
+--CREATE SCHEMA public;
 
 
-ALTER SCHEMA public OWNER TO postgres;
+ALTER SCHEMA public OWNER TO magnit;
 
 --
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
@@ -167,7 +64,7 @@ CREATE TYPE public.condition_action_type AS ENUM (
 );
 
 
-ALTER TYPE public.condition_action_type OWNER TO postgres;
+ALTER TYPE public.condition_action_type OWNER TO magnit;
 
 --
 -- Name: condition_type; Type: TYPE; Schema: public; Owner: postgres
@@ -179,7 +76,7 @@ CREATE TYPE public.condition_type AS ENUM (
 );
 
 
-ALTER TYPE public.condition_type OWNER TO postgres;
+ALTER TYPE public.condition_type OWNER TO magnit;
 
 --
 -- Name: input_type; Type: TYPE; Schema: public; Owner: postgres
@@ -191,7 +88,7 @@ CREATE TYPE public.input_type AS ENUM (
 );
 
 
-ALTER TYPE public.input_type OWNER TO postgres;
+ALTER TYPE public.input_type OWNER TO magnit;
 
 --
 -- Name: operator_type; Type: TYPE; Schema: public; Owner: postgres
@@ -206,7 +103,7 @@ CREATE TYPE public.operator_type AS ENUM (
 );
 
 
-ALTER TYPE public.operator_type OWNER TO postgres;
+ALTER TYPE public.operator_type OWNER TO magnit;
 
 --
 -- Name: puzzle_type; Type: TYPE; Schema: public; Owner: postgres
@@ -226,7 +123,7 @@ CREATE TYPE public.puzzle_type AS ENUM (
 );
 
 
-ALTER TYPE public.puzzle_type OWNER TO postgres;
+ALTER TYPE public.puzzle_type OWNER TO magnit;
 
 --
 -- Name: status_type; Type: TYPE; Schema: public; Owner: postgres
@@ -242,7 +139,7 @@ CREATE TYPE public.status_type AS ENUM (
 );
 
 
-ALTER TYPE public.status_type OWNER TO postgres;
+ALTER TYPE public.status_type OWNER TO magnit;
 
 --
 -- Name: template_type; Type: TYPE; Schema: public; Owner: postgres
@@ -254,7 +151,7 @@ CREATE TYPE public.template_type AS ENUM (
 );
 
 
-ALTER TYPE public.template_type OWNER TO postgres;
+ALTER TYPE public.template_type OWNER TO magnit;
 
 --
 -- Name: unit_type; Type: TYPE; Schema: public; Owner: postgres
@@ -267,7 +164,7 @@ CREATE TYPE public.unit_type AS ENUM (
 );
 
 
-ALTER TYPE public.unit_type OWNER TO postgres;
+ALTER TYPE public.unit_type OWNER TO magnit;
 
 --
 -- Name: validation_action_type; Type: TYPE; Schema: public; Owner: postgres
@@ -279,7 +176,7 @@ CREATE TYPE public.validation_action_type AS ENUM (
 );
 
 
-ALTER TYPE public.validation_action_type OWNER TO postgres;
+ALTER TYPE public.validation_action_type OWNER TO magnit;
 
 SET default_tablespace = '';
 
@@ -299,7 +196,7 @@ CREATE TABLE public.answers (
 );
 
 
-ALTER TABLE public.answers OWNER TO postgres;
+ALTER TABLE public.answers OWNER TO magnit;
 
 --
 -- Name: answers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -314,7 +211,7 @@ CREATE SEQUENCE public.answers_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.answers_id_seq OWNER TO postgres;
+ALTER TABLE public.answers_id_seq OWNER TO magnit;
 
 --
 -- Name: answers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -336,7 +233,7 @@ CREATE TABLE public.branches (
 );
 
 
-ALTER TABLE public.branches OWNER TO postgres;
+ALTER TABLE public.branches OWNER TO magnit;
 
 --
 -- Name: branches_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -351,7 +248,7 @@ CREATE SEQUENCE public.branches_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.branches_id_seq OWNER TO postgres;
+ALTER TABLE public.branches_id_seq OWNER TO magnit;
 
 --
 -- Name: branches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -378,7 +275,7 @@ CREATE TABLE public.conditions (
 );
 
 
-ALTER TABLE public.conditions OWNER TO postgres;
+ALTER TABLE public.conditions OWNER TO magnit;
 
 --
 -- Name: conditions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -393,7 +290,7 @@ CREATE SEQUENCE public.conditions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.conditions_id_seq OWNER TO postgres;
+ALTER TABLE public.conditions_id_seq OWNER TO magnit;
 
 --
 -- Name: conditions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -413,7 +310,7 @@ CREATE TABLE public.notifications (
 );
 
 
-ALTER TABLE public.notifications OWNER TO postgres;
+ALTER TABLE public.notifications OWNER TO magnit;
 
 --
 -- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -428,7 +325,7 @@ CREATE SEQUENCE public.notifications_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.notifications_id_seq OWNER TO postgres;
+ALTER TABLE public.notifications_id_seq OWNER TO magnit;
 
 --
 -- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -452,7 +349,7 @@ CREATE TABLE public.objects (
 );
 
 
-ALTER TABLE public.objects OWNER TO postgres;
+ALTER TABLE public.objects OWNER TO magnit;
 
 --
 -- Name: objects_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -467,7 +364,7 @@ CREATE SEQUENCE public.objects_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.objects_id_seq OWNER TO postgres;
+ALTER TABLE public.objects_id_seq OWNER TO magnit;
 
 --
 -- Name: objects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -496,7 +393,7 @@ CREATE TABLE public.puzzles (
 );
 
 
-ALTER TABLE public.puzzles OWNER TO postgres;
+ALTER TABLE public.puzzles OWNER TO magnit;
 
 --
 -- Name: puzzles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -511,7 +408,7 @@ CREATE SEQUENCE public.puzzles_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.puzzles_id_seq OWNER TO postgres;
+ALTER TABLE public.puzzles_id_seq OWNER TO magnit;
 
 --
 -- Name: puzzles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -532,7 +429,7 @@ CREATE TABLE public.regions (
 );
 
 
-ALTER TABLE public.regions OWNER TO postgres;
+ALTER TABLE public.regions OWNER TO magnit;
 
 --
 -- Name: regions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -547,7 +444,7 @@ CREATE SEQUENCE public.regions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.regions_id_seq OWNER TO postgres;
+ALTER TABLE public.regions_id_seq OWNER TO magnit;
 
 --
 -- Name: regions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -571,7 +468,7 @@ CREATE TABLE public.sections (
 );
 
 
-ALTER TABLE public.sections OWNER TO postgres;
+ALTER TABLE public.sections OWNER TO magnit;
 
 --
 -- Name: sections_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -586,7 +483,7 @@ CREATE SEQUENCE public.sections_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.sections_id_seq OWNER TO postgres;
+ALTER TABLE public.sections_id_seq OWNER TO magnit;
 
 --
 -- Name: sections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -610,7 +507,7 @@ CREATE TABLE public.tariffs (
 );
 
 
-ALTER TABLE public.tariffs OWNER TO postgres;
+ALTER TABLE public.tariffs OWNER TO magnit;
 
 --
 -- Name: tariffs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -625,7 +522,7 @@ CREATE SEQUENCE public.tariffs_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tariffs_id_seq OWNER TO postgres;
+ALTER TABLE public.tariffs_id_seq OWNER TO magnit;
 
 --
 -- Name: tariffs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -647,7 +544,7 @@ CREATE TABLE public.task_templates (
 );
 
 
-ALTER TABLE public.task_templates OWNER TO postgres;
+ALTER TABLE public.task_templates OWNER TO magnit;
 
 --
 -- Name: task_templates_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -662,7 +559,7 @@ CREATE SEQUENCE public.task_templates_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.task_templates_id_seq OWNER TO postgres;
+ALTER TABLE public.task_templates_id_seq OWNER TO magnit;
 
 --
 -- Name: task_templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -685,7 +582,7 @@ CREATE TABLE public.task_users (
 );
 
 
-ALTER TABLE public.task_users OWNER TO postgres;
+ALTER TABLE public.task_users OWNER TO magnit;
 
 --
 -- Name: task_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -700,7 +597,7 @@ CREATE SEQUENCE public.task_users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.task_users_id_seq OWNER TO postgres;
+ALTER TABLE public.task_users_id_seq OWNER TO magnit;
 
 --
 -- Name: task_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -727,7 +624,7 @@ CREATE TABLE public.tasks (
 );
 
 
-ALTER TABLE public.tasks OWNER TO postgres;
+ALTER TABLE public.tasks OWNER TO magnit;
 
 --
 -- Name: tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -742,7 +639,7 @@ CREATE SEQUENCE public.tasks_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tasks_id_seq OWNER TO postgres;
+ALTER TABLE public.tasks_id_seq OWNER TO magnit;
 
 --
 -- Name: tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -765,7 +662,7 @@ CREATE TABLE public.templates (
 );
 
 
-ALTER TABLE public.templates OWNER TO postgres;
+ALTER TABLE public.templates OWNER TO magnit;
 
 --
 -- Name: templates_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -780,7 +677,7 @@ CREATE SEQUENCE public.templates_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.templates_id_seq OWNER TO postgres;
+ALTER TABLE public.templates_id_seq OWNER TO magnit;
 
 --
 -- Name: templates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -804,7 +701,7 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
+ALTER TABLE public.users OWNER TO magnit;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -819,7 +716,7 @@ CREATE SEQUENCE public.users_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.users_id_seq OWNER TO postgres;
+ALTER TABLE public.users_id_seq OWNER TO magnit;
 
 --
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -847,7 +744,7 @@ CREATE TABLE public.validations (
 );
 
 
-ALTER TABLE public.validations OWNER TO postgres;
+ALTER TABLE public.validations OWNER TO magnit;
 
 --
 -- Name: validations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -862,7 +759,7 @@ CREATE SEQUENCE public.validations_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.validations_id_seq OWNER TO postgres;
+ALTER TABLE public.validations_id_seq OWNER TO magnit;
 
 --
 -- Name: validations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres

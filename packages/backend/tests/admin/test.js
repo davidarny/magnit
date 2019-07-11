@@ -1,5 +1,3 @@
-"use strict";
-
 let options = {
     host: JSON.parse(require("fs").readFileSync("config.json"), "utf8").host,
     assert: require("assert"),

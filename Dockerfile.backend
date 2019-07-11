@@ -1,0 +1,19 @@
+FROM node:10-alpine
+
+ARG BACKEND_PORT
+ARG POSTGRES_PASSWORD
+ARG SECRET
+
+WORKDIR /devel
+
+COPY . .
+
+RUN yarn global add cross-env
+
+RUN chmod +x gen_backend_config.sh && ./gen_backend_config.sh
+
+WORKDIR /devel/packages/backend
+
+RUN npm i
+
+ENTRYPOINT ["npm", "start"]

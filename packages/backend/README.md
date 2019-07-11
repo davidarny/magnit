@@ -1,22 +1,19 @@
-## **Recommended software versions:**
+## Requirements
 
--   PostgreSQL >= 10.8
+-   [PostgreSQL](https://www.postgresql.org/) ≥ 10.x
 
--   node.js >= 10.15.2
+-   [Node.js](https://nodejs.org/en/) ≥ 10.x
 
--   sails.js >= 1.1.0
+-   [Sails.js](https://sailsjs.com/) ≥ 1.1.0
 
--   mocha >= 6.0.2 (for running tests)
+-   [Mocha](https://mochajs.org/) ≥ 6.x (for tests)
 
-## **Usage**
+## Usage
 
-1. Create file "local.js" in folder "config" and fill it in by example "stuff/local_example.js"
-2. Create file "bootstrap.js" in folder "config" and fill it in by example "stuff/bootstrap_example.js"
-3. Create file "config.json" in the root directory and fill it in by example "stuff/config_example.json"
-4. `npm install`
+1. Create file `local.js` in folder `config` and fill it in by example `stuff/local_example.js`
+2. Create file `bootstrap.js` in folder `config` and fill it in by example `stuff/bootstrap_example.js`
+3. Create file `config.json` in the root directory and fill it in by example `stuff/config_example.json`
+4. `$ yarn install`
 5. Create database `magnit` in PostgreSQL
-6. `sudo -u postgres psql --quiet magnit < stuff/magnit.sql`
-7. `sails lift`
-
-####To run tests:
-`npm test`
+6. `$ sudo -u postgres psql --quiet magnit < stuff/magnit.sql`
+7. `$ sails lift`
