@@ -7,6 +7,8 @@ interface IGetTemplatesResponse extends IResponse {
         title: string;
         description: string;
         assigned: boolean;
+        createdAt: string;
+        updatedAt: string;
     }>;
 }
 

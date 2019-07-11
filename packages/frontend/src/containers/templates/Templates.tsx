@@ -13,6 +13,7 @@ import { getTemplates } from "services/api/templates";
 import { AppContext } from "context";
 import { Grid, Paper } from "@material-ui/core";
 import _ from "lodash";
+import { getFriendlyDate } from "services/date";
 
 const columns: IColumn[] = [
     { id: "title", sortable: true, label: "Название шаблона" },
@@ -28,7 +29,16 @@ export const Templates: React.FC = () => {
 
     useEffect(() => {
         getTemplates(context.courier)
-            .then(response => setRows(response.templates))
+            .then(response => {
+                response.templates = response.templates.map(template => {
+                    return {
+                        ...template,
+                        createdAt: getFriendlyDate(new Date(template.createdAt)),
+                        updatedAt: getFriendlyDate(new Date(template.updatedAt)),
+                    };
+                });
+                setRows(response.templates);
+            })
             .catch(console.error);
     }, [context.courier]);
 
