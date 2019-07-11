@@ -30,6 +30,7 @@ module.exports = {
                 for (let j = 0; j < conditions.length; j++) {
                     let condition = conditions[j];
                     puzzles[i].conditions.push({
+                        id: condition.id,
                         order: condition.order,
                         question_puzzle: condition.question_puzzle,
                         answer_puzzle: condition.answer_puzzle,
@@ -46,6 +47,7 @@ module.exports = {
                 for (let j = 0; j < validations.length; j++) {
                     let validation = validations[j];
                     puzzles[i].validations.push({
+                        id: validation.id,
                         order: validation.order,
                         left_hand_puzzle: validation.left_hand_puzzle,
                         operator_type: validation.operator_type,

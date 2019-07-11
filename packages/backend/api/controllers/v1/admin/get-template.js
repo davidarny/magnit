@@ -31,6 +31,7 @@ module.exports = {
                 return exits.notFound({ success: 0, message: "template does not exist" });
             }
 
+            json.id = template.id;
             json.type = template.type;
             json.title = template.title;
             json.description = template.description;
@@ -43,6 +44,7 @@ module.exports = {
                 for (let i = 0; i < sections.length; i++) {
                     let section = sections[i];
                     json.sections.push({
+                        id: section.id,
                         title: section.title,
                         description: section.description,
                         order: section.order,
