@@ -59,17 +59,13 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             return;
         }
         traverse(template, (value: any, parent: any) => {
-            if (!_.isObject(value) || !_.has(value, "puzzles")) {
-                return;
-            }
-            if (!_.isObject(parent) || !_.has(parent, "puzzles")) {
+            if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
             const parentPuzzle = parent as IPuzzle;
-            const isGroupParent =
-                "puzzleType" in parentPuzzle && parentPuzzle.puzzleType === EPuzzleType.GROUP;
-            isParentPuzzleGroup.current = "id" in puzzle && puzzle.id === puzzleId && isGroupParent;
+            const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
+            isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
         });
     }, [template, props.disabled]);
 
@@ -87,13 +83,12 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
-                        if (!_.isObject(value) || !("puzzles" in value)) {
+                        if (!_.has(value, "puzzles")) {
                             return;
                         }
                         const puzzle = value as IPuzzle;
                         // find dependent question in template
                         if (
-                            !("puzzleType" in puzzle) ||
                             puzzle.puzzleType !== EPuzzleType.QUESTION ||
                             puzzle.id !== dependentQuestion.id
                         ) {
@@ -116,7 +111,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         questions.length = 0;
         answers.length = 0;
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
+            if (!_.has(value, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -130,15 +125,13 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             // so that scope of questionPuzzle is always all puzzles above the current
             _.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any, parent: any) => {
-                    if (!_.isObject(value) || !("puzzleType" in value)) {
+                    if (!_.has(value, "puzzleType")) {
                         return;
                     }
                     const puzzle = value as IPuzzle;
                     // check if parent of current item is GROUP puzzle
                     const isGroupParent =
                         parent &&
-                        typeof parent === "object" &&
-                        "puzzleType" in parent &&
                         parent.puzzleType === EPuzzleType.GROUP &&
                         !isParentPuzzleGroup.current;
                     // if puzzle is question and has non-empty title

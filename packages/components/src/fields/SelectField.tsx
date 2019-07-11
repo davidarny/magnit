@@ -56,7 +56,7 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
                     ".icon": {
                         top: "50%",
                         transform: "translateY(-50%)",
-                        right: theme.spacing(),
+                        right: 0,
                         opacity: props.disabled ? 0.5 : 1,
                     },
                 })}

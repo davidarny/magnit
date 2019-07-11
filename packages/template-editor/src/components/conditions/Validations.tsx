@@ -66,17 +66,13 @@ export const Validations: React.FC<IValidationsProps> = props => {
             return;
         }
         traverse(template, (value: any, parent: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
-                return;
-            }
-            if (!_.isObject(parent) || !("puzzles" in parent)) {
+            if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
             const parentPuzzle = parent as IPuzzle;
-            const isGroupParent =
-                "puzzleType" in parentPuzzle && parentPuzzle.puzzleType === EPuzzleType.GROUP;
-            isParentPuzzleGroup.current = "id" in puzzle && puzzle.id === puzzleId && isGroupParent;
+            const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
+            isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
         });
     }, [template, props.disabled]);
 
@@ -86,11 +82,11 @@ export const Validations: React.FC<IValidationsProps> = props => {
             return;
         }
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
+            if (!_.has(value, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (!("id" in puzzle) || puzzle.id !== puzzleId) {
+            if (_.has(puzzle, "id") || puzzle.id !== puzzleId) {
                 return;
             }
             setCurrentQuestion(puzzle);
@@ -114,13 +110,12 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
-                        if (!_.isObject(value) || !("puzzles" in value)) {
+                        if (!_.has(value, "puzzles")) {
                             return;
                         }
                         const puzzle = value as IPuzzle;
                         // find dependent question in template
                         if (
-                            !("puzzleType" in puzzle) ||
                             puzzle.puzzleType !== EPuzzleType.QUESTION ||
                             puzzle.id !== dependentQuestion.id
                         ) {
@@ -143,7 +138,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         // by traversing whole template tree
         questions.length = 0;
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
+            if (!_.has(value, "puzzles")) {
                 return;
             }
             const puzzle = value as IPuzzle;
@@ -157,15 +152,13 @@ export const Validations: React.FC<IValidationsProps> = props => {
             // so that scope of questionPuzzle is always all puzzles above the current
             _.range(0, index).forEach(i => {
                 traverse(puzzle.puzzles[i], (value: any, parent: any) => {
-                    if (!_.isObject(value) || !("puzzleType" in value)) {
+                    if (!_.has(value, "puzzles")) {
                         return;
                     }
                     const puzzle = value as IPuzzle;
                     // check if parent of current item is GROUP puzzle
                     const isGroupParent =
                         parent &&
-                        typeof parent === "object" &&
-                        "puzzleType" in parent &&
                         parent.puzzleType === EPuzzleType.GROUP &&
                         !isParentPuzzleGroup.current;
                     // if puzzle is question and has non-empty title

@@ -73,10 +73,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     function onToolbarAddQuestion(): void {
         const whitelist = [EPuzzleType.GROUP];
         traverse(template, (value: any) => {
-            if (!focusedPuzzleChain.length) {
-                return;
-            }
-            if (typeof value !== "object" || !("id" in value)) {
+            if (_.isEmpty(focusedPuzzleChain) || !_.has(value, "id")) {
                 return;
             }
             const focusedPuzzleId = _.head(focusedPuzzleChain);
@@ -85,8 +82,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             }
             // do not allow to add question in template, section, question, answer, etc...
             if (
-                !("puzzles" in value) ||
-                ("puzzleType" in value && !whitelist.includes(value.puzzleType))
+                !_.has(value, "puzzles") ||
+                (_.has(value, "puzzleType") && !whitelist.includes(value.puzzleType))
             ) {
                 return;
             }
@@ -196,11 +193,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     function onAddAnswerPuzzle(id: string): void {
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("id" in value)) {
+            if (!_.has(value, "id")) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (!("puzzles" in puzzle)) {
+            if (!_.has(puzzle, "puzzles")) {
                 return;
             }
             if (!puzzle.puzzles.some(child => child.id === id)) {
@@ -226,11 +223,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     function onDeleteAnswerPuzzle(id: string): void {
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("id" in value)) {
+            if (!_.has(value, "id")) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (!("puzzles" in puzzle)) {
+            if (!_.has(puzzle, "puzzles")) {
                 return;
             }
             if (!puzzle.puzzles.some(child => child.id === id)) {
@@ -255,7 +252,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     function onDeletePuzzle(): void {
         traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("id" in value)) {
+            if (!_.has(value, "id")) {
                 return;
             }
             const focusedPuzzleId = _.head(focusedPuzzleChain);
