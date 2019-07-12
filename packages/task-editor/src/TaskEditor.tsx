@@ -52,6 +52,9 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         getEditorService(EEditorType.TASK, [[focusedPuzzleChain, setFocusedPuzzleChain]])
     );
 
+    // if no documents present (initially)
+    // we add one stub document, so user won't
+    // add it by himself
     useEffect(() => {
         if (_.isEmpty(task.documents)) {
             setDocuments([
@@ -66,6 +69,9 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
+    // on every documents change we have to
+    // update current task with their id's
+    // also caching template JSON for current active document
     useEffect(() => {
         setTask({
             ...task,
@@ -74,6 +80,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         if (documents.some(document => document.__uuid === focusedPuzzleId)) {
             const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
             props.getTemplate &&
+                documentId &&
                 props
                     .getTemplate(documentId)
                     .then(response => JSON.parse(response.template))
@@ -84,16 +91,37 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         }
     }, [documents]);
 
-    function onTemplateChange(documentId: string, event: TChangeEvent): void {
+    function onTemplateChange(uuid: string, event: TChangeEvent): void {
         const templateId = event.target.value as string;
-        if (!task.documents.includes(documentId)) {
-            setTask({ ...task, documents: [...task.documents, documentId] });
-        }
-        if (documents.some(document => document.id === documentId)) {
+        if (documents.some(document => document.__uuid === uuid)) {
             const templateIndex = templates.findIndex(template => template.id === templateId);
-            const documentIndex = documents.findIndex(document => document.id === documentId);
+            const documentIndex = documents.findIndex(document => document.__uuid === uuid);
             documents[documentIndex].id = templates[templateIndex].id;
             documents[documentIndex].title = templates[templateIndex].title;
+            setDocuments([...documents]);
+        }
+    }
+
+    function onAddDocument(): void {
+        setDocuments([
+            ...documents,
+            { id: ETerminals.EMPTY, __uuid: uuid(), title: ETerminals.EMPTY },
+        ]);
+    }
+
+    function onDeleteDocument(): void {
+        // do not to delete document if only one exists
+        if (documents.length === 1) {
+            return;
+        }
+        const document = documents.find(document => document.__uuid === focusedPuzzleId);
+        if (!document) {
+            return;
+        }
+        const documentId = document.id;
+        if (documents.some(document => document.id === documentId)) {
+            const documentIndex = documents.findIndex(document => document.id === documentId);
+            documents.splice(documentIndex, 1);
             setDocuments([...documents]);
         }
     }
@@ -106,20 +134,24 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                     {
                         label: "Добавить шаблон",
                         icon: <QuestionIcon />,
-                        action: _.noop,
+                        action: onAddDocument,
                     },
                     {
                         label: "Оставить комментарий",
                         icon: <CommentsIcon />,
                         action: _.noop,
                     },
-                    { label: "Удалить шаблон", icon: <TrashIcon />, action: _.noop },
+                    {
+                        label: "Удалить шаблон",
+                        icon: <TrashIcon />,
+                        action: onDeleteDocument,
+                    },
                 ]}
             />
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
-                    zIndex: 1300,
+                    zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
                 })}
                 onFocus={service.current.onPuzzleFocus.bind(service.current, task.id)}
                 onMouseDown={service.current.onPuzzleFocus.bind(service.current, task.id)}
@@ -193,7 +225,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
             {documents.map(document => {
                 return (
                     <SelectableBlockWrapper
-                        key={document.id}
+                        key={document.__uuid}
                         onFocus={service.current.onPuzzleFocus.bind(
                             service.current,
                             document.__uuid
@@ -203,7 +235,10 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                             document.__uuid
                         )}
                         onBlur={service.current.onPuzzleBlur.bind(service.current)}
-                        css={theme => ({ padding: theme.spacing(3) })}
+                        css={theme => ({
+                            padding: theme.spacing(3),
+                            zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
+                        })}
                         focused={focusedPuzzleId === document.__uuid}
                     >
                         <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
@@ -212,7 +247,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                                     placeholder="Выбрать шаблон"
                                     value={document.id}
                                     fullWidth
-                                    onChange={event => onTemplateChange(document.id, event)}
+                                    onChange={event => onTemplateChange(document.__uuid, event)}
                                 >
                                     {templates.map(template => (
                                         <MenuItem key={template.id} value={template.id}>

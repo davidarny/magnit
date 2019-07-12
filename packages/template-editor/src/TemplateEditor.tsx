@@ -172,11 +172,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
-    function onPuzzleBlur(event: React.SyntheticEvent): void {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
     function onTemplateChange(template: ITemplate) {
         setTemplate({ ...template });
     }
@@ -302,13 +297,21 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         icon: <QuestionIcon />,
                         action: onToolbarAddQuestion,
                     },
-                    { label: "Добавить группу", icon: <GroupIcon />, action: onToolbarAddGroup },
+                    {
+                        label: "Добавить группу",
+                        icon: <GroupIcon />,
+                        action: onToolbarAddGroup,
+                    },
                     {
                         label: "Добавить раздел",
                         icon: <SectionIcon />,
                         action: onToolbarAddSection,
                     },
-                    { label: "Удалить элемент", icon: <TrashIcon />, action: onDeletePuzzle },
+                    {
+                        label: "Удалить элемент",
+                        icon: <TrashIcon />,
+                        action: onDeletePuzzle,
+                    },
                 ]}
             />
             <SelectableBlockWrapper
