@@ -38,6 +38,7 @@
     },
     "dependencies": {
         "@magnit/icons": "^0.1.0",
-        "@magnit/components": "^0.1.0"
+        "@magnit/components": "^0.1.0",
+        "@magnit/services": "^0.1.0"
     }
 }
