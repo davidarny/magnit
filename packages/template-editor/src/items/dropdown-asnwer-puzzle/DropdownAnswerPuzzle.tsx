@@ -5,13 +5,11 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Grid, IconButton, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import { traverse } from "services/json";
 import { Close as DeleteIcon } from "@material-ui/icons";
 import { InputField } from "@magnit/components";
 import _ from "lodash";
-
-type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;

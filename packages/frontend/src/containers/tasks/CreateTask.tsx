@@ -8,8 +8,32 @@ import { jsx } from "@emotion/core";
 import { CustomButton } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "context";
+import { getTemplate, getTemplates } from "services/api";
+import _ from "lodash";
+
+interface IShortTemplate {
+    id: string;
+    title: string;
+}
 
 export const CreateTask: React.FC = () => {
+    const context = useContext(AppContext);
+    const [templates, setTemplates] = useState<IShortTemplate[]>([]);
+
+    useEffect(() => {
+        getTemplates(context.courier)
+            .then(response => {
+                return response.templates.map(template => ({
+                    ...template,
+                    id: template.id.toString(),
+                }));
+            })
+            .then(templates => setTemplates(templates))
+            .catch(console.error);
+    }, [context.courier]);
+
     return (
         <SectionLayout>
             <SectionTitle title="Создание задания">
@@ -37,7 +61,10 @@ export const CreateTask: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TaskEditor />
+                <TaskEditor
+                    templates={templates}
+                    getTemplate={(id: string) => getTemplate(context.courier, _.toNumber(id))}
+                />
             </Grid>
         </SectionLayout>
     );

@@ -14,7 +14,14 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { EActionType, EConditionType, ICondition, IPuzzle, ITemplate } from "entities";
+import {
+    EActionType,
+    EConditionType,
+    ICondition,
+    IPuzzle,
+    ITemplate,
+    TChangeEvent,
+} from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
@@ -31,8 +38,6 @@ interface IConditionsProps {
 
     onTemplateChange(template: ITemplate): void;
 }
-
-type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const Conditions: React.FC<IConditionsProps> = props => {
     const { puzzleId, template, disabled = false } = props;

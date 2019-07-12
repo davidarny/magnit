@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     DateField,
     EditorToolbar,
@@ -8,39 +10,93 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { TaskFieldContainer } from "./components/task-field-container";
-import { QuestionIcon, TrashIcon, CommentsIcon } from "@magnit/icons";
+import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
 import _ from "lodash";
-import { useState } from "react";
-import { useRef } from "react";
-import { EEditorType, getEditorService, ETerminals, getFriendlyDate } from "@magnit/services";
+import { EEditorType, ETerminals, getEditorService, getFriendlyDate } from "@magnit/services";
 import uuid from "uuid/v4";
-import { ITask } from "./entities";
+import { IDocument, ITask, TChangeEvent } from "./entities";
 
-export const TaskEditor: React.FC = () => {
-    const [task] = useState<ITask>({
-        id: uuid(),
-        stage: {
+interface ITaskEditorProps {
+    initialState?: ITask;
+    templates: Omit<IDocument, "__uuid">[];
+
+    getTemplate?(id: string): Promise<{ template: string }>;
+}
+
+export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) => {
+    const [task, setTask] = useState<ITask>(
+        props.initialState || {
+            id: uuid(),
+            stage: {
+                title: ETerminals.EMPTY,
+                until: null,
+            },
             title: ETerminals.EMPTY,
-            until: null,
-        },
-        title: ETerminals.EMPTY,
-        assignee: ETerminals.EMPTY,
-        location: {
-            region: ETerminals.EMPTY,
-            address: ETerminals.EMPTY,
-            branch: ETerminals.EMPTY,
-            format: ETerminals.EMPTY,
-        },
-    });
+            assignee: ETerminals.EMPTY,
+            location: {
+                region: ETerminals.EMPTY,
+                address: ETerminals.EMPTY,
+                branch: ETerminals.EMPTY,
+                format: ETerminals.EMPTY,
+            },
+            documents: [],
+        }
+    );
+    const [documents, setDocuments] = useState<IDocument[]>([]);
+    const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([task.id]);
     const service = useRef(
         getEditorService(EEditorType.TASK, [[focusedPuzzleChain, setFocusedPuzzleChain]])
     );
 
+    useEffect(() => {
+        if (_.isEmpty(task.documents)) {
+            setDocuments([
+                {
+                    title: ETerminals.EMPTY,
+                    id: ETerminals.EMPTY,
+                    __uuid: uuid(),
+                },
+            ]);
+        }
+    }, []);
+
     const focusedPuzzleId = _.head(focusedPuzzleChain);
+
+    useEffect(() => {
+        setTask({
+            ...task,
+            documents: documents.map(document => document.id),
+        });
+        if (documents.some(document => document.__uuid === focusedPuzzleId)) {
+            const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
+            props.getTemplate &&
+                props
+                    .getTemplate(documentId)
+                    .then(response => JSON.parse(response.template))
+                    .then(template => {
+                        templateSnapshots.set(documentId, template);
+                        setTemplateSnapshots(new Map(templateSnapshots));
+                    });
+        }
+    }, [documents]);
+
+    function onTemplateChange(documentId: string, event: TChangeEvent): void {
+        const templateId = event.target.value as string;
+        if (!task.documents.includes(documentId)) {
+            setTask({ ...task, documents: [...task.documents, documentId] });
+        }
+        if (documents.some(document => document.id === documentId)) {
+            const templateIndex = templates.findIndex(template => template.id === templateId);
+            const documentIndex = documents.findIndex(document => document.id === documentId);
+            documents[documentIndex].id = templates[templateIndex].id;
+            documents[documentIndex].title = templates[templateIndex].title;
+            setDocuments([...documents]);
+        }
+    }
 
     return (
         <React.Fragment>
@@ -134,6 +190,46 @@ export const TaskEditor: React.FC = () => {
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
+            {documents.map(document => {
+                return (
+                    <SelectableBlockWrapper
+                        key={document.id}
+                        onFocus={service.current.onPuzzleFocus.bind(
+                            service.current,
+                            document.__uuid
+                        )}
+                        onMouseDown={service.current.onPuzzleFocus.bind(
+                            service.current,
+                            document.__uuid
+                        )}
+                        onBlur={service.current.onPuzzleBlur.bind(service.current)}
+                        css={theme => ({ padding: theme.spacing(3) })}
+                        focused={focusedPuzzleId === document.__uuid}
+                    >
+                        <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
+                            <Grid item xs={3}>
+                                <SelectField
+                                    placeholder="Выбрать шаблон"
+                                    value={document.id}
+                                    fullWidth
+                                    onChange={event => onTemplateChange(document.id, event)}
+                                >
+                                    {templates.map(template => (
+                                        <MenuItem key={template.id} value={template.id}>
+                                            {template.title}
+                                        </MenuItem>
+                                    ))}
+                                </SelectField>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <pre>
+                                    {JSON.stringify(templateSnapshots.get(document.id), null, 2)}
+                                </pre>
+                            </Grid>
+                        </Grid>
+                    </SelectableBlockWrapper>
+                );
+            })}
         </React.Fragment>
     );
 };

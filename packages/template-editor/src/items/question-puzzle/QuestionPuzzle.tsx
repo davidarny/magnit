@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
+import { IPuzzle, ISpecificPuzzleProps, ITemplate, TChangeEvent } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
@@ -19,8 +19,6 @@ interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
 
     onTemplateChange(template: ITemplate): void;
 }
-
-type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 const answerTypes = [
     { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER },

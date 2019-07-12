@@ -21,6 +21,7 @@ import {
     IPuzzle,
     ITemplate,
     IValidation,
+    TChangeEvent,
 } from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
@@ -38,8 +39,6 @@ interface IValidationsProps {
 
     onTemplateChange(template: ITemplate): void;
 }
-
-type TChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
