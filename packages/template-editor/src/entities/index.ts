@@ -90,5 +90,4 @@ export * from "./EValidationType";
 export * from "./EOperatorType";
 export * from "./EConditionType";
 export * from "./EActionType";
-export * from "./ETerminals";
 export * from "./ETemplateType";

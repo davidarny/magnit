@@ -3,13 +3,14 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { ETerminals, IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
+import { IPuzzle, ISpecificPuzzleProps, ITemplate } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
+import { ETerminals } from "@magnit/services";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;

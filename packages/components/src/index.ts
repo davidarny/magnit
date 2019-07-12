@@ -5,3 +5,4 @@ export * from "./table";
 export * from "./block";
 export * from "./stepper";
 export * from "./route-matcher";
+export * from "./editor-toolbar";

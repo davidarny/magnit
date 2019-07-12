@@ -3,29 +3,18 @@
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { CopyIcon, GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 
 interface IPuzzleToolbarProps {
     right?: number;
     top?: number;
-
-    onAddClick?(): void;
-
-    onAddGroup?(): void;
-
-    onAddSection?(): void;
-
-    onDeletePuzzle?(): void;
+    items: Array<{
+        label: string;
+        icon: React.ReactNode;
+        action(...args: any[]): any;
+    }>;
 }
 
-export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0, ...props }) => {
-    const toolbar = [
-        { label: "Добавить вопрос", icon: <QuestionIcon />, action: props.onAddClick },
-        { label: "Добавить группу", icon: <GroupIcon />, action: props.onAddGroup },
-        { label: "Добавить раздел", icon: <SectionIcon />, action: props.onAddSection },
-        { label: "Удалить элемент", icon: <TrashIcon />, action: props.onDeletePuzzle },
-    ];
-
+export const EditorToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 0, ...props }) => {
     return (
         <Paper
             css={theme => ({
@@ -46,7 +35,7 @@ export const PuzzleToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 justify="center"
                 css={theme => ({ padding: theme.spacing() })}
             >
-                {toolbar.map(({ label, action, icon }, index) => (
+                {props.items.map(({ label, action, icon }, index) => (
                     <Grid item css={theme => ({ marginBottom: theme.spacing() })} key={index}>
                         <Grid container justify="center" alignItems="center">
                             <IconButton color="primary" aria-label={label} onClick={action}>

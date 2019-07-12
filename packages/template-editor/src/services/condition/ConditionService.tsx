@@ -8,10 +8,11 @@ import {
     TGetAnswerPuzzleResult,
 } from "./IConditionsService";
 import { EPuzzleType } from "components/puzzle";
-import { EActionType, ETerminals, IPuzzle, TChangeEvent } from "entities";
+import { EActionType, IPuzzle, TChangeEvent } from "entities";
 import { MenuItem } from "@material-ui/core";
 import { InputField, SelectField } from "@magnit/components";
 import { ServiceImpl } from "./ServiceImpl";
+import { ETerminals } from "@magnit/services";
 
 export class ConditionService extends ServiceImpl implements IConditionsService {
     constructor(protected readonly options: IConditionsServiceOptions) {

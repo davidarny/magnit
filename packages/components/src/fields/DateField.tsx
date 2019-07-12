@@ -19,7 +19,6 @@ export const DateField: React.FC<TDateFieldProps> = props => {
         <FormControl disabled={disabled}>
             {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
             <Input
-                {...rest}
                 id={id}
                 type="text"
                 disabled={disabled}
@@ -28,6 +27,7 @@ export const DateField: React.FC<TDateFieldProps> = props => {
                         <CalendarIcon />
                     </InputAdornment>
                 }
+                {...rest}
             />
         </FormControl>
     );

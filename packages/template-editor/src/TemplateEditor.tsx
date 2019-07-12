@@ -3,16 +3,18 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { ETerminals, IPuzzle, ITemplate, ETemplateType, ISection } from "./entities";
-import { SectionPuzzle } from "./items/section-puzzle";
-import { EPuzzleType, PuzzleToolbar } from "./components/puzzle";
+import { useEffect, useRef, useState } from "react";
+import { ETemplateType, IPuzzle, ITemplate } from "./entities";
+import { EPuzzleType } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
-import { SelectableBlockWrapper } from "./components/block";
+import { SelectableBlockWrapper, EditorToolbar } from "@magnit/components";
 import { SectionHead } from "./components/section-head";
-import { Item } from "./components/item";
+import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
+import { TemplateSection } from "./components/template-section";
+import { EEditorType, getEditorService } from "@magnit/services";
+import { ETerminals } from "@magnit/services";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -44,6 +46,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
+    const service = useRef(
+        getEditorService(EEditorType.TEMPLATE, [[focusedPuzzleChain, setFocusedPuzzleChain]])
+    );
 
     (window as typeof window & { template: ITemplate }).template = template;
 
@@ -172,21 +177,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         event.stopPropagation();
     }
 
-    const wait = 100;
-    const throttledChainCleaning = _.throttle(() => {
-        focusedPuzzleChain.length = 0;
-    }, wait);
-
-    function onPuzzleFocus(id: string): void {
-        throttledChainCleaning();
-        if (focusedPuzzleChain.includes(id)) {
-            setFocusedPuzzleChain([...focusedPuzzleChain]);
-            return;
-        }
-        focusedPuzzleChain.push(id);
-        setFocusedPuzzleChain([...focusedPuzzleChain]);
-    }
-
     function onTemplateChange(template: ITemplate) {
         setTemplate({ ...template });
     }
@@ -304,12 +294,22 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 } as unknown) as IEditorContext
             }
         >
-            <PuzzleToolbar
+            <EditorToolbar
                 top={toolbarTopPosition}
-                onAddClick={onToolbarAddQuestion}
-                onAddGroup={onToolbarAddGroup}
-                onAddSection={onToolbarAddSection}
-                onDeletePuzzle={onDeletePuzzle}
+                items={[
+                    {
+                        label: "Добавить вопрос",
+                        icon: <QuestionIcon />,
+                        action: onToolbarAddQuestion,
+                    },
+                    { label: "Добавить группу", icon: <GroupIcon />, action: onToolbarAddGroup },
+                    {
+                        label: "Добавить раздел",
+                        icon: <SectionIcon />,
+                        action: onToolbarAddSection,
+                    },
+                    { label: "Удалить элемент", icon: <TrashIcon />, action: onDeletePuzzle },
+                ]}
             />
             <SelectableBlockWrapper
                 id={template.id}
@@ -318,9 +318,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     marginBottom: theme.spacing(2),
                 })}
                 focused={focusedPuzzleId === template.id}
-                onFocus={onPuzzleFocus.bind(undefined, template.id)}
-                onMouseDown={onPuzzleFocus.bind(undefined, template.id)}
-                onBlur={onPuzzleBlur}
+                onFocus={service.current.onPuzzleFocus.bind(service.current, template.id)}
+                onMouseDown={service.current.onPuzzleFocus.bind(service.current, template.id)}
+                onBlur={service.current.onPuzzleBlur.bind(service.current)}
             >
                 <SectionHead
                     template={template}
@@ -336,59 +336,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         template={template}
                         focusedPuzzleId={focusedPuzzleId}
                         onTemplateChange={onTemplateChange}
-                        onPuzzleFocus={onPuzzleFocus}
-                        onPuzzleBlur={onPuzzleBlur}
+                        onPuzzleFocus={service.current.onPuzzleFocus.bind(service.current)}
+                        onPuzzleBlur={service.current.onPuzzleBlur.bind(service.current)}
                     />
                 ))}
         </EditorContext.Provider>
-    );
-};
-
-interface ITemplateSectionProps {
-    template: ITemplate;
-    section: ISection;
-    index: number;
-    focusedPuzzleId?: string;
-
-    onTemplateChange(template: ITemplate): void;
-
-    onPuzzleFocus(id: string): void;
-
-    onPuzzleBlur(event: React.SyntheticEvent): void;
-}
-
-const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
-    const focused = props.focusedPuzzleId === section.id;
-
-    return (
-        <SelectableBlockWrapper
-            key={section.id}
-            id={section.id}
-            css={theme => ({
-                marginTop: theme.spacing(4),
-                marginBottom: theme.spacing(2),
-                paddingTop: theme.spacing(2),
-            })}
-            onFocus={props.onPuzzleFocus.bind(null, section.id)}
-            onMouseDown={props.onPuzzleFocus.bind(null, section.id)}
-            onBlur={props.onPuzzleBlur}
-            focused={focused}
-        >
-            <SectionPuzzle
-                id={section.id}
-                title={section.title}
-                index={props.index}
-                focused={focused}
-                template={props.template}
-                onTemplateChange={props.onTemplateChange}
-            >
-                <Item
-                    puzzles={section.puzzles}
-                    onFocus={props.onPuzzleFocus}
-                    onBlur={props.onPuzzleBlur}
-                    isFocused={id => id === props.focusedPuzzleId}
-                />
-            </SectionPuzzle>
-        </SelectableBlockWrapper>
     );
 };

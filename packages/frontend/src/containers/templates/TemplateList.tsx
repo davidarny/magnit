@@ -13,7 +13,7 @@ import { getTemplates } from "services/api/templates";
 import { AppContext } from "context";
 import { Grid, Paper } from "@material-ui/core";
 import _ from "lodash";
-import { getFriendlyDate } from "services/date";
+import { getFriendlyDate } from "@magnit/services";
 
 const columns: IColumn[] = [
     { id: "title", sortable: true, label: "Название шаблона" },

@@ -2,8 +2,11 @@ Table task {
   id int
   title varchar
   stage_title varchar
-  stage_due_date datetime
-  location varchar // координаты локации
+  stage_until datetime
+  location_region varchar
+  location_branch varchar
+  location_format varchar
+  location_address varchar
   assignee varchar // FK к исполнителю
 }
 

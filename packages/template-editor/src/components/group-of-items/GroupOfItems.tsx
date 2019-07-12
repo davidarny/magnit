@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { SelectableBlockWrapper } from "components/block";
+import { SelectableBlockWrapper } from "@magnit/components";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "components/puzzle";

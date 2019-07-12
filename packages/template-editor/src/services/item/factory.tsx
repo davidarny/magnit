@@ -49,7 +49,11 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
         case EPuzzleType.NUMERIC_ANSWER:
             return new NumericAnswerFactory();
         default:
-            console.warn(`Current type (${type}) factory does not exist!`);
+            console.log(
+                "%c%s",
+                "color:" + "#F07178",
+                `Current type (${type}) factory does not exist!`
+            );
             return new DefaultFactory();
     }
 }

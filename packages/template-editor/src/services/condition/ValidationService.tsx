@@ -8,9 +8,10 @@ import {
 } from "./IValidationService";
 import { ServiceImpl } from "./ServiceImpl";
 import { MenuItem } from "@material-ui/core";
-import { EOperatorType, ETerminals, EValidationType, IPuzzle, TChangeEvent } from "entities";
+import { EOperatorType, EValidationType, IPuzzle, TChangeEvent } from "entities";
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
+import { ETerminals } from "@magnit/services";
 
 export class ValidationService extends ServiceImpl implements IValidationService {
     constructor(protected readonly options: IValidationServiceOptions) {

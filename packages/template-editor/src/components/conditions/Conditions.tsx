@@ -14,7 +14,7 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { EActionType, EConditionType, ETerminals, ICondition, IPuzzle, ITemplate } from "entities";
+import { EActionType, EConditionType, ICondition, IPuzzle, ITemplate } from "entities";
 import { traverse } from "services/json";
 import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
@@ -22,6 +22,7 @@ import uuid from "uuid/v4";
 import { CustomButton, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getConditionService } from "services/condition";
+import { ETerminals } from "@magnit/services";
 
 interface IConditionsProps {
     puzzleId: string;

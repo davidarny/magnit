@@ -17,7 +17,6 @@ import { Close as DeleteIcon } from "@material-ui/icons";
 import {
     EConditionType,
     EOperatorType,
-    ETerminals,
     EValidationType,
     IPuzzle,
     ITemplate,
@@ -30,6 +29,7 @@ import uuid from "uuid/v4";
 import { CustomButton, InputField, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getValidationService } from "services/condition";
+import { ETerminals } from "@magnit/services";
 
 interface IValidationsProps {
     puzzleId: string;
