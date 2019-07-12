@@ -88,7 +88,6 @@ export class ValidationService extends ServiceImpl implements IValidationService
                             fullWidth
                             value={validation.value}
                             onChange={onValueChange}
-                            css={theme => ({ marginTop: theme.spacing(-2) })}
                             placeholder="Ответ"
                         />
                     );

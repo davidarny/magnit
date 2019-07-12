@@ -86,7 +86,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (_.has(puzzle, "id") || puzzle.id !== puzzleId) {
+            if (!_.has(puzzle, "id") || puzzle.id !== puzzleId) {
                 return;
             }
             setCurrentQuestion(puzzle);

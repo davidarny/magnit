@@ -25,7 +25,6 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
 
     return (
         <SelectableBlockWrapper
-            key={section.id}
             id={section.id}
             css={theme => ({
                 marginTop: theme.spacing(4),

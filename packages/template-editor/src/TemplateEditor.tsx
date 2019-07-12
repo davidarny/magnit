@@ -331,6 +331,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             {template.sections &&
                 template.sections.map((section, index) => (
                     <TemplateSection
+                        key={section.id}
                         section={section}
                         index={index}
                         template={template}
