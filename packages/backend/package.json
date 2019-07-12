@@ -8,7 +8,7 @@
         "@sailshq/socket.io-redis": "^5.2.0",
         "moment": "^2.24.0",
         "request": "^2.88.0",
-        "sails": "^1.2.2",
+        "sails": "^1.2.3",
         "sails-hook-orm": "^2.1.1",
         "sails-hook-sockets": "^2.0.0",
         "sails-postgresql": "^1.0.2",
