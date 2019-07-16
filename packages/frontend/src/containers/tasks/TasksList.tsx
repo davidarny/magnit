@@ -3,7 +3,7 @@
 import { css, jsx } from "@emotion/core";
 import { Grid, Paper } from "@material-ui/core";
 import * as React from "react";
-import { Link, RouteComponentProps } from "@reach/router";
+import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import {
@@ -16,51 +16,66 @@ import {
     TabsWrapper,
 } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { ETaskStatus } from "../../entities";
+import { ETaskStatus } from "./ETaskStatus";
 import { EmptyList } from "components/list";
-
-const tabs: ITab[] = [
-    { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
-    { value: ETaskStatus.CHECKED, label: "На проверке" },
-    { value: ETaskStatus.DRAFT, label: "Черновики" },
-    { value: ETaskStatus.DONE, label: "Завершенные" },
-];
-
-const columns: IColumn[] = [
-    { id: "title", label: "Название задания" },
-    { id: "region", label: "Регион" },
-    { id: "office_part", label: "Филиал" },
-    { id: "address", label: "Адрес объекта" },
-    { id: "step", label: "Этап" },
-    { id: "date", label: "Срок выполнения" },
-];
-
-const rows: object[] = [
-    {
-        title: "Задание 1",
-        region: "Марий Эл",
-        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-        step: 1,
-    },
-    {
-        title: "Задание 2",
-        region: "Марий Эл",
-        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-        step: 2,
-    },
-    {
-        title: "Задание 3",
-        region: "Марий Эл",
-        address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-        step: 3,
-    },
-];
+import { useState } from "react";
+import _ from "lodash";
 
 export const TasksList: React.FC<RouteComponentProps> = () => {
+    const tabs: ITab[] = [
+        { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
+        { value: ETaskStatus.CHECKED, label: "На проверке" },
+        { value: ETaskStatus.DRAFT, label: "Черновики" },
+        { value: ETaskStatus.DONE, label: "Завершенные" },
+    ];
+
+    const columns: IColumn[] = [
+        { id: "title", label: "Название задания" },
+        { id: "region", label: "Регион" },
+        { id: "office_part", label: "Филиал" },
+        { id: "address", label: "Адрес объекта" },
+        { id: "step", label: "Этап" },
+        { id: "date", label: "Срок выполнения" },
+    ];
+
+    const rows: object[] = [
+        {
+            id: 1,
+            title: "Задание 1",
+            region: "Марий Эл",
+            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+            step: 1,
+        },
+        {
+            id: 2,
+            title: "Задание 2",
+            region: "Марий Эл",
+            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+            step: 2,
+        },
+        {
+            id: 3,
+            title: "Задание 3",
+            region: "Марий Эл",
+            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
+            step: 3,
+        },
+    ];
+
     const empty = !rows.length;
+
+    const [redirect, setRedirect] = useState({ redirect: false, to: "" });
+
+    function onRowClick(row?: object) {
+        if (!_.isObject(row) || !_.has(row, "id")) {
+            return;
+        }
+        setRedirect({ redirect: true, to: _.get(row, "id") });
+    }
 
     return (
         <SectionLayout>
+            {redirect.redirect && <Redirect to={`tasks/view/${redirect.to}`} noThrow />}
             <SectionTitle title="Список заданий">
                 <Grid item hidden={empty}>
                     <CustomButton
@@ -150,7 +165,11 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                                     </Grid>
                                 </Grid>
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
-                                    <TableWrapper columns={columns} data={rows} />
+                                    <TableWrapper
+                                        columns={columns}
+                                        data={rows}
+                                        onRowClick={onRowClick}
+                                    />
                                 </Grid>
                             </Grid>
                         </TabsWrapper>

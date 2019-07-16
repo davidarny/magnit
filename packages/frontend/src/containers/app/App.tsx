@@ -92,8 +92,8 @@ const App: React.FC = () => {
                         <Router>
                             {/* tasks */}
                             <AsyncTasksList path="tasks/*" />
-                            <AsyncViewTask path="tasks/view" />
                             <AsyncCreateTask path="tasks/create" />
+                            <AsyncViewTask path="tasks/view/:taskId" />
                             <AsyncEditTask path="tasks/edit/:taskId" />
                             {/* templates */}
                             <AsyncTemplates path="templates" />

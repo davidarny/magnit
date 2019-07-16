@@ -7,7 +7,7 @@ import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { CustomButton, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { ETaskStatus } from "../../entities";
+import { ETaskStatus } from "./ETaskStatus";
 
 export const ViewTask: React.FC = () => {
     const steps = [

@@ -58,23 +58,19 @@ export const EditTask: React.FC = () => {
                             </Typography>
                         </Grid>
                         <TaskFieldContainer label="Название задания">
-                            <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
+                            <Grid container direction="row" alignItems="flex-end" spacing={2}>
                                 <Grid item xs>
-                                    <InputField
-                                        placeholder={"Введите название задания"}
-                                        fullWidth
-                                    />
+                                    <InputField placeholder="Введите название задания" fullWidth />
                                 </Grid>
                             </Grid>
-                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Этап задания">
-                            <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
+                            <Grid container direction="row" alignItems="flex-end" spacing={2}>
                                 <Grid item xs>
-                                    <InputField placeholder={"Введите название этапа"} fullWidth />
+                                    <InputField placeholder="Введите название этапа" fullWidth />
                                 </Grid>
                                 <Grid item>
-                                    <DateField placeholder={"Срок выполнения"} />
+                                    <DateField placeholder="Срок выполнения" />
                                 </Grid>
                                 <Grid container>
                                     <Grid item xs css={theme => ({ marginLeft: theme.spacing() })}>
@@ -90,30 +86,27 @@ export const EditTask: React.FC = () => {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Местоположение">
-                            <Grid container direction={"row"} alignItems={"flex-end"} spacing={2}>
+                            <Grid container direction="row" alignItems="flex-end" spacing={2}>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Регион"} fullWidth />
+                                    <SelectField placeholder="Регион" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Филиал"} fullWidth />
+                                    <SelectField placeholder="Филиал" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Формат"} fullWidth />
+                                    <SelectField placeholder="Формат" fullWidth />
                                 </Grid>
                                 <Grid item xs>
-                                    <SelectField placeholder={"Адрес"} fullWidth />
+                                    <SelectField placeholder="Адрес" fullWidth />
                                 </Grid>
                             </Grid>
-                            ,
                         </TaskFieldContainer>
                         <TaskFieldContainer label="Исполнитель">
                             <Grid item xs={4}>
-                                <SelectField placeholder={"Выберите исполнителя"} fullWidth />
+                                <SelectField placeholder="Выберите исполнителя" fullWidth />
                             </Grid>
-                            ,
                         </TaskFieldContainer>
                     </Grid>
                 </SelectableBlockWrapper>
@@ -130,11 +123,9 @@ export const EditTask: React.FC = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TaskFieldContainer label="Шаблон">
-                                    {" "}
                                     <Grid item xs={3}>
-                                        <SelectField placeholder={"Выбрать шаблон"} fullWidth />
+                                        <SelectField placeholder="Выбрать шаблон" fullWidth />
                                     </Grid>
-                                    ,
                                 </TaskFieldContainer>
                             </Grid>
                         </Grid>
@@ -153,13 +144,13 @@ const TaskFieldContainer: React.FC<ITaskFieldProps> = ({ label, children }) => {
     return (
         <Grid
             container
-            direction={"row"}
+            direction="row"
             spacing={2}
-            alignItems={"flex-start"}
+            alignItems="flex-start"
             css={theme => ({ marginTop: theme.spacing() })}
         >
             <Grid item xs={2} css={theme => ({ marginTop: theme.spacing(2) })}>
-                <Typography component={"span"}>{label}</Typography>
+                <Typography component="span">{label}</Typography>
             </Grid>
             <Grid item xs>
                 {children}
