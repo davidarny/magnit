@@ -46,11 +46,20 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         }
     );
     const [documents, setDocuments] = useState<IDocument[]>([]);
+    const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([task.id]);
     const service = useRef(
-        getEditorService(EEditorType.TASK, [[focusedPuzzleChain, setFocusedPuzzleChain]])
+        getEditorService(EEditorType.TASK, [
+            [focusedPuzzleChain, setFocusedPuzzleChain],
+            [toolbarTopPosition, setToolbarTopPosition],
+        ])
     );
+
+    // set toolbar offset top
+    useEffect(() => {
+        service.current.updateToolbarTopPosition();
+    }, [focusedPuzzleChain]);
 
     // if no documents present (initially)
     // we add one stub document, so user won't
@@ -129,7 +138,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
     return (
         <React.Fragment>
             <EditorToolbar
-                top={0}
+                top={toolbarTopPosition}
                 items={[
                     {
                         label: "Добавить шаблон",
@@ -157,6 +166,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 onMouseDown={service.current.onPuzzleFocus.bind(service.current, task.id)}
                 onBlur={service.current.onPuzzleBlur.bind(service.current)}
                 focused={focusedPuzzleId === task.id}
+                id={task.id}
             >
                 <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
                     <Grid item xs={12}>
@@ -240,6 +250,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                             zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
                         })}
                         focused={focusedPuzzleId === document.__uuid}
+                        id={document.__uuid}
                     >
                         <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
                             <Grid item xs={3}>

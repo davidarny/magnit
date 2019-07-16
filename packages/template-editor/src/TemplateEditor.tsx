@@ -47,28 +47,20 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
     const service = useRef(
-        getEditorService(EEditorType.TEMPLATE, [[focusedPuzzleChain, setFocusedPuzzleChain]])
+        getEditorService(EEditorType.TEMPLATE, [
+            [focusedPuzzleChain, setFocusedPuzzleChain],
+            [toolbarTopPosition, setToolbarTopPosition],
+        ])
     );
 
     (window as typeof window & { template: ITemplate }).template = template;
 
+    // set toolbar offset top
     useEffect(() => {
-        // set toolbar offset top
-        if (!focusedPuzzleChain.length) {
-            return;
-        }
-        const focusedPuzzleId = _.head(focusedPuzzleChain);
-        if (!focusedPuzzleId) {
-            return;
-        }
-        const element = document.getElementById(focusedPuzzleId);
-        if (!element) {
-            return;
-        }
-        const { top } = element.getBoundingClientRect();
-        setToolbarTopPosition(window.scrollY + top - 128);
+        service.current.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
 
+    // handle passed onChange callback
     useEffect(() => {
         if (props.onChange) {
             props.onChange(template);

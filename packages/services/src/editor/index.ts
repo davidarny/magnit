@@ -1,14 +1,21 @@
 import { IEditorService } from "./IEditorService";
 import { TaskEditorService } from "./TaskEditorService";
 import { TemplateEditorService } from "./TemplateEditorService";
-import { EditorServiceImpl, TFocusedPuzzleState } from "./EditorServiceImpl";
+import {
+    EditorServiceImpl,
+    TFocusedPuzzleState,
+    TToolbarTopPositionState,
+} from "./EditorServiceImpl";
 
 export enum EEditorType {
     TEMPLATE = 0,
     TASK,
 }
 
-export function getEditorService(type: EEditorType, args: [TFocusedPuzzleState]): IEditorService {
+export function getEditorService(
+    type: EEditorType,
+    args: [TFocusedPuzzleState, TToolbarTopPositionState]
+): IEditorService {
     switch (type) {
         case EEditorType.TASK:
             return new TaskEditorService(...args);
