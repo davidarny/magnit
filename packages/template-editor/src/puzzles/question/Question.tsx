@@ -6,11 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { IPuzzle, ISpecificPuzzleProps, ITemplate, TChangeEvent } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { EPuzzleType } from "components/puzzle";
 import { traverse } from "services/json";
 import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
-import { ETerminals } from "@magnit/services";
+import { ETerminals, EPuzzleType } from "@magnit/services";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;

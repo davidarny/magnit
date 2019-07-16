@@ -4,7 +4,7 @@ import * as React from "react";
 import { SelectableBlockWrapper } from "@magnit/components";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "entities";
-import { EPuzzleType } from "components/puzzle";
+import { EPuzzleType } from "@magnit/services";
 import { ItemFactory } from "components/item";
 import { ConditionsWrapper } from "components/conditions";
 import _ from "lodash";

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { jsx } from "@emotion/core";
-import { EPuzzleType } from "components/puzzle";
+import { EPuzzleType } from "@magnit/services";
 import { IPuzzle } from "entities";
 import {
     NumericAnswerFactory,

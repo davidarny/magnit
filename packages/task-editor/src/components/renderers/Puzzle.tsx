@@ -3,7 +3,7 @@
 import * as React from "react";
 import _ from "lodash";
 import { Grid, Typography } from "@material-ui/core";
-import { EPuzzleType } from "@magnit/template-editor";
+import { EPuzzleType } from "@magnit/services";
 import { jsx } from "@emotion/core";
 import { getPuzzleFactory } from "services/item";
 

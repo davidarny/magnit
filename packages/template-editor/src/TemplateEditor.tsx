@@ -5,7 +5,6 @@ import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { ETemplateType, IPuzzle, ITemplate } from "./entities";
-import { EPuzzleType } from "./components/puzzle";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
@@ -13,8 +12,7 @@ import { SelectableBlockWrapper, EditorToolbar } from "@magnit/components";
 import { SectionHead } from "./components/section-head";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 import { TemplateSection } from "./components/template-section";
-import { EEditorType, getEditorService } from "@magnit/services";
-import { ETerminals } from "@magnit/services";
+import { EEditorType, getEditorService, EPuzzleType, ETerminals } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 

@@ -23,13 +23,12 @@ import {
     TChangeEvent,
 } from "entities";
 import { traverse } from "services/json";
-import { EPuzzleType } from "components/puzzle";
 import _ from "lodash";
 import uuid from "uuid/v4";
 import { CustomButton, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getConditionService } from "services/condition";
-import { ETerminals } from "@magnit/services";
+import { ETerminals, EPuzzleType } from "@magnit/services";
 
 interface IConditionsProps {
     puzzleId: string;

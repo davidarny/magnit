@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ICondition, IPuzzle, TChangeEvent } from "entities";
-import { EPuzzleType } from "components/puzzle";
+import { EPuzzleType } from "@magnit/services";
 import { IService, IServiceOptions } from "./IService";
 
 export type TGetAnswerPuzzleResult =

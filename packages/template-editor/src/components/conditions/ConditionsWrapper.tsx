@@ -6,7 +6,7 @@ import { jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "TemplateEditor";
 import { Conditions } from "./Conditions";
 import { Validations } from "./Validations";
-import { EPuzzleType } from "components/puzzle";
+import { EPuzzleType } from "@magnit/services";
 import { Grid, Tab, Tabs } from "@material-ui/core";
 
 interface IContentConditionsProps {

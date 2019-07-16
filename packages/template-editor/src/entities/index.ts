@@ -2,7 +2,7 @@ import { EValidationType } from "./EValidationType";
 import { EOperatorType } from "./EOperatorType";
 import { EConditionType } from "./EConditionType";
 import { EActionType } from "./EActionType";
-import { EPuzzleType } from "components/puzzle";
+import { EPuzzleType } from "@magnit/services";
 import * as React from "react";
 import { ETemplateType } from "./ETemplateType";
 
