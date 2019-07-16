@@ -7,7 +7,7 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { ITemplate, TemplateEditor } from "@magnit/template-editor";
-import { CustomButton } from "@magnit/components";
+import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { getTemplate, updateTemplate } from "services/api/templates";
 import { AppContext } from "context";
@@ -62,7 +62,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Редактирование шаблона">
                 <Grid item>
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Обновить"
                         scheme="blue"

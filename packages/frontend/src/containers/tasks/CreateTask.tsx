@@ -5,7 +5,7 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { CustomButton } from "@magnit/components";
+import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { useContext, useEffect, useState } from "react";
@@ -38,14 +38,14 @@ export const CreateTask: React.FC = () => {
         <SectionLayout>
             <SectionTitle title="Создание задания">
                 <Grid item>
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Сохранить"
                         scheme="green"
                         icon={<CheckIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Отправить"
                         scheme="violet"

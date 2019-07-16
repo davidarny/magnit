@@ -7,7 +7,7 @@ import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import {
-    CustomButton,
+    Button,
     IColumn,
     InputField,
     ITab,
@@ -78,7 +78,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
             {redirect.redirect && <Redirect to={`tasks/view/${redirect.to}`} noThrow />}
             <SectionTitle title="Список заданий">
                 <Grid item hidden={empty}>
-                    <CustomButton
+                    <Button
                         component={Link}
                         to="create"
                         variant="contained"
@@ -96,7 +96,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                     title="Заданий нет"
                     actionName="Создать задание"
                     button={
-                        <CustomButton
+                        <Button
                             component={Link}
                             to="create"
                             icon={<AddIcon />}

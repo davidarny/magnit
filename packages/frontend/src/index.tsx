@@ -32,6 +32,7 @@ const theme = {
     },
 
     colors: {
+        darkPrimary: "#207BD6",
         primary: "#2F97FF",
         secondary: "#8A94A2",
         default: "#000000",
@@ -42,9 +43,12 @@ const theme = {
         gray: "#AAB4BE",
         lightGray: "#DEE5EF",
         green: "#0CDAAC",
+        darkGreen: "#1EC9A3",
         lightBlue: "#ECF6FF",
         red: "#FF6A89",
+        darkRed: "#DE3659",
         violet: "#8F7EE5",
+        darkViolet: "#6959B8",
         yellow: "#FFF5BE",
         darkYellow: "#FFBC3C",
         white: "#FFFFFF",

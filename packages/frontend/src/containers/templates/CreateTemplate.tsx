@@ -7,7 +7,7 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { TemplateEditor } from "@magnit/template-editor";
-import { CustomButton } from "@magnit/components";
+import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { createTemplate } from "services/api/templates";
 import { AppContext } from "context";
@@ -52,7 +52,7 @@ export const CreateTemplate: React.FC = () => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Сохранить"
                         scheme="blue"

@@ -5,7 +5,7 @@ import { jsx } from "@emotion/core";
 import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
-import { CustomButton, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
+import { Button, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { ETaskStatus } from "./ETaskStatus";
 
@@ -27,7 +27,7 @@ export const ViewTask: React.FC = () => {
                     </Typography>
                 </Grid>
             ),
-            completed: true,
+            completed: false,
         },
         {
             title: (
@@ -45,6 +45,7 @@ export const ViewTask: React.FC = () => {
                     </Typography>
                 </Grid>
             ),
+            completed: false,
         },
     ];
 
@@ -60,21 +61,21 @@ export const ViewTask: React.FC = () => {
         <SectionLayout>
             <SectionTitle title="Информация о задании">
                 <Grid item>
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Завершить"
                         scheme="green"
                         icon={<CheckIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Отправить"
                         scheme="violet"
                         icon={<CheckIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Редактировать"
                         scheme="blueOutline"
@@ -127,8 +128,11 @@ export const ViewTask: React.FC = () => {
                         </Grid>
                     </Grid>
                 </SelectableBlockWrapper>
-                {parts.map(part => (
-                    <SelectableBlockWrapper css={theme => ({ padding: theme.spacing(3) })}>
+                {parts.map((part, index) => (
+                    <SelectableBlockWrapper
+                        key={index}
+                        css={theme => ({ padding: theme.spacing(3) })}
+                    >
                         <Head title={part.title} />
                     </SelectableBlockWrapper>
                 ))}

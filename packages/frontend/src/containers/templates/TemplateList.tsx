@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { Link, Redirect } from "@reach/router";
-import { CustomButton, IColumn, InputField, TableWrapper } from "@magnit/components";
+import { Button, IColumn, InputField, TableWrapper } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { EmptyList } from "components/list";
 import { getTemplates } from "services/api/templates";
@@ -56,7 +56,7 @@ export const TemplateList: React.FC = () => {
             {redirect.redirect && <Redirect to={`templates/edit/${redirect.to}`} noThrow />}
             <SectionTitle title="Список шаблонов">
                 <Grid item hidden={empty}>
-                    <CustomButton
+                    <Button
                         component={Link}
                         to="create"
                         variant="contained"
@@ -74,7 +74,7 @@ export const TemplateList: React.FC = () => {
                     title={"Шаблонов нет"}
                     actionName={"Создать шаблон"}
                     button={
-                        <CustomButton
+                        <Button
                             component={Link}
                             to="create"
                             icon={<AddIcon />}

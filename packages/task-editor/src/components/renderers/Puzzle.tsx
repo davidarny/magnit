@@ -41,7 +41,7 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = ({ puzzle, last = 
                                 width: theme.spacing(3),
                                 height: theme.spacing(3),
                                 borderRadius: "50%",
-                                border: `1px solid ${theme.colors.primary}`,
+                                border: `2px solid ${theme.colors.primary}`,
                                 zIndex: 2,
                                 position: "relative",
                                 background: theme.colors.white,

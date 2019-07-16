@@ -4,6 +4,7 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
+    ButtonLikeText,
     DateField,
     EditorToolbar,
     InputField,
@@ -19,6 +20,7 @@ import { EEditorType, ETerminals, getEditorService, getFriendlyDate } from "@mag
 import uuid from "uuid/v4";
 import { IDocument, ITask, TChangeEvent } from "./entities";
 import { TemplateRenderer } from "./components/renderers";
+import { Link } from "@reach/router";
 
 interface ITaskEditorProps {
     initialState?: ITask;
@@ -235,6 +237,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 </Grid>
             </SelectableBlockWrapper>
             {documents.map(document => {
+                const snapshot = templateSnapshots.get(document.id);
                 return (
                     <SelectableBlockWrapper
                         key={document.__uuid}
@@ -270,7 +273,19 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                                 </SelectField>
                             </Grid>
                             <Grid item xs={12}>
-                                <TemplateRenderer template={templateSnapshots.get(document.id)} />
+                                {_.get(snapshot, "id") && (
+                                    <ButtonLikeText
+                                        component={Link}
+                                        to={`/templates/edit/${_.get(snapshot, "id")}`}
+                                        css={theme => ({
+                                            marginLeft: theme.spacing(),
+                                            marginTop: theme.spacing(2),
+                                        })}
+                                    >
+                                        Перейти к шаблону
+                                    </ButtonLikeText>
+                                )}
+                                <TemplateRenderer template={snapshot} />
                             </Grid>
                         </Grid>
                     </SelectableBlockWrapper>

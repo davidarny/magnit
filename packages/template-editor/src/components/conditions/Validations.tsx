@@ -26,7 +26,7 @@ import {
 import { traverse } from "services/json";
 import _ from "lodash";
 import uuid from "uuid/v4";
-import { CustomButton, InputField, SelectField } from "@magnit/components";
+import { Button, InputField, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getValidationService } from "services/condition";
 import { ETerminals, EPuzzleType } from "@magnit/services";
@@ -387,7 +387,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 );
             })}
             <Grid item css={theme => ({ marginLeft: theme.spacing(9) })}>
-                <CustomButton
+                <Button
                     variant="outlined"
                     color="primary"
                     onClick={onAddValidation}

@@ -6,6 +6,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import _ from "lodash";
 import { PuzzleRenderer } from "./Puzzle";
+import { ButtonLikeText } from "@magnit/components";
 
 interface ISectionRendererProps {
     index: number;
@@ -50,21 +51,17 @@ export const SectionRenderer: React.FC<ISectionRendererProps> = ({ index, sectio
                 >
                     {_.get(section, "title")}
                 </Typography>
-                <Typography
+                <ButtonLikeText
                     css={theme => ({
-                        color: theme.colors.primary,
-                        fontSize: theme.fontSize.sNormal,
                         position: "absolute",
                         top: "50%",
                         transform: "translateY(-50%)",
                         right: theme.spacing(4),
-                        cursor: "pointer",
-                        ":hover": { borderBottom: `1px solid ${theme.colors.primary}` },
                     })}
                     onClick={onCollapsedToggle}
                 >
                     {collapsed ? "Развернуть" : "Свернуть"} раздел
-                </Typography>
+                </ButtonLikeText>
             </Grid>
             {!collapsed && (
                 <Grid item>

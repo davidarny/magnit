@@ -6,7 +6,7 @@ import { SectionTitle } from "components/section-title";
 import { Grid, Typography } from "@material-ui/core";
 import { jsx, css } from "@emotion/core";
 import {
-    CustomButton,
+    Button,
     DateField,
     InputField,
     SelectableBlockWrapper,
@@ -21,14 +21,14 @@ export const EditTask: React.FC = () => {
         <SectionLayout>
             <SectionTitle title="Информация о задании">
                 <Grid item>
-                    <CustomButton
+                    <Button
                         variant="contained"
                         title="Сохранить"
                         scheme="green"
                         icon={<CheckIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
-                    <CustomButton
+                    <Button
                         variant="outlined"
                         title="Отмена"
                         scheme="violet"
@@ -74,7 +74,7 @@ export const EditTask: React.FC = () => {
                                 </Grid>
                                 <Grid container>
                                     <Grid item xs css={theme => ({ marginLeft: theme.spacing() })}>
-                                        <CustomButton
+                                        <Button
                                             variant="outlined"
                                             title="Добавить этап"
                                             scheme="blueOutline"
