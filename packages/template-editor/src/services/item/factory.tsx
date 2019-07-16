@@ -3,15 +3,17 @@
 import * as React from "react";
 import { jsx } from "@emotion/core";
 import { EPuzzleType } from "components/puzzle";
-import { QuestionFactory } from "items/question-puzzle";
 import { IPuzzle } from "entities";
-import { GroupFactory } from "items/group-puzzle";
-import { DropdownAnswerFactory } from "items/dropdown-asnwer-puzzle";
-import { DateAnswerFactory } from "items/date-answer-puzzle";
-import { TextAnswerFactory } from "items/text-answer-puzzle";
-import { CheckboxAnswerFactory } from "items/checkbox-answer-puzzle";
-import { RadioAnswerFactory } from "items/radio-answer-puzzle";
-import { NumericAnswerFactory } from "items/numeric-answer-puzzle";
+import {
+    NumericAnswerFactory,
+    RadioAnswerFactory,
+    CheckboxAnswerFactory,
+    TextAnswerFactory,
+    DateAnswerFactory,
+    DropdownAnswerFactory,
+    GroupFactory,
+    QuestionFactory,
+} from "puzzles";
 
 export interface IPuzzleFactory {
     create(params: IPuzzleFactoryProps): React.ReactNode;
@@ -52,7 +54,7 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             console.log(
                 "%c%s",
                 "color:" + "#F07178",
-                `Current type (${type}) factory does not exist!`
+                `${type.toUpperCase()} factory does not exist!`
             );
             return new DefaultFactory();
     }

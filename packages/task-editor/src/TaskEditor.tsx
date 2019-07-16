@@ -18,6 +18,7 @@ import _ from "lodash";
 import { EEditorType, ETerminals, getEditorService, getFriendlyDate } from "@magnit/services";
 import uuid from "uuid/v4";
 import { IDocument, ITask, TChangeEvent } from "./entities";
+import { TemplateRenderer } from "./components/renderers";
 
 interface ITaskEditorProps {
     initialState?: ITask;
@@ -268,9 +269,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                                 </SelectField>
                             </Grid>
                             <Grid item xs={12}>
-                                <pre>
-                                    {JSON.stringify(templateSnapshots.get(document.id), null, 2)}
-                                </pre>
+                                <TemplateRenderer template={templateSnapshots.get(document.id)} />
                             </Grid>
                         </Grid>
                     </SelectableBlockWrapper>

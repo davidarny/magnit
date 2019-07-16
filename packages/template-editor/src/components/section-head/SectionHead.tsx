@@ -57,7 +57,7 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                             fullWidth={true}
                             placeholder="Название шаблона"
                             defaultValue={template.title}
-                            isSimpleMode={!focused}
+                            simple={!focused}
                             css={theme => ({
                                 input: {
                                     fontSize: theme.fontSize.xLarge,
@@ -89,7 +89,7 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                     fullWidth={true}
                     placeholder="Описание шаблона (необязательно)"
                     defaultValue={template.description}
-                    isSimpleMode={!focused}
+                    simple={!focused}
                     css={theme => ({
                         input: {
                             fontSize: theme.fontSize.medium,

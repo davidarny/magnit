@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { SelectableBlockWrapper } from "@magnit/components";
-import { SectionPuzzle } from "items/section-puzzle";
+import { Section } from "components/section";
 import { Item } from "components/item";
 import { jsx } from "@emotion/core";
 import { ISection, ITemplate } from "entities";
@@ -36,7 +36,7 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
             onBlur={props.onPuzzleBlur}
             focused={focused}
         >
-            <SectionPuzzle
+            <Section
                 id={section.id}
                 title={section.title}
                 index={props.index}
@@ -50,7 +50,7 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
                     onBlur={props.onPuzzleBlur}
                     isFocused={id => id === props.focusedPuzzleId}
                 />
-            </SectionPuzzle>
+            </Section>
         </SelectableBlockWrapper>
     );
 };

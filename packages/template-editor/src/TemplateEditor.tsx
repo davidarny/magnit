@@ -15,6 +15,8 @@ import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 import { TemplateSection } from "./components/template-section";
 import { EEditorType, getEditorService } from "@magnit/services";
 import { ETerminals } from "@magnit/services";
+import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
+import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -336,6 +338,16 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         onPuzzleBlur={service.current.onPuzzleBlur.bind(service.current)}
                     />
                 ))}
+            {process.env.NODE_ENV !== "production" && (
+                <ExpansionPanel css={theme => ({ marginTop: theme.spacing(3) })}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                        JSON
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <pre>{JSON.stringify(template, null, 2)}</pre>
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+            )}
         </EditorContext.Provider>
     );
 };
