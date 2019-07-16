@@ -27,6 +27,10 @@ export const DateField: React.FC<TDateFieldProps> = props => {
                         <CalendarIcon />
                     </InputAdornment>
                 }
+                css={theme => ({
+                    ":before": { borderBottom: `1px solid ${theme.colors.default}42` },
+                    ":after": { borderBottom: `2px solid ${theme.colors.primary}` },
+                })}
                 {...rest}
             />
         </FormControl>

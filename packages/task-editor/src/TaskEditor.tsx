@@ -196,6 +196,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                                     value={
                                         task.stage.until ? getFriendlyDate(task.stage.until) : ""
                                     }
+                                    css={theme => ({ color: theme.colors.secondary })}
                                     placeholder="Срок выполнения"
                                 />
                             </Grid>
