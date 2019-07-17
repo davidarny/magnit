@@ -1,7 +1,7 @@
 module.exports = {
     friendlyName: "",
 
-    description: ``,
+    description: "",
 
     inputs: {
         id: {
@@ -26,22 +26,22 @@ module.exports = {
         try {
             const id = _.escape(inputs.id);
 
-            const template = await Template.findOne({ id: id });
+            const task = await Task.findOne({ id: id });
 
-            if (!template) {
-                return exits.notFound({ success: 0, message: "template does not exist" });
+            if (!task) {
+                return exits.notFound({ success: 0, message: "Task does not exist" });
             }
 
-            const taskTemplatesCount = await TaskTemplate.find({ template_id: template.id });
+            const taskTemplatesCount = await TaskTemplate.find({ task_id: task.id });
 
             if (taskTemplatesCount.length > 0) {
                 return exits.forbidden({
                     success: 0,
-                    message: "template assigned to task; deletion impossible",
+                    message: "Cannot delete Task with assigned Templates ",
                 });
             }
 
-            await Template.destroy({ id: template.id });
+            await Task.destroy({ id: task.id });
 
             return exits.success({ success: 1 });
         } catch (err) {
