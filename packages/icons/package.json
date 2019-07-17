@@ -6,7 +6,7 @@
     "typings": "dist/index.d.ts",
     "private": true,
     "scripts": {
-        "clean": "rimraf dist",
+        "clean": "rimraf dist ./node_modules/.cache",
         "build:lib": "concurrently -n webpack,tsc \"cross-env NODE_ENV=production webpack --mode production\" \"tsc --emitDeclarationOnly -p tsconfig.json\"",
         "watch:lib": "concurrently -n webpack,tsc \"webpack --mode development --watch\" \"tsc --emitDeclarationOnly -p tsconfig.json -w\""
     },

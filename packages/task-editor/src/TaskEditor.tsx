@@ -108,7 +108,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         if (documents.some(document => document.__uuid === uuid)) {
             const templateIndex = templates.findIndex(template => template.id === templateId);
             const documentIndex = documents.findIndex(document => document.__uuid === uuid);
-            documents[documentIndex].key = templates[templateIndex].id;
+            documents[documentIndex].id = templates[templateIndex].id;
             documents[documentIndex].title = templates[templateIndex].title;
             setDocuments([...documents]);
         }
