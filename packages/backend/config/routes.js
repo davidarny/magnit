@@ -45,4 +45,5 @@ module.exports.routes = {
     //    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
     "POST /v1/tasks": "v1/tasks/create-task",
     "DELETE /v1/tasks/:id": "v1/tasks/delete-task",
+    "GET /v1/tasks": "v1/tasks/get-tasks",
 };

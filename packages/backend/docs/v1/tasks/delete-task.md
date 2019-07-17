@@ -2,7 +2,7 @@
 
 #### URL
 
-`/v1/templates/:id`
+`/v1/tasks/:id`
 
 #### Method:
 
@@ -12,11 +12,7 @@
 
 | Name | Type      | Required |
 | ---- | --------- | -------- |
-| id   | `integer` | `true`   |
-
-#### Body params
-
-None
+| `id` | `integer` | `true`   |
 
 #### Success response
 

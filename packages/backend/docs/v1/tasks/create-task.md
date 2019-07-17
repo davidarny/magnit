@@ -8,15 +8,11 @@
 
 `POST`
 
-#### URL params
-
-None
-
 #### Body params
 
-| Name | Type   | Required |
-| ---- | ------ | -------- |
-| task | `JSON` | `true`   |
+| Name   | Type   | Required |
+| ------ | ------ | -------- |
+| `task` | `JSON` | `true`   |
 
 #### Success response
 
