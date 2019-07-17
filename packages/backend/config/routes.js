@@ -16,4 +16,5 @@ module.exports.routes = {
     "DELETE /v1/templates/:id": "v1/admin/delete-template",
     "GET /v1/objects": "v1/admin/get-objects",
     "GET /v1/users": "v1/admin/get-users",
+    "POST /v1/tasks": "v1/admin/create-task",
 };
