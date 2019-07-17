@@ -38,6 +38,8 @@ services:
             - ./packages/backend/stuff:/docker-entrypoint-initdb.d
         networks:
             - magnit
+        ports:
+            - 5432:5432
 
 networks:
     magnit:
