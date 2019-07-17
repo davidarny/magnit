@@ -1,5 +1,6 @@
 import { ICourier, TMethod } from "./entities";
 import { IMiddleware } from "./entities";
+import _ from "lodash";
 
 export class FetchCourier implements ICourier {
     constructor(
@@ -13,36 +14,38 @@ export class FetchCourier implements ICourier {
     }
 
     async post<T>(path: string, body?: object): Promise<T> {
-        const response = await this.send(path, "POST", body);
-        return response.json();
+        return this.send(path, "POST", body);
     }
 
     async get<T>(path: string): Promise<T> {
-        const response = await this.send(path, "GET");
-        return response.json();
+        return this.send(path, "GET");
     }
 
     async put<T>(path: string, body?: object): Promise<T> {
-        const response = await this.send(path, "PUT", body);
-        return response.json();
+        return this.send(path, "PUT", body);
     }
 
     async delete<T>(path: string, body?: object): Promise<T> {
-        const response = await this.send(path, "DELETE", body);
-        return response.json();
+        return this.send(path, "DELETE", body);
     }
 
     private async send<T>(path: string, method: TMethod, body?: object) {
         try {
             const response = await this.fetch(path, method, body);
+            const json = await response.clone().json();
             if (this.middlewares) {
-                await Promise.all(
-                    this.middlewares.map(async middleware =>
-                        middleware.apply({ path, method, version: this.version }, response)
-                    )
-                );
+                const responses = [];
+                for (const middleware of this.middlewares) {
+                    _.merge(json, ...responses);
+                    const result = await middleware.apply(
+                        { path, method, version: this.version },
+                        json
+                    );
+                    responses.push(result);
+                }
+                _.merge(json, ...responses);
             }
-            return response;
+            return json;
         } catch (error) {
             if (this.middlewares) {
                 this.middlewares.forEach(async middleware =>

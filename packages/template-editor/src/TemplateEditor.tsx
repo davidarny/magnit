@@ -74,7 +74,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return;
             }
             const focusedPuzzleId = _.head(focusedPuzzleChain);
-            if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
+            if (value.key !== focusedPuzzleId || !focusedPuzzleChain.includes(value.key)) {
                 return;
             }
             // do not allow to add question in template, section, question, answer, etc...

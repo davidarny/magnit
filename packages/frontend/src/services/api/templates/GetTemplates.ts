@@ -1,4 +1,4 @@
-import { IResponse, ICourier } from "services/api";
+import { ICourier, IResponse } from "services/api";
 
 interface IGetTemplatesResponse extends IResponse {
     total: number;

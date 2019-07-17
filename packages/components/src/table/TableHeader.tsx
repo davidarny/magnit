@@ -15,7 +15,7 @@ export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
             <TableRow>
                 {headers.map(header => (
                     <TableCell
-                        key={header.id}
+                        key={header.key}
                         css={theme => ({ borderBottomColor: theme.colors.light })}
                     >
                         <TableSortLabel

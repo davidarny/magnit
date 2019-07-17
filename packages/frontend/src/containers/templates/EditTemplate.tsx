@@ -28,7 +28,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
 
     useEffect(() => {
         getTemplate(context.courier, templateId)
-            .then(response => setTemplate(JSON.parse(response.template)))
+            .then(response => setTemplate(response.template))
             .catch(console.error);
     }, [context.courier, templateId]);
 

@@ -16,10 +16,10 @@ import _ from "lodash";
 import { getFriendlyDate } from "@magnit/services";
 
 const columns: IColumn[] = [
-    { id: "title", sortable: true, label: "Название шаблона" },
-    { id: "description", label: "Описание" },
-    { id: "createdAt", label: "Дата создания" },
-    { id: "updatedAt", label: "Дата редактирования" },
+    { key: "title", sortable: true, label: "Название шаблона" },
+    { key: "description", label: "Описание" },
+    { key: "createdAt", label: "Дата создания" },
+    { key: "updatedAt", label: "Дата редактирования" },
 ];
 
 export const TemplateList: React.FC = () => {

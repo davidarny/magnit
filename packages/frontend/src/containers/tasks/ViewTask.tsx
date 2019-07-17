@@ -100,7 +100,7 @@ export const ViewTask: React.FC = () => {
                 >
                     <Head
                         title="Хардкорное задание для суровых прорабов"
-                        status={ETaskStatus.CHECKED}
+                        status={ETaskStatus.ON_CHECK}
                     />
                     <Grid container spacing={2}>
                         <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
@@ -179,8 +179,8 @@ const Head: React.FC<IHeadProps> = ({ title, status }) => {
     function getTitleByStatus(status: ETaskStatus): string {
         return {
             [ETaskStatus.IN_PROGRESS]: "В работе",
-            [ETaskStatus.CHECKED]: "На проверке",
-            [ETaskStatus.DONE]: "Завершено",
+            [ETaskStatus.ON_CHECK]: "На проверке",
+            [ETaskStatus.COMPLETED]: "Завершено",
             [ETaskStatus.DRAFT]: "Черновик",
         }[status];
     }
@@ -188,8 +188,8 @@ const Head: React.FC<IHeadProps> = ({ title, status }) => {
     function getColorByStatus(theme: any, status: ETaskStatus): string {
         return {
             [ETaskStatus.IN_PROGRESS]: theme.colors.violet,
-            [ETaskStatus.CHECKED]: theme.colors.darkYellow,
-            [ETaskStatus.DONE]: theme.colors.green,
+            [ETaskStatus.ON_CHECK]: theme.colors.darkYellow,
+            [ETaskStatus.COMPLETED]: theme.colors.green,
             [ETaskStatus.DRAFT]: theme.colors.secondary,
         }[status];
     }

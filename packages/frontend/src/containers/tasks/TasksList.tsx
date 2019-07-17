@@ -18,51 +18,36 @@ import {
 import { AddIcon } from "@magnit/icons";
 import { ETaskStatus } from "./ETaskStatus";
 import { EmptyList } from "components/list";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import _ from "lodash";
+import { getTasks } from "services/api";
+import { AppContext } from "context";
+
+const tabs: ITab[] = [
+    { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
+    { value: ETaskStatus.ON_CHECK, label: "На проверке" },
+    { value: ETaskStatus.DRAFT, label: "Черновики" },
+    { value: ETaskStatus.COMPLETED, label: "Завершенные" },
+];
+
+const columns: IColumn[] = [
+    { key: "name", label: "Название задания" },
+    { key: "description", label: "Описание задания" },
+    { key: "status", label: "Статус" },
+    { key: "deadlineDate", label: "Срок выполнения" },
+    { key: "createdAt", label: "Дата создания" },
+    { key: "updatedAt", label: "Дата последнего обновления" },
+];
 
 export const TasksList: React.FC<RouteComponentProps> = () => {
-    const tabs: ITab[] = [
-        { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
-        { value: ETaskStatus.CHECKED, label: "На проверке" },
-        { value: ETaskStatus.DRAFT, label: "Черновики" },
-        { value: ETaskStatus.DONE, label: "Завершенные" },
-    ];
+    const context = useContext(AppContext);
+    const [tasks, setTasks] = useState<object[]>([]);
 
-    const columns: IColumn[] = [
-        { id: "title", label: "Название задания" },
-        { id: "region", label: "Регион" },
-        { id: "office_part", label: "Филиал" },
-        { id: "address", label: "Адрес объекта" },
-        { id: "step", label: "Этап" },
-        { id: "date", label: "Срок выполнения" },
-    ];
-
-    const rows: object[] = [
-        {
-            id: 1,
-            title: "Задание 1",
-            region: "Марий Эл",
-            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-            step: 1,
-        },
-        {
-            id: 2,
-            title: "Задание 2",
-            region: "Марий Эл",
-            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-            step: 2,
-        },
-        {
-            id: 3,
-            title: "Задание 3",
-            region: "Марий Эл",
-            address: "г. Йошкар-Ола, Воскресенский Проспект 17",
-            step: 3,
-        },
-    ];
-
-    const empty = !rows.length;
+    useEffect(() => {
+        getTasks(context.courier)
+            .then(response => setTasks(response.tasks))
+            .catch(console.error);
+    }, [context.courier]);
 
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
@@ -72,6 +57,8 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
         }
         setRedirect({ redirect: true, to: _.get(row, "id") });
     }
+
+    const empty = !tasks.length;
 
     return (
         <SectionLayout>
@@ -112,11 +99,9 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
             {!empty && (
                 <Paper
                     square={true}
-                    css={theme => ({
-                        margin: theme.spacing(3),
-                        boxShadow: `0px 0px ${theme.spacing(2)} ${
-                            theme.colors.lightGray
-                        } !important`,
+                    css={({ spacing, ...theme }) => ({
+                        margin: spacing(3),
+                        boxShadow: `0px 0px ${spacing(2)} ${theme.colors.lightGray} !important`,
                     })}
                 >
                     <Grid
@@ -135,7 +120,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                                         <InputField
                                             placeholder="Поиск ..."
                                             fullWidth
-                                            css={theme => ({
+                                            css={({ spacing, ...theme }) => ({
                                                 borderRadius: theme.radius(5),
                                                 background: theme.colors.white,
                                                 border: `1px solid ${theme.colors.lightGray}`,
@@ -150,9 +135,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                                                     },
                                                 },
                                                 input: {
-                                                    padding: `${theme.spacing(2)} ${theme.spacing(
-                                                        4
-                                                    )}`,
+                                                    padding: `${spacing(2)} ${spacing(4)}`,
                                                 },
                                             })}
                                         />
@@ -167,7 +150,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                     <TableWrapper
                                         columns={columns}
-                                        data={rows}
+                                        data={tasks}
                                         onRowClick={onRowClick}
                                     />
                                 </Grid>

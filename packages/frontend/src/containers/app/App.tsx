@@ -8,8 +8,9 @@ import { RouteComponentProps, Router } from "@reach/router";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
 import _ from "lodash";
-import { FetchCourier, LoggerMiddleware } from "services/api";
+import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware } from "services/api";
 import { AppContext } from "context";
+import { JsonParseMiddleware } from "../../services/api/middlewares/JsonParseMiddleware";
 
 // tasks
 const AsyncTasksList = Loadable(({
@@ -47,7 +48,11 @@ const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
     const [logoHeight, setLogoHeight] = useState(0);
     const courier = useRef(
-        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [new LoggerMiddleware()])
+        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [
+            new JsonParseMiddleware(),
+            new CamelCaseMiddleware(),
+            new LoggerMiddleware(),
+        ])
     );
 
     useEffect(() => {

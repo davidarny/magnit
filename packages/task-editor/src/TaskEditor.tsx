@@ -26,7 +26,7 @@ interface ITaskEditorProps {
     initialState?: ITask;
     templates: Omit<IDocument, "__uuid">[];
 
-    getTemplate?(id: string): Promise<{ template: string }>;
+    getTemplate?(id: string): Promise<{ template: object }>;
 }
 
 export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) => {
@@ -95,7 +95,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 documentId &&
                 props
                     .getTemplate(documentId)
-                    .then(response => JSON.parse(response.template))
+                    .then(response => response.template)
                     .then(template => {
                         templateSnapshots.set(documentId, template);
                         setTemplateSnapshots(new Map(templateSnapshots));
@@ -108,7 +108,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         if (documents.some(document => document.__uuid === uuid)) {
             const templateIndex = templates.findIndex(template => template.id === templateId);
             const documentIndex = documents.findIndex(document => document.__uuid === uuid);
-            documents[documentIndex].id = templates[templateIndex].id;
+            documents[documentIndex].key = templates[templateIndex].id;
             documents[documentIndex].title = templates[templateIndex].title;
             setDocuments([...documents]);
         }

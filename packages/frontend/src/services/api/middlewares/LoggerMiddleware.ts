@@ -2,12 +2,12 @@
 import { IMiddleware, IMiddlewareMeta } from "services/api";
 
 export class LoggerMiddleware implements IMiddleware {
-    async apply(meta: IMiddlewareMeta, response: Response): Promise<void> {
+    async apply(meta: IMiddlewareMeta, response: any): Promise<void> {
         console.log(
             "%c%s",
             "color:" + "#006DFF",
             `[${meta.method} ${meta.version}/${meta.path}]`,
-            await response.clone().json()
+            response
         );
     }
 

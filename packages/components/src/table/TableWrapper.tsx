@@ -12,7 +12,7 @@ import {
 } from "@material-ui/icons";
 
 export interface IColumn {
-    id: string;
+    key: string;
     label: string;
     sortable?: boolean;
 }

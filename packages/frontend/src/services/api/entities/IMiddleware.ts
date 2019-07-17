@@ -7,7 +7,7 @@ export interface IMiddlewareMeta {
 }
 
 export interface IMiddleware {
-    apply(meta: IMiddlewareMeta, response: Response): Promise<void>;
+    apply(meta: IMiddlewareMeta, response: any): Promise<any>;
 
     error<T>(meta: IMiddlewareMeta, reason: T): void;
 }

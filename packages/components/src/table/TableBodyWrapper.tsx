@@ -23,7 +23,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, ..
                     onClick={() => props.onRowClick && props.onRowClick(value)}
                 >
                     {columns.map((column: IColumn, index) => {
-                        const label = _.get(value, column.id, null);
+                        const label = _.get(value, column.key, null);
                         return (
                             <TableCell
                                 key={index}

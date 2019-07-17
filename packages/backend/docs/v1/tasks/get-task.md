@@ -28,18 +28,18 @@
 
 #### Task schema
 
-| Property name    | Property type                                                       |
-| ---------------- | ------------------------------------------------------------------- |
-| `id`             | `number`                                                            |
-| `name`           | `string`                                                            |
-| `object_id`      | `string or null`                                                    |
-| `user_id`        | `string or null`                                                    |
-| `status`         | `enum(assigned, inactive, inprogress, oncheck, overdue, completed)` |
-| `deadline_date`  | `string or null`                                                    |
-| `departure_date` | `string or null`                                                    |
-| `description`    | `string or null`                                                    |
-| `createdAt`      | `string`                                                            |
-| `updatedAt`      | `string`                                                            |
+| Property name    | Property type                                   |
+| ---------------- | ----------------------------------------------- |
+| `id`             | `number`                                        |
+| `name`           | `string`                                        |
+| `object_id`      | `string or null`                                |
+| `user_id`        | `string or null`                                |
+| `status`         | `enum(in_progress, on_check, draft, completed)` |
+| `deadline_date`  | `string or null`                                |
+| `departure_date` | `string or null`                                |
+| `description`    | `string or null`                                |
+| `createdAt`      | `string`                                        |
+| `updatedAt`      | `string`                                        |
 
 #### Task example
 
