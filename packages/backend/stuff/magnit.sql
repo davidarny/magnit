@@ -130,11 +130,9 @@ ALTER TYPE public.puzzle_type OWNER TO magnit;
 --
 
 CREATE TYPE public.status_type AS ENUM (
-    'assigned',
-    'inactive',
-    'inprogress',
-    'oncheck',
-    'overdue',
+    'in_progress',
+    'on_check',
+    'draft',
     'completed'
 );
 
