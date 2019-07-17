@@ -22,15 +22,14 @@
 -   [Table of Contents](#Table-of-Contents)
     -   [Requirements](#Requirements)
     -   [Project structure](#Project-structure)
-    -   [Usage](#Usage)
-        -   [Installation](#Installation)
-        -   [Running](#Running)
-            -   [Frontend](#Frontend)
-            -   [Backend](#Backend)
-            -   [Libraries](#Libraries)
-        -   [Testing](#Testing)
-        -   [Contributing](#Contributing)
-        -   [Documentation](#Documentation)
+    -   [Installation](#Installation)
+    -   [Running](#Running)
+        -   [Frontend](#Frontend)
+        -   [Backend](#Backend)
+        -   [Libraries](#Libraries)
+    -   [Testing](#Testing)
+    -   [Contributing](#Contributing)
+    -   [Documentation](#Documentation)
 
 ### Requirements
 
@@ -45,9 +44,7 @@ This project consists of 2 main parts
 -   [@magnit/backend](./packages/backend) - REST API server built on top of [sails.js](https://sailsjs.com/)
 -   [@magnit/frontend](./packages/frontend) - SPA application build on top of [React](https://reactjs.org/)
 
-### Usage
-
-#### Installation
+### Installation
 
 ```bash
 $ lerna bootstrap
@@ -83,9 +80,9 @@ Done in 0.11s.
 
 More info about `yarn workspaces` can be found [here](https://yarnpkg.com/en/docs/cli/workspaces)
 
-#### Running
+### Running
 
-##### Frontend
+#### Frontend
 
 To start frontend just run this command
 
@@ -93,7 +90,7 @@ To start frontend just run this command
 $ yarn start:frontend
 ```
 
-##### Backend
+#### Backend
 
 To start backend just run this command
 
@@ -101,7 +98,7 @@ To start backend just run this command
 $ yarn start:backend
 ```
 
-##### Libraries
+#### Libraries
 
 It's recommended to build all libraries before starting project
 
@@ -113,7 +110,7 @@ Also if you're developing a library, provide a `build:lib` script, which will pa
 
 You can find examples in [@magnit/template-editor](packages/template-editor/package.json) `package.json` file
 
-#### Testing
+### Testing
 
 ```bash
 $ lerna run test
@@ -121,12 +118,14 @@ $ lerna run test
 
 This will run tests in all packages that have `test` script in `package.json`
 
-#### Contributing
+### Contributing
 
 The recommended way to commit is using `yarn commit` command
 
 This script is using [commitizen](https://github.com/commitizen/cz-cli), as well as [commitlint](https://github.com/conventional-changelog/commitlint) as git `post-commit` hook
 
-#### Documentation
+### Documentation
 
-All the necessary documentation can be found [here](./docs)
+All the necessary documentation for architecture can be found [here](./docs)
+
+All the necessary documentation for backend APIs can be found [here](./packages/backend/docs)
