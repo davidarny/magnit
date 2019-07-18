@@ -5,10 +5,10 @@ import * as React from "react";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
 import { ReportsIcon, TasksIcon, TemplatesIcon, ExecutorIcon, ObjectIcon } from "@magnit/icons";
-import MagnitIcon from "assets/MagnitIcon.png";
 import _ from "lodash";
+import { MagnitIcon } from "./MagnitIcon";
 
-export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
+export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
     return (
         <Drawer
             variant="permanent"
@@ -43,13 +43,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}
                     >
                         <Link to="/">
-                            <img
-                                src={MagnitIcon}
-                                css={css`
-                                    max-width: 60px;
-                                `}
-                                alt="Магнит"
-                            />
+                            <MagnitIcon />
                         </Link>
                     </Grid>
                 </Grid>

@@ -63,9 +63,6 @@ export const TemplateList: React.FC = () => {
                         title="Создать шаблон"
                         scheme="blue"
                         icon={<AddIcon />}
-                        css={css`
-                            width: 180px;
-                        `}
                     />
                 </Grid>
             </SectionTitle>
@@ -79,9 +76,6 @@ export const TemplateList: React.FC = () => {
                             to="create"
                             icon={<AddIcon />}
                             title={"Создать шаблон"}
-                            css={css`
-                                width: 180px;
-                            `}
                         />
                     }
                     description={"Для создания шаблона нажмите кнопку"}

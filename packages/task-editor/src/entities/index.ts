@@ -1,5 +1,13 @@
 import * as React from "react";
 
+export interface IStep {
+    id: string;
+    title: string;
+    date: string;
+    completed: boolean;
+    editable?: boolean;
+}
+
 export interface ITask {
     id: string;
     title: string;

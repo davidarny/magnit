@@ -29,7 +29,7 @@ interface ICreateTaskProps {
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
-    const { task, service, documents, templates, focusedPuzzleId, templateSnapshots } = props;
+    const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
     return (
         <React.Fragment>
             <SelectableBlockWrapper
@@ -70,7 +70,6 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                                     value={
                                         task.stage.until ? getFriendlyDate(task.stage.until) : ""
                                     }
-                                    css={theme => ({ color: theme.colors.secondary })}
                                     placeholder="Срок выполнения"
                                 />
                             </Grid>
@@ -123,6 +122,20 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                         focused={focusedPuzzleId === document.__uuid}
                         id={document.__uuid}
                     >
+                        <Grid item xs={3}>
+                            <SelectField
+                                placeholder="Выбрать шаблон"
+                                value={document.id}
+                                fullWidth
+                                onChange={event => props.onTemplateChange(document.__uuid, event)}
+                            >
+                                {templates.map(template => (
+                                    <MenuItem key={template.id} value={template.id}>
+                                        {template.title}
+                                    </MenuItem>
+                                ))}
+                            </SelectField>
+                        </Grid>
                         <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
                             <Grid item xs={12}>
                                 {_.get(snapshot, "id") && (

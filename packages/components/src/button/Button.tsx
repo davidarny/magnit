@@ -7,12 +7,6 @@ import _ from "lodash";
 import { Link } from "@reach/router";
 
 const variants = {
-    main: (theme: any) => ({
-        transition: "0.25s",
-        borderRadius: theme.radius(5),
-        width: theme.spacing(20),
-        height: theme.spacing(5),
-    }),
     blue: ({ spacing, ...theme }: any) => ({
         color: theme.colors.white,
         border: `1px solid ${theme.colors.primary}`,
@@ -85,20 +79,23 @@ export const Button: React.FC<TButtonProps> = props => {
     return (
         <MaterialButton
             css={theme => ({
-                ...variants.main(theme),
-                ...variant(theme),
                 textTransform: "none",
                 position: "relative",
+                transition: "0.25s",
                 boxShadow: "none",
+                minWidth: theme.spacing(20),
+                minHeight: theme.spacing(5),
+                padding: `0 ${theme.spacing(2)}`,
+                borderRadius: theme.radius(5),
                 ":hover": { ..._.get(variant(theme), "hover", {}) },
                 ":active": { ..._.get(variant(theme), "active", {}) },
+                ...variant(theme),
             })}
             {...rest}
         >
             <div
                 css={theme => ({
                     height: theme.spacing(3),
-                    marginLeft: theme.spacing(-2),
                     marginRight: theme.spacing(),
                     svg: {
                         width: theme.spacing(3),

@@ -1,14 +1,25 @@
 /** @jsx jsx */
 
-import { jsx } from "@emotion/core";
+import { css, jsx } from "@emotion/core";
 import * as React from "react";
-import { Grid, Typography } from "@material-ui/core";
-import { ButtonLikeText, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
+import { useState } from "react";
+import { Dialog, Grid, MenuItem, Typography } from "@material-ui/core";
+import {
+    Button,
+    ButtonLikeText,
+    DateField,
+    SelectableBlockWrapper,
+    SelectField,
+    StepperWrapper,
+} from "@magnit/components";
 import { ETaskStatus, IEditorService } from "@magnit/services";
-import { IDocument, ITask } from "entities";
+import { IDocument, IStep, ITask } from "entities";
 import _ from "lodash";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
+import { AddIcon, CheckIcon } from "@magnit/icons";
+import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
+import uuid from "uuid/v4";
 
 interface IViewTaskProps {
     task: ITask;
@@ -17,52 +28,133 @@ interface IViewTaskProps {
     documents: IDocument[];
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
+
+    onAssigneeChange?(userId: string): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
-    const { service, task, documents, focusedPuzzleId, templateSnapshots } = props;
-    const realDocument = documents.filter(document => !!document.title);
-    const steps = [
+    const [open, setOpen] = useState(false);
+    const { service, task, focusedPuzzleId, templateSnapshots } = props;
+
+    let { documents } = props;
+    documents = documents.filter(document => !!document.title);
+
+    const [steps, setSteps] = useState<IStep[]>([
         {
-            title: (
-                <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                    Подготовка технического плана
-                </Typography>
-            ),
-            content: (
-                <Grid container direction={"column"}>
-                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
-                        до 07.07.2019 (просрочено)
-                    </Typography>
-                    <Typography css={theme => ({ fontSize: theme.fontSize.smaller })}>
-                        История изменений
-                    </Typography>
-                </Grid>
-            ),
+            id: uuid(),
+            title: "Подготовка технического плана",
+            date: "07.07.2019",
             completed: false,
+            editable: false,
         },
-        {
-            title: (
-                <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                    Подготовка технического плана
-                </Typography>
-            ),
-            content: (
-                <Grid container direction={"column"}>
-                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
-                        до 07.07.2019 (просрочено)
-                    </Typography>
-                    <Typography css={theme => ({ fontSize: theme.fontSize.smaller })}>
-                        История изменений
-                    </Typography>
-                </Grid>
-            ),
-            completed: false,
-        },
-    ];
+    ]);
+
+    function onDialogClose(): void {
+        setOpen(false);
+    }
+
+    function onAssigneeChange(): void {
+        setOpen(true);
+    }
+
+    function onAssigneeChangeComplete(): void {
+        setOpen(false);
+    }
+
+    function onAddStep(): void {
+        setSteps([
+            ...steps,
+            {
+                id: uuid(),
+                title: "",
+                date: "",
+                completed: false,
+                editable: true,
+            },
+        ]);
+    }
+
+    function onChangeStepTitle(id: string, value: string): void {
+        if (steps.some(step => step.id === id)) {
+            const stepIndex = steps.findIndex(step => step.id === id);
+            steps[stepIndex].title = value;
+            setSteps([...steps]);
+        }
+    }
+
+    function onChangeStepDate(id: string, value: string): void {
+        if (steps.some(step => step.id === id)) {
+            const stepIndex = steps.findIndex(step => step.id === id);
+            steps[stepIndex].date = value;
+            setSteps([...steps]);
+        }
+    }
+
+    function onStepDelete(id: string): void {
+        if (steps.some(step => step.id === id)) {
+            const stepIndex = steps.findIndex(step => step.id === id);
+            steps.splice(stepIndex, 1);
+            setSteps([...steps]);
+        }
+    }
 
     return (
         <React.Fragment>
+            <Dialog
+                onClose={onDialogClose}
+                open={open}
+                classes={{ paper: "paper" }}
+                css={css`
+                    .paper {
+                        overflow: hidden;
+                    }
+                `}
+            >
+                <Grid
+                    container
+                    spacing={2}
+                    direction="column"
+                    css={theme => ({
+                        padding: theme.spacing(6),
+                        minWidth: theme.spacing(50),
+                    })}
+                >
+                    <Grid item>
+                        <Grid container justify="center" alignItems="center">
+                            <Grid item>
+                                <ChangeAssigneIllustration />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item>
+                        <Typography css={theme => ({ fontSize: theme.fontSize.medium })}>
+                            Выберите исполнителя:
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <SelectField fullWidth placeholder="Выберите исполнителя">
+                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                        </SelectField>
+                    </Grid>
+                    <Grid item css={theme => ({ paddingTop: `${theme.spacing(5)} !important` })}>
+                        <Grid container justify="center" alignItems="center">
+                            <Grid item>
+                                <Button
+                                    icon={<CheckIcon />}
+                                    variant="contained"
+                                    scheme="blue"
+                                    title="Сохранить"
+                                    onClick={onAssigneeChangeComplete}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Dialog>
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
@@ -110,28 +202,62 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 <Grid container spacing={2}>
                     <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
                         <Grid container direction={"row"}>
-                            <MainInfo title="Администратор" value="Andrey_555" />
-                            <MainInfo title="Исполнитель" value="Рукастый Иннокентий Петрович" />
+                            <InfoField title="Администратор" value="SuperMegaAdmin" />
+                            <InfoField
+                                title="Исполнитель"
+                                value="Рукастый Иннокентий Петрович"
+                                editable
+                                label="Изменить исполнителя"
+                                onEditableClick={onAssigneeChange}
+                            />
                         </Grid>
                         <Grid
                             container
                             direction={"row"}
                             css={theme => ({ marginTop: theme.spacing(3) })}
                         >
-                            <MainInfo
+                            <InfoField
                                 title="Местоположение"
                                 value="Челябинская область, Челябинск, улица Железная, 5"
                             />
-                            <MainInfo title="Формат объекта" value="МК" />
+                            <InfoField title="Формат объекта" value="МК" />
                         </Grid>
                     </Grid>
                     <Grid item xs>
-                        <StepperWrapper steps={steps} />
+                        <StepperWrapper
+                            onTitleChange={onChangeStepTitle}
+                            onStepDelete={onStepDelete}
+                            steps={steps.map(step => ({
+                                id: step.id,
+                                editable: step.editable,
+                                completed: step.completed,
+                                title: step.title,
+                                content: (
+                                    <DateField
+                                        onChange={event =>
+                                            onChangeStepDate(step.id, event.target.value)
+                                        }
+                                        value={step.date}
+                                    />
+                                ),
+                            }))}
+                        />
+                        <Button
+                            variant="outlined"
+                            scheme="blueOutline"
+                            css={theme => ({
+                                color: theme.colors.primary,
+                                marginLeft: theme.spacing(6),
+                            })}
+                            icon={<AddIcon />}
+                            title="Добавить новый этап"
+                            onClick={onAddStep}
+                        />
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
-            {realDocument.length > 0 &&
-                realDocument.map(document => {
+            {documents.length > 0 &&
+                documents.map(document => {
                     const snapshot = templateSnapshots.get(document.id);
                     return (
                         <SelectableBlockWrapper
@@ -173,9 +299,13 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 interface IMainInfoProps {
     title: string;
     value: string;
+    editable?: boolean;
+    label?: string;
+
+    onEditableClick?(): void;
 }
 
-const MainInfo: React.FC<IMainInfoProps> = ({ title, value }) => {
+const InfoField: React.FC<IMainInfoProps> = ({ title, value, editable, label, ...props }) => {
     return (
         <Grid item xs>
             <Typography
@@ -195,6 +325,7 @@ const MainInfo: React.FC<IMainInfoProps> = ({ title, value }) => {
             >
                 {value}
             </Typography>
+            {editable && <ButtonLikeText onClick={props.onEditableClick}>{label}</ButtonLikeText>}
         </Grid>
     );
 };

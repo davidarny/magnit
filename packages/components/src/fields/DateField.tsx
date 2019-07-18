@@ -24,7 +24,7 @@ export const DateField: React.FC<TDateFieldProps> = props => {
                 disabled={disabled}
                 endAdornment={
                     <InputAdornment position="end">
-                        <CalendarIcon />
+                        <CalendarIcon css={theme => ({ color: theme.colors.secondary })} />
                     </InputAdornment>
                 }
                 css={theme => ({

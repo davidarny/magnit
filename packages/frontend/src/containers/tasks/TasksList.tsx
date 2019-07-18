@@ -74,9 +74,6 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                         title="Создать задание"
                         scheme="blue"
                         icon={<AddIcon />}
-                        css={css`
-                            width: 180px;
-                        `}
                     />
                 </Grid>
             </SectionTitle>
@@ -90,9 +87,6 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                             to="create"
                             icon={<AddIcon />}
                             title="Создать задание"
-                            css={css`
-                                width: 180px;
-                            `}
                         />
                     }
                     description="Для создания задания нажмите кнопку"
