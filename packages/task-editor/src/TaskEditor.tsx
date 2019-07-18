@@ -3,40 +3,31 @@
 
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import {
-    ButtonLikeText,
-    DateField,
-    EditorToolbar,
-    InputField,
-    SelectableBlockWrapper,
-    SelectField,
-} from "@magnit/components";
-import { Grid, MenuItem, Typography } from "@material-ui/core";
+import { EditorToolbar } from "@magnit/components";
 import { jsx } from "@emotion/core";
-import { TaskFieldContainer } from "./components/task-field-container";
 import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
 import _ from "lodash";
-import { EEditorType, ETerminals, getEditorService, getFriendlyDate } from "@magnit/services";
+import { EEditorType, ETerminals, getEditorService } from "@magnit/services";
 import uuid from "uuid/v4";
 import { IDocument, ITask, TChangeEvent } from "./entities";
-import { TemplateRenderer } from "./components/renderers";
-import { Link } from "@reach/router";
+import { ViewTask } from "./components/view-task";
+import { CreateTask } from "./components/create-task";
 
 interface IGetTemplate {
     template: object;
 }
 
 interface ITaskEditorProps {
-    initialState?: ITask;
+    task?: ITask;
     templates: Omit<IDocument, "__uuid">[];
-    variant?: "create" | "view";
+    variant: "create" | "view";
 
     getTemplate?(id: string): Promise<IGetTemplate>;
 }
 
 export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) => {
     const [task, setTask] = useState<ITask>(
-        props.initialState || {
+        props.task || {
             id: uuid(),
             stage: {
                 title: ETerminals.EMPTY,
@@ -165,137 +156,27 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                     },
                 ]}
             />
-            <SelectableBlockWrapper
-                css={theme => ({
-                    padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
-                })}
-                onFocus={service.current.onPuzzleFocus.bind(service.current, task.id)}
-                onMouseDown={service.current.onPuzzleFocus.bind(service.current, task.id)}
-                onBlur={service.current.onPuzzleBlur.bind(service.current)}
-                focused={focusedPuzzleId === task.id}
-                id={task.id}
-            >
-                <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                    <Grid item xs={12}>
-                        <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                            Основная информация
-                        </Typography>
-                    </Grid>
-                    <TaskFieldContainer label="Название задания">
-                        <InputField
-                            placeholder="Введите название задания"
-                            value={task.title}
-                            fullWidth
-                        />
-                    </TaskFieldContainer>
-                    <TaskFieldContainer label="Этап задания">
-                        <Grid container direction="row" alignItems="flex-end" spacing={2}>
-                            <Grid item xs>
-                                <InputField
-                                    placeholder="Введите название этапа"
-                                    value={task.stage.title}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item>
-                                <DateField
-                                    value={
-                                        task.stage.until ? getFriendlyDate(task.stage.until) : ""
-                                    }
-                                    css={theme => ({ color: theme.colors.secondary })}
-                                    placeholder="Срок выполнения"
-                                />
-                            </Grid>
-                        </Grid>
-                    </TaskFieldContainer>
-                    <TaskFieldContainer label="Местоположение">
-                        <Grid container direction="row" alignItems="flex-end" spacing={2}>
-                            <Grid item xs>
-                                <SelectField placeholder="Регион" fullWidth />
-                            </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Филиал" fullWidth />
-                            </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Формат" fullWidth />
-                            </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Адрес" fullWidth />
-                            </Grid>
-                        </Grid>
-                    </TaskFieldContainer>
-                    <TaskFieldContainer label="Исполнитель">
-                        <Grid item xs={4}>
-                            <SelectField placeholder="Выберите исполнителя" fullWidth />
-                        </Grid>
-                    </TaskFieldContainer>
-                </Grid>
-            </SelectableBlockWrapper>
-            <SelectableBlockWrapper css={theme => ({ padding: theme.spacing(3) })}>
-                <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                    <Grid item xs={12}>
-                        <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                            Документы
-                        </Typography>
-                    </Grid>
-                </Grid>
-            </SelectableBlockWrapper>
-            {documents.map(document => {
-                const snapshot = templateSnapshots.get(document.id);
-                return (
-                    <SelectableBlockWrapper
-                        key={document.__uuid}
-                        onFocus={service.current.onPuzzleFocus.bind(
-                            service.current,
-                            document.__uuid
-                        )}
-                        onMouseDown={service.current.onPuzzleFocus.bind(
-                            service.current,
-                            document.__uuid
-                        )}
-                        onBlur={service.current.onPuzzleBlur.bind(service.current)}
-                        css={theme => ({
-                            padding: theme.spacing(3),
-                            zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
-                        })}
-                        focused={focusedPuzzleId === document.__uuid}
-                        id={document.__uuid}
-                    >
-                        <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                            <Grid item xs={3}>
-                                <SelectField
-                                    placeholder="Выбрать шаблон"
-                                    value={document.id}
-                                    fullWidth
-                                    onChange={event => onTemplateChange(document.__uuid, event)}
-                                >
-                                    {templates.map(template => (
-                                        <MenuItem key={template.id} value={template.id}>
-                                            {template.title}
-                                        </MenuItem>
-                                    ))}
-                                </SelectField>
-                            </Grid>
-                            <Grid item xs={12}>
-                                {_.get(snapshot, "id") && (
-                                    <ButtonLikeText
-                                        component={Link}
-                                        to={`/templates/edit/${_.get(snapshot, "id")}`}
-                                        css={theme => ({
-                                            marginLeft: theme.spacing(),
-                                            marginTop: theme.spacing(2),
-                                        })}
-                                    >
-                                        Перейти к шаблону
-                                    </ButtonLikeText>
-                                )}
-                                <TemplateRenderer template={snapshot} />
-                            </Grid>
-                        </Grid>
-                    </SelectableBlockWrapper>
-                );
-            })}
+            {_.eq(props.variant, "create") && (
+                <CreateTask
+                    task={task}
+                    service={service.current}
+                    templates={templates}
+                    documents={documents}
+                    focusedPuzzleId={focusedPuzzleId}
+                    templateSnapshots={templateSnapshots}
+                    onTemplateChange={onTemplateChange}
+                />
+            )}
+            {_.eq(props.variant, "view") && (
+                <ViewTask
+                    task={task}
+                    service={service.current}
+                    templates={templates}
+                    documents={documents}
+                    focusedPuzzleId={focusedPuzzleId}
+                    templateSnapshots={templateSnapshots}
+                />
+            )}
         </React.Fragment>
     );
 };

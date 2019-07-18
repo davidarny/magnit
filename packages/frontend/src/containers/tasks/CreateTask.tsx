@@ -58,7 +58,11 @@ export const CreateTask: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TaskEditor templates={templates} getTemplate={getTemplateHandler} />
+                <TaskEditor
+                    variant="create"
+                    templates={templates}
+                    getTemplate={getTemplateHandler}
+                />
             </Grid>
         </SectionLayout>
     );

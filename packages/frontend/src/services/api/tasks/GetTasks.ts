@@ -1,5 +1,5 @@
 import { IResponse, ICourier } from "services/api";
-import { ETaskStatus } from "containers/tasks";
+import { ETaskStatus } from "@magnit/services";
 
 interface IGetTasksResponse extends IResponse {
     total: number;

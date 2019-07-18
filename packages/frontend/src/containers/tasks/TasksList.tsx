@@ -16,12 +16,12 @@ import {
     TabsWrapper,
 } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { ETaskStatus } from "./ETaskStatus";
 import { EmptyList } from "components/list";
 import { useContext, useEffect, useState } from "react";
 import _ from "lodash";
 import { getTasks } from "services/api";
 import { AppContext } from "context";
+import { ETaskStatus } from "@magnit/services";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS, label: "В работе" },

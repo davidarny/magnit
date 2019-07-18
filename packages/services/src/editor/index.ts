@@ -30,3 +30,5 @@ export function getEditorService(
             return new EditorServiceImpl(...args);
     }
 }
+
+export * from "./IEditorService";
