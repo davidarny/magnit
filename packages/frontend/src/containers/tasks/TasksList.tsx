@@ -33,21 +33,23 @@ const tabs: ITab[] = [
 const columns: IColumn[] = [
     { key: "name", label: "Название задания" },
     { key: "description", label: "Описание задания" },
-    { key: "status", label: "Статус" },
     { key: "deadlineDate", label: "Срок выполнения" },
     { key: "createdAt", label: "Дата создания" },
     { key: "updatedAt", label: "Дата последнего обновления" },
 ];
 
-export const TasksList: React.FC<RouteComponentProps> = () => {
+type TRouteProps = { "*": string };
+
+export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
+    const tab = props["*"];
     const context = useContext(AppContext);
     const [tasks, setTasks] = useState<object[]>([]);
 
     useEffect(() => {
-        getTasks(context.courier)
+        getTasks(context.courier, getTaskStatusByTab(tab))
             .then(response => setTasks(response.tasks))
             .catch(console.error);
-    }, [context.courier]);
+    }, [context.courier, tab]);
 
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
@@ -162,3 +164,10 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
         </SectionLayout>
     );
 };
+
+function getTaskStatusByTab(tab?: string): ETaskStatus {
+    if (!tab) {
+        return ETaskStatus.IN_PROGRESS;
+    }
+    return (tab as unknown) as ETaskStatus;
+}

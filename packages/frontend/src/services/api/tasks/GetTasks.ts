@@ -16,6 +16,8 @@ interface IGetTasksResponse extends IResponse {
     }>;
 }
 
-export async function getTasks(courier: ICourier) {
-    return courier.get<IGetTasksResponse>("tasks");
+export async function getTasks(courier: ICourier, status?: ETaskStatus) {
+    return courier.get<IGetTasksResponse>(
+        `tasks${status ? `?status=${status.replace(/-/g, "_")}` : ""}`
+    );
 }
