@@ -22,11 +22,16 @@ import { IDocument, ITask, TChangeEvent } from "./entities";
 import { TemplateRenderer } from "./components/renderers";
 import { Link } from "@reach/router";
 
+interface IGetTemplate {
+    template: object;
+}
+
 interface ITaskEditorProps {
     initialState?: ITask;
     templates: Omit<IDocument, "__uuid">[];
+    variant?: "create" | "view";
 
-    getTemplate?(id: string): Promise<{ template: object }>;
+    getTemplate?(id: string): Promise<IGetTemplate>;
 }
 
 export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) => {

@@ -34,6 +34,10 @@ export const CreateTask: React.FC = () => {
             .catch(console.error);
     }, [context.courier]);
 
+    function getTemplateHandler(id: string) {
+        return getTemplate(context.courier, _.toNumber(id));
+    }
+
     return (
         <SectionLayout>
             <SectionTitle title="Создание задания">
@@ -54,10 +58,7 @@ export const CreateTask: React.FC = () => {
                     position: "relative",
                 })}
             >
-                <TaskEditor
-                    templates={templates}
-                    getTemplate={(id: string) => getTemplate(context.courier, _.toNumber(id))}
-                />
+                <TaskEditor templates={templates} getTemplate={getTemplateHandler} />
             </Grid>
         </SectionLayout>
     );
