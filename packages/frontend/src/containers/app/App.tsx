@@ -12,7 +12,12 @@ import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware } from "services/ap
 import { AppContext } from "context";
 import { JsonParseMiddleware } from "../../services/api/middlewares/JsonParseMiddleware";
 
-// tasks
+// ████████╗ █████╗ ███████╗██╗  ██╗███████╗
+// ╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝██╔════╝
+//    ██║   ███████║███████╗█████╔╝ ███████╗
+//    ██║   ██╔══██║╚════██║██╔═██╗ ╚════██║
+//    ██║   ██║  ██║███████║██║  ██╗███████║
+//    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
 const AsyncTasksList = Loadable(({
     loader: () => import("containers/tasks").then(module => module.TasksList),
     loading: Loading,
@@ -25,12 +30,13 @@ const AsyncCreateTask = Loadable(({
     loader: () => import("containers/tasks").then(module => module.CreateTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
-const AsyncEditTask = Loadable(({
-    loader: () => import("containers/tasks").then(module => module.EditTask),
-    loading: Loading,
-} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
-// templates
+// ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
+// ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+//    ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
+//    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
+//    ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
+//    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
 const AsyncTemplates = Loadable(({
     loader: () => import("containers/templates").then(module => module.TemplateList),
     loading: Loading,
@@ -95,12 +101,25 @@ const App: React.FC = () => {
                 >
                     <AppContext.Provider value={{ courier: courier.current }}>
                         <Router>
-                            {/* tasks */}
+                            {/*
+                            ████████╗ █████╗ ███████╗██╗  ██╗███████╗
+                            ╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝██╔════╝
+                               ██║   ███████║███████╗█████╔╝ ███████╗
+                               ██║   ██╔══██║╚════██║██╔═██╗ ╚════██║
+                               ██║   ██║  ██║███████║██║  ██╗███████║
+                               ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+                            */}
                             <AsyncTasksList path="tasks/*" />
                             <AsyncCreateTask path="tasks/create" />
                             <AsyncViewTask path="tasks/view/:taskId" />
-                            <AsyncEditTask path="tasks/edit/:taskId" />
-                            {/* templates */}
+                            {/*
+                            ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
+                            ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
+                               ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
+                               ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
+                               ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
+                               ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
+                            */}
                             <AsyncTemplates path="templates" />
                             <AsyncCreateTemplate path="templates/create" />
                             <AsyncEditTemplate path="templates/edit/:templateId" />
