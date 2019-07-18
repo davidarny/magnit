@@ -92,9 +92,7 @@ export const TemplateList: React.FC = () => {
                     square={true}
                     css={theme => ({
                         margin: theme.spacing(3),
-                        boxShadow: `0px 0px ${theme.spacing(2)} ${
-                            theme.colors.lightGray
-                        } !important`,
+                        boxShadow: `0 0 ${theme.spacing(2)} ${theme.colors.lightGray} !important`,
                     })}
                 >
                     <Grid

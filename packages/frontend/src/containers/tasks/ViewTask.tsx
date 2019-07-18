@@ -6,7 +6,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { Button, SelectableBlockWrapper, StepperWrapper } from "@magnit/components";
-import { CheckIcon } from "@magnit/icons";
+import { SendIcon } from "@magnit/icons";
 import { ETaskStatus } from "./ETaskStatus";
 
 export const ViewTask: React.FC = () => {
@@ -63,23 +63,9 @@ export const ViewTask: React.FC = () => {
                 <Grid item>
                     <Button
                         variant="contained"
-                        title="Завершить"
-                        scheme="green"
-                        icon={<CheckIcon />}
-                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                    />
-                    <Button
-                        variant="contained"
                         title="Отправить"
-                        scheme="violet"
-                        icon={<CheckIcon />}
-                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                    />
-                    <Button
-                        variant="contained"
-                        title="Редактировать"
-                        scheme="blueOutline"
-                        icon={<CheckIcon />}
+                        scheme="blue"
+                        icon={<SendIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
                 </Grid>

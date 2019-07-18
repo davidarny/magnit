@@ -5,7 +5,7 @@ import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
 import { IIconProps } from "./IIconProps";
 
-export const SectionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
+export const SectionIcon: React.FC<IIconProps> = ({ size = 30, ...props }) => {
     return (
         <SvgIcon
             width={size}
@@ -16,6 +16,7 @@ export const SectionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
                 width: ${size}px;
                 height: ${size}px;
             `}
+            {...props}
         >
             <rect
                 x="3"
@@ -23,7 +24,7 @@ export const SectionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
                 width="22.5"
                 height="5.5"
                 rx="1"
-                stroke="#2F97FF"
+                stroke="currentColor"
                 strokeWidth="1.5"
             />
             <rect
@@ -32,7 +33,7 @@ export const SectionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
                 width="22.5"
                 height="5.5"
                 rx="1"
-                stroke="#2F97FF"
+                stroke="currentColor"
                 strokeWidth="1.5"
             />
         </SvgIcon>

@@ -18,9 +18,7 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
         <Paper
             {...rest}
             css={theme => ({
-                boxShadow: focused
-                    ? `0px 0px ${theme.spacing(2)} ${theme.colors.shadowGray}`
-                    : "none",
+                boxShadow: focused ? `0 0 ${theme.spacing(2)} ${theme.colors.shadowGray}` : "none",
                 position: "relative",
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,

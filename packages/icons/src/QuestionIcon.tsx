@@ -5,7 +5,7 @@ import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
 import { IIconProps } from "./IIconProps";
 
-export const QuestionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
+export const QuestionIcon: React.FC<IIconProps> = ({ size = 30, ...props }) => {
     return (
         <SvgIcon
             width={size}
@@ -16,15 +16,16 @@ export const QuestionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
                 width: ${size}px;
                 height: ${size}px;
             `}
+            {...props}
         >
-            <circle cx="15" cy="15" r="13" stroke="#2F97FF" strokeWidth="1.5" />
+            <circle cx="15" cy="15" r="13" stroke="currentColor" strokeWidth="1.5" />
             <rect
                 x="14.0625"
                 y="9.84375"
                 width="1.875"
                 height="10.3125"
                 rx="0.9375"
-                fill="#2F97FF"
+                fill="currentColor"
             />
             <rect
                 x="9.84375"
@@ -33,7 +34,7 @@ export const QuestionIcon: React.FC<IIconProps> = ({ size = 30 }) => {
                 height="10.3125"
                 rx="0.9375"
                 transform="rotate(-90 9.84375 15.9375)"
-                fill="#2F97FF"
+                fill="currentColor"
             />
         </SvgIcon>
     );

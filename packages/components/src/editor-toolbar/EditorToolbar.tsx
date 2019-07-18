@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { Grid, IconButton, Paper } from "@material-ui/core";
-import { jsx } from "@emotion/core";
 
 interface IPuzzleToolbarProps {
     right?: number;
@@ -24,7 +24,8 @@ export const EditorToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 top: 0,
                 transform: `translateY(${top}px)`,
                 transition: "transform 0.3s ease-in-out !important",
-                boxShadow: "0px 0px 16px #bfc8d2 !important",
+                boxShadow: `0 0 ${theme.spacing(2)} ${theme.colors.shadowGray} !important`,
+                color: theme.colors.primary,
             })}
             className="toolbar"
         >
@@ -38,7 +39,16 @@ export const EditorToolbar: React.FC<IPuzzleToolbarProps> = ({ right = 0, top = 
                 {props.items.map(({ label, action, icon }, index) => (
                     <Grid item css={theme => ({ marginBottom: theme.spacing() })} key={index}>
                         <Grid container justify="center" alignItems="center">
-                            <IconButton color="primary" aria-label={label} onClick={action}>
+                            <IconButton
+                                color="inherit"
+                                css={theme => ({
+                                    color:
+                                        index === props.items.length - 1
+                                            ? theme.colors.gray
+                                            : "inherit",
+                                })}
+                                onClick={action}
+                            >
                                 {icon}
                             </IconButton>
                         </Grid>

@@ -5,7 +5,7 @@ import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
 import { IIconProps } from "./IIconProps";
 
-export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = false }) => {
+export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, ...props }) => {
     return (
         <SvgIcon
             width={size}
@@ -16,6 +16,7 @@ export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = fals
                 width: ${size}px;
                 height: ${size}px;
             `}
+            {...props}
         >
             <rect
                 x="5.75"
@@ -23,7 +24,7 @@ export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = fals
                 width="24.5"
                 height="20.5"
                 rx="1.25"
-                stroke={isActive ? "#2F97FF" : "#AAB4BE"}
+                stroke="currentColor"
                 strokeWidth="1.5"
             />
             <mask id="path-2-inside-1" fill="white">
@@ -35,7 +36,7 @@ export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = fals
                 width="6"
                 height="6.5"
                 rx="0.5"
-                stroke={isActive ? "#2F97FF" : "#AAB4BE"}
+                stroke="currentColor"
                 strokeWidth="3"
                 mask="url(#path-2-inside-1)"
             />
@@ -48,7 +49,7 @@ export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = fals
                 width="10"
                 height="6.5"
                 rx="0.5"
-                stroke={isActive ? "#2F97FF" : "#AAB4BE"}
+                stroke="currentColor"
                 strokeWidth="3"
                 mask="url(#path-3-inside-2)"
             />
@@ -61,8 +62,8 @@ export const TemplatesIcon: React.FC<IIconProps> = ({ size = 36, isActive = fals
                 width="24"
                 height="1.5"
                 rx="0.4"
-                fill={isActive ? "#2F97FF" : "#AAB4BE"}
-                stroke={isActive ? "#2F97FF" : "#AAB4BE"}
+                fill="currentColor"
+                stroke="currentColor"
                 mask="url(#path-4-inside-3)"
             />
         </SvgIcon>

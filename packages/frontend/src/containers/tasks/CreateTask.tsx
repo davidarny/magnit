@@ -1,14 +1,14 @@
 /** @jsx jsx */
 
 import * as React from "react";
+import { useContext, useEffect, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { CheckIcon } from "@magnit/icons";
+import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
-import { useContext, useEffect, useState } from "react";
 import { AppContext } from "context";
 import { getTemplate, getTemplates } from "services/api";
 import _ from "lodash";
@@ -40,16 +40,9 @@ export const CreateTask: React.FC = () => {
                 <Grid item>
                     <Button
                         variant="contained"
-                        title="Сохранить"
-                        scheme="green"
-                        icon={<CheckIcon />}
-                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                    />
-                    <Button
-                        variant="contained"
                         title="Отправить"
-                        scheme="violet"
-                        icon={<CheckIcon />}
+                        scheme="blue"
+                        icon={<SendIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                     />
                 </Grid>

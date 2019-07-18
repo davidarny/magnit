@@ -61,7 +61,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                         { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
                         { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
                     ].map(({ text, icon: Icon, to }) => {
-                        const isActive = _.get(location, "pathname", "").indexOf(to) !== -1;
+                        const active = _.get(location, "pathname", "").indexOf(to) !== -1;
                         return (
                             <ListItem
                                 component={Link}
@@ -101,8 +101,8 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                             height: theme.spacing(8),
                                             borderTopRightRadius: theme.radius(0.5),
                                             borderBottomRightRadius: theme.radius(0.5),
-                                            background: isActive ? theme.colors.primary : "none",
-                                            boxShadow: isActive
+                                            background: active ? theme.colors.primary : "none",
+                                            boxShadow: active
                                                 ? `1px 0 ${theme.colors.shadowBlue}40`
                                                 : "none",
                                         })}
@@ -118,7 +118,13 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                         <ListItemIcon>
                                             <Grid container justify="center" alignItems="center">
                                                 <Grid item>
-                                                    <Icon isActive={isActive} />
+                                                    <Icon
+                                                        css={theme => ({
+                                                            color: active
+                                                                ? theme.colors.primary
+                                                                : theme.colors.gray,
+                                                        })}
+                                                    />
                                                 </Grid>
                                             </Grid>
                                         </ListItemIcon>
@@ -126,7 +132,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location = {} }) => {
                                     <Grid item>
                                         <Typography
                                             css={theme => ({
-                                                color: isActive
+                                                color: active
                                                     ? theme.colors.primary
                                                     : theme.colors.gray,
                                                 fontSize: theme.fontSize.small,

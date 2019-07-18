@@ -5,7 +5,7 @@ import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
 import { IIconProps } from "./IIconProps";
 
-export const TrashIcon: React.FC<IIconProps> = ({ size = 30, ...props }) => {
+export const SendIcon: React.FC<IIconProps> = ({ size = 22, ...props }) => {
     return (
         <SvgIcon
             width={size}
@@ -19,10 +19,13 @@ export const TrashIcon: React.FC<IIconProps> = ({ size = 30, ...props }) => {
             {...props}
         >
             <path
-                d="M11.8367 6.40625L12.1847 5.72473L12.5548 5H17.4452L17.8153 5.72473L18.1633 6.40625H18.9286H23.75V6.71875H6.25V6.40625H11.0714H11.8367ZM22.2393 10.625L21.3776 24.1923C21.3495 24.6299 20.9734 25 20.4866 25H9.51339C9.02676 25 8.65071 24.6301 8.62245 24.1926C8.62244 24.1925 8.62243 24.1924 8.62243 24.1923L7.76075 10.625H22.2393Z"
+                d="M16.5 5.5L5.5 9.35L10.45 11.55L12.65 16.5L16.5 5.5Z"
                 stroke="currentColor"
-                strokeWidth="2.5"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
+            <path d="M10.5416 11.4583L16.5 5.5" stroke="currentColor" strokeWidth="1.5" />
         </SvgIcon>
     );
 };

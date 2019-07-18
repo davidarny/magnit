@@ -103,7 +103,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                     square={true}
                     css={({ spacing, ...theme }) => ({
                         margin: spacing(3),
-                        boxShadow: `0px 0px ${spacing(2)} ${theme.colors.lightGray} !important`,
+                        boxShadow: `0 0 ${spacing(2)} ${theme.colors.lightGray} !important`,
                     })}
                 >
                     <Grid
