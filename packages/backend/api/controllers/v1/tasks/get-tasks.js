@@ -20,6 +20,9 @@ module.exports = {
         name: {
             type: "string",
         },
+        status: {
+            type: "string",
+        },
     },
 
     exits: {
@@ -37,11 +40,16 @@ module.exports = {
             const limit = _.escape(inputs.limit);
             const sort = _.escape(inputs.sort);
             const name = _.escape(inputs.name);
+            const status = _.escape(inputs.status);
 
             const criteria = {};
 
             if (name) {
                 criteria.title = name;
+            }
+
+            if (status) {
+                criteria.status = status;
             }
 
             const total = await Task.count(criteria);
