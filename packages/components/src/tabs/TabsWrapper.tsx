@@ -14,23 +14,16 @@ export interface ITab {
 
 interface ITabsWrapperProps {
     tabs: ITab[];
-    baseUrl?: string; // to handle nested paths
 }
 
-export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", children }) => {
+export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, children }) => {
     const [tab, setTab] = useState(0);
-
-    function getBaseUrlPath(value: string): string {
-        return `${baseUrl ? baseUrl + "/" : ""}${value}`;
-    }
 
     return (
         <React.Fragment>
             <RouteMatcher
                 routes={tabs.map(({ value }, index) => ({
-                    ...(index === 0
-                        ? { paths: [getBaseUrlPath(""), getBaseUrlPath(value)] }
-                        : { path: getBaseUrlPath(value) }),
+                    ...(index === 0 ? { paths: ["", value] } : { path: value }),
                     render: () => setTab(index),
                 }))}
             />
@@ -55,7 +48,7 @@ export const TabsWrapper: React.FC<ITabsWrapperProps> = ({ tabs, baseUrl = "", c
                     return (
                         <Tab
                             component={Link}
-                            to={getBaseUrlPath(value)}
+                            to={value}
                             key={index}
                             css={theme => ({
                                 textTransform: "none",

@@ -109,7 +109,7 @@ export const TasksList: React.FC<RouteComponentProps> = () => {
                         direction="row"
                         css={theme => ({ marginTop: theme.spacing(2) })}
                     >
-                        <TabsWrapper tabs={tabs} baseUrl="tasks">
+                        <TabsWrapper tabs={tabs}>
                             <Grid
                                 container
                                 direction="column"

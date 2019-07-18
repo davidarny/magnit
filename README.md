@@ -9,7 +9,7 @@
   <h4 align="center">Monorepo for internal Omega-R project Магнит "Опросный Лист"</h4>
 
   <p align="center">
-    <a href="https://magnit-omega-r.herokuapp.com/">View Demo</a>
+    <a href="http://magnit-omega-r.herokuapp.com/">View Demo</a>
     ·
     <a href="https://github.com/DavidArutiunian/magnit/issues">Report Bug</a>
     ·
