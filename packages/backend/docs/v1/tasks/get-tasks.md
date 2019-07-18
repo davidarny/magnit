@@ -10,12 +10,13 @@
 
 #### URL params
 
-| Name     | Type              | Required | Default |
-| -------- | ----------------- | -------- | ------- |
-| `offset` | `integer`         | `false`  | 0       |
-| `limit`  | `integer`         | `false`  | 10      |
-| `sort`   | `enum(ASC, DESC)` | `false`  | `ASC`   |
-| `name`   | `string`          | `false`  |         |
+| Name     | Type                                            | Required | Default |
+| -------- | ----------------------------------------------- | -------- | ------- |
+| `offset` | `integer`                                       | `false`  | 0       |
+| `limit`  | `integer`                                       | `false`  | 10      |
+| `sort`   | `enum(ASC, DESC)`                               | `false`  | `ASC`   |
+| `name`   | `string`                                        | `false`  |         |
+| `status` | `enum(in_progress, on_check, draft, completed)` | `false`  |         |
 
 #### Success response
 
