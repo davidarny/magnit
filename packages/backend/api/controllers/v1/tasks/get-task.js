@@ -29,10 +29,10 @@ module.exports = {
                 return exits.notFound({ success: 0, message: "Task does not exist" });
             }
 
-            const taskTemplates = await TaskTemplate.find({ task_id: taskId });
+            const tasksWithTemplates = await TaskTemplate.find({ task_id: taskId });
 
-            if (taskTemplates.length > 0) {
-                task.templates = taskTemplates.map(document => document.template_id);
+            if (tasksWithTemplates.length > 0) {
+                task.templates = tasksWithTemplates.map(document => document.template_id);
             }
 
             return exits.success({ success: 1, task });

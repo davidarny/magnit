@@ -2,7 +2,7 @@
 
 #### URL
 
-`/v1/tasks/:id`
+`/v1/tasks/:id/extended`
 
 #### Method
 
@@ -38,7 +38,8 @@
 | `deadline_date`  | `string or null`                                |
 | `departure_date` | `string or null`                                |
 | `description`    | `string or null`                                |
-| `templates`      | `<array of numbers>`                            |
+| `templates`      | `<array of Templates>`                          |
+| `estimates`      | `<array of Estimates>`                          |
 | `createdAt`      | `string`                                        |
 | `updatedAt`      | `string`                                        |
 
@@ -54,16 +55,47 @@
     "deadline_date": null,
     "departure_date": null,
     "description": null,
-    "templates": [1, 2],
+    "templates": [
+        {
+            "description": null,
+            "id": 1,
+            "title": "Template 1",
+            "type": null
+        }
+    ],
     "createdAt": "2019-07-17T10:38:01.807Z",
     "updatedAt": "2019-07-17T10:38:01.807Z"
+}
+```
+
+#### Estimate schema
+
+| Property name | Property type |
+| ------------- | ------------- |
+| `id`          | `number`      |
+| `ttile`       | `string`      |
+| `template_id` | `string`      |
+| `unit`        | `string`      |
+| `count`       | `number`      |
+| `cost`        | `number`      |
+
+#### Estimate example
+
+```json
+{
+    "cost": 250279,
+    "count": 7624,
+    "id": 1,
+    "template_id": 1,
+    "title": "Template 1",
+    "unit": "м3"
 }
 ```
 
 #### Sample call
 
 ```javascript
-const response = await fetch("/v1/templates/17", {
+const response = await fetch("/v1/templates/17/extended", {
     credentials: "same-origin",
     method: "GET",
 });

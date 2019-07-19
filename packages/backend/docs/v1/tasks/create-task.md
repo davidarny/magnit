@@ -46,7 +46,7 @@
 ```json
 {
     "id": 8,
-    "name": "task1",
+    "name": "Task 1",
     "object_id": null,
     "user_id": null,
     "status": "inactive",
