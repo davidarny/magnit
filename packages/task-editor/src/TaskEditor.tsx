@@ -25,7 +25,7 @@ interface ITaskEditorProps {
     getTemplate?(id: string): Promise<IGetTemplate>;
 }
 
-export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) => {
+export const TaskEditor: React.FC<ITaskEditorProps> = props => {
     const [task, setTask] = useState<ITask>(
         props.task || {
             id: uuid(),
@@ -41,7 +41,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 branch: ETerminals.EMPTY,
                 format: ETerminals.EMPTY,
             },
-            documents: [],
+            templates: [],
         }
     );
     const [documents, setDocuments] = useState<IDocument[]>([]);
@@ -60,11 +60,14 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         service.current.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
 
-    // if no documents present (initially)
-    // we add one stub document, so user won't
-    // add it by himself
+    // if no templates present (initially)
+    // we add one stub document
     useEffect(() => {
-        if (_.isEmpty(task.documents)) {
+        if (props.variant !== "create") {
+            return;
+        }
+        if (_.isEmpty(task.templates)) {
+            console.log(1);
             setDocuments([
                 {
                     title: ETerminals.EMPTY,
@@ -75,20 +78,47 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
         }
     }, []);
 
+    const templates = _.get(props.task, "templates", []) as string[];
+    useEffect(() => {
+        if (props.variant !== "view" || !props.getTemplate) {
+            return;
+        }
+        Promise.all(
+            templates.map(async id =>
+                props.getTemplate!(id)
+                    .then(response => response.template)
+                    .then(template => {
+                        templateSnapshots.set(id, template);
+                        setTemplateSnapshots(new Map(templateSnapshots));
+                        return template;
+                    })
+                    .then(template => ({
+                        id: _.get(template, "id"),
+                        title: _.get(template, "title"),
+                        __uuid: uuid(),
+                    }))
+            )
+        )
+            .then(documents => setDocuments(([...documents] as unknown) as IDocument[]))
+            .catch(console.error);
+    }, [templates]);
+
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
     // on every documents change we have to
     // update current task with their id's
     // also caching template JSON for current active document
     useEffect(() => {
+        if (props.variant !== "create") {
+            return;
+        }
         setTask({
             ...task,
-            documents: documents.map(document => document.id),
+            templates: documents.map(document => document.id),
         });
         if (documents.some(document => document.__uuid === focusedPuzzleId)) {
             const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
-            props.getTemplate &&
-                documentId &&
+            if (props.getTemplate && documentId) {
                 props
                     .getTemplate(documentId)
                     .then(response => response.template)
@@ -96,10 +126,12 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                         templateSnapshots.set(documentId, template);
                         setTemplateSnapshots(new Map(templateSnapshots));
                     });
+            }
         }
     }, [documents]);
 
     function onTemplateChange(uuid: string, event: TChangeEvent): void {
+        const { templates } = props;
         const templateId = event.target.value as string;
         if (documents.some(document => document.__uuid === uuid)) {
             const templateIndex = templates.findIndex(template => template.id === templateId);
@@ -160,7 +192,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 <CreateTask
                     task={task}
                     service={service.current}
-                    templates={templates}
+                    templates={props.templates}
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
@@ -171,7 +203,6 @@ export const TaskEditor: React.FC<ITaskEditorProps> = ({ templates, ...props }) 
                 <ViewTask
                     task={task}
                     service={service.current}
-                    templates={templates}
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}

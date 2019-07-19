@@ -1,9 +1,8 @@
 import { IResponse, ICourier } from "services/api";
 import { ETaskStatus } from "@magnit/services";
 
-interface IGetTasksResponse extends IResponse {
-    total: number;
-    tasks: Array<{
+interface IGetTaskResponse extends IResponse {
+    task: {
         id: number;
         name: string;
         objectId: string | null;
@@ -14,11 +13,9 @@ interface IGetTasksResponse extends IResponse {
         descriptions: string;
         templates: string[];
         updatedAt: string;
-    }>;
+    };
 }
 
-export async function getTasks(courier: ICourier, status?: ETaskStatus) {
-    return courier.get<IGetTasksResponse>(
-        `tasks${status ? `?status=${status.replace(/-/g, "_")}` : ""}`
-    );
+export async function getTask(courier: ICourier, id: number) {
+    return courier.get<IGetTaskResponse>(`tasks/${id}`);
 }

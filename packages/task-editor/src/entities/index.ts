@@ -22,7 +22,7 @@ export interface ITask {
         address: string;
     };
     assignee: string;
-    documents: string[];
+    templates: string[];
 }
 
 export interface IDocument {

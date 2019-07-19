@@ -15,7 +15,6 @@ import {
 import { ETaskStatus, IEditorService } from "@magnit/services";
 import { IDocument, IStep, ITask } from "entities";
 import _ from "lodash";
-import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
 import { AddIcon, CheckIcon } from "@magnit/icons";
 import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
@@ -24,7 +23,6 @@ import uuid from "uuid/v4";
 interface IViewTaskProps {
     task: ITask;
     service: IEditorService;
-    templates: Omit<IDocument, "__uuid">[];
     documents: IDocument[];
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
@@ -259,6 +257,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             {documents.length > 0 &&
                 documents.map(document => {
                     const snapshot = templateSnapshots.get(document.id);
+                    const focused = focusedPuzzleId === document.__uuid;
                     return (
                         <SelectableBlockWrapper
                             key={document.__uuid}
@@ -269,24 +268,17 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 padding: theme.spacing(3),
                                 zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
                             })}
-                            focused={focusedPuzzleId === document.__uuid}
+                            focused={focused}
                             id={document.__uuid}
                         >
                             <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
                                 <Grid item xs={12}>
-                                    {_.get(snapshot, "id") && (
-                                        <ButtonLikeText
-                                            component={Link}
-                                            to={`/templates/edit/${_.get(snapshot, "id")}`}
-                                            css={theme => ({
-                                                marginLeft: theme.spacing(),
-                                                marginTop: theme.spacing(2),
-                                            })}
-                                        >
-                                            Перейти к шаблону
-                                        </ButtonLikeText>
-                                    )}
-                                    <TemplateRenderer template={snapshot} />
+                                    <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
+                                        {_.get(snapshot, "title")}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    {focused && <TemplateRenderer template={snapshot} />}
                                 </Grid>
                             </Grid>
                         </SelectableBlockWrapper>
