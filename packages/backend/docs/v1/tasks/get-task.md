@@ -38,6 +38,7 @@
 | `deadline_date`  | `string or null`                                |
 | `departure_date` | `string or null`                                |
 | `description`    | `string or null`                                |
+| `templates`      | `<array of numbers>`                            |
 | `createdAt`      | `string`                                        |
 | `updatedAt`      | `string`                                        |
 
@@ -53,6 +54,7 @@
     "deadline_date": null,
     "departure_date": null,
     "description": null,
+    "templates": [1, 2],
     "createdAt": "2019-07-17T10:38:01.807Z",
     "updatedAt": "2019-07-17T10:38:01.807Z"
 }

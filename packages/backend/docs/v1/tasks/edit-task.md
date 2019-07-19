@@ -32,6 +32,38 @@
 | --------------- | -------------------------------------------------- |
 | `404 NOT FOUND` | `{"success": 0, "message": "Task does not exist"}` |
 
+#### Task schema
+
+| Property name    | Property type                                   |
+| ---------------- | ----------------------------------------------- |
+| `id`             | `number`                                        |
+| `name`           | `string`                                        |
+| `object_id`      | `string or null`                                |
+| `user_id`        | `string or null`                                |
+| `status`         | `enum(in_progress, on_check, draft, completed)` |
+| `deadline_date`  | `string or null`                                |
+| `departure_date` | `string or null`                                |
+| `description`    | `string or null`                                |
+| `createdAt`      | `string`                                        |
+| `updatedAt`      | `string`                                        |
+
+#### Task example
+
+```json
+{
+    "id": 8,
+    "name": "task1",
+    "object_id": null,
+    "user_id": null,
+    "status": "inactive",
+    "deadline_date": null,
+    "departure_date": null,
+    "description": null,
+    "createdAt": "2019-07-17T10:38:01.807Z",
+    "updatedAt": "2019-07-17T10:38:01.807Z"
+}
+```
+
 #### Sample call
 
 ```javascript

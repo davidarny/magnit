@@ -31,19 +31,19 @@ module.exports = {
 
     fn: async function(inputs, exits) {
         try {
-            const id = _.escape(inputs.id);
+            const taskId = _.escape(inputs.id);
             const task = inputs.task;
 
             // check if task exists
             {
-                const task = await Task.findOne({ id });
+                const task = await Task.findOne({ id: taskId });
 
                 if (!task) {
                     return exits.notFound({ success: 0, message: "Task does not exist" });
                 }
             }
 
-            await Task.updateOne({ id }).set(task);
+            await Task.updateOne({ id: taskId }).set(task);
 
             return exits.success({ success: 1 });
         } catch (err) {

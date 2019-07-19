@@ -24,9 +24,9 @@ module.exports = {
 
     fn: async function(inputs, exits) {
         try {
-            const id = _.escape(inputs.id);
+            const taskId = _.escape(inputs.id);
 
-            const task = await Task.findOne({ id: id });
+            const task = await Task.findOne({ id: taskId });
 
             if (!task) {
                 return exits.notFound({ success: 0, message: "Task does not exist" });

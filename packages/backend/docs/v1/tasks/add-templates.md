@@ -1,30 +1,37 @@
-## Create Task
+## Add Templates to Task
 
 #### URL
 
-`/v1/tasks`
+`/v1/tasks/:id/templates`
 
 #### Method
 
-`POST`
+`PUT`
+
+#### URL params
+
+| Name | Type      | Required |
+| ---- | --------- | -------- |
+| `id` | `integer` | `true`   |
 
 #### Body params
 
-| Name   | Type   | Required |
-| ------ | ------ | -------- |
-| `task` | `JSON` | `true`   |
+| Name        | Type                 | Required |
+| ----------- | -------------------- | -------- |
+| `templates` | `<array of numbers>` | `true`   |
 
 #### Success response
 
-| Code     | Content                                   |
-| -------- | ----------------------------------------- |
-| `200 OK` | `{"success": 1, "template_id": <number>}` |
+| Code     | Content          |
+| -------- | ---------------- |
+| `200 OK` | `{"success": 1}` |
 
 #### Error responses
 
-| Code              | Content                                       |
-| ----------------- | --------------------------------------------- |
-| `400 BAD REQUEST` | `{"success": 0, "message": "Not valid JSON"}` |
+| Code              | Content                                                        |
+| ----------------- | -------------------------------------------------------------- |
+| `400 BAD REQUEST` | `{"success": 0, "message": "Not valid JSON"}`                  |
+| `404 NOT FOUND`   | `{"success": 0, "message": "Template missing for one of IDs"}` |
 
 #### Task schema
 
@@ -61,9 +68,9 @@
 #### Sample call
 
 ```javascript
-const response = await fetch("/v1/tasks", {
+const response = await fetch("/v1/tasks/1/templates", {
     credentials: "same-origin",
-    method: "POST",
+    method: "PUT",
     headers: {
         "Content-Type": "application/json",
     },

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { SectionTitle } from "components/section-title";

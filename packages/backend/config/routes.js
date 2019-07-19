@@ -48,4 +48,5 @@ module.exports.routes = {
     "GET /v1/tasks": "v1/tasks/get-tasks",
     "GET /v1/tasks/:id": "v1/tasks/get-task",
     "PUT /v1/tasks/:id": "v1/tasks/edit-task",
+    "PUT /v1/tasks/:id/templates": "v1/tasks/add-templates",
 };

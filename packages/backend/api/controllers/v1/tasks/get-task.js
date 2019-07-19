@@ -21,12 +21,18 @@ module.exports = {
 
     fn: async function(inputs, exits) {
         try {
-            const id = _.escape(inputs.id);
+            const taskId = _.escape(inputs.id);
 
-            const task = await Task.findOne({ id });
+            const task = await Task.findOne({ id: taskId });
 
             if (!task) {
                 return exits.notFound({ success: 0, message: "Task does not exist" });
+            }
+
+            const taskTemplates = await TaskTemplate.find({ task_id: taskId });
+
+            if (taskTemplates.length > 0) {
+                task.templates = taskTemplates.map(document => document.template_id);
             }
 
             return exits.success({ success: 1, task });

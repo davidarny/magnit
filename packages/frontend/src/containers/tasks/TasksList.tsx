@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { Grid, Paper } from "@material-ui/core";
 import * as React from "react";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
