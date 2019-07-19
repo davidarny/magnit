@@ -63,6 +63,16 @@
             "type": null
         }
     ],
+    "estimates": [
+        {
+            "cost": 250279,
+            "count": 7624,
+            "id": 1,
+            "template_id": 1,
+            "title": "Template 1",
+            "unit": "м3"
+        }
+    ],
     "createdAt": "2019-07-17T10:38:01.807Z",
     "updatedAt": "2019-07-17T10:38:01.807Z"
 }
