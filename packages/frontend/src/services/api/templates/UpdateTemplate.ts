@@ -3,6 +3,8 @@ import _ from "lodash";
 import { traverse } from "@magnit/template-editor";
 import { toSnakeCase } from "services/string";
 
+export interface IUpdateTemplateResponse extends IResponse {}
+
 export async function updateTemplate(courier: ICourier, id: number, template: object) {
     const buffer = _.cloneDeep(template);
     // convert all props to snake_case before saving
@@ -14,5 +16,5 @@ export async function updateTemplate(courier: ICourier, id: number, template: ob
             });
         }
     });
-    return courier.put<IResponse>(`templates/${id}`, { template: buffer });
+    return courier.put<IUpdateTemplateResponse>(`templates/${id}`, { template: buffer });
 }

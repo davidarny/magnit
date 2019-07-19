@@ -16,9 +16,9 @@
 
 #### Success response
 
-| Code     | Content                                   |
-| -------- | ----------------------------------------- |
-| `200 OK` | `{"success": 1, "template_id": <number>}` |
+| Code     | Content                               |
+| -------- | ------------------------------------- |
+| `200 OK` | `{"success": 1, "task_id": <number>}` |
 
 #### Error responses
 

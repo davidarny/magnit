@@ -256,7 +256,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             </SelectableBlockWrapper>
             {documents.length > 0 &&
                 documents.map(document => {
-                    const snapshot = templateSnapshots.get(document.id);
+                    const snapshot = templateSnapshots.get(document.id.toString());
                     const focused = focusedPuzzleId === document.__uuid;
                     return (
                         <SelectableBlockWrapper

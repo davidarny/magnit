@@ -4,7 +4,7 @@ import _ from "lodash";
 import { toSnakeCase } from "services/string";
 
 interface ICreateTemplateResponse extends IResponse {
-    template_id: number;
+    templateId: number;
 }
 
 export async function createTemplate(courier: ICourier, template: object) {

@@ -10,7 +10,7 @@ import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
 import { ITask, TaskEditor } from "@magnit/task-editor";
 import { AppContext } from "context";
-import { getTask, getTemplate } from "services/api";
+import { getTask, getTemplate, IGetTaskResponse } from "services/api";
 import _ from "lodash";
 
 interface IViewTaskProps {
@@ -19,7 +19,8 @@ interface IViewTaskProps {
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
-    const [task, setTask] = useState<object>({});
+    const [task, setTask] = useState<Partial<IGetTaskResponse["task"]>>({});
+    const [, setUpdatedTask] = useState<Partial<ITask>>({});
 
     useEffect(() => {
         getTask(context.courier, _.toNumber(taskId))
@@ -29,6 +30,14 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     function getTemplateHandler(id: string) {
         return getTemplate(context.courier, _.toNumber(id));
+    }
+
+    function onTaskChange(task: ITask): void {
+        setUpdatedTask({ ...task });
+    }
+
+    function onTaskSave(): void {
+        // TODO: update task
     }
 
     return (
@@ -41,6 +50,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                         scheme="blue"
                         icon={<SendIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
+                        onClick={onTaskSave}
                     />
                 </Grid>
             </SectionTitle>
@@ -55,12 +65,13 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     task={
                         ({
                             ...task,
-                            documents: _.get(task, "templates", []).map(_.toString),
+                            templates: (task.templates || []).map(_.toString),
                         } as unknown) as ITask
                     }
-                    getTemplate={getTemplateHandler}
                     templates={[]}
                     variant="view"
+                    getTemplate={getTemplateHandler}
+                    onTaskChange={onTaskChange}
                 />
             </Grid>
         </SectionLayout>

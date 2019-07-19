@@ -1,7 +1,7 @@
 import { IResponse, ICourier } from "services/api";
 import { ETaskStatus } from "@magnit/services";
 
-interface IGetTasksResponse extends IResponse {
+export interface IGetTasksResponse extends IResponse {
     total: number;
     tasks: Array<{
         id: number;

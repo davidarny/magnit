@@ -23,6 +23,8 @@ interface ITaskEditorProps {
     variant: "create" | "view";
 
     getTemplate?(id: string): Promise<IGetTemplate>;
+
+    onTaskChange?(task: ITask): void;
 }
 
 export const TaskEditor: React.FC<ITaskEditorProps> = props => {
@@ -67,7 +69,6 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
             return;
         }
         if (_.isEmpty(task.templates)) {
-            console.log(1);
             setDocuments([
                 {
                     title: ETerminals.EMPTY,
@@ -129,6 +130,15 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
             }
         }
     }, [documents]);
+
+    useEffect(() => {
+        if (props.variant !== "create") {
+            return;
+        }
+        if (props.onTaskChange) {
+            props.onTaskChange(_.cloneDeep(task));
+        }
+    }, [task]);
 
     function onTemplateChange(uuid: string, event: TChangeEvent): void {
         const { templates } = props;

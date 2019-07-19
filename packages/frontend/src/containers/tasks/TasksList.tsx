@@ -19,7 +19,7 @@ import { AddIcon } from "@magnit/icons";
 import { EmptyList } from "components/list";
 import { useContext, useEffect, useState } from "react";
 import _ from "lodash";
-import { getTasks } from "services/api";
+import { getTasks, IGetTasksResponse } from "services/api";
 import { AppContext } from "context";
 import { ETaskStatus } from "@magnit/services";
 
@@ -43,11 +43,15 @@ type TRouteProps = { "*": string };
 export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     const tab = props["*"];
     const context = useContext(AppContext);
-    const [tasks, setTasks] = useState<object[]>([]);
+    const [tasks, setTasks] = useState<IGetTasksResponse["tasks"]>([]);
+    const [total, setTotal] = useState(0);
 
     useEffect(() => {
         getTasks(context.courier, getTaskStatusByTab(tab))
             .then(response => setTasks(response.tasks))
+            .catch(console.error);
+        getTasks(context.courier)
+            .then(response => setTotal(response.tasks.length))
             .catch(console.error);
     }, [context.courier, tab]);
 
@@ -60,7 +64,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         setRedirect({ redirect: true, to: _.get(row, "id") });
     }
 
-    const empty = !tasks.length;
+    const empty = !total;
 
     return (
         <SectionLayout>
