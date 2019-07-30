@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Template } from "./template.entity";
 import { Repository } from "typeorm";
+import { Template } from "../entities/template.entity";
 
 @Injectable()
 export class TemplateService {
@@ -9,11 +9,15 @@ export class TemplateService {
         @InjectRepository(Template) private readonly templateRepository: Repository<Template>
     ) {}
 
-    findAll(): Promise<Template[]> {
+    async findAll() {
         return this.templateRepository.find();
     }
 
-    async save(template: Template): Promise<Template> {
+    async save(template: Template) {
         return this.templateRepository.save(template);
+    }
+
+    async findById(id: string) {
+        return this.templateRepository.findOne({ where: { id } });
     }
 }

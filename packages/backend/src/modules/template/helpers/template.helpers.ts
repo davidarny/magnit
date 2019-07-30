@@ -1,15 +1,18 @@
-import { Puzzle } from "./puzzle.entity";
-import { ConditionDto, PuzzleDto, ValidationDto } from "./template.dto";
-import { Section } from "./section.entity";
-import { Template } from "./template.entity";
-import { Condition } from "./condition.entity";
-import { Validation } from "./validation.entity";
+import { Template } from "../entities/template.entity";
+import { Section } from "../entities/section.entity";
+import { PuzzleDto } from "../dto/puzzle.dto";
+import { Puzzle } from "../entities/puzzle.entity";
+import { Condition } from "../entities/condition.entity";
+import { Validation } from "../entities/validation.entity";
+import { ValidationDto } from "../dto/validation.dto";
+import { ConditionDto } from "../dto/condition.dto";
 
 export function deeplyCreatePuzzles(
     puzzles: Puzzle[],
     puzzleDtoArray: PuzzleDto[],
     section: Section,
-    template: Template
+    template: Template,
+    parent: Puzzle | null = null
 ) {
     for (const puzzleDto of puzzleDtoArray || []) {
         const puzzle = new Puzzle();
@@ -39,7 +42,11 @@ export function deeplyCreatePuzzles(
             setValidationFields(validation, validationDto, puzzle, puzzles);
         }
 
-        deeplyCreatePuzzles(puzzles, puzzleDto.puzzles, section, template);
+        if (parent) {
+            puzzle.parent = parent;
+        }
+
+        deeplyCreatePuzzles(puzzles, puzzleDto.puzzles, section, template, puzzle);
 
         puzzles.push(puzzle);
     }
@@ -47,6 +54,7 @@ export function deeplyCreatePuzzles(
 
 function setPuzzleFields(puzzle: Puzzle, puzzleDto: PuzzleDto) {
     puzzle.id = puzzleDto.id;
+    puzzle.answerType = puzzleDto.answer_type;
     puzzle.puzzleType = puzzleDto.puzzle_type;
     puzzle.description = puzzleDto.description;
     puzzle.order = puzzleDto.order;

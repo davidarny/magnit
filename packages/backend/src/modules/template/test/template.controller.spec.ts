@@ -1,18 +1,16 @@
-import { AppModule } from "../src/app.module";
-import { Test, TestingModule } from "@nestjs/testing";
-import * as request from "supertest";
-import { TemplateService } from "../src/modules/template/services/template.service";
-import { NestApplication } from "@nestjs/core";
-import { Template } from "../src/modules/template/entities/template.entity";
-import { PuzzleService } from "../src/modules/template/services/puzzle.service";
-import { SectionService } from "../src/modules/template/services/section.service";
-import { ConditionService } from "../src/modules/template/services/condition.service";
-import { ValidationService } from "../src/modules/template/services/validation.service";
+import { TemplateController } from "../template.controller";
+import { Test } from "@nestjs/testing";
+import { TemplateService } from "../services/template.service";
+import { SectionService } from "../services/section.service";
+import { PuzzleService } from "../services/puzzle.service";
+import { ConditionService } from "../services/condition.service";
+import { ValidationService } from "../services/validation.service";
+import { Template } from "../entities/template.entity";
 
 const payload = require("./payload.json");
 
-describe("TemplateController (e2e)", () => {
-    let app: NestApplication;
+describe("TemplateController", () => {
+    let templateController: TemplateController;
     const templateService = {
         async findAll() {
             return [];
@@ -94,52 +92,48 @@ describe("TemplateController (e2e)", () => {
     };
 
     beforeEach(async () => {
-        const imports = [AppModule];
-        const moduleFixture = await Test.createTestingModule({ imports })
-            .overrideProvider(TemplateService)
-            .useValue(templateService)
-            .overrideProvider(PuzzleService)
-            .useValue(puzzleService)
-            .overrideProvider(SectionService)
-            .useValue(sectionService)
-            .overrideProvider(ConditionService)
-            .useValue(conditionService)
-            .overrideProvider(ValidationService)
-            .useValue(validationService)
-            .compile();
+        const providers = [
+            {
+                provide: TemplateService,
+                useValue: templateService,
+            },
+            {
+                provide: SectionService,
+                useValue: sectionService,
+            },
+            {
+                provide: PuzzleService,
+                useValue: puzzleService,
+            },
+            {
+                provide: ConditionService,
+                useValue: conditionService,
+            },
+            {
+                provide: ValidationService,
+                useValue: validationService,
+            },
+        ];
+        const controllers = [TemplateController];
+        const app = await Test.createTestingModule({ providers, controllers }).compile();
 
-        app = moduleFixture.createNestApplication();
-        (await app.setGlobalPrefix("v1")).init();
+        templateController = app.get(TemplateController);
     });
 
-    afterEach(async () => {
-        await app.close();
+    it("should return empty list of templates", async () => {
+        const result = { success: 1, total: 0, templates: [] };
+        expect(await templateController.findAll()).toStrictEqual(result);
     });
 
-    it("GET /v1/templates", async () => {
-        return request(app.getHttpServer())
-            .get("/v1/templates")
-            .expect(200)
-            .expect({ success: 1, total: 0, templates: await templateService.findAll() });
+    it("should create template", async () => {
+        const result = { success: 1, template_id: 0 };
+        expect(await templateController.create(payload)).toStrictEqual(result);
     });
 
-    it("POST /v1/template", async () => {
-        return request(app.getHttpServer())
-            .post("/v1/templates")
-            .send({ template: payload })
-            .expect(201)
-            .expect({ success: 1, template_id: 0 });
-    });
-
-    it("GET /v1/template/0", async () => {
-        return request(app.getHttpServer())
-            .get("/v1/templates/0")
-            .send({ template: payload })
-            .expect(200)
-            .then(res => {
-                const body = res.body;
-                body.template = JSON.parse(body.template);
-                expect(body).toStrictEqual({ success: 1, template: payload });
-            });
+    it("should return assembled template", async () => {
+        const result = { success: 1, template: payload };
+        const actual = await templateController.findById("0");
+        actual.template = JSON.parse(actual.template);
+        expect(actual).toStrictEqual(result);
     });
 });

@@ -1,14 +1,24 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { TemplateService } from "./template.service";
-import { TemplateDto } from "./template.dto";
-import { Puzzle } from "./puzzle.entity";
-import { Section } from "./section.entity";
-import { Template } from "./template.entity";
-import { deeplyCreatePuzzles } from "./template.helpers";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { TemplateService } from "./services/template.service";
+import { TemplateDto } from "./dto/template.dto";
+import { deeplyCreatePuzzles } from "./helpers/template.helpers";
+import { Puzzle } from "./entities/puzzle.entity";
+import { Template } from "./entities/template.entity";
+import { Section } from "./entities/section.entity";
+import { SectionService } from "./services/section.service";
+import { PuzzleService } from "./services/puzzle.service";
+import { ConditionService } from "./services/condition.service";
+import { ValidationService } from "./services/validation.service";
 
 @Controller("templates")
 export class TemplateController {
-    constructor(private readonly templateService: TemplateService) {}
+    constructor(
+        private readonly templateService: TemplateService,
+        private readonly sectionService: SectionService,
+        private readonly puzzleService: PuzzleService,
+        private readonly conditionService: ConditionService,
+        private readonly validationService: ValidationService
+    ) {}
 
     @Get("/")
     async findAll() {
@@ -45,5 +55,30 @@ export class TemplateController {
         const saved = await this.templateService.save(template);
 
         return { success: 1, template_id: saved.id };
+    }
+
+    @Get("/:id")
+    async findById(@Param("id") id: string) {
+        const template = await this.templateService.findById(id);
+        template.sections = await this.sectionService.findByTemplateId(template.id);
+        for (const section of template.sections || []) {
+            section.puzzles = await this.puzzleService.findBySectionId(section.id);
+        }
+        const puzzles: Puzzle[] = [
+            ...template.sections.reduce((prev, curr) => [...prev, ...curr.puzzles], []),
+        ];
+        for (const puzzle of puzzles) {
+            if (puzzle.puzzleType === "group") {
+                puzzle.children = await this.puzzleService.findByParentId(puzzle.id);
+                puzzles.push(...puzzle.children);
+            }
+        }
+        for (const puzzle of puzzles) {
+            const conditions = await this.conditionService.findByPuzzleId(puzzle.id);
+            puzzle.conditions = conditions || [];
+            const validations = await this.validationService.findByPuzzleId(puzzle.id);
+            puzzle.validations = validations || [];
+        }
+        return { success: 1, template: JSON.stringify(template) };
     }
 }

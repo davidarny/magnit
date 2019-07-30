@@ -16,6 +16,8 @@ export type TPuzzleType =
     | "text_answer"
     | "numeric_answer";
 
+export type TAnswerType = "number" | "string";
+
 @Entity()
 export class Puzzle {
     @PrimaryGeneratedColumn("uuid")
@@ -35,15 +37,21 @@ export class Puzzle {
     @JoinColumn({ name: "id_section" })
     section: Section;
 
-    @ManyToOne(() => Puzzle, puzzle => puzzle.parent, { nullable: true })
+    @ManyToOne(() => Puzzle, puzzle => puzzle.children, { nullable: true })
     @JoinColumn({ name: "id_parent" })
     parent: Puzzle;
+
+    @OneToMany(() => Puzzle, puzzle => puzzle.parent)
+    children: Puzzle[];
 
     @Column("int")
     order: number;
 
     @Column({ type: "varchar", name: "puzzle_type" })
     puzzleType: TPuzzleType;
+
+    @Column({ type: "varchar", name: "answer_type", nullable: true })
+    answerType: TAnswerType;
 
     @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true })
     conditions: Condition[];

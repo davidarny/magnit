@@ -7,4 +7,4 @@ async function bootstrap() {
     await app.listen(1337);
 }
 
-bootstrap();
+bootstrap().catch(console.error);
