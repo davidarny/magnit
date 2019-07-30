@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
 import { deeplyCreatePuzzles } from "./helpers/template.helpers";
@@ -80,5 +80,11 @@ export class TemplateController {
             puzzle.validations = validations || [];
         }
         return { success: 1, template: JSON.stringify(template) };
+    }
+
+    @Delete("/:id")
+    async deleteById(@Param("id") id: string) {
+        await this.templateService.deleteById(id);
+        return { success: 1 };
     }
 }

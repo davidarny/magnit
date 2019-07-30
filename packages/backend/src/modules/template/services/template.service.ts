@@ -20,4 +20,8 @@ export class TemplateService {
     async findById(id: string) {
         return this.templateRepository.findOne({ where: { id } });
     }
+
+    async deleteById(id: string) {
+        await this.templateRepository.delete(id);
+    }
 }

@@ -29,7 +29,7 @@ export class Puzzle {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @ManyToOne(() => Template, undefined, { nullable: true })
+    @ManyToOne(() => Template, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
     template: Template;
 

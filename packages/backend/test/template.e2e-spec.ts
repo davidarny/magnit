@@ -67,4 +67,11 @@ describe("TemplateController (e2e)", () => {
                 expect(body).toStrictEqual({ success: 1, template: payload });
             });
     });
+
+    it("DELETE /v1/templates/0", async () => {
+        return request(app.getHttpServer())
+            .delete("/v1/templates/0")
+            .expect(200)
+            .expect({ success: 1 });
+    });
 });

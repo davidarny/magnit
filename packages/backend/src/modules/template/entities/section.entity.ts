@@ -7,7 +7,7 @@ export class Section {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Template, template => template.sections)
+    @ManyToOne(type => Template, template => template.sections, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
     template: Template;
 

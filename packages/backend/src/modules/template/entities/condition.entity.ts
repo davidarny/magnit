@@ -16,18 +16,18 @@ export class Condition {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(() => Puzzle, puzzle => puzzle.conditions)
+    @ManyToOne(() => Puzzle, puzzle => puzzle.conditions, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true })
+    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_question_puzzle" })
     questionPuzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
     actionType: TActionType;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true })
+    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_answer_puzzle" })
     answerPuzzle: Puzzle;
 

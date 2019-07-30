@@ -16,4 +16,8 @@ export const templateService = {
         delete buffer.sections;
         return { ...buffer };
     },
+
+    async deleteById(id: string) {
+        return undefined;
+    },
 };

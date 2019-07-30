@@ -10,18 +10,18 @@ export class Validation {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(() => Puzzle, puzzle => puzzle.validations)
+    @ManyToOne(() => Puzzle, puzzle => puzzle.validations, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true })
+    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_left_hand_puzzle" })
     leftHandPuzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
     validationType: TValidationType;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true })
+    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_right_hand_puzzle" })
     rightHandPuzzle: Puzzle;
 
