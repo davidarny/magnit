@@ -34,8 +34,6 @@ services:
             - POSTGRES_USER=magnit
             - POSTGRES_DB=magnit
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
-        volumes:
-            - ./packages/backend/stuff:/docker-entrypoint-initdb.d
         networks:
             - magnit
         ports:
