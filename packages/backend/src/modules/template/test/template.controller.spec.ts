@@ -5,91 +5,16 @@ import { SectionService } from "../services/section.service";
 import { PuzzleService } from "../services/puzzle.service";
 import { ConditionService } from "../services/condition.service";
 import { ValidationService } from "../services/validation.service";
-import { Template } from "../entities/template.entity";
+import { sectionService } from "./mocks/section.service.mock";
+import { puzzleService } from "./mocks/puzzle.service.mock";
+import { conditionService } from "./mocks/condition.service.mock";
+import { validationService } from "./mocks/validation.service.mock";
+import { templateService } from "./mocks/template.service.mock";
 
 const payload = require("./payload.json");
 
 describe("TemplateController", () => {
     let templateController: TemplateController;
-    const templateService = {
-        async findAll() {
-            return [];
-        },
-
-        async save(template: Template) {
-            return template;
-        },
-
-        async findById(id: string) {
-            const buffer = { ...payload };
-            delete buffer.sections;
-            return { ...buffer };
-        },
-    };
-
-    const sectionService = {
-        async findByTemplateId(id: number) {
-            if (payload.id !== id) {
-                return;
-            }
-            return payload.sections.map(section => {
-                const buffer = { ...section };
-                delete buffer.puzzles;
-                return { ...buffer };
-            });
-        },
-    };
-
-    const puzzleService = {
-        async findBySectionId(id: string) {
-            return payload.sections.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...curr.puzzles];
-            }, []);
-        },
-
-        async findByParentId(id: string) {
-            const puzzles = await this.findBySectionId(payload.sections[0].id);
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.puzzles || [])];
-            }, []);
-        },
-    };
-
-    const conditionService = {
-        async findByPuzzleId(id: string) {
-            const puzzles = [
-                ...(await puzzleService.findBySectionId(payload.sections[0].id)),
-                ...(await puzzleService.findByParentId(id)),
-            ];
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.conditions || [])];
-            }, []);
-        },
-    };
-
-    const validationService = {
-        async findByPuzzleId(id: string) {
-            const puzzles = [
-                ...(await puzzleService.findBySectionId(payload.sections[0].id)),
-                ...(await puzzleService.findByParentId(id)),
-            ];
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.validations || [])];
-            }, []);
-        },
-    };
 
     beforeEach(async () => {
         const providers = [

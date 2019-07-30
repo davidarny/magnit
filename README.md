@@ -41,7 +41,7 @@
 
 This project consists of 2 main parts
 
--   [@magnit/backend](./packages/backend) - REST API server built on top of [sails.js](https://sailsjs.com/)
+-   [@magnit/backend](./packages/backend) - REST API server built on top of [Nest.JS](https://nestjs.com/)
 -   [@magnit/frontend](./packages/frontend) - SPA application build on top of [React](https://reactjs.org/)
 
 ### Installation
@@ -127,5 +127,3 @@ This script is using [commitizen](https://github.com/commitizen/cz-cli), as well
 ### Documentation
 
 All the necessary documentation for architecture can be found [here](./docs)
-
-All the necessary documentation for backend APIs can be found [here](./packages/backend/docs)

@@ -1,97 +1,22 @@
 import { AppModule } from "../src/app.module";
-import { Test, TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
 import * as request from "supertest";
 import { TemplateService } from "../src/modules/template/services/template.service";
 import { NestApplication } from "@nestjs/core";
-import { Template } from "../src/modules/template/entities/template.entity";
 import { PuzzleService } from "../src/modules/template/services/puzzle.service";
 import { SectionService } from "../src/modules/template/services/section.service";
 import { ConditionService } from "../src/modules/template/services/condition.service";
 import { ValidationService } from "../src/modules/template/services/validation.service";
+import { templateService } from "../src/modules/template/test/mocks/template.service.mock";
+import { puzzleService } from "../src/modules/template/test/mocks/puzzle.service.mock";
+import { sectionService } from "../src/modules/template/test/mocks/section.service.mock";
+import { conditionService } from "../src/modules/template/test/mocks/condition.service.mock";
+import { validationService } from "../src/modules/template/test/mocks/validation.service.mock";
 
-const payload = require("./payload.json");
+const payload = require("../src/modules/template/test/payload.json");
 
 describe("TemplateController (e2e)", () => {
     let app: NestApplication;
-    const templateService = {
-        async findAll() {
-            return [];
-        },
-
-        async save(template: Template) {
-            return template;
-        },
-
-        async findById(id: string) {
-            const buffer = { ...payload };
-            delete buffer.sections;
-            return { ...buffer };
-        },
-    };
-
-    const sectionService = {
-        async findByTemplateId(id: number) {
-            if (payload.id !== id) {
-                return;
-            }
-            return payload.sections.map(section => {
-                const buffer = { ...section };
-                delete buffer.puzzles;
-                return { ...buffer };
-            });
-        },
-    };
-
-    const puzzleService = {
-        async findBySectionId(id: string) {
-            return payload.sections.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...curr.puzzles];
-            }, []);
-        },
-
-        async findByParentId(id: string) {
-            const puzzles = await this.findBySectionId(payload.sections[0].id);
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.puzzles || [])];
-            }, []);
-        },
-    };
-
-    const conditionService = {
-        async findByPuzzleId(id: string) {
-            const puzzles = [
-                ...(await puzzleService.findBySectionId(payload.sections[0].id)),
-                ...(await puzzleService.findByParentId(id)),
-            ];
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.conditions || [])];
-            }, []);
-        },
-    };
-
-    const validationService = {
-        async findByPuzzleId(id: string) {
-            const puzzles = [
-                ...(await puzzleService.findBySectionId(payload.sections[0].id)),
-                ...(await puzzleService.findByParentId(id)),
-            ];
-            return puzzles.reduce((prev, curr) => {
-                if (curr.id !== id) {
-                    return prev;
-                }
-                return [...prev, ...(curr.validations || [])];
-            }, []);
-        },
-    };
 
     beforeEach(async () => {
         const imports = [AppModule];
