@@ -58,7 +58,11 @@ export class TemplateController {
     }
 
     @Put("/:id")
-    async update(@Param("id") id: string, @Body("template") templateDto: TemplateDto) {}
+    async update(@Param("id") id: string, @Body("template") templateDto: TemplateDto) {
+        await this.deleteById(id);
+        const { template_id } = await this.create(templateDto);
+        return { success: 1, template_id };
+    }
 
     @Get("/:id")
     async findById(@Param("id") id: string) {

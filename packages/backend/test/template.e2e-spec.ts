@@ -74,4 +74,12 @@ describe("TemplateController (e2e)", () => {
             .expect(200)
             .expect({ success: 1 });
     });
+
+    it("PUT /v1/templates/0", async () => {
+        return request(app.getHttpServer())
+            .put("/v1/templates/0")
+            .send({ template: payload })
+            .expect(200)
+            .expect({ success: 1, template_id: 0 });
+    });
 });

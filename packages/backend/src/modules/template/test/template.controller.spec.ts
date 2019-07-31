@@ -66,4 +66,9 @@ describe("TemplateController", () => {
         const result = { success: 1 };
         expect(await templateController.deleteById("0")).toStrictEqual(result);
     });
+
+    it("should update template", async () => {
+        const result = { success: 1, template_id: 0 };
+        expect(await templateController.update("0", payload)).toStrictEqual(result);
+    });
 });
