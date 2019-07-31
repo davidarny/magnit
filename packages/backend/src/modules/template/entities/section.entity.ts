@@ -1,9 +1,25 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import { Template } from "./template.entity";
 import { Puzzle } from "./puzzle.entity";
 
+type TConstructableSection = Omit<Section, "template" | "puzzles">;
+
 @Entity()
 export class Section {
+    constructor(section?: DeepPartial<TConstructableSection>) {
+        if (section) {
+            Object.assign(this, section);
+        }
+    }
+
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

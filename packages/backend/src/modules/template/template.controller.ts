@@ -49,18 +49,10 @@ export class TemplateController {
         const puzzles: Puzzle[] = [];
         const sections: Section[] = [];
 
-        const template = new Template();
-        template.title = templateDto.title;
-        template.id = templateDto.id;
-        template.description = templateDto.description;
-        template.type = templateDto.type;
+        const template = new Template(templateDto);
 
         for (const sectionDto of templateDto.sections) {
-            const section = new Section();
-            section.template = template;
-            section.description = sectionDto.description;
-            section.title = sectionDto.title;
-            section.order = sectionDto.order;
+            const section = new Section(sectionDto);
 
             puzzles.length = 0;
             deeplyCreatePuzzles(puzzles, sectionDto.puzzles, section, template);

@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import { Puzzle } from "./puzzle.entity";
 
 export type TActionType =
@@ -11,8 +18,16 @@ export type TActionType =
 
 export type TConditionType = "or" | "and";
 
+type TConstructableCondition = Omit<Condition, "puzzle" | "question_puzzle" | "answer_puzzle">;
+
 @Entity()
 export class Condition {
+    constructor(condition?: DeepPartial<TConstructableCondition>) {
+        if (condition) {
+            Object.assign(this, condition);
+        }
+    }
+
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
@@ -35,5 +50,5 @@ export class Condition {
     value: string;
 
     @Column({ type: "varchar", nullable: true, name: "condition_type" })
-    condition_pype: TConditionType;
+    condition_type: TConditionType;
 }

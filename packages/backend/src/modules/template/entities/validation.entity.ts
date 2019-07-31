@@ -1,12 +1,30 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import { Puzzle } from "./puzzle.entity";
 
 export type TOperatorType = "less_than" | "more_than" | "equal" | "less_or_equal" | "more_or_equal";
 
 export type TValidationType = "compare_with_answer" | "set_value";
 
+type TConstructableValidation = Omit<
+    Validation,
+    "puzzle" | "left_hand_puzzle" | "right_hand_puzzle"
+>;
+
 @Entity()
 export class Validation {
+    constructor(validation?: DeepPartial<TConstructableValidation>) {
+        if (validation) {
+            Object.assign(this, validation);
+        }
+    }
+
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from "typeorm";
 import { Template } from "./template.entity";
 import { Section } from "./section.entity";
 import { Condition } from "./condition.entity";
@@ -18,8 +26,19 @@ export type TPuzzleType =
 
 export type TAnswerType = "number" | "string";
 
+type TConstructablePuzzle = Omit<
+    Puzzle,
+    "template" | "section" | "parent" | "children" | "conditions" | "validations"
+>;
+
 @Entity()
 export class Puzzle {
+    constructor(puzzle?: DeepPartial<TConstructablePuzzle>) {
+        if (puzzle) {
+            Object.assign(this, puzzle);
+        }
+    }
+
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
