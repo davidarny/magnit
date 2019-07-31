@@ -5,6 +5,7 @@
     "author": "",
     "license": "MIT",
     "scripts": {
+        "clean": "rimraf dist docs",
         "build": "rimraf dist && tsc -p tsconfig.build.json",
         "format": "prettier --write \"src/**/*.ts\"",
         "start": "ts-node -r tsconfig-paths/register src/main.ts",
