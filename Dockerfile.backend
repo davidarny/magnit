@@ -1,19 +1,25 @@
-FROM node:10-alpine
-
-ARG BACKEND_PORT
-ARG POSTGRES_PASSWORD
-ARG SECRET
+# build step
+FROM node:10-alpine AS build
 
 WORKDIR /devel
 
+COPY package.json .
+COPY yarn.lock .
+COPY packages/backend/package.json packages/backend/package.json
+
+RUN yarn install
+
 COPY . .
 
-RUN yarn global add cross-env
+RUN yarn build:backend
 
-RUN chmod +x gen_backend_config.sh && ./gen_backend_config.sh
+# serve step
+FROM node:10-alpine AS serve
 
-WORKDIR /devel/packages/backend
+WORKDIR /var/www/magnit
 
-RUN npm i
+COPY --from=build /devel/packages/backend/dist dist
+COPY --from=build /devel/node_modules node_modules
+COPY --from=build /devel/packages/backend/node_modules node_modules
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["node", "dist/main.js"]

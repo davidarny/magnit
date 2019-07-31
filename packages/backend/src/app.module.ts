@@ -5,11 +5,11 @@ import { LoggerMiddleware } from "./middleware/logger.middleware";
 
 const options: TypeOrmModuleOptions = {
     type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "magnit",
-    password: "magnit",
-    database: "magnit",
+    host: process.env.POSTGRES_HOST || "localhost",
+    port: parseInt(process.env.POSTGRES_PORT) || 5432,
+    username: process.env.POSTGRES_USER || "magnit",
+    password: process.env.POSTGRES_PASSWORD || "magnit",
+    database: process.env.POSTGRES_DB || "magnit",
     entities: [__dirname + "/**/*.entity{.ts,.js}"],
     synchronize: true,
 };

@@ -3,8 +3,8 @@ import { AppModule } from "./app.module";
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    app.setGlobalPrefix("v1");
-    await app.listen(1337);
+    app.setGlobalPrefix(process.env.GLOBAL_CONTROLLER_PREFIX || "v1");
+    await app.listen(process.env.BACKEND_PORT || 1337);
 }
 
 bootstrap().catch(console.error);
