@@ -1,4 +1,12 @@
-import { Column, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    DeepPartial,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from "typeorm";
 import { Section } from "./section.entity";
 
 export type TTemplateType = "light" | "complex";
@@ -27,4 +35,10 @@ export class Template {
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;
+
+    @CreateDateColumn({ type: "timestamptz" })
+    created_at: number;
+
+    @UpdateDateColumn({ type: "timestamptz" })
+    updated_at: number;
 }
