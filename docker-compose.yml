@@ -21,7 +21,7 @@ services:
             - GLOBAL_CONTROLLER_PREFIX=${GLOBAL_CONTROLLER_PREFIX:-v1}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
-            - POSTGRES_HOST=${POSTGRES_HOST:-localhost}
+            - POSTGRES_HOST=${POSTGRES_HOST:-db}
             - POSTGRES_DB=${POSTGRES_DB:-magnit}
         restart: unless-stopped
         networks:

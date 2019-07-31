@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "clean": "lerna run clean",
+        "docs:build": "lerna run docs:build --stream",
         "start:frontend": "lerna run --scope @magnit/frontend start --stream",
         "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
         "build:frontend": "lerna run --scope @magnit/frontend build --stream --no-prefix",

@@ -23,7 +23,6 @@ const options: TypeOrmModuleOptions = {
 };
 
 const imports = [CacheModule.register(), TypeOrmModule.forRoot(options), TemplateModule];
-
 const providers = [
     {
         provide: APP_INTERCEPTOR,

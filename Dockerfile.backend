@@ -11,14 +11,15 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn build:backend
+RUN yarn build:backend && yarn docs:build
 
-# serve step
+# serve backend step
 FROM node:10-alpine AS serve
 
 WORKDIR /var/www/magnit
 
 COPY --from=build /devel/packages/backend/dist dist
+COPY --from=build /devel/packages/backend/docs docs
 COPY --from=build /devel/node_modules node_modules
 COPY --from=build /devel/packages/backend/node_modules node_modules
 
