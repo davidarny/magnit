@@ -10,7 +10,21 @@ import { PuzzleService } from "./services/puzzle.service";
 import { ConditionService } from "./services/condition.service";
 import { ValidationService } from "./services/validation.service";
 import { TemplateByIdPipe } from "./template-by-id.pipe";
+import {
+    ApiCreatedResponse,
+    ApiImplicitBody,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiUseTags,
+} from "@nestjs/swagger";
+import { CreateTemplateResponse } from "./responses/create-template.response";
+import { GetTemplateResponse } from "./responses/get-template.response";
+import { UpdateTemplateResponse } from "./responses/update-template.response";
+import { ErrorResponse } from "./responses/error.response";
+import { BaseResponse } from "./responses/base.response";
+import { GetTemplatesResponse } from "./responses/get-templates.response";
 
+@ApiUseTags("templates")
 @Controller("templates")
 export class TemplateController {
     constructor(
@@ -22,12 +36,15 @@ export class TemplateController {
     ) {}
 
     @Get("/")
+    @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
     async findAll() {
         const templates = await this.templateService.findAll();
         return { success: 1, total: templates.length, templates };
     }
 
     @Post("/")
+    @ApiImplicitBody({ name: "template", type: TemplateDto, description: "Template JSON" })
+    @ApiCreatedResponse({ type: CreateTemplateResponse, description: "ID of created Template" })
     async create(@Body("template") templateDto: TemplateDto) {
         const puzzles: Puzzle[] = [];
         const sections: Section[] = [];
@@ -59,6 +76,9 @@ export class TemplateController {
     }
 
     @Put("/:id")
+    @ApiImplicitBody({ name: "template", type: TemplateDto, description: "Template JSON" })
+    @ApiOkResponse({ type: UpdateTemplateResponse, description: "ID of updated Template" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async update(
         @Param("id", TemplateByIdPipe) id: string,
         @Body("template") templateDto: TemplateDto
@@ -69,6 +89,8 @@ export class TemplateController {
     }
 
     @Get("/:id")
+    @ApiOkResponse({ type: GetTemplateResponse, description: "Stringified Template JSON" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
         template.sections = await this.sectionService.findByTemplateId(template.id);
@@ -94,6 +116,8 @@ export class TemplateController {
     }
 
     @Delete("/:id")
+    @ApiOkResponse({ type: BaseResponse, description: "OK response" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async deleteById(@Param("id", TemplateByIdPipe) id: string) {
         await this.templateService.deleteById(id);
         return { success: 1 };

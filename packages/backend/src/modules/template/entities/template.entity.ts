@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Section } from "./section.entity";
+import { ApiModelProperty } from "@nestjs/swagger";
 
 export type TTemplateType = "light" | "complex";
 

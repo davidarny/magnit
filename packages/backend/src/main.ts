@@ -5,6 +5,7 @@ import { AppModule } from "./app.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
 import { existsSync } from "fs";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,11 +18,21 @@ async function bootstrap() {
     app.use(helmet());
     app.use(compression());
 
-    // serve docs
+    // code docs
     const pathToDocs = join(__dirname, "..", "docs");
     if (existsSync(pathToDocs)) {
         app.useStaticAssets(pathToDocs);
     }
+
+    // api docs
+    const config = new DocumentBuilder()
+        .setTitle("Templates API")
+        .setHost("91.144.161.208:1337/v1")
+        .setVersion("1.0")
+        .addTag("templates")
+        .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup("api", app, document);
 
     // listen port
     await app.listen(process.env.BACKEND_PORT || 1337);

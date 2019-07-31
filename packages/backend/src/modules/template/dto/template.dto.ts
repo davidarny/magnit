@@ -1,10 +1,12 @@
 import { SectionDto } from "./section.dto";
 import { TTemplateType } from "../entities/template.entity";
+import { ApiModelProperty } from "@nestjs/swagger";
 
 export class TemplateDto {
-    readonly id: number;
-    readonly title: string;
-    readonly description: string;
+    @ApiModelProperty() readonly id: number;
+    @ApiModelProperty() readonly title: string;
+    @ApiModelProperty() readonly description: string;
+    @ApiModelProperty({ enum: ["light", "complex"] })
     readonly type: TTemplateType;
-    readonly sections: SectionDto[];
+    @ApiModelProperty({ type: [SectionDto] }) readonly sections: SectionDto[];
 }
