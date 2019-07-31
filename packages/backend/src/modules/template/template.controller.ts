@@ -101,7 +101,7 @@ export class TemplateController {
             ...template.sections.reduce((prev, curr) => [...prev, ...curr.puzzles], []),
         ];
         for (const puzzle of puzzles) {
-            if (puzzle.puzzleType === "group") {
+            if (puzzle.puzzle_type === "group") {
                 puzzle.children = await this.puzzleService.findByParentId(puzzle.id);
                 puzzles.push(...puzzle.children);
             }

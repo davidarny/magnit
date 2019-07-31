@@ -54,8 +54,8 @@ export function deeplyCreatePuzzles(
 
 function setPuzzleFields(puzzle: Puzzle, puzzleDto: PuzzleDto) {
     puzzle.id = puzzleDto.id;
-    puzzle.answerType = puzzleDto.answer_type;
-    puzzle.puzzleType = puzzleDto.puzzle_type;
+    puzzle.answer_type = puzzleDto.answer_type;
+    puzzle.puzzle_type = puzzleDto.puzzle_type;
     puzzle.description = puzzleDto.description;
     puzzle.order = puzzleDto.order;
     puzzle.title = puzzleDto.title;
@@ -63,11 +63,11 @@ function setPuzzleFields(puzzle: Puzzle, puzzleDto: PuzzleDto) {
 
 function setConditionFields(condition: Condition, conditionDto: ConditionDto, puzzles: Puzzle[]) {
     condition.id = conditionDto.id;
-    condition.actionType = conditionDto.action_type;
+    condition.action_type = conditionDto.action_type;
     condition.value = conditionDto.value;
-    condition.conditionType = conditionDto.condition_type;
-    condition.questionPuzzle = puzzles.find(puzzle => puzzle.id === conditionDto.question_puzzle);
-    condition.answerPuzzle = puzzles.find(puzzle => puzzle.id === conditionDto.answer_puzzle);
+    condition.condition_pype = conditionDto.condition_type;
+    condition.question_puzzle = puzzles.find(puzzle => puzzle.id === conditionDto.question_puzzle);
+    condition.answer_puzzle = puzzles.find(puzzle => puzzle.id === conditionDto.answer_puzzle);
 }
 
 function setValidationFields(
@@ -77,12 +77,12 @@ function setValidationFields(
     puzzles: Puzzle[]
 ) {
     validation.id = validationDto.id;
-    validation.errorMessage = validationDto.error_message;
-    validation.operatorType = validationDto.operator_type;
-    validation.validationType = validationDto.validation_type;
+    validation.error_message = validationDto.error_message;
+    validation.operator_type = validationDto.operator_type;
+    validation.validation_type = validationDto.validation_type;
     validation.value = validationDto.value;
-    validation.leftHandPuzzle = puzzle;
-    validation.rightHandPuzzle = puzzles.find(
+    validation.left_hand_puzzle = puzzle;
+    validation.right_hand_puzzle = puzzles.find(
         puzzle => puzzle.id === validationDto.right_hand_puzzle
     );
 }

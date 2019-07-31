@@ -2,6 +2,6 @@
     "hooks": {
         "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
         "pre-commit": "pretty-quick --staged && git add . && lint-staged",
-        "pre-push": "cross-env CI=true yarn workspaces run test"
+        "pre-push": "cross-env CI=true lerna run test --stream"
     }
 }

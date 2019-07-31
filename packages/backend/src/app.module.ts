@@ -22,7 +22,7 @@ const options: TypeOrmModuleOptions = {
     synchronize: true,
 };
 
-const imports = [CacheModule.register(), TypeOrmModule.forRoot(options), TemplateModule];
+const imports = [TypeOrmModule.forRoot(options), CacheModule.register(), TemplateModule];
 const providers = [
     {
         provide: APP_INTERCEPTOR,

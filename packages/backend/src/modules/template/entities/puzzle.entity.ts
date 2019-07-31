@@ -48,10 +48,10 @@ export class Puzzle {
     order: number;
 
     @Column({ type: "varchar", name: "puzzle_type" })
-    puzzleType: TPuzzleType;
+    puzzle_type: TPuzzleType;
 
     @Column({ type: "varchar", name: "answer_type", nullable: true })
-    answerType: TAnswerType;
+    answer_type: TAnswerType;
 
     @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true })
     conditions: Condition[];

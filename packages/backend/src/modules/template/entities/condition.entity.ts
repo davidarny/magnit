@@ -22,18 +22,18 @@ export class Condition {
 
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_question_puzzle" })
-    questionPuzzle: Puzzle;
+    question_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
-    actionType: TActionType;
+    action_type: TActionType;
 
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_answer_puzzle" })
-    answerPuzzle: Puzzle;
+    answer_puzzle: Puzzle;
 
     @Column({ type: "varchar", default: "" })
     value: string;
 
     @Column({ type: "varchar", nullable: true, name: "condition_type" })
-    conditionType: TConditionType;
+    condition_pype: TConditionType;
 }

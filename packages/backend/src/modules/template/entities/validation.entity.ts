@@ -16,21 +16,21 @@ export class Validation {
 
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_left_hand_puzzle" })
-    leftHandPuzzle: Puzzle;
+    left_hand_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
-    validationType: TValidationType;
+    validation_type: TValidationType;
 
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_right_hand_puzzle" })
-    rightHandPuzzle: Puzzle;
+    right_hand_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true })
     value: string;
 
     @Column({ type: "varchar", nullable: true, name: "operator_type" })
-    operatorType: TOperatorType;
+    operator_type: TOperatorType;
 
     @Column({ type: "text", name: "error_message" })
-    errorMessage: string;
+    error_message: string;
 }

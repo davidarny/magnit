@@ -7,11 +7,11 @@ export class Section {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @ManyToOne(type => Template, template => template.sections, { onDelete: "CASCADE" })
+    @ManyToOne(() => Template, template => template.sections, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
     template: Template;
 
-    @OneToMany(type => Puzzle, puzzle => puzzle.section, { nullable: true, cascade: true })
+    @OneToMany(() => Puzzle, puzzle => puzzle.section, { nullable: true, cascade: true })
     puzzles: Puzzle[];
 
     @Column("varchar")
