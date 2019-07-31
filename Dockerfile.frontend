@@ -3,9 +3,20 @@ FROM node:10-alpine AS build
 
 WORKDIR /devel
 
+COPY package.json .
+COPY yarn.lock .
+COPY packages/components/package.json packages/components/package.json
+COPY packages/frontend/package.json packages/frontend/package.json
+COPY packages/icons/package.json packages/icons/package.json
+COPY packages/services/package.json packages/services/package.json
+COPY packages/task-editor/package.json packages/task-editor/package.json
+COPY packages/template-editor/package.json packages/template-editor/package.json
+
+RUN yarn install
+
 COPY . .
 
-RUN yarn install && yarn build:frontend
+RUN yarn build:frontend
 
 # serve step
 FROM nginx:1.17-alpine AS serve
