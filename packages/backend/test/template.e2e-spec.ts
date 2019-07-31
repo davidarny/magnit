@@ -59,12 +59,22 @@ describe("TemplateController (e2e)", () => {
     it("GET /v1/template/0", async () => {
         return request(app.getHttpServer())
             .get("/v1/templates/0")
-            .send({ template: payload })
             .expect(200)
             .then(res => {
                 const body = res.body;
                 body.template = JSON.parse(body.template);
                 expect(body).toStrictEqual({ success: 1, template: payload });
+            });
+    });
+
+    it("GET /v1/template/1", async () => {
+        return request(app.getHttpServer())
+            .get("/v1/templates/1")
+            .expect(404)
+            .expect({
+                error: "Not Found",
+                message: "Template with id 1 was not found",
+                statusCode: 404,
             });
     });
 
@@ -75,11 +85,34 @@ describe("TemplateController (e2e)", () => {
             .expect({ success: 1 });
     });
 
+    it("DELETE /v1/templates/1", async () => {
+        return request(app.getHttpServer())
+            .delete("/v1/templates/1")
+            .expect(404)
+            .expect({
+                error: "Not Found",
+                message: "Template with id 1 was not found",
+                statusCode: 404,
+            });
+    });
+
     it("PUT /v1/templates/0", async () => {
         return request(app.getHttpServer())
             .put("/v1/templates/0")
             .send({ template: payload })
             .expect(200)
             .expect({ success: 1, template_id: 0 });
+    });
+
+    it("PUT /v1/templates/1", async () => {
+        return request(app.getHttpServer())
+            .put("/v1/templates/1")
+            .send({ template: payload })
+            .expect(404)
+            .expect({
+                error: "Not Found",
+                message: "Template with id 1 was not found",
+                statusCode: 404,
+            });
     });
 });

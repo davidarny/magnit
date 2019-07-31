@@ -12,6 +12,9 @@ export const templateService = {
     },
 
     async findById(id: string) {
+        if (payload.id !== parseInt(id)) {
+            return undefined;
+        }
         const buffer = { ...payload };
         delete buffer.sections;
         return { ...buffer };

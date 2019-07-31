@@ -9,6 +9,7 @@ import { SectionService } from "./services/section.service";
 import { PuzzleService } from "./services/puzzle.service";
 import { ConditionService } from "./services/condition.service";
 import { ValidationService } from "./services/validation.service";
+import { TemplateByIdPipe } from "./template-by-id.pipe";
 
 @Controller("templates")
 export class TemplateController {
@@ -58,14 +59,17 @@ export class TemplateController {
     }
 
     @Put("/:id")
-    async update(@Param("id") id: string, @Body("template") templateDto: TemplateDto) {
-        await this.deleteById(id);
+    async update(
+        @Param("id", TemplateByIdPipe) id: string,
+        @Body("template") templateDto: TemplateDto
+    ) {
+        await this.templateService.deleteById(id);
         const { template_id } = await this.create(templateDto);
         return { success: 1, template_id };
     }
 
     @Get("/:id")
-    async findById(@Param("id") id: string) {
+    async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
         template.sections = await this.sectionService.findByTemplateId(template.id);
         for (const section of template.sections || []) {
@@ -90,7 +94,7 @@ export class TemplateController {
     }
 
     @Delete("/:id")
-    async deleteById(@Param("id") id: string) {
+    async deleteById(@Param("id", TemplateByIdPipe) id: string) {
         await this.templateService.deleteById(id);
         return { success: 1 };
     }
