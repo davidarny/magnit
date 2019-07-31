@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
 import { deeplyCreatePuzzles } from "./helpers/template.helpers";
@@ -56,6 +56,9 @@ export class TemplateController {
 
         return { success: 1, template_id: saved.id };
     }
+
+    @Put("/:id")
+    async update(@Param("id") id: string, @Body("template") templateDto: TemplateDto) {}
 
     @Get("/:id")
     async findById(@Param("id") id: string) {
