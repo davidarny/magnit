@@ -42,8 +42,10 @@ export class TemplateService implements ITemplateService {
             .getMany();
     }
 
-    async save(template: Template) {
-        delete template.id;
+    async save(template: Template, insert: boolean = true) {
+        if (insert) {
+            delete template.id;
+        }
         return this.templateRepository.save(template);
     }
 

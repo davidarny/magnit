@@ -2,11 +2,11 @@ import { Task } from "../../modules/tasks/entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 
 export class TaskServiceMock implements ITaskService {
-    deleteById(id: string): Promise<any> {
+    async deleteById(id: string): Promise<any> {
         return undefined;
     }
 
-    findAll(
+    async findAll(
         offset?: number,
         limit?: number,
         sort?: "ASC" | "DESC",
@@ -16,11 +16,11 @@ export class TaskServiceMock implements ITaskService {
         return undefined;
     }
 
-    findById(id: string): Promise<any> {
+    async findById(id: string): Promise<any> {
         return undefined;
     }
 
-    save(task: Task): Promise<any> {
+    async save(task: Task): Promise<any> {
         return undefined;
     }
 }

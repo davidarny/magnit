@@ -12,7 +12,7 @@ export interface ITemplateService {
 
     findByTaskId(id: string): Promise<Template[]>;
 
-    save(template: Template): Promise<Template>;
+    save(template: Template, insert?: boolean): Promise<Template>;
 
     findById(id: string): Promise<Template>;
 

@@ -79,7 +79,7 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
     async update(@Param("id", TaskByIdPipe) id: string, @Body("task") taskDto: TaskDto) {
         const task = await this.taskService.findById(id);
-        const updated = await this.taskService.save({ ...task, ...taskDto });
+        const updated = await this.taskService.save({ ...task, ...taskDto }, false);
         return { success: 1, task_id: updated.id };
     }
 
@@ -111,7 +111,7 @@ export class TaskController {
         }
         const task = await this.taskService.findById(id);
         task.templates = templates;
-        await this.taskService.save(task);
+        await this.taskService.save(task, false);
         return { success: 1 };
     }
 

@@ -40,8 +40,10 @@ export class TaskService implements ITaskService {
         return this.taskRepository.find(options);
     }
 
-    async save(task: Task) {
-        delete task.id;
+    async save(task: Task, insert: boolean = true) {
+        if (insert) {
+            delete task.id;
+        }
         return this.taskRepository.save(task);
     }
 
