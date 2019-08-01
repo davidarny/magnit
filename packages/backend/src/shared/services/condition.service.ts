@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Condition } from "../entities/condition.entity";
-import { IConditionService } from "../../../shared/interfaces/condition.service.interface";
+import { IConditionService } from "../interfaces/condition.service.interface";
 
 @Injectable()
 export class ConditionService implements IConditionService {

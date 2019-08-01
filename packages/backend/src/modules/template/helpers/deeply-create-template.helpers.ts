@@ -1,9 +1,9 @@
-import { Template } from "../entities/template.entity";
-import { Section } from "../entities/section.entity";
+import { Template } from "../../../shared/entities/template.entity";
+import { Section } from "../../../shared/entities/section.entity";
 import { PuzzleDto } from "../dto/puzzle.dto";
-import { Puzzle } from "../entities/puzzle.entity";
-import { Condition } from "../entities/condition.entity";
-import { Validation } from "../entities/validation.entity";
+import { Puzzle } from "../../../shared/entities/puzzle.entity";
+import { Condition } from "../../../shared/entities/condition.entity";
+import { Validation } from "../../../shared/entities/validation.entity";
 
 export function deeplyCreatePuzzles(
     puzzles: Puzzle[],

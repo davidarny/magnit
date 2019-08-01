@@ -1,4 +1,4 @@
-import { Section } from "../../modules/template/entities/section.entity";
+import { Section } from "../entities/section.entity";
 
 export interface ISectionService {
     findByTemplateId(id: number): Promise<Section[]>;

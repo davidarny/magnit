@@ -1,4 +1,4 @@
-import { TOperatorType, TValidationType } from "../entities/validation.entity";
+import { TOperatorType, TValidationType } from "../../../shared/entities/validation.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class ValidationDto {

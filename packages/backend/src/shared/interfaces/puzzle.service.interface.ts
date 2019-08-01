@@ -1,4 +1,4 @@
-import { Puzzle } from "../../modules/template/entities/puzzle.entity";
+import { Puzzle } from "../entities/puzzle.entity";
 
 export interface IPuzzleService {
     findBySectionId(id: string): Promise<Puzzle[]>;

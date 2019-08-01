@@ -1,12 +1,12 @@
 import { AppModule } from "../src/app.module";
 import { Test } from "@nestjs/testing";
 import * as request from "supertest";
-import { TemplateService } from "../src/modules/template/services/template.service";
+import { TemplateService } from "../src/shared/services/template.service";
 import { NestApplication } from "@nestjs/core";
-import { PuzzleService } from "../src/modules/template/services/puzzle.service";
-import { SectionService } from "../src/modules/template/services/section.service";
-import { ConditionService } from "../src/modules/template/services/condition.service";
-import { ValidationService } from "../src/modules/template/services/validation.service";
+import { PuzzleService } from "../src/shared/services/puzzle.service";
+import { SectionService } from "../src/shared/services/section.service";
+import { ConditionService } from "../src/shared/services/condition.service";
+import { ValidationService } from "../src/shared/services/validation.service";
 import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
 import { PuzzleServiceMock } from "../src/shared/mocks/puzzle.service.mock";
 import { SectionServiceMock } from "../src/shared/mocks/section.service.mock";

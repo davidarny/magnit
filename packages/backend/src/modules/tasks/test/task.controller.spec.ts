@@ -3,7 +3,7 @@ import { TaskService } from "../services/task.service";
 import { TaskServiceMock } from "../../../shared/mocks/task.service.mock";
 import { Test } from "@nestjs/testing";
 import { TaskDto } from "../dto/task.dto";
-import { TemplateService } from "../../template/services/template.service";
+import { TemplateService } from "../../../shared/services/template.service";
 import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock";
 
 describe("TaskController", () => {

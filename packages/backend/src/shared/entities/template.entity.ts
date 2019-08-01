@@ -5,13 +5,12 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
-    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
 import { Section } from "./section.entity";
-import { Task } from "../../tasks/entities/task.entity";
+import { Task } from "../../modules/tasks/entities/task.entity";
 
 export type TTemplateType = "light" | "complex";
 

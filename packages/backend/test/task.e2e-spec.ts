@@ -5,7 +5,7 @@ import { NestApplication } from "@nestjs/core";
 import { TaskService } from "../src/modules/tasks/services/task.service";
 import { TaskServiceMock } from "../src/shared/mocks/task.service.mock";
 import { TaskDto } from "../src/modules/tasks/dto/task.dto";
-import { TemplateService } from "../src/modules/template/services/template.service";
+import { TemplateService } from "../src/shared/services/template.service";
 import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
 
 describe("TaskController (e2e)", () => {

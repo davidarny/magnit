@@ -1,10 +1,10 @@
 import { TemplateController } from "../template.controller";
 import { Test } from "@nestjs/testing";
-import { TemplateService } from "../services/template.service";
-import { SectionService } from "../services/section.service";
-import { PuzzleService } from "../services/puzzle.service";
-import { ConditionService } from "../services/condition.service";
-import { ValidationService } from "../services/validation.service";
+import { TemplateService } from "../../../shared/services/template.service";
+import { SectionService } from "../../../shared/services/section.service";
+import { PuzzleService } from "../../../shared/services/puzzle.service";
+import { ConditionService } from "../../../shared/services/condition.service";
+import { ValidationService } from "../../../shared/services/validation.service";
 import { SectionServiceMock } from "../../../shared/mocks/section.service.mock";
 import { PuzzleServiceMock } from "../../../shared/mocks/puzzle.service.mock";
 import { ConditionServiceMock } from "../../../shared/mocks/condition.service.mock";

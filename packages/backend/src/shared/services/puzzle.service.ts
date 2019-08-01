@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Puzzle } from "../entities/puzzle.entity";
-import { IPuzzleService } from "../../../shared/interfaces/puzzle.service.interface";
+import { IPuzzleService } from "../interfaces/puzzle.service.interface";
 
 @Injectable()
 export class PuzzleService implements IPuzzleService {

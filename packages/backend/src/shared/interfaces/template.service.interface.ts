@@ -1,4 +1,4 @@
-import { Template } from "../../modules/template/entities/template.entity";
+import { Template } from "../entities/template.entity";
 
 export interface ITemplateService {
     findAll(

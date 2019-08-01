@@ -5,11 +5,10 @@ import {
     Entity,
     JoinTable,
     ManyToMany,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Template } from "../../template/entities/template.entity";
+import { Template } from "../../../shared/entities/template.entity";
 
 export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
 
@@ -35,7 +34,7 @@ export class Task {
     @Column("varchar")
     status: TTaskStatus;
 
-    @ManyToMany(() => Template)
+    @ManyToMany(() => Template, template => template.tasks)
     @JoinTable({
         name: "task_x_template",
         joinColumn: { name: "id_task", referencedColumnName: "id" },

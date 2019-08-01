@@ -1,6 +1,6 @@
 import { ConditionDto } from "./condition.dto";
 import { ValidationDto } from "./validation.dto";
-import { TAnswerType, TPuzzleType } from "../entities/puzzle.entity";
+import { TAnswerType, TPuzzleType } from "../../../shared/entities/puzzle.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class PuzzleDto {

@@ -1,4 +1,4 @@
-import { TActionType, TConditionType } from "../entities/condition.entity";
+import { TActionType, TConditionType } from "../../../shared/entities/condition.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class ConditionDto {

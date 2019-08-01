@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Validation } from "../entities/validation.entity";
-import { IValidationService } from "../../../shared/interfaces/validation.service.interface";
+import { IValidationService } from "../interfaces/validation.service.interface";
 
 @Injectable()
 export class ValidationService implements IValidationService {

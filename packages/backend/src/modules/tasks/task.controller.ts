@@ -17,20 +17,34 @@ import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { GetTaskResponse } from "./responses/get-task.response";
 import { AddTemplatesDto } from "./dto/add-templates.dto";
-import { Template } from "../template/entities/template.entity";
-import { TemplateService } from "../template/services/template.service";
+import { Template } from "../../shared/entities/template.entity";
+import { TemplateService } from "../../shared/services/template.service";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { ITaskService } from "../../shared/interfaces/task.service.interface";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
+import { assembleTemplate } from "../../shared/helpers/assemble-template.helper";
+import { PuzzleService } from "../../shared/services/puzzle.service";
+import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
+import { SectionService } from "../../shared/services/section.service";
+import { ISectionService } from "../../shared/interfaces/section.service.interface";
+import { ConditionService } from "../../shared/services/condition.service";
+import { IConditionService } from "../../shared/interfaces/condition.service.interface";
+import { ValidationService } from "../../shared/services/validation.service";
+import { IValidationService } from "../../shared/interfaces/validation.service.interface";
+import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
 export class TaskController {
     constructor(
         @Inject(TaskService) private readonly taskService: ITaskService,
-        @Inject(TemplateService) private readonly templateService: ITemplateService
+        @Inject(TemplateService) private readonly templateService: ITemplateService,
+        @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
+        @Inject(SectionService) private readonly sectionService: ISectionService,
+        @Inject(ConditionService) private readonly conditionService: IConditionService,
+        @Inject(ValidationService) private readonly validationService: IValidationService
     ) {}
 
     @Get("/")
@@ -97,6 +111,7 @@ export class TaskController {
         }
         const task = await this.taskService.findById(id);
         task.templates = templates;
+        console.log(task);
         await this.taskService.save(task);
         return { success: 1 };
     }
@@ -107,5 +122,25 @@ export class TaskController {
     async deleteById(@Param("id", TemplateByIdPipe) id: string) {
         await this.taskService.deleteById(id);
         return { success: 1 };
+    }
+
+    @Get("/:id/extended")
+    @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
+    async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
+        const task = await this.taskService.findById(id);
+        const templates = await this.templateService.findByTaskId(task.id.toString());
+        const assembledTemplates = await Promise.all(
+            templates.map(async template => {
+                await assembleTemplate(template, {
+                    sectionService: this.sectionService,
+                    puzzleService: this.puzzleService,
+                    conditionService: this.conditionService,
+                    validationService: this.validationService,
+                });
+                return template;
+            })
+        );
+        return { success: 1, task: { ...task, templates: assembledTemplates } };
     }
 }

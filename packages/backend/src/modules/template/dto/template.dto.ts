@@ -1,5 +1,5 @@
 import { SectionDto } from "./section.dto";
-import { TTemplateType } from "../entities/template.entity";
+import { TTemplateType } from "../../../shared/entities/template.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class TemplateDto {

@@ -1,14 +1,13 @@
 import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
-import { TemplateService } from "./services/template.service";
+import { TemplateService } from "../../shared/services/template.service";
 import { TemplateDto } from "./dto/template.dto";
-import { deeplyCreatePuzzles } from "./helpers/template.helpers";
-import { Puzzle } from "./entities/puzzle.entity";
-import { Template } from "./entities/template.entity";
-import { Section } from "./entities/section.entity";
-import { SectionService } from "./services/section.service";
-import { PuzzleService } from "./services/puzzle.service";
-import { ConditionService } from "./services/condition.service";
-import { ValidationService } from "./services/validation.service";
+import { Puzzle } from "../../shared/entities/puzzle.entity";
+import { Template } from "../../shared/entities/template.entity";
+import { Section } from "../../shared/entities/section.entity";
+import { SectionService } from "../../shared/services/section.service";
+import { PuzzleService } from "../../shared/services/puzzle.service";
+import { ConditionService } from "../../shared/services/condition.service";
+import { ValidationService } from "../../shared/services/validation.service";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import {
     ApiCreatedResponse,
@@ -29,6 +28,8 @@ import { ISectionService } from "../../shared/interfaces/section.service.interfa
 import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
 import { IConditionService } from "../../shared/interfaces/condition.service.interface";
 import { IValidationService } from "../../shared/interfaces/validation.service.interface";
+import { deeplyCreatePuzzles } from "./helpers/deeply-create-template.helpers";
+import { assembleTemplate } from "../../shared/helpers/assemble-template.helper";
 
 @ApiUseTags("templates")
 @Controller("templates")
@@ -100,25 +101,12 @@ export class TemplateController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
-        template.sections = await this.sectionService.findByTemplateId(template.id);
-        for (const section of template.sections || []) {
-            section.puzzles = await this.puzzleService.findBySectionId(section.id);
-        }
-        const puzzles: Puzzle[] = [
-            ...template.sections.reduce((prev, curr) => [...prev, ...curr.puzzles], []),
-        ];
-        for (const puzzle of puzzles) {
-            if (puzzle.puzzle_type === "group") {
-                puzzle.children = await this.puzzleService.findByParentId(puzzle.id);
-                puzzles.push(...puzzle.children);
-            }
-        }
-        for (const puzzle of puzzles) {
-            const conditions = await this.conditionService.findByPuzzleId(puzzle.id);
-            puzzle.conditions = conditions || [];
-            const validations = await this.validationService.findByPuzzleId(puzzle.id);
-            puzzle.validations = validations || [];
-        }
+        await assembleTemplate(template, {
+            conditionService: this.conditionService,
+            puzzleService: this.puzzleService,
+            sectionService: this.sectionService,
+            validationService: this.validationService,
+        });
         return { success: 1, template: JSON.stringify(template) };
     }
 
