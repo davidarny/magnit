@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
@@ -22,6 +22,8 @@ import { TemplateService } from "../template/services/template.service";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { ITaskService } from "../../shared/interfaces/task.service.interface";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { BaseResponse } from "../../shared/responses/base.response";
+import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -96,6 +98,14 @@ export class TaskController {
         const task = await this.taskService.findById(id);
         task.templates = templates;
         await this.taskService.save(task);
+        return { success: 1 };
+    }
+
+    @Delete("/:id")
+    @ApiOkResponse({ type: BaseResponse, description: "OK response" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
+    async deleteById(@Param("id", TemplateByIdPipe) id: string) {
+        await this.taskService.deleteById(id);
         return { success: 1 };
     }
 }

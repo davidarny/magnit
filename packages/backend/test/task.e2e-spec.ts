@@ -137,4 +137,11 @@ describe("TaskController (e2e)", () => {
                 expect(response.body).toStrictEqual(expected);
             });
     });
+
+    it("DELETE /v1/tasks/0 should delete task", async () => {
+        return request(app.getHttpServer())
+            .delete("/v1/tasks/0")
+            .expect(200)
+            .expect({ success: 1 });
+    });
 });

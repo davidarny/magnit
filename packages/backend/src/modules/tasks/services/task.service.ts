@@ -43,6 +43,6 @@ export class TaskService implements ITaskService {
     }
 
     async deleteById(id: string) {
-        return this.taskRepository.delete(id);
+        await this.taskRepository.delete(id);
     }
 }

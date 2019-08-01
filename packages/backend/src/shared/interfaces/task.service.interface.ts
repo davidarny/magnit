@@ -7,11 +7,11 @@ export interface ITaskService {
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
         name?: string
-    ): Promise<any>;
+    ): Promise<Task[]>;
 
-    save(task: Task): Promise<any>;
+    save(task: Task): Promise<Task>;
 
-    findById(id: string): Promise<any>;
+    findById(id: string): Promise<Task>;
 
-    deleteById(id: string): Promise<any>;
+    deleteById(id: string): Promise<void>;
 }
