@@ -28,7 +28,7 @@ export class Task {
     @Column("varchar")
     name: string;
 
-    @Column("text")
+    @Column({ type: "text", nullable: true })
     description: string;
 
     @Column("varchar")
