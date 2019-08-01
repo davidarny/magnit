@@ -1,4 +1,4 @@
-import { BaseResponse } from "../../../shared/base.response";
+import { BaseResponse } from "../../../shared/responses/base.response";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class CreateTaskResponse extends BaseResponse {

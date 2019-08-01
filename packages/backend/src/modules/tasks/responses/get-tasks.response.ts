@@ -1,6 +1,6 @@
 import { ApiModelProperty } from "@nestjs/swagger";
 import { TaskDto } from "../dto/task.dto";
-import { BaseResponse } from "../../../shared/base.response";
+import { BaseResponse } from "../../../shared/responses/base.response";
 
 export class GetTasksResponse extends BaseResponse {
     @ApiModelProperty() readonly total: number;

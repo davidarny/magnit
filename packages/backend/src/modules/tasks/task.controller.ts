@@ -16,11 +16,18 @@ import { ErrorResponse } from "../template/responses/error.response";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { GetTaskResponse } from "./responses/get-task.response";
+import { AddTemplatesDto } from "./dto/add-templates.dto";
+import { Template } from "../template/entities/template.entity";
+import { TemplateService } from "../template/services/template.service";
+import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
 export class TaskController {
-    constructor(private readonly taskService: TaskService) {}
+    constructor(
+        private readonly taskService: TaskService,
+        private readonly templateService: TemplateService
+    ) {}
 
     @Get("/")
     @ApiImplicitQuery({ name: "offset", description: "Defaults to 0" })
@@ -63,6 +70,30 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
     async findById(@Param("id", TaskByIdPipe) id: string) {
         const task = await this.taskService.findById(id);
-        return { success: 1, task };
+        const templates = await this.templateService.findByTaskId(task.id.toString());
+        return { success: 1, task: { ...task, templates: templates.map(template => template.id) } };
+    }
+
+    @Put("/:id/templates")
+    @ApiImplicitBody({
+        name: "templates",
+        type: AddTemplatesDto,
+        description: "IDs of Templates to add",
+    })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template with ID was not found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
+    async addTemplates(
+        @Param("id", TaskByIdPipe) id: string,
+        @Body("templates", TemplatesByIdsPipe) ids: number[]
+    ) {
+        const templates: Template[] = [];
+        for (const id of ids) {
+            const template = await this.templateService.findById(id.toString());
+            templates.push(template);
+        }
+        const task = await this.taskService.findById(id);
+        task.templates = templates;
+        await this.taskService.save(task);
+        return { success: 1 };
     }
 }

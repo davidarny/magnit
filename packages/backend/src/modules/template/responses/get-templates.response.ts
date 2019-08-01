@@ -1,6 +1,6 @@
 import { ApiModelProperty } from "@nestjs/swagger";
 import { TemplateDto } from "../dto/template.dto";
-import { BaseResponse } from "../../../shared/base.response";
+import { BaseResponse } from "../../../shared/responses/base.response";
 
 export class GetTemplatesResponse extends BaseResponse {
     @ApiModelProperty() readonly total: number;

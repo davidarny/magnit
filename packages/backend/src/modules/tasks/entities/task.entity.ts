@@ -3,6 +3,8 @@ import {
     CreateDateColumn,
     DeepPartial,
     Entity,
+    JoinTable,
+    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -33,7 +35,12 @@ export class Task {
     @Column("varchar")
     status: TTaskStatus;
 
-    @OneToMany(() => Template, template => template.tasks, { cascade: true })
+    @ManyToMany(() => Template)
+    @JoinTable({
+        name: "task_x_template",
+        joinColumn: { name: "id_task", referencedColumnName: "id" },
+        inverseJoinColumn: { name: "id_template", referencedColumnName: "id" },
+    })
     templates: Template[];
 
     @CreateDateColumn({ type: "timestamptz" })

@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Task, TTaskStatus } from "../entities/task.entity";
 import { FindManyOptions, Repository } from "typeorm";
+import { ITaskService } from "../../../shared/interfaces/task.service.interface";
 
 @Injectable()
-export class TaskService {
+export class TaskService implements ITaskService {
     constructor(@InjectRepository(Task) private readonly taskRepository: Repository<Task>) {}
 
     async findAll(

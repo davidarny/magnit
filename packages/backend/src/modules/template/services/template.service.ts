@@ -2,7 +2,6 @@ import { Injectable, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, Repository } from "typeorm";
 import { Template } from "../entities/template.entity";
-import { Task } from "../../tasks/entities/task.entity";
 
 @Injectable()
 export class TemplateService {
@@ -25,6 +24,18 @@ export class TemplateService {
             Object.assign(options.where, { title });
         }
         return this.templateRepository.find(options);
+    }
+
+    async findOneOrFail(id: string) {
+        return this.templateRepository.findOneOrFail({ where: { id } });
+    }
+
+    async findByTaskId(id: string) {
+        return this.templateRepository
+            .createQueryBuilder("template")
+            .leftJoinAndSelect("template.tasks", "task")
+            .where("task.id = :id", { id })
+            .getMany();
     }
 
     async save(template: Template) {

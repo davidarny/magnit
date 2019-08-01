@@ -23,7 +23,7 @@ import { GetTemplateResponse } from "./responses/get-template.response";
 import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { ErrorResponse } from "./responses/error.response";
 import { GetTemplatesResponse } from "./responses/get-templates.response";
-import { BaseResponse } from "../../shared/base.response";
+import { BaseResponse } from "../../shared/responses/base.response";
 
 @ApiUseTags("templates")
 @Controller("templates")

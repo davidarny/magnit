@@ -20,6 +20,8 @@ const options: TypeOrmModuleOptions = {
     password: process.env.POSTGRES_PASSWORD || "magnit",
     database: process.env.POSTGRES_DB || "magnit",
     entities: [__dirname + "/**/*.entity{.ts,.js}"],
+    logger: "advanced-console",
+    logging: process.env.NODE_ENV !== "testing",
     synchronize: true,
 };
 

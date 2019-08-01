@@ -7,6 +7,10 @@ export const templateService = {
         return [];
     },
 
+    async findByTaskId(id: string) {
+        return [];
+    },
+
     async save(template: Template) {
         return template;
     },
