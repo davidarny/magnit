@@ -3,15 +3,17 @@ import {
     CreateDateColumn,
     DeepPartial,
     Entity,
+    ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
 import { Section } from "./section.entity";
+import { Task } from "../../tasks/entities/task.entity";
 
 export type TTemplateType = "light" | "complex";
 
-type TConstructableTemplate = Omit<Template, "sections">;
+type TConstructableTemplate = Omit<Template, "sections" | "tasks">;
 
 @Entity()
 export class Template {
@@ -30,8 +32,11 @@ export class Template {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @OneToMany(type => Section, section => section.template, { cascade: true })
+    @OneToMany(() => Section, section => section.template, { cascade: true })
     sections: Section[];
+
+    @ManyToOne(() => Task, task => task.templates)
+    tasks: Task[];
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;

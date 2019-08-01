@@ -1,8 +1,16 @@
-import { Controller, Get, Query } from "@nestjs/common";
-import { ApiImplicitQuery, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import {
+    ApiCreatedResponse,
+    ApiImplicitBody,
+    ApiImplicitQuery,
+    ApiOkResponse,
+    ApiUseTags,
+} from "@nestjs/swagger";
 import { TaskService } from "./services/task.service";
 import { GetTasksResponse } from "./responses/get-tasks.response";
-import { TTaskStatus } from "./entities/task.entity";
+import { Task, TTaskStatus } from "./entities/task.entity";
+import { TaskDto } from "./dto/task.dto";
+import { CreateTaskResponse } from "./responses/create-task.response";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -24,5 +32,14 @@ export class TaskController {
     ) {
         const tasks = await this.taskService.findAll(offset, limit, sort, status, name);
         return { success: 1, total: tasks.length, tasks };
+    }
+
+    @Post("/")
+    @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
+    @ApiCreatedResponse({ type: CreateTaskResponse, description: "ID of created Task" })
+    async create(@Body("task") taskDto: TaskDto) {
+        const task = new Task(taskDto);
+        const saved = await this.taskService.save(task);
+        return { success: 1, task_id: saved.id };
     }
 }
