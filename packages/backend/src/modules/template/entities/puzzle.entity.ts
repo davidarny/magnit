@@ -52,7 +52,7 @@ export class Puzzle {
     @JoinColumn({ name: "id_template" })
     template: Template;
 
-    @ManyToOne(() => Section, section => section.puzzles, { nullable: true })
+    @ManyToOne(() => Section, section => section.puzzles, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_section" })
     section: Section;
 
