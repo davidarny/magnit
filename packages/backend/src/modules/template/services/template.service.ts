@@ -1,7 +1,8 @@
 import { Injectable, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindManyOptions, Repository } from "typeorm";
 import { Template } from "../entities/template.entity";
+import { Task } from "../../tasks/entities/task.entity";
 
 @Injectable()
 export class TemplateService {
@@ -9,13 +10,21 @@ export class TemplateService {
         @InjectRepository(Template) private readonly templateRepository: Repository<Template>
     ) {}
 
-    async findAll(offset: number, limit: number, sort: "ASC" | "DESC", title: string) {
-        return this.templateRepository.find({
-            order: { title: sort },
-            where: { title },
-            skip: offset,
-            take: limit,
-        });
+    async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
+        const options: FindManyOptions<Template> = {};
+        if (typeof offset !== "undefined") {
+            options.skip = offset;
+        }
+        if (typeof limit !== "undefined") {
+            options.take = limit;
+        }
+        if (sort) {
+            options.order = { title: sort };
+        }
+        if (title) {
+            Object.assign(options.where, { title });
+        }
+        return this.templateRepository.find(options);
     }
 
     async save(template: Template) {
