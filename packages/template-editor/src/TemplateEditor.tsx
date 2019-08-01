@@ -42,7 +42,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             title: ETerminals.EMPTY,
             description: ETerminals.EMPTY,
             type: ETemplateType.LIGHT,
-        }
+        },
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
@@ -50,7 +50,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         getEditorService(EEditorType.TEMPLATE, [
             [focusedPuzzleChain, setFocusedPuzzleChain],
             [toolbarTopPosition, setToolbarTopPosition],
-        ])
+        ]),
     );
 
     (window as typeof window & { template: ITemplate }).template = template;
@@ -237,7 +237,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if ("puzzles" in puzzle) {
                 if (puzzle.puzzles.some(child => child.id === focusedPuzzleId)) {
                     const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(
-                        child => child.id === focusedPuzzleId
+                        child => child.id === focusedPuzzleId,
                     );
                     puzzle.puzzles.splice(indexOfPuzzleToDelete, 1);
                     // re-calculate order
@@ -252,7 +252,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if ("sections" in puzzle) {
                 if (puzzle.sections.some(child => child.id === focusedPuzzleId)) {
                     const indexOfPuzzleToDelete = puzzle.sections.findIndex(
-                        child => child.id === focusedPuzzleId
+                        child => child.id === focusedPuzzleId,
                     );
                     puzzle.sections.splice(indexOfPuzzleToDelete, 1);
                     // re-calculate order

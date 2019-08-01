@@ -104,7 +104,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
             validations.forEach((validation, index, array) => {
                 let hasDependentQuestionChanged = false;
                 const dependentQuestion = questions.find(
-                    question => question.id === validation.rightHandPuzzle
+                    question => question.id === validation.rightHandPuzzle,
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
@@ -371,7 +371,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                     validation.validationType ===
                                         EValidationType.COMPARE_WITH_ANSWER
                                         ? onRightHandPuzzleChange
-                                        : onValueChange
+                                        : onValueChange,
                                 )}
                         </Grid>
                         <Grid item xs>

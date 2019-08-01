@@ -84,7 +84,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             conditions.forEach((condition, index, array) => {
                 let hasDependentQuestionChanged = false;
                 const dependentQuestion = questions.find(
-                    question => question.id === condition.questionPuzzle
+                    question => question.id === condition.questionPuzzle,
                 );
                 if (dependentQuestion) {
                     traverse(template, (value: any) => {
@@ -261,7 +261,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
 
                 const questionAnswers = answers.filter(answer => {
                     const question = questions.find(
-                        question => question.id === condition.questionPuzzle
+                        question => question.id === condition.questionPuzzle,
                     );
                     if (!question) {
                         return false;
@@ -374,7 +374,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                 conditionService.getAnswerPuzzle(answers, questions)(
                                     condition.actionType === EActionType.CHOSEN_ANSWER
                                         ? onAnswerPuzzleChange
-                                        : onValueChange
+                                        : onValueChange,
                                 )}
                         </Grid>
                         <Grid item xs={2}>

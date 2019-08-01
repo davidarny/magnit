@@ -5,14 +5,14 @@ import { IPuzzleService } from "../interfaces/puzzle.service.interface";
 import { IConditionService } from "../interfaces/condition.service.interface";
 import { IValidationService } from "../interfaces/validation.service.interface";
 
-interface TServices {
+interface IServices {
     sectionService: ISectionService;
     puzzleService: IPuzzleService;
     conditionService: IConditionService;
     validationService: IValidationService;
 }
 
-export async function assembleTemplate(template: Template, services: TServices) {
+export async function assembleTemplate(template: Template, services: IServices) {
     template.sections = await services.sectionService.findByTemplateId(template.id);
     for (const section of template.sections || []) {
         section.puzzles = await services.puzzleService.findBySectionId(section.id);

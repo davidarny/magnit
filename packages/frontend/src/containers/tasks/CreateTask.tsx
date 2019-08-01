@@ -66,7 +66,7 @@ export const CreateTask: React.FC = () => {
                 return addTemplatesToTask(
                     context.courier,
                     _.toNumber(response.taskId),
-                    (task.templates || []).map(_.toNumber)
+                    (task.templates || []).map(_.toNumber),
                 );
             })
             .then(() => setOpen(true))

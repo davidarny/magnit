@@ -1,3 +1,5 @@
+/* tslint:disable:no-console */
+
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { Request, Response } from "express";
 

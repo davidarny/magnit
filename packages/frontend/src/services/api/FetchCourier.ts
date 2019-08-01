@@ -48,7 +48,7 @@ export class FetchCourier implements ICourier {
             return json;
         } catch (error) {
             if (this.middlewares) {
-                this.middlewares.forEach(async middleware =>
+                this.middlewares.forEach(middleware =>
                     middleware.error({ path, method, version: this.version }, error),
                 );
             }

@@ -102,16 +102,15 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
     async addTemplates(
         @Param("id", TaskByIdPipe) id: string,
-        @Body("templates", TemplatesByIdsPipe) ids: number[],
+        @Body("templates", TemplatesByIdsPipe) arrayOfIds: number[],
     ) {
         const templates: Template[] = [];
-        for (const id of ids) {
-            const template = await this.templateService.findById(id.toString());
+        for (const templateId of arrayOfIds) {
+            const template = await this.templateService.findById(templateId.toString());
             templates.push(template);
         }
         const task = await this.taskService.findById(id);
         task.templates = templates;
-        console.log(task);
         await this.taskService.save(task);
         return { success: 1 };
     }

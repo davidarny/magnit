@@ -44,7 +44,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
                 format: ETerminals.EMPTY,
             },
             templates: [],
-        }
+        },
     );
     const [documents, setDocuments] = useState<IDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
@@ -54,7 +54,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
         getEditorService(EEditorType.TASK, [
             [focusedPuzzleChain, setFocusedPuzzleChain],
             [toolbarTopPosition, setToolbarTopPosition],
-        ])
+        ]),
     );
 
     // set toolbar offset top
@@ -97,8 +97,8 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
                         id: _.get(template, "id"),
                         title: _.get(template, "title"),
                         __uuid: uuid(),
-                    }))
-            )
+                    })),
+            ),
         )
             .then(documents => setDocuments(([...documents] as unknown) as IDocument[]))
             .catch(console.error);

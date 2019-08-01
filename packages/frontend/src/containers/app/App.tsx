@@ -58,7 +58,7 @@ const App: React.FC = () => {
             new JsonParseMiddleware(),
             new CamelCaseMiddleware(),
             new LoggerMiddleware(),
-        ])
+        ]),
     );
 
     useEffect(() => {

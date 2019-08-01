@@ -89,7 +89,7 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
                                     .filter(answer => {
                                         // find which question references to current condition
                                         const currentQuestion = questions.find(
-                                            question => condition.questionPuzzle === question.id
+                                            question => condition.questionPuzzle === question.id,
                                         );
                                         if (!currentQuestion) {
                                             return false;
@@ -99,7 +99,7 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
                                         // to current condition
                                         // condition -> question -> answer ~ condition -> answer
                                         return currentQuestion.puzzles.some(
-                                            puzzle => puzzle.id === answer.id
+                                            puzzle => puzzle.id === answer.id,
                                         );
                                     })
                                     .map(answer => {

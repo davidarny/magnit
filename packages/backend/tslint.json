@@ -13,6 +13,10 @@
         "interface-name": [false],
         "arrow-parens": false,
         "object-literal-sort-keys": false,
-        "variable-name": false
+        "variable-name": false,
+        "radix": false,
+        "no-console": [true, "log"],
+        "ban-types": false,
+        "no-var-requires": false
     }
 }

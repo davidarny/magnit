@@ -54,7 +54,7 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             console.log(
                 "%c%s",
                 "color:" + "#F07178",
-                `${type.toUpperCase()} factory does not exist!`
+                `${type.toUpperCase()} factory does not exist!`,
             );
             return new DefaultFactory();
     }
