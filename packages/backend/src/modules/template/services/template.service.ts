@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Template } from "../entities/template.entity";
@@ -9,8 +9,13 @@ export class TemplateService {
         @InjectRepository(Template) private readonly templateRepository: Repository<Template>
     ) {}
 
-    async findAll() {
-        return this.templateRepository.find();
+    async findAll(offset: number, limit: number, sort: "ASC" | "DESC", title: string) {
+        return this.templateRepository.find({
+            order: { title: sort },
+            where: { title },
+            skip: offset,
+            take: limit,
+        });
     }
 
     async save(template: Template) {

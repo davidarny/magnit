@@ -10,6 +10,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { TemplateModule } from "./modules/template/template.module";
 import { LoggerMiddleware } from "./middleware/logger.middleware";
 import { APP_INTERCEPTOR } from "@nestjs/core";
+import { TaskModule } from "./modules/tasks/task.module";
 
 const options: TypeOrmModuleOptions = {
     type: "postgres",
@@ -22,7 +23,12 @@ const options: TypeOrmModuleOptions = {
     synchronize: true,
 };
 
-const imports = [TypeOrmModule.forRoot(options), CacheModule.register(), TemplateModule];
+const imports = [
+    TypeOrmModule.forRoot(options),
+    CacheModule.register(),
+    TemplateModule,
+    TaskModule,
+];
 const providers = [
     {
         provide: APP_INTERCEPTOR,

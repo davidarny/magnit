@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
 import { deeplyCreatePuzzles } from "./helpers/template.helpers";
@@ -13,6 +13,7 @@ import { TemplateByIdPipe } from "./template-by-id.pipe";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
+    ApiImplicitQuery,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiUseTags,
@@ -21,8 +22,8 @@ import { CreateTemplateResponse } from "./responses/create-template.response";
 import { GetTemplateResponse } from "./responses/get-template.response";
 import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { ErrorResponse } from "./responses/error.response";
-import { BaseResponse } from "./responses/base.response";
 import { GetTemplatesResponse } from "./responses/get-templates.response";
+import { BaseResponse } from "../../shared/base.response";
 
 @ApiUseTags("templates")
 @Controller("templates")
@@ -36,9 +37,18 @@ export class TemplateController {
     ) {}
 
     @Get("/")
+    @ApiImplicitQuery({ name: "offset", description: "Defaults to 0" })
+    @ApiImplicitQuery({ name: "limit", description: "Defaults to 10" })
+    @ApiImplicitQuery({ name: "sort", enum: ["ASC", "DESC"], description: "Defaults to ASC" })
+    @ApiImplicitQuery({ name: "title", description: "Query Template by title" })
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
-    async findAll() {
-        const templates = await this.templateService.findAll();
+    async findAll(
+        @Query() offset: number = 0,
+        @Query() limit: number = 10,
+        @Query() sort: "ASC" | "DESC" = "ASC",
+        @Query() title?: string
+    ) {
+        const templates = await this.templateService.findAll(offset, limit, sort, title);
         return { success: 1, total: templates.length, templates };
     }
 
