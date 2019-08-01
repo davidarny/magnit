@@ -18,8 +18,8 @@ const controllers = [TaskController];
 const providers = [
     TaskService,
     TemplateService,
-    SectionService,
     PuzzleService,
+    SectionService,
     ConditionService,
     ValidationService,
 ];

@@ -4,23 +4,23 @@ import { ITemplateService } from "../interfaces/template.service.interface";
 const payload = require("../../modules/template/test/template.json");
 
 export class TemplateServiceMock implements ITemplateService {
-    async findOneOrFail(id: string) {
+    async findOneOrFail(id: string): Promise<any> {
         return undefined;
     }
 
-    async findAll() {
+    async findAll(): Promise<any[]> {
         return [];
     }
 
-    async findByTaskId(id: string) {
+    async findByTaskId(id: string): Promise<any[]> {
         return [];
     }
 
-    async save(template: Template) {
+    async save(template: Template): Promise<any> {
         return template;
     }
 
-    async findById(id: string) {
+    async findById(id: string): Promise<any> {
         if (payload.id !== parseInt(id)) {
             return undefined;
         }

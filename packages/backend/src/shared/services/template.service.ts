@@ -40,6 +40,7 @@ export class TemplateService implements ITemplateService {
     }
 
     async save(template: Template) {
+        delete template.id;
         return this.templateRepository.save(template);
     }
 

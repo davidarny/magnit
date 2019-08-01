@@ -1,3 +1,11 @@
+import { ConditionServiceMock } from "../../../shared/mocks/condition.service.mock";
+import { PuzzleServiceMock } from "../../../shared/mocks/puzzle.service.mock";
+import { SectionServiceMock } from "../../../shared/mocks/section.service.mock";
+import { ValidationServiceMock } from "../../../shared/mocks/validation.service.mock";
+import { ConditionService } from "../../../shared/services/condition.service";
+import { PuzzleService } from "../../../shared/services/puzzle.service";
+import { SectionService } from "../../../shared/services/section.service";
+import { ValidationService } from "../../../shared/services/validation.service";
 import { TaskController } from "../task.controller";
 import { TaskService } from "../services/task.service";
 import { TaskServiceMock } from "../../../shared/mocks/task.service.mock";
@@ -8,8 +16,12 @@ import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock
 
 describe("TaskController", () => {
     let taskController: TaskController;
-    const templateService = new TemplateServiceMock();
     const taskService = new TaskServiceMock();
+    const templateService = new TemplateServiceMock();
+    const sectionService = new SectionServiceMock();
+    const puzzleService = new PuzzleServiceMock();
+    const conditionService = new ConditionServiceMock(puzzleService);
+    const validationService = new ValidationServiceMock(puzzleService);
     const payload: TaskDto = {
         id: 0,
         name: "task",
@@ -26,6 +38,22 @@ describe("TaskController", () => {
             {
                 provide: TemplateService,
                 useValue: templateService,
+            },
+            {
+                provide: SectionService,
+                useValue: sectionService,
+            },
+            {
+                provide: PuzzleService,
+                useValue: puzzleService,
+            },
+            {
+                provide: ConditionService,
+                useValue: conditionService,
+            },
+            {
+                provide: ValidationService,
+                useValue: validationService,
             },
         ];
         const controllers = [TaskController];

@@ -6,7 +6,7 @@ const payload = require("../../modules/template/test/template.json");
 export class ConditionServiceMock implements IConditionService {
     constructor(private readonly puzzleService: IPuzzleService) {}
 
-    async findByPuzzleId(id: string) {
+    async findByPuzzleId(id: string): Promise<any[]> {
         const puzzles = [
             ...(await this.puzzleService.findBySectionId(payload.sections[0].id)),
             ...(await this.puzzleService.findByParentId(id)),
