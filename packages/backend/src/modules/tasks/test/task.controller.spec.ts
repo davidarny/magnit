@@ -37,6 +37,11 @@ describe("TaskController", () => {
         expect(await taskController.create(payload)).toStrictEqual(expected);
     });
 
+    it("should get task by id", async () => {
+        const expected = { success: 1, task: new Task(payload) };
+        expect(await taskController.findById("0")).toStrictEqual(expected);
+    });
+
     it("should return list of task with created task", async () => {
         const expected = { success: 1, total: 1, tasks: [new Task(payload)] };
         expect(await taskController.findAll()).toStrictEqual(expected);

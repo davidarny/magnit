@@ -55,6 +55,27 @@ describe("TaskController (e2e)", () => {
             });
     });
 
+    it("GET /v1/tasks/0", async () => {
+        return request(app.getHttpServer())
+            .get("/v1/tasks/0")
+            .expect(200)
+            .then(response => {
+                const expected = { success: 1, task: payload };
+                expect(response.body).toStrictEqual(expected);
+            });
+    });
+
+    it("GET /v1/tasks/1", async () => {
+        return request(app.getHttpServer())
+            .get("/v1/tasks/1")
+            .expect(404)
+            .expect({
+                error: "Not Found",
+                message: "Task with id 1 was not found",
+                statusCode: 404,
+            });
+    });
+
     it("PUT /v1/tasks/0", async () => {
         const updatedPayload = { ...payload, name: "updated task" };
         return request(app.getHttpServer())
@@ -84,6 +105,17 @@ describe("TaskController (e2e)", () => {
             .expect(200)
             .then(response => {
                 const expected = { success: 1, total: 1, tasks: [updatedPayload] };
+                expect(response.body).toStrictEqual(expected);
+            });
+    });
+
+    it("GET /v1/tasks/0", async () => {
+        const updatedPayload = { ...payload, name: "updated task" };
+        return request(app.getHttpServer())
+            .get("/v1/tasks/0")
+            .expect(200)
+            .then(response => {
+                const expected = { success: 1, task: updatedPayload };
                 expect(response.body).toStrictEqual(expected);
             });
     });

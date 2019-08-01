@@ -14,8 +14,8 @@ import { TaskDto } from "./dto/task.dto";
 import { CreateTaskResponse } from "./responses/create-task.response";
 import { ErrorResponse } from "../template/responses/error.response";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
-import { BaseResponse } from "../../shared/base.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
+import { GetTaskResponse } from "./responses/get-task.response";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -56,5 +56,13 @@ export class TaskController {
         const task = await this.taskService.findById(id);
         const updated = await this.taskService.save({ ...task, ...taskDto });
         return { success: 1, task_id: updated.id };
+    }
+
+    @Get("/:id")
+    @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
+    async findById(@Param("id", TaskByIdPipe) id: string) {
+        const task = await this.taskService.findById(id);
+        return { success: 1, task };
     }
 }
