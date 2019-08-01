@@ -24,11 +24,11 @@ export class TaskController {
     @ApiImplicitQuery({ name: "name", description: "Query Task by name" })
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
     async findAll(
-        @Query() offset: number = 0,
-        @Query() limit: number = 10,
-        @Query() sort: "ASC" | "DESC" = "ASC",
-        @Query() status?: TTaskStatus,
-        @Query() name?: string
+        @Query("offset") offset: number = 0,
+        @Query("limit") limit: number = 10,
+        @Query("sort") sort: "ASC" | "DESC" = "ASC",
+        @Query("status") status?: TTaskStatus,
+        @Query("name") name?: string
     ) {
         const tasks = await this.taskService.findAll(offset, limit, sort, status, name);
         return { success: 1, total: tasks.length, tasks };

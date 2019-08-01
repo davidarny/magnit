@@ -1,7 +1,7 @@
 import { Injectable, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Task, TTaskStatus } from "../entities/task.entity";
-import { Repository } from "typeorm";
+import { FindManyOptions, Repository } from "typeorm";
 
 @Injectable()
 export class TaskService {

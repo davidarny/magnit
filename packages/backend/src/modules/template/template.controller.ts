@@ -43,10 +43,10 @@ export class TemplateController {
     @ApiImplicitQuery({ name: "title", description: "Query Template by title" })
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
     async findAll(
-        @Query() offset: number = 0,
-        @Query() limit: number = 10,
-        @Query() sort: "ASC" | "DESC" = "ASC",
-        @Query() title?: string
+        @Query("offset") offset: number = 0,
+        @Query("limit") limit: number = 10,
+        @Query("sort") sort: "ASC" | "DESC" = "ASC",
+        @Query("title") title?: string
     ) {
         const templates = await this.templateService.findAll(offset, limit, sort, title);
         return { success: 1, total: templates.length, templates };
