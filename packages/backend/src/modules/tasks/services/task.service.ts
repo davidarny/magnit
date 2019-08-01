@@ -41,6 +41,7 @@ export class TaskService implements ITaskService {
     }
 
     async save(task: Task) {
+        delete task.id;
         return this.taskRepository.save(task);
     }
 
