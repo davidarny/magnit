@@ -10,7 +10,7 @@ export class EditorServiceImpl implements IEditorService {
 
     constructor(
         private focusedPuzzleState: TFocusedPuzzleState,
-        private toolbarTopPositionState: TToolbarTopPositionState
+        private toolbarTopPositionState: TToolbarTopPositionState,
     ) {
         const wait = 100;
         this.throttledChainCleaning = _.throttle(() => {

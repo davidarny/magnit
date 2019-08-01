@@ -7,7 +7,7 @@ export class LoggerMiddleware implements IMiddleware {
             "%c%s",
             "color:" + "#006DFF",
             `[${meta.method} ${meta.version}/${meta.path}]`,
-            response
+            response,
         );
     }
 
@@ -16,7 +16,7 @@ export class LoggerMiddleware implements IMiddleware {
             "%c%s",
             "color:" + "#F07178",
             `[${meta.method} ${meta.version}/${meta.path}]`,
-            reason
+            reason,
         );
     }
 }

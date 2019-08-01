@@ -11,7 +11,7 @@ export class TaskServiceMock implements ITaskService {
         limit?: number,
         sort?: "ASC" | "DESC",
         status?: "in_progress" | "on_check" | "draft" | "completed",
-        name?: string
+        name?: string,
     ): Promise<any> {
         return undefined;
     }

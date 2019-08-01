@@ -44,7 +44,7 @@ export class TaskController {
         @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
         @Inject(SectionService) private readonly sectionService: ISectionService,
         @Inject(ConditionService) private readonly conditionService: IConditionService,
-        @Inject(ValidationService) private readonly validationService: IValidationService
+        @Inject(ValidationService) private readonly validationService: IValidationService,
     ) {}
 
     @Get("/")
@@ -58,7 +58,7 @@ export class TaskController {
         @Query("limit") limit: number = 10,
         @Query("sort") sort: "ASC" | "DESC" = "ASC",
         @Query("status") status?: TTaskStatus,
-        @Query("name") name?: string
+        @Query("name") name?: string,
     ) {
         const tasks = await this.taskService.findAll(offset, limit, sort, status, name);
         return { success: 1, total: tasks.length, tasks };
@@ -102,7 +102,7 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
     async addTemplates(
         @Param("id", TaskByIdPipe) id: string,
-        @Body("templates", TemplatesByIdsPipe) ids: number[]
+        @Body("templates", TemplatesByIdsPipe) ids: number[],
     ) {
         const templates: Template[] = [];
         for (const id of ids) {
@@ -139,7 +139,7 @@ export class TaskController {
                     validationService: this.validationService,
                 });
                 return template;
-            })
+            }),
         );
         return { success: 1, task: { ...task, templates: assembledTemplates } };
     }

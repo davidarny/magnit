@@ -21,6 +21,6 @@ export function toCamelCase(string: string): string {
         replacer
             .toUpperCase()
             .replace("-", "")
-            .replace("_", "")
+            .replace("_", ""),
     );
 }

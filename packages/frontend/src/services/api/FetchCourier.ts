@@ -6,7 +6,7 @@ export class FetchCourier implements ICourier {
     constructor(
         private readonly host: string | undefined,
         private readonly version: string,
-        private readonly middlewares?: IMiddleware[]
+        private readonly middlewares?: IMiddleware[],
     ) {
         if (!host) {
             throw new Error("Host cannot be null or undefined!");
@@ -39,7 +39,7 @@ export class FetchCourier implements ICourier {
                     _.merge(json, ...responses);
                     const result = await middleware.apply(
                         { path, method, version: this.version },
-                        json
+                        json,
                     );
                     responses.push(result);
                 }
@@ -49,7 +49,7 @@ export class FetchCourier implements ICourier {
         } catch (error) {
             if (this.middlewares) {
                 this.middlewares.forEach(async middleware =>
-                    middleware.error({ path, method, version: this.version }, error)
+                    middleware.error({ path, method, version: this.version }, error),
                 );
             }
             throw error;

@@ -10,7 +10,7 @@ export function deeplyCreatePuzzles(
     puzzleDtoArray: PuzzleDto[],
     section: Section,
     template: Template,
-    parent: Puzzle | null = null
+    parent: Puzzle | null = null,
 ) {
     for (const puzzleDto of puzzleDtoArray || []) {
         const puzzle = new Puzzle(puzzleDto);

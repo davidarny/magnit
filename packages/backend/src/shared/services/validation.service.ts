@@ -7,7 +7,7 @@ import { IValidationService } from "../interfaces/validation.service.interface";
 @Injectable()
 export class ValidationService implements IValidationService {
     constructor(
-        @InjectRepository(Validation) private readonly validationRepository: Repository<Validation>
+        @InjectRepository(Validation) private readonly validationRepository: Repository<Validation>,
     ) {}
 
     async findByPuzzleId(id: string) {

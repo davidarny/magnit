@@ -7,7 +7,7 @@ import { IConditionService } from "../interfaces/condition.service.interface";
 @Injectable()
 export class ConditionService implements IConditionService {
     constructor(
-        @InjectRepository(Condition) private readonly conditionRepository: Repository<Condition>
+        @InjectRepository(Condition) private readonly conditionRepository: Repository<Condition>,
     ) {}
 
     async findByPuzzleId(id: string) {

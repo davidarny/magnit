@@ -13,7 +13,7 @@ export class TaskService implements ITaskService {
         limit?: number,
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
-        name?: string
+        name?: string,
     ) {
         const options: FindManyOptions<Task> = {};
         if (typeof offset !== "undefined") {

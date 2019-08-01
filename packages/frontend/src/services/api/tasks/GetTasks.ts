@@ -19,6 +19,6 @@ export interface IGetTasksResponse extends IResponse {
 
 export async function getTasks(courier: ICourier, status?: ETaskStatus) {
     return courier.get<IGetTasksResponse>(
-        `tasks${status ? `?status=${status.replace(/-/g, "_")}` : ""}`
+        `tasks${status ? `?status=${status.replace(/-/g, "_")}` : ""}`,
     );
 }

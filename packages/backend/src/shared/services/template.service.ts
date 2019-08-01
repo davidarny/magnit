@@ -7,7 +7,7 @@ import { ITemplateService } from "../interfaces/template.service.interface";
 @Injectable()
 export class TemplateService implements ITemplateService {
     constructor(
-        @InjectRepository(Template) private readonly templateRepository: Repository<Template>
+        @InjectRepository(Template) private readonly templateRepository: Repository<Template>,
     ) {}
 
     async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {

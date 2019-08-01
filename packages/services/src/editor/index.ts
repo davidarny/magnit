@@ -14,7 +14,7 @@ export enum EEditorType {
 
 export function getEditorService(
     type: EEditorType,
-    args: [TFocusedPuzzleState, TToolbarTopPositionState]
+    args: [TFocusedPuzzleState, TToolbarTopPositionState],
 ): IEditorService {
     switch (type) {
         case EEditorType.TASK:
@@ -25,7 +25,7 @@ export function getEditorService(
             console.log(
                 "%c%s",
                 "color:" + "#F07178",
-                `Current type (${type}) service does not exist!`
+                `Current type (${type}) service does not exist!`,
             );
             return new EditorServiceImpl(...args);
     }

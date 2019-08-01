@@ -5,7 +5,7 @@ export interface ITemplateService {
         offset?: number,
         limit?: number,
         sort?: "ASC" | "DESC",
-        title?: string
+        title?: string,
     ): Promise<Template[]>;
 
     findOneOrFail(id: string): Promise<Template>;

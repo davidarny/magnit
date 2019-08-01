@@ -6,7 +6,7 @@ export interface ITaskService {
         limit?: number,
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
-        name?: string
+        name?: string,
     ): Promise<Task[]>;
 
     save(task: Task): Promise<Task>;

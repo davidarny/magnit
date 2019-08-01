@@ -3,7 +3,6 @@ import {
     CreateDateColumn,
     DeepPartial,
     Entity,
-    JoinTable,
     ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
@@ -37,11 +36,6 @@ export class Template {
     sections: Section[];
 
     @ManyToMany(() => Task, task => task.templates)
-    @JoinTable({
-        name: "task_x_template",
-        joinColumn: { name: "id_template", referencedColumnName: "id" },
-        inverseJoinColumn: { name: "id_task", referencedColumnName: "id" },
-    })
     tasks: Task[];
 
     @Column({ type: "varchar", default: "light" })

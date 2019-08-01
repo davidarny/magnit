@@ -7,7 +7,7 @@ import { ISectionService } from "../interfaces/section.service.interface";
 @Injectable()
 export class SectionService implements ISectionService {
     constructor(
-        @InjectRepository(Section) private readonly sectionRepository: Repository<Section>
+        @InjectRepository(Section) private readonly sectionRepository: Repository<Section>,
     ) {}
 
     async findByTemplateId(id: number) {

@@ -39,7 +39,7 @@ export class TemplateController {
         @Inject(SectionService) private readonly sectionService: ISectionService,
         @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
         @Inject(ConditionService) private readonly conditionService: IConditionService,
-        @Inject(ValidationService) private readonly validationService: IValidationService
+        @Inject(ValidationService) private readonly validationService: IValidationService,
     ) {}
 
     @Get("/")
@@ -52,7 +52,7 @@ export class TemplateController {
         @Query("offset") offset: number = 0,
         @Query("limit") limit: number = 10,
         @Query("sort") sort: "ASC" | "DESC" = "ASC",
-        @Query("title") title?: string
+        @Query("title") title?: string,
     ) {
         const templates = await this.templateService.findAll(offset, limit, sort, title);
         return { success: 1, total: templates.length, templates };
@@ -89,7 +89,7 @@ export class TemplateController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async update(
         @Param("id", TemplateByIdPipe) id: string,
-        @Body("template") templateDto: TemplateDto
+        @Body("template") templateDto: TemplateDto,
     ) {
         await this.templateService.deleteById(id);
         const { template_id } = await this.create(templateDto);
