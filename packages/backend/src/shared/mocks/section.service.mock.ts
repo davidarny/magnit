@@ -1,6 +1,8 @@
-const payload = require("../payload.json");
+import { ISectionService } from "../interfaces/section.service.interface";
 
-export const sectionService = {
+const payload = require("../../modules/template/test/template.json");
+
+export class SectionServiceMock implements ISectionService {
     async findByTemplateId(id: number) {
         if (payload.id !== id) {
             return;
@@ -10,5 +12,5 @@ export const sectionService = {
             delete buffer.puzzles;
             return { ...buffer };
         });
-    },
-};
+    }
+}

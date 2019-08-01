@@ -1,10 +1,11 @@
-import { Injectable, Query } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, Repository } from "typeorm";
 import { Template } from "../entities/template.entity";
+import { ITemplateService } from "../../../shared/interfaces/template.service.interface";
 
 @Injectable()
-export class TemplateService {
+export class TemplateService implements ITemplateService {
     constructor(
         @InjectRepository(Template) private readonly templateRepository: Repository<Template>
     ) {}

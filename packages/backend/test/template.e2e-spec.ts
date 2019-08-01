@@ -7,16 +7,21 @@ import { PuzzleService } from "../src/modules/template/services/puzzle.service";
 import { SectionService } from "../src/modules/template/services/section.service";
 import { ConditionService } from "../src/modules/template/services/condition.service";
 import { ValidationService } from "../src/modules/template/services/validation.service";
-import { templateService } from "../src/modules/template/test/mocks/template.service.mock";
-import { puzzleService } from "../src/modules/template/test/mocks/puzzle.service.mock";
-import { sectionService } from "../src/modules/template/test/mocks/section.service.mock";
-import { conditionService } from "../src/modules/template/test/mocks/condition.service.mock";
-import { validationService } from "../src/modules/template/test/mocks/validation.service.mock";
+import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
+import { PuzzleServiceMock } from "../src/shared/mocks/puzzle.service.mock";
+import { SectionServiceMock } from "../src/shared/mocks/section.service.mock";
+import { ConditionServiceMock } from "../src/shared/mocks/condition.service.mock";
+import { ValidationServiceMock } from "../src/shared/mocks/validation.service.mock";
 
-const payload = require("../src/modules/template/test/payload.json");
+const payload = require("../src/modules/template/test/template.json");
 
 describe("TemplateController (e2e)", () => {
     let app: NestApplication;
+    const templateService = new TemplateServiceMock();
+    const puzzleService = new PuzzleServiceMock();
+    const sectionService = new SectionServiceMock();
+    const conditionService = new ConditionServiceMock(puzzleService);
+    const validationService = new ValidationServiceMock(puzzleService);
 
     beforeEach(async () => {
         const imports = [AppModule];

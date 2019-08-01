@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Condition } from "../entities/condition.entity";
 import { Validation } from "../entities/validation.entity";
+import { IValidationService } from "../../../shared/interfaces/validation.service.interface";
 
 @Injectable()
-export class ValidationService {
+export class ValidationService implements IValidationService {
     constructor(
         @InjectRepository(Validation) private readonly validationRepository: Repository<Validation>
     ) {}

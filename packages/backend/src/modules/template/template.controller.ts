@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
 import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
 import { deeplyCreatePuzzles } from "./helpers/template.helpers";
@@ -24,16 +24,21 @@ import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { ErrorResponse } from "./responses/error.response";
 import { GetTemplatesResponse } from "./responses/get-templates.response";
 import { BaseResponse } from "../../shared/responses/base.response";
+import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { ISectionService } from "../../shared/interfaces/section.service.interface";
+import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
+import { IConditionService } from "../../shared/interfaces/condition.service.interface";
+import { IValidationService } from "../../shared/interfaces/validation.service.interface";
 
 @ApiUseTags("templates")
 @Controller("templates")
 export class TemplateController {
     constructor(
-        private readonly templateService: TemplateService,
-        private readonly sectionService: SectionService,
-        private readonly puzzleService: PuzzleService,
-        private readonly conditionService: ConditionService,
-        private readonly validationService: ValidationService
+        @Inject(TemplateService) private readonly templateService: ITemplateService,
+        @Inject(SectionService) private readonly sectionService: ISectionService,
+        @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
+        @Inject(ConditionService) private readonly conditionService: IConditionService,
+        @Inject(ValidationService) private readonly validationService: IValidationService
     ) {}
 
     @Get("/")

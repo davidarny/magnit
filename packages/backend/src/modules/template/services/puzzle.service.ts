@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Puzzle } from "../entities/puzzle.entity";
+import { IPuzzleService } from "../../../shared/interfaces/puzzle.service.interface";
 
 @Injectable()
-export class PuzzleService {
+export class PuzzleService implements IPuzzleService {
     constructor(@InjectRepository(Puzzle) private readonly puzzleRepository: Repository<Puzzle>) {}
 
     async findBySectionId(id: string) {

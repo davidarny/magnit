@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Section } from "../entities/section.entity";
+import { ISectionService } from "../../../shared/interfaces/section.service.interface";
 
 @Injectable()
-export class SectionService {
+export class SectionService implements ISectionService {
     constructor(
         @InjectRepository(Section) private readonly sectionRepository: Repository<Section>
     ) {}

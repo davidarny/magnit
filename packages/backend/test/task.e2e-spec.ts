@@ -6,11 +6,12 @@ import { TaskService } from "../src/modules/tasks/services/task.service";
 import { TaskServiceMock } from "../src/shared/mocks/task.service.mock";
 import { TaskDto } from "../src/modules/tasks/dto/task.dto";
 import { TemplateService } from "../src/modules/template/services/template.service";
-import { templateService } from "../src/modules/template/test/mocks/template.service.mock";
+import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
 
 describe("TaskController (e2e)", () => {
     let app: NestApplication;
     const taskService = new TaskServiceMock();
+    const templateService = new TemplateServiceMock();
     const payload: TaskDto = {
         id: 0,
         name: "task",

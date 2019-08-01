@@ -1,6 +1,8 @@
-const payload = require("../payload.json");
+import { IPuzzleService } from "../interfaces/puzzle.service.interface";
 
-export const puzzleService = {
+const payload = require("../../modules/template/test/template.json");
+
+export class PuzzleServiceMock implements IPuzzleService {
     async findBySectionId(id: string) {
         return payload.sections.reduce((prev, curr) => {
             if (curr.id !== id) {
@@ -8,7 +10,7 @@ export const puzzleService = {
             }
             return [...prev, ...curr.puzzles];
         }, []);
-    },
+    }
 
     async findByParentId(id: string) {
         const puzzles = await this.findBySectionId(payload.sections[0].id);
@@ -18,5 +20,5 @@ export const puzzleService = {
             }
             return [...prev, ...(curr.puzzles || [])];
         }, []);
-    },
-};
+    }
+}

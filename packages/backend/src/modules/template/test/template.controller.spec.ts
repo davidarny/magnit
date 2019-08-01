@@ -5,16 +5,21 @@ import { SectionService } from "../services/section.service";
 import { PuzzleService } from "../services/puzzle.service";
 import { ConditionService } from "../services/condition.service";
 import { ValidationService } from "../services/validation.service";
-import { sectionService } from "./mocks/section.service.mock";
-import { puzzleService } from "./mocks/puzzle.service.mock";
-import { conditionService } from "./mocks/condition.service.mock";
-import { validationService } from "./mocks/validation.service.mock";
-import { templateService } from "./mocks/template.service.mock";
+import { SectionServiceMock } from "../../../shared/mocks/section.service.mock";
+import { PuzzleServiceMock } from "../../../shared/mocks/puzzle.service.mock";
+import { ConditionServiceMock } from "../../../shared/mocks/condition.service.mock";
+import { ValidationServiceMock } from "../../../shared/mocks/validation.service.mock";
+import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock";
 
-const payload = require("./payload.json");
+const payload = require("./template.json");
 
 describe("TemplateController", () => {
     let templateController: TemplateController;
+    const templateService = new TemplateServiceMock();
+    const sectionService = new SectionServiceMock();
+    const puzzleService = new PuzzleServiceMock();
+    const conditionService = new ConditionServiceMock(puzzleService);
+    const validationService = new ValidationServiceMock(puzzleService);
 
     beforeEach(async () => {
         const providers = [
@@ -65,10 +70,5 @@ describe("TemplateController", () => {
     it("should delete template", async () => {
         const result = { success: 1 };
         expect(await templateController.deleteById("0")).toStrictEqual(result);
-    });
-
-    it("should update template", async () => {
-        const result = { success: 1, template_id: 0 };
-        expect(await templateController.update("0", payload)).toStrictEqual(result);
     });
 });

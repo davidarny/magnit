@@ -4,10 +4,11 @@ import { TaskServiceMock } from "../../../shared/mocks/task.service.mock";
 import { Test } from "@nestjs/testing";
 import { TaskDto } from "../dto/task.dto";
 import { TemplateService } from "../../template/services/template.service";
-import { templateService } from "../../template/test/mocks/template.service.mock";
+import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock";
 
 describe("TaskController", () => {
     let taskController: TaskController;
+    const templateService = new TemplateServiceMock();
     const taskService = new TaskServiceMock();
     const payload: TaskDto = {
         id: 0,

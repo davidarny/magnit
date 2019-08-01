@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
@@ -20,13 +20,15 @@ import { AddTemplatesDto } from "./dto/add-templates.dto";
 import { Template } from "../template/entities/template.entity";
 import { TemplateService } from "../template/services/template.service";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
+import { ITaskService } from "../../shared/interfaces/task.service.interface";
+import { ITemplateService } from "../../shared/interfaces/template.service.interface";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
 export class TaskController {
     constructor(
-        private readonly taskService: TaskService,
-        private readonly templateService: TemplateService
+        @Inject(TaskService) private readonly taskService: ITaskService,
+        @Inject(TemplateService) private readonly templateService: ITemplateService
     ) {}
 
     @Get("/")
