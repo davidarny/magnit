@@ -26,9 +26,15 @@ export class TaskService implements ITaskService {
             options.order = { name: sort };
         }
         if (status) {
+            if (!options.where) {
+                options.where = {};
+            }
             Object.assign(options.where, { status });
         }
         if (name) {
+            if (!options.where) {
+                options.where = {};
+            }
             Object.assign(options.where, { name });
         }
         return this.taskRepository.find(options);

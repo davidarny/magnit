@@ -22,6 +22,9 @@ export class TemplateService implements ITemplateService {
             options.order = { title: sort };
         }
         if (title) {
+            if (!options.where) {
+                options.where = {};
+            }
             Object.assign(options.where, { title });
         }
         return this.templateRepository.find(options);
