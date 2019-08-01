@@ -9,7 +9,7 @@ import { SectionService } from "./services/section.service";
 import { PuzzleService } from "./services/puzzle.service";
 import { ConditionService } from "./services/condition.service";
 import { ValidationService } from "./services/validation.service";
-import { TemplateByIdPipe } from "./template-by-id.pipe";
+import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
     ApiImplicitQuery,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
@@ -11,6 +12,10 @@ import { GetTasksResponse } from "./responses/get-tasks.response";
 import { Task, TTaskStatus } from "./entities/task.entity";
 import { TaskDto } from "./dto/task.dto";
 import { CreateTaskResponse } from "./responses/create-task.response";
+import { ErrorResponse } from "../template/responses/error.response";
+import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
+import { BaseResponse } from "../../shared/base.response";
+import { UpdateTaskResponse } from "./responses/update-task.response";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -41,5 +46,15 @@ export class TaskController {
         const task = new Task(taskDto);
         const saved = await this.taskService.save(task);
         return { success: 1, task_id: saved.id };
+    }
+
+    @Put("/:id")
+    @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
+    @ApiOkResponse({ type: UpdateTaskResponse, description: "ID of updated Template" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
+    async update(@Param("id", TaskByIdPipe) id: string, @Body("task") taskDto: TaskDto) {
+        const task = await this.taskService.findById(id);
+        const updated = await this.taskService.save({ ...task, ...taskDto });
+        return { success: 1, task_id: updated.id };
     }
 }
