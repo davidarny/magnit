@@ -17,6 +17,7 @@
         "radix": false,
         "no-console": [true, "log"],
         "ban-types": false,
-        "no-var-requires": false
+        "no-var-requires": false,
+        "no-empty": false
     }
 }

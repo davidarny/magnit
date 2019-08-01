@@ -52,6 +52,7 @@ describe("TemplateController", () => {
 
     it("should return empty list of templates", async () => {
         const result = { success: 1, total: 0, templates: [] };
+        jest.spyOn(templateService, "findAll").mockImplementation(async () => []);
         expect(await templateController.findAll()).toStrictEqual(result);
     });
 

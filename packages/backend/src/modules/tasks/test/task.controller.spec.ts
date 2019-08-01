@@ -77,6 +77,7 @@ describe("TaskController", () => {
     it("should get task by id", async () => {
         const expected = { success: 1, task: { ...payload, templates: [] } };
         jest.spyOn(taskService, "findById").mockImplementation(async () => payload);
+        jest.spyOn(templateService, "findByTaskId").mockImplementation(async () => []);
         expect(await taskController.findById("0")).toStrictEqual(expected);
     });
 

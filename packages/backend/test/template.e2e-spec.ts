@@ -42,11 +42,10 @@ describe("TemplateController (e2e)", () => {
         (await app.setGlobalPrefix("v1")).init();
     });
 
-    afterEach(async () => {
-        await app.close();
-    });
+    afterEach(async () => await app.close());
 
     it("GET /v1/templates", async () => {
+        jest.spyOn(templateService, "findAll").mockImplementation(async () => []);
         return request(app.getHttpServer())
             .get("/v1/templates")
             .expect(200)
