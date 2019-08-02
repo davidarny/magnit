@@ -83,7 +83,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             >
                 {!_.isEmpty(template) && (
                     <TemplateEditor
-                        template={(template as unknown) as ITemplate}
+                        initialState={(template as unknown) as ITemplate}
                         css={theme => ({ background: theme.colors.main })}
                         onChange={onTemplateChange}
                     />

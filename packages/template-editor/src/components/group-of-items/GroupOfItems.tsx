@@ -64,6 +64,8 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                 {isGroup && (
                     <ConditionsWrapper
                         puzzleId={puzzle.id}
+                        conditions={puzzle.conditions}
+                        validations={puzzle.validations}
                         focused={focused}
                         puzzleType={puzzle.puzzleType}
                         answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
@@ -99,6 +101,8 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                 {!isGroup && (
                     <ConditionsWrapper
                         puzzleId={puzzle.id}
+                        conditions={puzzle.conditions}
+                        validations={puzzle.validations}
                         focused={focused}
                         puzzleType={puzzle.puzzleType}
                         answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}

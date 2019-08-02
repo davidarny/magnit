@@ -17,7 +17,7 @@ import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@m
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 
 interface ITemplateEditorProps {
-    template?: ITemplate;
+    initialState?: ITemplate;
 
     onChange?(template: ITemplate): void;
 }
@@ -36,7 +36,7 @@ export const EditorContext = React.createContext<IEditorContext>(({} as unknown)
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const [template, setTemplate] = useState<ITemplate>(
-        props.template || {
+        props.initialState || {
             id: uuid(),
             sections: [],
             title: ETerminals.EMPTY,

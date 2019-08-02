@@ -32,15 +32,13 @@ export class Validation {
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
-    @JoinColumn({ name: "id_left_hand_puzzle" })
+    @Column({ type: "varchar", nullable: true })
     left_hand_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
     validation_type: TValidationType;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
-    @JoinColumn({ name: "id_right_hand_puzzle" })
+    @Column({ type: "varchar", nullable: true })
     right_hand_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true })

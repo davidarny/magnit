@@ -86,9 +86,25 @@ export class TemplateController {
         @Param("id", TemplateByIdPipe) id: string,
         @Body("template") templateDto: TemplateDto,
     ) {
-        await this.templateService.deleteById(id);
-        const { template_id } = await this.create(templateDto);
-        return { success: 1, template_id };
+        const puzzles: Puzzle[] = [];
+        const sections: Section[] = [];
+
+        const template = new Template(templateDto);
+
+        for (const sectionDto of templateDto.sections) {
+            const section = new Section(sectionDto);
+
+            puzzles.length = 0;
+            this.puzzleService.deeplyCreatePuzzles(puzzles, sectionDto.puzzles, section, template);
+
+            section.puzzles = puzzles;
+            sections.push(section);
+        }
+
+        template.sections = sections;
+        const saved = await this.templateService.save(template, false);
+
+        return { success: 1, template_id: saved.id };
     }
 
     @Get("/:id")

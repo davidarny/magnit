@@ -24,6 +24,7 @@ export class PuzzleService implements IPuzzleService {
     async findByParentId(id: string) {
         return this.puzzleRepository.find({
             where: { parent: { id } },
+            order: { order: "ASC" },
             relations: ["puzzles", "conditions", "validations"],
         });
     }

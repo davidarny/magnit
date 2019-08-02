@@ -8,10 +8,13 @@ import { Conditions } from "./Conditions";
 import { Validations } from "./Validations";
 import { EPuzzleType } from "@magnit/services";
 import { Grid, Tab, Tabs } from "@material-ui/core";
+import { ICondition, IValidation } from "entities";
 
 interface IContentConditionsProps {
     puzzleId: string;
     focused: boolean;
+    conditions: ICondition[];
+    validations: IValidation[];
     puzzleType: EPuzzleType;
     answerType?: EPuzzleType;
 }
@@ -112,6 +115,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                                 <Conditions
                                     disabled={tab !== 0}
                                     puzzleId={puzzleId}
+                                    initialState={props.conditions}
                                     onTemplateChange={onTemplateChange}
                                     template={template}
                                 />
@@ -127,6 +131,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                                 <Validations
                                     disabled={tab !== 1}
                                     puzzleId={puzzleId}
+                                    initialState={props.validations}
                                     onTemplateChange={onTemplateChange}
                                     template={template}
                                 />

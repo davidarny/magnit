@@ -32,6 +32,7 @@ import { getValidationService } from "services/condition";
 import { ETerminals, EPuzzleType } from "@magnit/services";
 
 interface IValidationsProps {
+    initialState?: IValidation[];
     puzzleId: string;
     template: ITemplate;
     disabled?: boolean;
@@ -41,17 +42,19 @@ interface IValidationsProps {
 
 export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
-    const [validations, setValidations] = useState<IValidation[]>([
-        {
-            id: uuid(),
-            order: 0,
-            leftHandPuzzle: ETerminals.EMPTY,
-            errorMessage: ETerminals.EMPTY,
-            operatorType: EOperatorType.NONE,
-            validationType: EValidationType.NONE,
-            conditionType: EConditionType.OR,
-        },
-    ]);
+    const [validations, setValidations] = useState<IValidation[]>(
+        props.initialState || [
+            {
+                id: uuid(),
+                order: 0,
+                leftHandPuzzle: ETerminals.EMPTY,
+                errorMessage: ETerminals.EMPTY,
+                operatorType: EOperatorType.NONE,
+                validationType: EValidationType.NONE,
+                conditionType: EConditionType.OR,
+            },
+        ],
+    );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);

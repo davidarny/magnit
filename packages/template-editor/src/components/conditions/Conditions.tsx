@@ -31,6 +31,7 @@ import { getConditionService } from "services/condition";
 import { ETerminals, EPuzzleType } from "@magnit/services";
 
 interface IConditionsProps {
+    initialState?: ICondition[];
     puzzleId: string;
     template: ITemplate;
     disabled?: boolean;
@@ -40,17 +41,19 @@ interface IConditionsProps {
 
 export const Conditions: React.FC<IConditionsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
-    const [conditions, setConditions] = useState<ICondition[]>([
-        {
-            id: uuid(),
-            order: 0,
-            questionPuzzle: ETerminals.EMPTY,
-            answerPuzzle: ETerminals.EMPTY,
-            value: ETerminals.EMPTY,
-            actionType: EActionType.NONE,
-            conditionType: EConditionType.OR,
-        },
-    ]);
+    const [conditions, setConditions] = useState<ICondition[]>(
+        props.initialState || [
+            {
+                id: uuid(),
+                order: 0,
+                questionPuzzle: ETerminals.EMPTY,
+                answerPuzzle: ETerminals.EMPTY,
+                value: ETerminals.EMPTY,
+                actionType: EActionType.NONE,
+                conditionType: EConditionType.OR,
+            },
+        ],
+    );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
@@ -144,7 +147,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     // disallow referencing to questions in GROUPS
                     if (
                         puzzle.puzzleType === EPuzzleType.QUESTION &&
-                        puzzle.title.length > 0 &&
+                        puzzle.title.toString().length > 0 &&
                         !isGroupParent
                     ) {
                         questions.push(puzzle);

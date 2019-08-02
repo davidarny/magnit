@@ -7,8 +7,6 @@ export class JsonParseMiddleware implements IMiddleware {
         traverse(response, (object: any) => {
             if (_.isObject(object)) {
                 _.mapKeys(object, (value: any, key: string) => {
-                    // delete (object as { [key: string]: any })[key];
-                    // (object as { [key: string]: any })[toCamelCase(key)] = value;
                     if (_.isString(value)) {
                         try {
                             (object as { [key: string]: any })[key] = JSON.parse(value);
