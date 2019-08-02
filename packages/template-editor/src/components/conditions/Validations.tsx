@@ -368,7 +368,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs>
+                        <Grid item xs css={theme => ({ maxWidth: theme.spacing(32) })}>
                             {!!validation.leftHandPuzzle &&
                                 validationService.getRightHandPuzzle(questions)(
                                     validation.validationType ===
@@ -397,10 +397,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     title={"Добавить внутреннее условие"}
                     icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
                     scheme={"blueOutline"}
-                    css={theme => ({
-                        width: 290,
-                        marginLeft: theme.spacing(0.5),
-                    })}
+                    css={theme => ({ width: theme.spacing(36) })}
                 />
             </Grid>
             <Grid item xs={12}>

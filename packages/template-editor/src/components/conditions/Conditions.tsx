@@ -400,10 +400,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     title={"Добавить внутреннее условие"}
                     icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
                     scheme={"blueOutline"}
-                    css={theme => ({
-                        width: 290,
-                        marginLeft: theme.spacing(0.5),
-                    })}
+                    css={theme => ({ width: theme.spacing(36) })}
                 />
             </Grid>
         </Grid>
