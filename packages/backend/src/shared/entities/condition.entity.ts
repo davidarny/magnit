@@ -35,26 +35,18 @@ export class Condition {
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;
 
-    @Column({ nullable: true })
-    id_question_puzzle: string;
+    @Column({ type: "varchar", nullable: true })
+    question_puzzle: string;
 
-    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
-    @JoinColumn({ name: "id_question_puzzle" })
-    question_puzzle: Puzzle;
-
-    @Column({ type: "varchar", nullable: true, name: "action_type" })
+    @Column({ type: "varchar", nullable: true })
     action_type: TActionType;
 
-    @Column({ nullable: true })
-    id_answer_puzzle: string;
-
-    @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
-    @JoinColumn({ name: "id_answer_puzzle" })
-    answer_puzzle: Puzzle;
+    @Column({ type: "varchar", nullable: true })
+    answer_puzzle: string;
 
     @Column({ type: "varchar", default: "" })
     value: string;
 
-    @Column({ type: "varchar", nullable: true, name: "condition_type" })
+    @Column({ type: "varchar", nullable: true })
     condition_type: TConditionType;
 }

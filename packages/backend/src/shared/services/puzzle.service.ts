@@ -16,13 +16,16 @@ export class PuzzleService implements IPuzzleService {
     async findBySectionId(id: string) {
         return this.puzzleRepository.find({
             where: { section: { id }, parent: null },
-            relations: ["puzzles"],
+            relations: ["puzzles", "conditions", "validations"],
             order: { order: "ASC" },
         });
     }
 
     async findByParentId(id: string) {
-        return this.puzzleRepository.find({ where: { parent: { id } }, relations: ["puzzles"] });
+        return this.puzzleRepository.find({
+            where: { parent: { id } },
+            relations: ["puzzles", "conditions", "validations"],
+        });
     }
 
     deeplyCreatePuzzles(
