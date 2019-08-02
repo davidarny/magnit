@@ -61,6 +61,14 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                     onFocus={onFocus}
                     onBlur={props.onBlur}
                 />
+                {isGroup && (
+                    <ConditionsWrapper
+                        puzzleId={puzzle.id}
+                        focused={focused}
+                        puzzleType={puzzle.puzzleType}
+                        answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
+                    />
+                )}
                 {puzzle.puzzles &&
                     puzzle.puzzles.map((childPuzzle, index) => {
                         if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
@@ -88,12 +96,14 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                             />
                         );
                     })}
-                <ConditionsWrapper
-                    puzzleId={puzzle.id}
-                    focused={focused}
-                    puzzleType={puzzle.puzzleType}
-                    answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
-                />
+                {!isGroup && (
+                    <ConditionsWrapper
+                        puzzleId={puzzle.id}
+                        focused={focused}
+                        puzzleType={puzzle.puzzleType}
+                        answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
+                    />
+                )}
             </div>
         </SelectableBlockWrapper>
     );
