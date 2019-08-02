@@ -42,7 +42,7 @@ interface IConditionsProps {
 export const Conditions: React.FC<IConditionsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
     const [conditions, setConditions] = useState<ICondition[]>(
-        props.initialState || [
+        (props.initialState && props.initialState.length && props.initialState) || [
             {
                 id: uuid(),
                 order: 0,

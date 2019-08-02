@@ -43,7 +43,7 @@ interface IValidationsProps {
 export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
     const [validations, setValidations] = useState<IValidation[]>(
-        props.initialState || [
+        (props.initialState && props.initialState.length && props.initialState) || [
             {
                 id: uuid(),
                 order: 0,
