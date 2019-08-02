@@ -6,8 +6,6 @@ import { Template } from "../../shared/entities/template.entity";
 import { Section } from "../../shared/entities/section.entity";
 import { SectionService } from "../../shared/services/section.service";
 import { PuzzleService } from "../../shared/services/puzzle.service";
-import { ConditionService } from "../../shared/services/condition.service";
-import { ValidationService } from "../../shared/services/validation.service";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import {
     ApiCreatedResponse,
@@ -26,10 +24,8 @@ import { BaseResponse } from "../../shared/responses/base.response";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
 import { ISectionService } from "../../shared/interfaces/section.service.interface";
 import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
-import { IConditionService } from "../../shared/interfaces/condition.service.interface";
-import { IValidationService } from "../../shared/interfaces/validation.service.interface";
-import { deeplyCreatePuzzles } from "./helpers/deeply-create-template.helpers";
-import { assembleTemplate } from "../../shared/helpers/assemble-template.helper";
+import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
+import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
 
 @ApiUseTags("templates")
 @Controller("templates")
@@ -38,8 +34,7 @@ export class TemplateController {
         @Inject(TemplateService) private readonly templateService: ITemplateService,
         @Inject(SectionService) private readonly sectionService: ISectionService,
         @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
-        @Inject(ConditionService) private readonly conditionService: IConditionService,
-        @Inject(ValidationService) private readonly validationService: IValidationService,
+        @Inject(PuzzleAssemblerService) private readonly assemblerService: IAssemblerService,
     ) {}
 
     @Get("/")
@@ -71,7 +66,7 @@ export class TemplateController {
             const section = new Section(sectionDto);
 
             puzzles.length = 0;
-            deeplyCreatePuzzles(puzzles, sectionDto.puzzles, section, template);
+            this.puzzleService.deeplyCreatePuzzles(puzzles, sectionDto.puzzles, section, template);
 
             section.puzzles = puzzles;
             sections.push(section);
@@ -101,12 +96,7 @@ export class TemplateController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
     async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
-        await assembleTemplate(template, {
-            conditionService: this.conditionService,
-            puzzleService: this.puzzleService,
-            sectionService: this.sectionService,
-            validationService: this.validationService,
-        });
+        await this.assemblerService.assemble(template);
         return { success: 1, template: JSON.stringify(template) };
     }
 

@@ -5,13 +5,9 @@ import { TemplateService } from "../src/shared/services/template.service";
 import { NestApplication } from "@nestjs/core";
 import { PuzzleService } from "../src/shared/services/puzzle.service";
 import { SectionService } from "../src/shared/services/section.service";
-import { ConditionService } from "../src/shared/services/condition.service";
-import { ValidationService } from "../src/shared/services/validation.service";
 import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
 import { PuzzleServiceMock } from "../src/shared/mocks/puzzle.service.mock";
 import { SectionServiceMock } from "../src/shared/mocks/section.service.mock";
-import { ConditionServiceMock } from "../src/shared/mocks/condition.service.mock";
-import { ValidationServiceMock } from "../src/shared/mocks/validation.service.mock";
 
 const payload = require("../src/modules/template/test/template.json");
 
@@ -20,8 +16,6 @@ describe("TemplateController (e2e)", () => {
     const templateService = new TemplateServiceMock();
     const puzzleService = new PuzzleServiceMock();
     const sectionService = new SectionServiceMock();
-    const conditionService = new ConditionServiceMock(puzzleService);
-    const validationService = new ValidationServiceMock(puzzleService);
 
     beforeEach(async () => {
         const imports = [AppModule];
@@ -32,10 +26,6 @@ describe("TemplateController (e2e)", () => {
             .useValue(puzzleService)
             .overrideProvider(SectionService)
             .useValue(sectionService)
-            .overrideProvider(ConditionService)
-            .useValue(conditionService)
-            .overrideProvider(ValidationService)
-            .useValue(validationService)
             .compile();
 
         app = moduleFixture.createNestApplication();

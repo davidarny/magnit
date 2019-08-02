@@ -6,6 +6,8 @@ import {
     ManyToOne,
     OneToMany,
     PrimaryGeneratedColumn,
+    TreeChildren,
+    TreeParent,
 } from "typeorm";
 import { Template } from "./template.entity";
 import { Section } from "./section.entity";
@@ -28,7 +30,7 @@ export type TAnswerType = "number" | "string";
 
 type TConstructablePuzzle = Omit<
     Puzzle,
-    "template" | "section" | "parent" | "children" | "conditions" | "validations"
+    "template" | "section" | "parent" | "puzzles" | "conditions" | "validations"
 >;
 
 @Entity()
@@ -56,12 +58,12 @@ export class Puzzle {
     @JoinColumn({ name: "id_section" })
     section: Section;
 
-    @ManyToOne(() => Puzzle, puzzle => puzzle.children, { nullable: true })
+    @TreeParent()
     @JoinColumn({ name: "id_parent" })
     parent: Puzzle;
 
-    @OneToMany(() => Puzzle, puzzle => puzzle.parent)
-    children: Puzzle[];
+    @TreeChildren({ cascade: true })
+    puzzles: Puzzle[];
 
     @Column("int")
     order: number;
@@ -72,9 +74,9 @@ export class Puzzle {
     @Column({ type: "varchar", name: "answer_type", nullable: true })
     answer_type: TAnswerType;
 
-    @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true })
+    @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true, eager: true })
     conditions: Condition[];
 
-    @OneToMany(() => Validation, validation => validation.puzzle, { cascade: true })
+    @OneToMany(() => Validation, validation => validation.puzzle, { cascade: true, eager: true })
     validations: Validation[];
 }

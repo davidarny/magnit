@@ -24,16 +24,13 @@ import { ITaskService } from "../../shared/interfaces/task.service.interface";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
-import { assembleTemplate } from "../../shared/helpers/assemble-template.helper";
 import { PuzzleService } from "../../shared/services/puzzle.service";
 import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
 import { SectionService } from "../../shared/services/section.service";
 import { ISectionService } from "../../shared/interfaces/section.service.interface";
-import { ConditionService } from "../../shared/services/condition.service";
-import { IConditionService } from "../../shared/interfaces/condition.service.interface";
-import { ValidationService } from "../../shared/services/validation.service";
-import { IValidationService } from "../../shared/interfaces/validation.service.interface";
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
+import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
+import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -43,8 +40,7 @@ export class TaskController {
         @Inject(TemplateService) private readonly templateService: ITemplateService,
         @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
         @Inject(SectionService) private readonly sectionService: ISectionService,
-        @Inject(ConditionService) private readonly conditionService: IConditionService,
-        @Inject(ValidationService) private readonly validationService: IValidationService,
+        @Inject(PuzzleAssemblerService) private readonly assemblerService: IAssemblerService,
     ) {}
 
     @Get("/")
@@ -131,12 +127,7 @@ export class TaskController {
         const templates = await this.templateService.findByTaskId(task.id.toString());
         const assembledTemplates = await Promise.all(
             templates.map(async template => {
-                await assembleTemplate(template, {
-                    sectionService: this.sectionService,
-                    puzzleService: this.puzzleService,
-                    conditionService: this.conditionService,
-                    validationService: this.validationService,
-                });
+                await this.assemblerService.assemble(template);
                 return template;
             }),
         );

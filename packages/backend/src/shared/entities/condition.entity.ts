@@ -35,12 +35,18 @@ export class Condition {
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;
 
+    @Column({ nullable: true })
+    id_question_puzzle: string;
+
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_question_puzzle" })
     question_puzzle: Puzzle;
 
     @Column({ type: "varchar", nullable: true, name: "action_type" })
     action_type: TActionType;
+
+    @Column({ nullable: true })
+    id_answer_puzzle: string;
 
     @ManyToOne(() => Puzzle, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_answer_puzzle" })

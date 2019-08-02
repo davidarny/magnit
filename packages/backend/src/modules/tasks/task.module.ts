@@ -7,12 +7,11 @@ import { TemplateService } from "../../shared/services/template.service";
 import { Template } from "../../shared/entities/template.entity";
 import { SectionService } from "../../shared/services/section.service";
 import { PuzzleService } from "../../shared/services/puzzle.service";
-import { ConditionService } from "../../shared/services/condition.service";
-import { ValidationService } from "../../shared/services/validation.service";
 import { Section } from "../../shared/entities/section.entity";
 import { Puzzle } from "../../shared/entities/puzzle.entity";
 import { Condition } from "../../shared/entities/condition.entity";
 import { Validation } from "../../shared/entities/validation.entity";
+import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
 
 const controllers = [TaskController];
 const providers = [
@@ -20,8 +19,7 @@ const providers = [
     TemplateService,
     PuzzleService,
     SectionService,
-    ConditionService,
-    ValidationService,
+    PuzzleAssemblerService,
 ];
 const entities = [Task, Template, Section, Puzzle, Condition, Validation];
 const imports = [TypeOrmModule.forFeature(entities)];

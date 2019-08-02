@@ -27,7 +27,7 @@ export class Section {
     @JoinColumn({ name: "id_template" })
     template: Template;
 
-    @OneToMany(() => Puzzle, puzzle => puzzle.section, { nullable: true, cascade: true })
+    @OneToMany(() => Puzzle, puzzle => puzzle.section, { cascade: true })
     puzzles: Puzzle[];
 
     @Column("varchar")

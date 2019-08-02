@@ -1,4 +1,8 @@
 import { IPuzzleService } from "../interfaces/puzzle.service.interface";
+import { Puzzle } from "../entities/puzzle.entity";
+import { PuzzleDto } from "../../modules/template/dto/puzzle.dto";
+import { Section } from "../entities/section.entity";
+import { Template } from "../entities/template.entity";
 
 const payload = require("../../modules/template/test/template.json");
 
@@ -21,4 +25,12 @@ export class PuzzleServiceMock implements IPuzzleService {
             return [...prev, ...(curr.puzzles || [])];
         }, []);
     }
+
+    deeplyCreatePuzzles(
+        puzzles: Puzzle[],
+        puzzleDtoArray: PuzzleDto[],
+        section: Section,
+        template: Template,
+        parent?: Puzzle,
+    ): void {}
 }
