@@ -28,8 +28,8 @@
         -   [Backend](#Backend)
         -   [Libraries](#Libraries)
     -   [Testing](#Testing)
-    -   [Contributing](#Contributing)
     -   [Documentation](#Documentation)
+    -   [Contributing](#Contributing)
 
 ### Requirements
 
@@ -118,12 +118,16 @@ $ lerna run test
 
 This will run tests in all packages that have `test` script in `package.json`
 
+### Documentation
+
+All the necessary documentation for architecture can be found [here](./docs)
+
+Backend documentation is available [here (compodoc)](http://91.144.161.208:1337/)
+
+REST API documentations is available [here (swagger)](http://91.144.161.208:1337/api)
+
 ### Contributing
 
 The recommended way to commit is using `yarn commit` command
 
 This script is using [commitizen](https://github.com/commitizen/cz-cli), as well as [commitlint](https://github.com/conventional-changelog/commitlint) as git `post-commit` hook
-
-### Documentation
-
-All the necessary documentation for architecture can be found [here](./docs)
