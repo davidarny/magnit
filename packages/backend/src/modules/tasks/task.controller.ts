@@ -2,35 +2,37 @@ import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
-    ApiImplicitQuery,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { TaskService } from "./services/task.service";
-import { GetTasksResponse } from "./responses/get-tasks.response";
-import { Task, TTaskStatus } from "./entities/task.entity";
-import { TaskDto } from "./dto/task.dto";
-import { CreateTaskResponse } from "./responses/create-task.response";
-import { ErrorResponse } from "../template/responses/error.response";
-import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
-import { UpdateTaskResponse } from "./responses/update-task.response";
-import { GetTaskResponse } from "./responses/get-task.response";
-import { AddTemplatesDto } from "./dto/add-templates.dto";
 import { Template } from "../../shared/entities/template.entity";
-import { TemplateService } from "../../shared/services/template.service";
-import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
+import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
+import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
+import { ISectionService } from "../../shared/interfaces/section.service.interface";
 import { ITaskService } from "../../shared/interfaces/task.service.interface";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { JsonParsePipe } from "../../shared/pipes/json-parse.pipe";
+import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
-import { PuzzleService } from "../../shared/services/puzzle.service";
-import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
-import { SectionService } from "../../shared/services/section.service";
-import { ISectionService } from "../../shared/interfaces/section.service.interface";
-import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
-import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
+import { PuzzleService } from "../../shared/services/puzzle.service";
+import { SectionService } from "../../shared/services/section.service";
+import { TemplateService } from "../../shared/services/template.service";
+import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
+import { ErrorResponse } from "../template/responses/error.response";
+import { AddTemplatesBody } from "./bodies/add-templates.body";
+import { TaskDto } from "./dto/task.dto";
+import { Task } from "./entities/task.entity";
+import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
+import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
+import { FindAllQuery } from "./queries/find-all.query";
+import { CreateTaskResponse } from "./responses/create-task.response";
+import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
+import { GetTaskResponse } from "./responses/get-task.response";
+import { GetTasksResponse } from "./responses/get-tasks.response";
+import { UpdateTaskResponse } from "./responses/update-task.response";
+import { TaskService } from "./services/task.service";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -44,19 +46,13 @@ export class TaskController {
     ) {}
 
     @Get("/")
-    @ApiImplicitQuery({ name: "offset", description: "Defaults to 0" })
-    @ApiImplicitQuery({ name: "limit", description: "Defaults to 10" })
-    @ApiImplicitQuery({ name: "sort", enum: ["ASC", "DESC"], description: "Defaults to ASC" })
-    @ApiImplicitQuery({ name: "name", description: "Query Task by name" })
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
     async findAll(
-        @Query("offset") offset: number = 0,
-        @Query("limit") limit: number = 10,
-        @Query("sort") sort: "ASC" | "DESC" = "ASC",
-        @Query("status") status?: TTaskStatus,
-        @Query("name") name?: string,
+        @Query(new NonCompatiblePropsPipe<FindAllQuery>(["status", "statuses"]), JsonParsePipe)
+        query: FindAllQuery = {} as FindAllQuery,
     ) {
-        const tasks = await this.taskService.findAll(offset, limit, sort, status, name);
+        const { offset, limit, sort, status, statuses, name } = query;
+        const tasks = await this.taskService.findAll(offset, limit, sort, status, statuses, name);
         return { success: 1, total: tasks.length, tasks };
     }
 
@@ -91,7 +87,7 @@ export class TaskController {
     @Put("/:id/templates")
     @ApiImplicitBody({
         name: "templates",
-        type: AddTemplatesDto,
+        type: AddTemplatesBody,
         description: "IDs of Templates to add",
     })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template with ID was not found" })

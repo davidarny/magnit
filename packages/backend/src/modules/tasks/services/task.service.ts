@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Task, TTaskStatus } from "../entities/task.entity";
-import { FindManyOptions, Repository } from "typeorm";
+import { FindManyOptions, In, Repository } from "typeorm";
 import { ITaskService } from "../../../shared/interfaces/task.service.interface";
 
 @Injectable()
@@ -13,6 +13,7 @@ export class TaskService implements ITaskService {
         limit?: number,
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
+        statuses?: TTaskStatus[],
         name?: string,
     ) {
         const options: FindManyOptions<Task> = {};
@@ -30,6 +31,12 @@ export class TaskService implements ITaskService {
                 options.where = {};
             }
             Object.assign(options.where, { status });
+        }
+        if (statuses) {
+            if (!options.where) {
+                options.where = {};
+            }
+            Object.assign(options.where, { status: In(statuses) });
         }
         if (name) {
             if (!options.where) {

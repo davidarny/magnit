@@ -1,4 +1,4 @@
-import { Task } from "../../modules/tasks/entities/task.entity";
+import { Task, TTaskStatus } from "../../modules/tasks/entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 
 export class TaskServiceMock implements ITaskService {
@@ -8,7 +8,8 @@ export class TaskServiceMock implements ITaskService {
         offset?: number,
         limit?: number,
         sort?: "ASC" | "DESC",
-        status?: "in_progress" | "on_check" | "draft" | "completed",
+        status?: TTaskStatus,
+        statuses?: TTaskStatus[],
         name?: string,
     ): Promise<any> {}
 

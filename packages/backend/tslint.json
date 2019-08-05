@@ -5,7 +5,7 @@
         "no-unused-expression": true
     },
     "rules": {
-        "quotemark": [true, "double"],
+        "quotemark": [true, "double", "avoid-escape", "avoid-template"],
         "member-access": [false],
         "ordered-imports": [false],
         "max-line-length": [true, 100],

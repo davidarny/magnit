@@ -6,6 +6,7 @@ export interface ITaskService {
         limit?: number,
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
+        statuses?: TTaskStatus[],
         name?: string,
     ): Promise<Task[]>;
 
