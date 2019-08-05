@@ -1,31 +1,31 @@
 import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
-import { TemplateService } from "../../shared/services/template.service";
-import { TemplateDto } from "./dto/template.dto";
-import { Puzzle } from "../../shared/entities/puzzle.entity";
-import { Template } from "../../shared/entities/template.entity";
-import { Section } from "../../shared/entities/section.entity";
-import { SectionService } from "../../shared/services/section.service";
-import { PuzzleService } from "../../shared/services/puzzle.service";
-import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
-    ApiImplicitQuery,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
+import { Puzzle } from "../../shared/entities/puzzle.entity";
+import { Section } from "../../shared/entities/section.entity";
+import { Template } from "../../shared/entities/template.entity";
+import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
+import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
+import { ISectionService } from "../../shared/interfaces/section.service.interface";
+import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { BaseResponse } from "../../shared/responses/base.response";
+import { ErrorResponse } from "../../shared/responses/error.response";
+import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
+import { PuzzleService } from "../../shared/services/puzzle.service";
+import { SectionService } from "../../shared/services/section.service";
+import { TemplateService } from "../../shared/services/template.service";
+import { TemplateDto } from "./dto/template.dto";
+import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
+import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTemplateResponse } from "./responses/create-template.response";
 import { GetTemplateResponse } from "./responses/get-template.response";
-import { UpdateTemplateResponse } from "./responses/update-template.response";
-import { ErrorResponse } from "./responses/error.response";
 import { GetTemplatesResponse } from "./responses/get-templates.response";
-import { BaseResponse } from "../../shared/responses/base.response";
-import { ITemplateService } from "../../shared/interfaces/template.service.interface";
-import { ISectionService } from "../../shared/interfaces/section.service.interface";
-import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
-import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
-import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
+import { UpdateTemplateResponse } from "./responses/update-template.response";
 
 @ApiUseTags("templates")
 @Controller("templates")
@@ -38,17 +38,9 @@ export class TemplateController {
     ) {}
 
     @Get("/")
-    @ApiImplicitQuery({ name: "offset", description: "Defaults to 0" })
-    @ApiImplicitQuery({ name: "limit", description: "Defaults to 10" })
-    @ApiImplicitQuery({ name: "sort", enum: ["ASC", "DESC"], description: "Defaults to ASC" })
-    @ApiImplicitQuery({ name: "title", description: "Query Template by title" })
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
-    async findAll(
-        @Query("offset") offset: number = 0,
-        @Query("limit") limit: number = 10,
-        @Query("sort") sort: "ASC" | "DESC" = "ASC",
-        @Query("title") title?: string,
-    ) {
+    async findAll(@Query() query?: FindAllQuery) {
+        const { offset, limit, sort, title } = query || new FindAllQuery();
         const templates = await this.templateService.findAll(offset, limit, sort, title);
         return { success: 1, total: templates.length, templates };
     }

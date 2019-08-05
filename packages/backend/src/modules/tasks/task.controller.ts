@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
 import {
+    ApiBadRequestResponse,
     ApiCreatedResponse,
     ApiImplicitBody,
     ApiNotFoundResponse,
@@ -20,7 +21,7 @@ import { PuzzleService } from "../../shared/services/puzzle.service";
 import { SectionService } from "../../shared/services/section.service";
 import { TemplateService } from "../../shared/services/template.service";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
-import { ErrorResponse } from "../template/responses/error.response";
+import { ErrorResponse } from "../../shared/responses/error.response";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
 import { TaskDto } from "./dto/task.dto";
 import { Task } from "./entities/task.entity";
@@ -47,11 +48,12 @@ export class TaskController {
 
     @Get("/")
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
+    @ApiBadRequestResponse({ description: "Found non compatible props" })
     async findAll(
         @Query(new NonCompatiblePropsPipe<FindAllQuery>(["status", "statuses"]), JsonParsePipe)
-        query: FindAllQuery = {} as FindAllQuery,
+        query?: FindAllQuery,
     ) {
-        const { offset, limit, sort, status, statuses, name } = query;
+        const { offset, limit, sort, statuses, status, name } = query || new FindAllQuery();
         const tasks = await this.taskService.findAll(offset, limit, sort, status, statuses, name);
         return { success: 1, total: tasks.length, tasks };
     }

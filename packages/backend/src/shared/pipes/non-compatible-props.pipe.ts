@@ -10,11 +10,6 @@ export class NonCompatiblePropsPipe<T extends IIndexedObject> implements PipeTra
 
     transform(value: T, metadata: ArgumentMetadata): T {
         const present = new Map<string | number | symbol, boolean>();
-        for (const key of Object.keys(value)) {
-            if (!this.keys.includes(key)) {
-                throw new BadRequestException(`Key "${key}" not found`);
-            }
-        }
         for (const key of this.keys) {
             present.set(key, !!value[key]);
         }
