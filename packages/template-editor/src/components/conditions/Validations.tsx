@@ -396,7 +396,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     onClick={onAddValidation}
                     title={"Добавить внутреннее условие"}
                     icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
-                    scheme={"blueOutline"}
+                    scheme={"outline"}
                     css={theme => ({ width: theme.spacing(36) })}
                 />
             </Grid>

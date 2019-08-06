@@ -6,3 +6,4 @@ export * from "./radio-answer";
 export * from "./dropdown-asnwer";
 export * from "./date-answer";
 export * from "./checkbox-answer";
+export * from "./upload-files-answer";

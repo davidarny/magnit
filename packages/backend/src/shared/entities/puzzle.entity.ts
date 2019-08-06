@@ -72,6 +72,7 @@ export class Puzzle {
     puzzle_type: TPuzzleType;
 
     @Column({ type: "varchar", name: "answer_type", nullable: true })
+    /** @deprecated */
     answer_type: TAnswerType;
 
     @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true, eager: true })

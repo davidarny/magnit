@@ -399,7 +399,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     onClick={onAddCondition}
                     title={"Добавить внутреннее условие"}
                     icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
-                    scheme={"blueOutline"}
+                    scheme={"outline"}
                     css={theme => ({ width: theme.spacing(36) })}
                 />
             </Grid>

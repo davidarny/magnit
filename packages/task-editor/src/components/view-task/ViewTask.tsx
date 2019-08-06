@@ -242,7 +242,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         />
                         <Button
                             variant="outlined"
-                            scheme="blueOutline"
+                            scheme="outline"
                             css={theme => ({
                                 color: theme.colors.primary,
                                 marginLeft: theme.spacing(6),

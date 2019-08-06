@@ -9,7 +9,7 @@ import { css, jsx } from "@emotion/core";
 import { traverse } from "services/json";
 import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
-import { ETerminals, EPuzzleType } from "@magnit/services";
+import { EPuzzleType, ETerminals } from "@magnit/services";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -26,6 +26,7 @@ const answerTypes = [
     { label: "Несколько из списка", type: EPuzzleType.CHECKBOX_ANSWER },
     { label: "Дата", type: EPuzzleType.DATE_ANSWER },
     { label: "Выпадающий список", type: EPuzzleType.DROPDOWN_ANSWER },
+    { label: "Загрузка файлов", type: EPuzzleType.UPLOAD_FILES },
 ];
 
 export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {

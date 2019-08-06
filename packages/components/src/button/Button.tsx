@@ -7,55 +7,41 @@ import _ from "lodash";
 import { Link } from "@reach/router";
 
 const variants = {
-    blue: ({ spacing, ...theme }: any) => ({
-        color: theme.colors.white,
-        border: `1px solid ${theme.colors.primary}`,
-        background: `${theme.colors.primary} !important`,
+    blue: ({ spacing, colors }: any) => ({
+        color: colors.white,
+        border: `1px solid ${colors.primary}`,
+        background: `${colors.primary} !important`,
         hover: {
-            color: theme.colors.white,
-            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${theme.colors.primary}40 !important`,
+            color: colors.white,
+            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${colors.primary}40 !important`,
         },
-        active: { background: `${theme.colors.darkPrimary} !important` },
+        active: { background: `${colors.darkPrimary} !important` },
     }),
-    green: ({ spacing, ...theme }: any) => ({
-        color: theme.colors.white,
-        border: `1px solid ${theme.colors.green}`,
-        background: `${theme.colors.green} !important`,
+    green: ({ spacing, colors }: any) => ({
+        color: colors.white,
+        border: `1px solid ${colors.green}`,
+        background: `${colors.green} !important`,
         hover: {
-            color: theme.colors.white,
-            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${theme.colors.green}40 !important`,
+            color: colors.white,
+            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${colors.green}40 !important`,
         },
-        active: { background: `${theme.colors.darkGreen} !important` },
+        active: { background: `${colors.darkGreen} !important` },
     }),
-    violet: ({ spacing, ...theme }: any) => ({
-        color: theme.colors.white,
-        border: `1px solid ${theme.colors.violet}`,
-        background: `${theme.colors.violet} !important`,
+    violet: ({ spacing, colors }: any) => ({
+        color: colors.white,
+        border: `1px solid ${colors.violet}`,
+        background: `${colors.violet} !important`,
         hover: {
-            color: theme.colors.white,
-            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${theme.colors.violet}40 !important`,
+            color: colors.white,
+            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${colors.violet}40 !important`,
         },
-        active: { background: `${theme.colors.darkViolet} !important` },
+        active: { background: `${colors.darkViolet} !important` },
     }),
-    blueOutline: ({ spacing, ...theme }: any) => ({
-        color: theme.colors.primary,
-        border: `1px solid ${theme.colors.primary} !important`,
+    outline: ({ spacing, colors }: any) => ({
+        color: colors.primary,
+        border: `1px solid ${colors.primary} !important`,
         background: "none !important",
-        hover: { boxShadow: `0 ${spacing(0.5)} ${spacing()} ${theme.colors.primary}40 !important` },
-    }),
-    redOutline: ({ spacing, ...theme }: any) => ({
-        color: theme.colors.red,
-        border: `1px solid ${theme.colors.red}`,
-        background: "none !important",
-        hover: {
-            color: theme.colors.white,
-            background: `${theme.colors.red} !important`,
-            boxShadow: `0 ${spacing(0.5)} ${spacing()} ${theme.colors.red}40 !important`,
-        },
-        active: {
-            color: theme.colors.white,
-            background: `${theme.colors.darkRed} !important`,
-        },
+        hover: { boxShadow: `0 ${spacing(0.5)} ${spacing()} ${colors.primary}40 !important` },
     }),
 };
 

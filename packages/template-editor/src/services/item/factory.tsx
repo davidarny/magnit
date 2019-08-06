@@ -13,6 +13,7 @@ import {
     DropdownAnswerFactory,
     GroupFactory,
     QuestionFactory,
+    UploadFilesAnswerFactory,
 } from "puzzles";
 
 export interface IPuzzleFactory {
@@ -50,6 +51,8 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             return new RadioAnswerFactory();
         case EPuzzleType.NUMERIC_ANSWER:
             return new NumericAnswerFactory();
+        case EPuzzleType.UPLOAD_FILES:
+            return new UploadFilesAnswerFactory();
         default:
             console.log(
                 "%c%s",
