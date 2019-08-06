@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
@@ -28,7 +28,7 @@ interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
 export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
-    useEffect(() => {
+    const onTemplateChange = useCallback(() => {
         traverse(props.template, (value: any) => {
             if (!_.has(value, "id")) {
                 return;
@@ -100,7 +100,12 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
                         padding-left: 0 !important;
                     `}
                 >
-                    <InputField fullWidth value={label} onChange={onLabelChange} />
+                    <InputField
+                        fullWidth
+                        value={label}
+                        onChange={onLabelChange}
+                        onBlur={onTemplateChange}
+                    />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
                     <IconButton onClick={onDeleteCheckboxButton}>

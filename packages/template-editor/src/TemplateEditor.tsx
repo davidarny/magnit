@@ -107,6 +107,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.QUESTION,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
+            return true;
         });
         setTemplate({ ...template });
     }
@@ -194,6 +195,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 description: "",
                 validations: [],
             });
+            return true;
         });
         setTemplate({ ...template });
     }
@@ -223,6 +225,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     ...element,
                 };
             });
+            return true;
         });
         setTemplate({ ...template });
     }
@@ -247,6 +250,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             ...element,
                         };
                     });
+                    return true;
                 }
             }
             if ("sections" in puzzle) {
@@ -262,6 +266,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             ...element,
                         };
                     });
+                    return true;
                 }
             }
         });

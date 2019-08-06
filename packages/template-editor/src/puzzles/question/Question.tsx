@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IPuzzle, ISpecificPuzzleProps, ITemplate, TChangeEvent } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
@@ -19,7 +19,7 @@ interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     onTemplateChange(template: ITemplate): void;
 }
 
-const answerTypes = [
+const answerMenuItems = [
     { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER },
     { label: "Числовое поле", type: EPuzzleType.NUMERIC_ANSWER },
     { label: "Один из списка", type: EPuzzleType.RADIO_ANSWER },
@@ -36,7 +36,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const answerTypeSnapshot = useRef<EPuzzleType>((ETerminals.EMPTY as unknown) as EPuzzleType);
 
-    useEffect(() => {
+    const onTemplateChange = useCallback(() => {
         traverse(template, (value: any) => {
             if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
@@ -82,6 +82,8 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
         templateSnapshot.current = _.cloneDeep(template);
         props.onTemplateChange(templateSnapshot.current);
     }, [answersType, questionTitle, template]);
+
+    useEffect(() => onTemplateChange(), [answersType]);
 
     function onAnswerTypeChange(event: TChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
@@ -160,6 +162,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
                             placeholder="Название вопроса"
                             value={questionTitle}
                             onChange={onQuestionTitleChange}
+                            onBlur={onTemplateChange}
                         />
                     </Grid>
                     <Grid item xs={3}>
@@ -169,7 +172,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
                             value={answersType || ETerminals.EMPTY}
                             onChange={onAnswerTypeChange}
                         >
-                            {answerTypes.map(({ label, type }, index) => (
+                            {answerMenuItems.map(({ label, type }, index) => (
                                 <MenuItem value={type} key={index}>
                                     {label}
                                 </MenuItem>

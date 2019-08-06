@@ -1,11 +1,17 @@
-type TCallback = (...args: any[]) => void;
+type TCallback = (...args: any[]) => void | boolean;
 
 export function traverse(object: any | any[], callback?: TCallback, parent?: any | any[]): void {
     if (isArray(object)) {
-        callback && callback(object, parent);
+        const result = callback && callback(object, parent);
+        if (result) {
+            return;
+        }
         object.forEach(prop => traverse(prop, callback, parent));
     } else if (isObject(object)) {
-        callback && callback(object, parent);
+        const result = callback && callback(object, parent);
+        if (result) {
+            return;
+        }
         for (const key in object) {
             if (object.hasOwnProperty(key)) {
                 traverse(object[key], callback, object);

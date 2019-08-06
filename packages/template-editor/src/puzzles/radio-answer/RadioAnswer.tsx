@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
@@ -28,7 +28,7 @@ interface IRadioAnswerPuzzleProps extends IFocusedPuzzleProps {
 export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
-    useEffect(() => {
+    const onTemplateChange = useCallback(() => {
         traverse(template, (value: any) => {
             if (!_.has(value, "id")) {
                 return;
@@ -100,7 +100,12 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...pr
                         padding-left: 0 !important;
                     `}
                 >
-                    <InputField fullWidth value={label} onChange={onLabelChange} />
+                    <InputField
+                        fullWidth
+                        value={label}
+                        onChange={onLabelChange}
+                        onBlur={onTemplateChange}
+                    />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
                     <IconButton onClick={onDeleteRadioButton}>
