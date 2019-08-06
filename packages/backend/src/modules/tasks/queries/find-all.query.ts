@@ -1,4 +1,4 @@
-import { ApiModelProperty, ApiModelPropertyOptional } from "@nestjs/swagger";
+import { ApiModelPropertyOptional } from "@nestjs/swagger";
 import { TTaskStatus } from "../entities/task.entity";
 
 export class FindAllQuery {
@@ -16,7 +16,7 @@ export class FindAllQuery {
         type: [String],
         enum: ["in_progress", "on_check", "draft", "completed"],
         description:
-            'Query by multiple status (e.g. ["in_progress", "completed"]).' +
+            'Query by multiple status (e.g. "in_progress, completed"]).' +
             ' Not compatible with "status".',
     })
     readonly statuses?: TTaskStatus[];

@@ -13,7 +13,6 @@ import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface
 import { ISectionService } from "../../shared/interfaces/section.service.interface";
 import { ITaskService } from "../../shared/interfaces/task.service.interface";
 import { ITemplateService } from "../../shared/interfaces/template.service.interface";
-import { JsonParsePipe } from "../../shared/pipes/json-parse.pipe";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
@@ -34,6 +33,7 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
+import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -50,7 +50,10 @@ export class TaskController {
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
     @ApiBadRequestResponse({ description: "Found non compatible props" })
     async findAll(
-        @Query(new NonCompatiblePropsPipe<FindAllQuery>(["status", "statuses"]), JsonParsePipe)
+        @Query(
+            new NonCompatiblePropsPipe<FindAllQuery>(["status", "statuses"]),
+            new SplitPropPipe<FindAllQuery>("statuses"),
+        )
         query?: FindAllQuery,
     ) {
         const { offset, limit, sort, statuses, status, name } = query || new FindAllQuery();
