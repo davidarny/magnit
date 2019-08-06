@@ -30,11 +30,11 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
 
     useEffect(() => {
         traverse(props.template, (value: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
+            if (!_.has(value, "id")) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (!("id" in puzzle) || puzzle.id !== props.id) {
+            if (puzzle.id !== props.id) {
                 return;
             }
             puzzle.title = label;
