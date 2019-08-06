@@ -5,7 +5,7 @@ import * as React from "react";
 import { useContext, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
@@ -52,13 +52,10 @@ export const CreateTemplate: React.FC = () => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button
-                        variant="contained"
-                        title="Сохранить"
-                        scheme="blue"
-                        icon={<CheckIcon />}
-                        onClick={onTemplateSave}
-                    />
+                    <Button variant="contained" scheme="blue" onClick={onTemplateSave}>
+                        <CheckIcon />
+                        <Typography>Сохранить</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             <Grid

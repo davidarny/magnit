@@ -5,7 +5,7 @@ import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
@@ -62,13 +62,10 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Редактирование шаблона">
                 <Grid item>
-                    <Button
-                        variant="contained"
-                        title="Обновить"
-                        scheme="blue"
-                        icon={<CheckIcon />}
-                        onClick={onTemplateSave}
-                    />
+                    <Button variant="contained" scheme="blue" onClick={onTemplateSave}>
+                        <CheckIcon />
+                        <Typography>Обновить</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             <Grid

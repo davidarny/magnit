@@ -142,12 +142,13 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         <Grid container justify="center" alignItems="center">
                             <Grid item>
                                 <Button
-                                    icon={<CheckIcon />}
                                     variant="contained"
                                     scheme="blue"
-                                    title="Сохранить"
                                     onClick={onAssigneeChangeComplete}
-                                />
+                                >
+                                    <CheckIcon />
+                                    <Typography>Сохранить</Typography>
+                                </Button>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -247,10 +248,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 color: theme.colors.primary,
                                 marginLeft: theme.spacing(6),
                             })}
-                            icon={<AddIcon />}
-                            title="Добавить новый этап"
                             onClick={onAddStep}
-                        />
+                        >
+                            <AddIcon />
+                            <Typography>Добавить новый этап</Typography>
+                        </Button>
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>

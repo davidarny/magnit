@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { jsx } from "@emotion/core";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { SectionTitle } from "components/section-title";
 import { SectionLayout } from "components/section-layout";
 import { Button } from "@magnit/components";
@@ -46,12 +46,13 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 <Grid item>
                     <Button
                         variant="contained"
-                        title="Отправить"
                         scheme="blue"
-                        icon={<SendIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                         onClick={onTaskSave}
-                    />
+                    >
+                        <SendIcon />
+                        <Typography>Отправить</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             <Grid

@@ -11,7 +11,7 @@ import { AddIcon } from "@magnit/icons";
 import { EmptyList } from "components/list";
 import { getTemplates } from "services/api/templates";
 import { AppContext } from "context";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper, Typography } from "@material-ui/core";
 import _ from "lodash";
 import { getFriendlyDate } from "@magnit/services";
 
@@ -56,14 +56,10 @@ export const TemplateList: React.FC = () => {
             {redirect.redirect && <Redirect to={`templates/edit/${redirect.to}`} noThrow />}
             <SectionTitle title="Список шаблонов">
                 <Grid item hidden={empty}>
-                    <Button
-                        component={Link}
-                        to="create"
-                        variant="contained"
-                        title="Создать шаблон"
-                        scheme="blue"
-                        icon={<AddIcon />}
-                    />
+                    <Button component={Link} to="create" variant="contained" scheme="blue">
+                        <AddIcon />
+                        <Typography>Создать шаблон</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             {empty && (
@@ -71,12 +67,10 @@ export const TemplateList: React.FC = () => {
                     title={"Шаблонов нет"}
                     actionName={"Создать шаблон"}
                     button={
-                        <Button
-                            component={Link}
-                            to="create"
-                            icon={<AddIcon />}
-                            title={"Создать шаблон"}
-                        />
+                        <Button component={Link} to="create" scheme="blue">
+                            <AddIcon />
+                            <Typography>Создать шаблон</Typography>
+                        </Button>
                     }
                     description={"Для создания шаблона нажмите кнопку"}
                 />

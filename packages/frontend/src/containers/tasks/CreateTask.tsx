@@ -4,7 +4,7 @@ import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
@@ -83,12 +83,13 @@ export const CreateTask: React.FC = () => {
                 <Grid item>
                     <Button
                         variant="contained"
-                        title="Отправить"
                         scheme="blue"
-                        icon={<SendIcon />}
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                         onClick={onTaskSave}
-                    />
+                    >
+                        <SendIcon />
+                        <Typography>Отправить</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             <Grid

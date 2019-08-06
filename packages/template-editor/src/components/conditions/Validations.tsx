@@ -57,6 +57,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
     );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
+
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const isParentPuzzleGroup = useRef(false);
 
@@ -394,11 +395,11 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     variant="outlined"
                     color="primary"
                     onClick={onAddValidation}
-                    title={"Добавить внутреннее условие"}
-                    icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
                     scheme={"outline"}
-                    css={theme => ({ width: theme.spacing(36) })}
-                />
+                >
+                    <AddIcon css={theme => ({ color: theme.colors.primary })} />
+                    <Typography>Добавить внутреннее условие</Typography>
+                </Button>
             </Grid>
             <Grid item xs={12}>
                 <Grid container>

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper, Typography } from "@material-ui/core";
 import * as React from "react";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
@@ -71,14 +71,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             {redirect.redirect && <Redirect to={`tasks/view/${redirect.to}`} noThrow />}
             <SectionTitle title="Список заданий">
                 <Grid item hidden={empty}>
-                    <Button
-                        component={Link}
-                        to="create"
-                        variant="contained"
-                        title="Создать задание"
-                        scheme="blue"
-                        icon={<AddIcon />}
-                    />
+                    <Button component={Link} to="create" variant="contained" scheme="blue">
+                        <AddIcon />
+                        <Typography>Создать задание</Typography>
+                    </Button>
                 </Grid>
             </SectionTitle>
             {empty && (
@@ -86,12 +82,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                     title="Заданий нет"
                     actionName="Создать задание"
                     button={
-                        <Button
-                            component={Link}
-                            to="create"
-                            icon={<AddIcon />}
-                            title="Создать задание"
-                        />
+                        <Button component={Link} to="create" variant="contained" scheme="blue">
+                            <AddIcon />
+                            <Typography>Создать задание</Typography>
+                        </Button>
                     }
                     description="Для создания задания нажмите кнопку"
                 />

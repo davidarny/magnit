@@ -18,7 +18,6 @@ type TButtonLikeTextProps = IButtonLikeTextProps &
 export const ButtonLikeText: React.FC<TButtonLikeTextProps> = ({ children, ...props }) => {
     return (
         <Typography
-            // @ts-ignore
             component={props.component || "span"}
             css={theme => ({
                 display: "inline-block",

@@ -59,19 +59,17 @@ type TButtonProps = IButtonProps &
     React.ComponentProps<typeof Link>;
 
 export const Button: React.FC<TButtonProps> = props => {
-    const { title = "", icon = "", scheme = "blue", ...rest } = props;
+    const { scheme = "blue", children, ...rest } = props;
     const variant = _.get(variants, scheme);
 
     return (
         <MaterialButton
             css={theme => ({
                 textTransform: "none",
-                position: "relative",
-                transition: "0.25s",
+                transition: "all 0.3s ease-in-out",
                 boxShadow: "none",
-                minWidth: theme.spacing(20),
-                minHeight: theme.spacing(5),
-                padding: `0 ${theme.spacing(2)}`,
+                width: "auto",
+                padding: `${theme.spacing()} ${theme.spacing(2)}`,
                 borderRadius: theme.radius(5),
                 ":hover": { ..._.get(variant(theme), "hover", {}) },
                 ":active": { ..._.get(variant(theme), "active", {}) },
@@ -79,26 +77,7 @@ export const Button: React.FC<TButtonProps> = props => {
             })}
             {...rest}
         >
-            <div
-                css={theme => ({
-                    height: theme.spacing(3),
-                    marginRight: theme.spacing(),
-                    svg: {
-                        width: theme.spacing(3),
-                        height: theme.spacing(3),
-                    },
-                })}
-            >
-                {icon}
-            </div>
-            <span
-                css={theme => ({
-                    fontSize: theme.fontSize.normal,
-                    lineHeight: theme.spacing(2),
-                })}
-            >
-                {title}
-            </span>
+            {children}
         </MaterialButton>
     );
 };

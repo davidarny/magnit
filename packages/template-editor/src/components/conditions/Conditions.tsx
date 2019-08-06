@@ -397,11 +397,11 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     variant="outlined"
                     color="primary"
                     onClick={onAddCondition}
-                    title={"Добавить внутреннее условие"}
-                    icon={<AddIcon css={theme => ({ color: theme.colors.primary })} />}
                     scheme={"outline"}
-                    css={theme => ({ width: theme.spacing(36) })}
-                />
+                >
+                    <AddIcon css={theme => ({ color: theme.colors.primary })} />
+                    <Typography>Добавить внутреннее условие</Typography>
+                </Button>
             </Grid>
         </Grid>
     );
