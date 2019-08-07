@@ -1,7 +1,9 @@
 import {
+    Check,
     Column,
     DeepPartial,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
@@ -23,6 +25,7 @@ export class Section {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Index()
     @ManyToOne(() => Template, template => template.sections, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
     template: Template;
@@ -36,6 +39,8 @@ export class Section {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @Column("int")
+    @Index()
+    @Column("bigint")
+    @Check(`"order" >= 0`)
     order: number;
 }

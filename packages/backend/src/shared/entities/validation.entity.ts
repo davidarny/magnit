@@ -2,6 +2,7 @@ import {
     Column,
     DeepPartial,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     PrimaryGeneratedColumn,
@@ -28,6 +29,7 @@ export class Validation {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Index()
     @ManyToOne(() => Puzzle, puzzle => puzzle.validations, { onDelete: "CASCADE" })
     @JoinColumn({ name: "id_puzzle" })
     puzzle: Puzzle;

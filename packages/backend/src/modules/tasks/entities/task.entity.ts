@@ -3,6 +3,7 @@ import {
     CreateDateColumn,
     DeepPartial,
     Entity,
+    Index,
     JoinTable,
     ManyToMany,
     PrimaryGeneratedColumn,
@@ -25,12 +26,14 @@ export class Task {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Index()
     @Column("varchar")
     name: string;
 
     @Column({ type: "text", nullable: true })
     description: string;
 
+    @Index()
     @Column("varchar")
     status: TTaskStatus;
 

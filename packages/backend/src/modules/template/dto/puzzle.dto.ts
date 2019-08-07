@@ -1,6 +1,6 @@
 import { ConditionDto } from "./condition.dto";
 import { ValidationDto } from "./validation.dto";
-import { TAnswerType, TPuzzleType } from "../../../shared/entities/puzzle.entity";
+import { TPuzzleType } from "../../../shared/entities/puzzle.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class PuzzleDto {
@@ -15,15 +15,15 @@ export class PuzzleDto {
             "radio_answer",
             "checkbox_answer",
             "dropdown_answer",
-            "reference_answer",
             "upload_files",
             "date_answer",
             "text_answer",
             "numeric_answer",
+            "reference_text",
+            "reference_asset",
         ],
     })
     readonly puzzle_type: TPuzzleType;
-    @ApiModelProperty({ enum: ["number", "string"] }) readonly answer_type: TAnswerType;
     @ApiModelProperty({ type: [ConditionDto] }) readonly conditions: ConditionDto[];
     @ApiModelProperty({ type: [ValidationDto] }) readonly validations: ValidationDto[];
     @ApiModelProperty({ type: [PuzzleDto] }) readonly puzzles: PuzzleDto[];

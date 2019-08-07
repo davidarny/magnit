@@ -1,7 +1,9 @@
 import {
+    Check,
     Column,
     DeepPartial,
     Entity,
+    Index,
     JoinColumn,
     ManyToOne,
     OneToMany,
@@ -20,13 +22,12 @@ export type TPuzzleType =
     | "radio_answer"
     | "checkbox_answer"
     | "dropdown_answer"
-    | "reference_answer"
     | "upload_files"
     | "date_answer"
     | "text_answer"
-    | "numeric_answer";
-
-export type TAnswerType = "number" | "string";
+    | "numeric_answer"
+    | "reference_text"
+    | "reference_asset";
 
 type TConstructablePuzzle = Omit<
     Puzzle,
@@ -50,14 +51,20 @@ export class Puzzle {
     @Column({ type: "text", nullable: true })
     description: string;
 
+    @Column({ type: "varchar", nullable: true })
+    asset: string;
+
+    @Index()
     @ManyToOne(() => Template, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
     template: Template;
 
+    @Index()
     @ManyToOne(() => Section, section => section.puzzles, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_section" })
     section: Section;
 
+    @Index()
     @TreeParent()
     @JoinColumn({ name: "id_parent" })
     parent: Puzzle;
@@ -65,15 +72,13 @@ export class Puzzle {
     @TreeChildren({ cascade: true })
     puzzles: Puzzle[];
 
-    @Column("int")
+    @Index()
+    @Column("bigint")
+    @Check(`"order" >= 0`)
     order: number;
 
-    @Column({ type: "varchar", name: "puzzle_type" })
+    @Column({ type: "varchar" })
     puzzle_type: TPuzzleType;
-
-    @Column({ type: "varchar", name: "answer_type", nullable: true })
-    /** @deprecated */
-    answer_type: TAnswerType;
 
     @OneToMany(() => Condition, condition => condition.puzzle, { cascade: true, eager: true })
     conditions: Condition[];
