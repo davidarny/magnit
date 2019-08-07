@@ -19,7 +19,6 @@ Table puzzle {
  description varchar
  puzzle_type puzzle_type
  order int
- answer_type input_type
 }
 
 Table condition {
@@ -46,16 +45,17 @@ Table validation {
 }
 
 enum puzzle_type {
- group
- question
- radio_answer
- checkbox_answer
- dropdown_answer
- reference_answer
- upload_files
- date_answer
- text_answer
- numeric_answer
+ "group"
+ "question"
+ "radio_answer"
+ "checkbox_answer"
+ "dropdown_answer"
+ "upload_files"
+ "date_answer"
+ "text_answer"
+ "numeric_answer"
+ "reference_text"
+ "reference_asset"
 }
 
 enum condition_action_type {
@@ -70,11 +70,6 @@ enum condition_action_type {
 enum validation_action_type {
  compare_with_answer
  set_value
-}
-
-enum input_type {
-  string
-  number
 }
 
 enum template_type {
