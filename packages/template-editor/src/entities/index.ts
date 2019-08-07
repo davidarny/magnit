@@ -67,6 +67,7 @@ export interface IPuzzle
         IWithConditions<ICondition>,
         IWithValidation<IValidation>,
         IWithDescription {
+    asset?: string;
     puzzleType: EPuzzleType;
 }
 

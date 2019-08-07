@@ -71,33 +71,33 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                         answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
                     />
                 )}
-                {puzzle.puzzles &&
-                    puzzle.puzzles.map((childPuzzle, index) => {
-                        if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
-                            return (
-                                <GroupOfItems
-                                    key={childPuzzle.id}
-                                    puzzle={childPuzzle}
-                                    onFocus={props.onFocus}
-                                    onBlur={props.onBlur}
-                                    isFocused={isFocused}
-                                    index={props.index + index}
-                                    parentPuzzle={childPuzzle}
-                                />
-                            );
-                        }
+                {(puzzle.puzzles || []).map((childPuzzle, index) => {
+                    if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
                         return (
-                            <ItemFactory
-                                puzzle={childPuzzle}
-                                index={index}
-                                active={focused}
-                                onFocus={onFocus}
-                                onBlur={props.onBlur}
+                            <GroupOfItems
                                 key={childPuzzle.id}
-                                parentPuzzle={puzzle}
+                                puzzle={childPuzzle}
+                                onFocus={props.onFocus}
+                                onBlur={props.onBlur}
+                                isFocused={isFocused}
+                                index={props.index + index}
+                                parentPuzzle={childPuzzle}
                             />
                         );
-                    })}
+                    }
+                    return (
+                        <ItemFactory
+                            deep={childPuzzle.puzzleType === EPuzzleType.REFERENCE_ANSWER}
+                            puzzle={childPuzzle}
+                            index={index}
+                            active={focused}
+                            onFocus={onFocus}
+                            onBlur={props.onBlur}
+                            key={childPuzzle.id}
+                            parentPuzzle={puzzle}
+                        />
+                    );
+                })}
                 {!isGroup && (
                     <ConditionsWrapper
                         puzzleId={puzzle.id}

@@ -5,14 +5,16 @@ import { jsx } from "@emotion/core";
 import { EPuzzleType } from "@magnit/services";
 import { IPuzzle } from "entities";
 import {
-    NumericAnswerFactory,
-    RadioAnswerFactory,
     CheckboxAnswerFactory,
-    TextAnswerFactory,
     DateAnswerFactory,
     DropdownAnswerFactory,
     GroupFactory,
+    NumericAnswerFactory,
     QuestionFactory,
+    RadioAnswerFactory,
+    ReferenceAssetFactory,
+    ReferenceTextFactory,
+    TextAnswerFactory,
     UploadFilesAnswerFactory,
 } from "puzzles";
 
@@ -28,8 +30,8 @@ export interface IPuzzleFactoryProps {
 }
 
 class DefaultFactory implements IPuzzleFactory {
-    create({ puzzle }: IPuzzleFactoryProps): React.ReactNode {
-        return <div key={puzzle.id} />;
+    create(): React.ReactNode {
+        return <React.Fragment />;
     }
 }
 
@@ -53,12 +55,11 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             return new NumericAnswerFactory();
         case EPuzzleType.UPLOAD_FILES:
             return new UploadFilesAnswerFactory();
+        case EPuzzleType.REFERENCE_TEXT:
+            return new ReferenceTextFactory();
+        case EPuzzleType.REFERENCE_ASSET:
+            return new ReferenceAssetFactory();
         default:
-            console.log(
-                "%c%s",
-                "color:" + "#F07178",
-                `${type.toUpperCase()} factory does not exist!`,
-            );
             return new DefaultFactory();
     }
 }

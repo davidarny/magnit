@@ -187,12 +187,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             };
             puzzle.puzzles.push({
                 id: uuid(),
-                title: "",
+                title: ETerminals.EMPTY,
                 puzzles: [],
                 puzzleType: lastPuzzle.puzzleType,
                 order: lastPuzzle.order + 1,
                 conditions: [],
-                description: "",
+                description: ETerminals.EMPTY,
                 validations: [],
             });
             return true;

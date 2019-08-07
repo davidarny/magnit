@@ -7,3 +7,5 @@ export * from "./dropdown-asnwer";
 export * from "./date-answer";
 export * from "./checkbox-answer";
 export * from "./upload-files-answer";
+export * from "./reference-asset";
+export * from "./reference-text";

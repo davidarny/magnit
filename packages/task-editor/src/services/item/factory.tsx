@@ -29,11 +29,6 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
         case EPuzzleType.DROPDOWN_ANSWER:
             return new DropdownAnswerFactory();
         default:
-            console.log(
-                "%c%s",
-                "color:" + "#F07178",
-                `${type.toUpperCase()} factory does not exist!`,
-            );
             return new DefaultFactory();
     }
 }

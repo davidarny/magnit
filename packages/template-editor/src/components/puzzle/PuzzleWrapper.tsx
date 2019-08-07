@@ -6,6 +6,7 @@ import { jsx } from "@emotion/core";
 
 interface IPuzzleWrapperProps {
     id?: string;
+    noWrapper?: boolean;
 
     onFocus?(): void;
 
@@ -15,6 +16,9 @@ interface IPuzzleWrapperProps {
 }
 
 export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, id, ...props }) => {
+    if (props.noWrapper) {
+        return <React.Fragment>{children}</React.Fragment>;
+    }
     return (
         <Grid
             id={id}

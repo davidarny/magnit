@@ -10,6 +10,7 @@ import { traverse } from "services/json";
 import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
 import { EPuzzleType, ETerminals } from "@magnit/services";
+import uuid from "uuid/v4";
 
 interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
     template: ITemplate;
@@ -27,6 +28,7 @@ const answerMenuItems = [
     { label: "Дата", type: EPuzzleType.DATE_ANSWER },
     { label: "Выпадающий список", type: EPuzzleType.DROPDOWN_ANSWER },
     { label: "Загрузка файлов", type: EPuzzleType.UPLOAD_FILES },
+    { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER },
 ];
 
 export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
@@ -70,6 +72,45 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
                     title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
                 };
             });
+            // check if there are nested children of answer
+            // if there aren't any, we proceed with adding stub ones
+            const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
+                if (prev) {
+                    return prev;
+                }
+                return !!(curr.puzzles || []).length;
+            }, false);
+            // REFERENCE_ANSWER needs specific handling as it's nested answer
+            // so we have to add it's children when choosing this type
+            if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
+                puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+                    return {
+                        ...childPuzzle,
+                        puzzles: [
+                            {
+                                id: uuid(),
+                                puzzleType: EPuzzleType.REFERENCE_TEXT,
+                                title: ETerminals.EMPTY,
+                                description: ETerminals.EMPTY,
+                                order: childPuzzle.puzzles.length,
+                                puzzles: [],
+                                conditions: [],
+                                validations: [],
+                            },
+                            {
+                                id: uuid(),
+                                puzzleType: EPuzzleType.REFERENCE_ASSET,
+                                title: ETerminals.EMPTY,
+                                description: ETerminals.EMPTY,
+                                order: childPuzzle.puzzles.length + 1,
+                                puzzles: [],
+                                conditions: [],
+                                validations: [],
+                            },
+                        ],
+                    };
+                });
+            }
             puzzle.title = questionTitle;
             answerTypeSnapshot.current = nextAnswerType;
         });

@@ -19,6 +19,7 @@ export class PuzzleDto {
             "date_answer",
             "text_answer",
             "numeric_answer",
+            "reference_answer",
             "reference_text",
             "reference_asset",
         ],

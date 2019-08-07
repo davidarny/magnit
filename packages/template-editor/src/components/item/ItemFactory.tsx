@@ -5,33 +5,57 @@ import { jsx } from "@emotion/core";
 import { PuzzleWrapper } from "components/puzzle";
 import { IPuzzle } from "entities";
 import { getPuzzleFactory } from "services/item";
+import { Grid } from "@material-ui/core";
 
 interface IContentItemProps {
+    deep?: boolean;
     puzzle: IPuzzle;
-    parentPuzzle?: IPuzzle;
     index: number;
     active?: boolean;
+    parentPuzzle?: IPuzzle;
+    noWrapper?: boolean;
 
     onFocus(): void;
 
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, parentPuzzle, ...props }) => {
+export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false, ...props }) => {
     const factory = getPuzzleFactory(puzzle.puzzleType);
     return (
-        <PuzzleWrapper
-            id={puzzle.id}
-            onFocus={props.onFocus}
-            onMouseDown={props.onFocus}
-            onBlur={props.onBlur}
-        >
-            {factory.create({
-                focused: !!props.active,
-                puzzle: puzzle,
-                index: props.index,
-                parentPuzzle: parentPuzzle,
-            })}
-        </PuzzleWrapper>
+        <React.Fragment>
+            <PuzzleWrapper
+                id={puzzle.id}
+                onFocus={props.onFocus}
+                onMouseDown={props.onFocus}
+                onBlur={props.onBlur}
+                noWrapper={props.noWrapper}
+            >
+                {factory.create({
+                    focused: !!props.active,
+                    puzzle: puzzle,
+                    index: props.index,
+                    parentPuzzle: props.parentPuzzle,
+                })}
+                {deep && (
+                    <Grid container spacing={2}>
+                        {(puzzle.puzzles || []).map((childPuzzle, index) => {
+                            return (
+                                <ItemFactory
+                                    noWrapper={true}
+                                    puzzle={childPuzzle}
+                                    index={index}
+                                    active={props.active}
+                                    onFocus={props.onFocus}
+                                    onBlur={props.onBlur}
+                                    key={childPuzzle.id}
+                                    parentPuzzle={puzzle}
+                                />
+                            );
+                        })}
+                    </Grid>
+                )}
+            </PuzzleWrapper>
+        </React.Fragment>
     );
 };

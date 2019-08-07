@@ -9,9 +9,9 @@ import { AddIcon } from "@magnit/icons";
 
 export const UploadFilesAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) => {
     return (
-        <div
+        <Grid
             css={theme => ({
-                display: focused ? "" : "none",
+                ...(!focused ? { display: "none" } : {}),
                 width: theme.spacing(25),
                 height: theme.spacing(17),
                 border: `1px solid ${theme.colors.lightGray}`,
@@ -50,6 +50,6 @@ export const UploadFilesAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) =>
                     Добавить файл
                 </Typography>
             </Grid>
-        </div>
+        </Grid>
     );
 };
