@@ -33,7 +33,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
-        library: "TemplateEditor",
+        library: "Services",
         libraryTarget: "umd",
     },
     externals: [externals()],

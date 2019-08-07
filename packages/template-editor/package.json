@@ -34,7 +34,9 @@
         "typescript": "^3.5.3",
         "webpack": "^4.35.3",
         "webpack-cli": "^3.3.4",
-        "webpack-node-externals": "^1.7.2"
+        "webpack-node-externals": "^1.7.2",
+        "concurrently": "^4.1.1",
+        "rimraf": "^2.6.3"
     },
     "dependencies": {
         "@magnit/icons": "^0.1.0",
