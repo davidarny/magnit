@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import * as React from "react";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { Grid, Typography } from "@material-ui/core";
@@ -10,7 +10,6 @@ import { Close as CloseIcon } from "@material-ui/icons";
 import { useRef } from "react";
 import _ from "lodash";
 import { ETerminals } from "@magnit/services";
-import { IUploadAssetResponse } from "TemplateEditor";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
     title: string;
@@ -22,11 +21,13 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
 
     onTemplateChange(template: ITemplate): void;
 
-    onUploadAsset(file: File): Promise<IUploadAssetResponse>;
+    onUploadAsset(file: File): Promise<{ filename: string }>;
 
     onAddAsset(id: string, addition?: Partial<IPuzzle>): void;
 
-    onDeleteAsset(id: string): void;
+    onDeleteAsset(filename: string): Promise<unknown>;
+
+    onDeleteAssetPuzzle(id: string): void;
 }
 
 export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...props }) => {
@@ -52,7 +53,9 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
     }
 
     function onDeleteAsset() {
-        props.onDeleteAsset(props.id);
+        const url = props.description;
+        const filename = url.substring(url.lastIndexOf("/") + 1);
+        props.onDeleteAsset(filename).then(() => props.onDeleteAssetPuzzle(props.id));
     }
 
     return (
@@ -73,9 +76,10 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                 {!props.addAssetButton && (
                     <React.Fragment>
                         <img
-                            css={css`
-                                width: 100%;
-                            `}
+                            css={theme => ({
+                                width: "100%",
+                                maxHeight: theme.spacing(20),
+                            })}
                             alt={props.title}
                             src={props.description}
                         />

@@ -9,7 +9,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { getTemplate, updateTemplate, uploadFile } from "services/api";
+import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
 import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
 import { Redirect } from "@reach/router";
@@ -64,6 +64,10 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
         }));
     }
 
+    async function onDeleteAsset(filename: string) {
+        return deleteFile(context.courier, filename);
+    }
+
     return (
         <SectionLayout>
             {redirect && <Redirect to={"/templates"} noThrow />}
@@ -91,6 +95,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                         css={theme => ({ background: theme.colors.main })}
                         onChange={onTemplateChange}
                         onAddAsset={onAddAsset}
+                        onDeleteAsset={onDeleteAsset}
                     />
                 )}
             </Grid>

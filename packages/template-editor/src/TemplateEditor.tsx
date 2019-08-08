@@ -16,17 +16,14 @@ import { EEditorType, EPuzzleType, ETerminals, getEditorService } from "@magnit/
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 
-export interface IUploadAssetResponse {
-    success: number;
-    filename: string;
-}
-
 interface ITemplateEditorProps {
     initialState?: ITemplate;
 
     onChange?(template: ITemplate): void;
 
-    onAddAsset?(file: File): Promise<IUploadAssetResponse>;
+    onAddAsset?(file: File): Promise<{ filename: string }>;
+
+    onDeleteAsset?(filename: string): Promise<unknown>;
 }
 
 export interface IEditorContext {
@@ -38,7 +35,9 @@ export interface IEditorContext {
 
     onDeleteAnswerPuzzle(id: string): void;
 
-    onUploadAsset(file: File): Promise<IUploadAssetResponse>;
+    onUploadAsset(file: File): Promise<{ filename: string }>;
+
+    onDeleteAsset(filename: string): Promise<unknown>;
 }
 
 export const EditorContext = React.createContext<IEditorContext>(({} as unknown) as IEditorContext);
@@ -294,6 +293,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     onAddAnswerPuzzle,
                     onDeleteAnswerPuzzle,
                     onUploadAsset: props.onAddAsset,
+                    onDeleteAsset: props.onDeleteAsset,
                 } as unknown) as IEditorContext
             }
         >
