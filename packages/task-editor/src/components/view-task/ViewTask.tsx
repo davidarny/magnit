@@ -131,11 +131,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                     <Grid item>
                         <SelectField fullWidth placeholder="Выберите исполнителя">
-                            <MenuItem>Антонов Сергей Петрович</MenuItem>
-                            <MenuItem>Антонов Сергей Петрович</MenuItem>
-                            <MenuItem>Антонов Сергей Петрович</MenuItem>
-                            <MenuItem>Антонов Сергей Петрович</MenuItem>
-                            <MenuItem>Антонов Сергей Петрович</MenuItem>
+                            <MenuItem>Гончар Семён Платонович</MenuItem>
+                            <MenuItem>Маслов Гарри Валерьевич</MenuItem>
+                            <MenuItem>Буров Юлиан Данилович</MenuItem>
+                            <MenuItem>Воронов Юрий Виталиевич</MenuItem>
+                            <MenuItem>Лановой Устин Иванович</MenuItem>
                         </SelectField>
                     </Grid>
                     <Grid item css={theme => ({ paddingTop: `${theme.spacing(5)} !important` })}>
