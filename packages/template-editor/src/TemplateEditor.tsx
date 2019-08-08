@@ -8,11 +8,11 @@ import { ETemplateType, IPuzzle, ITemplate } from "./entities";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
-import { SelectableBlockWrapper, EditorToolbar } from "@magnit/components";
+import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
 import { SectionHead } from "./components/section-head";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 import { TemplateSection } from "./components/template-section";
-import { EEditorType, getEditorService, EPuzzleType, ETerminals } from "@magnit/services";
+import { EEditorType, EPuzzleType, ETerminals, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 
@@ -27,7 +27,7 @@ export interface IEditorContext {
 
     onTemplateChange(template: ITemplate): void;
 
-    onAddAnswerPuzzle(id: string): void;
+    onAddAnswerPuzzle(id: string, addition?: Partial<IPuzzle>): void;
 
     onDeleteAnswerPuzzle(id: string): void;
 }
@@ -169,7 +169,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
-    function onAddAnswerPuzzle(id: string): void {
+    function onAddAnswerPuzzle(id: string, addition: Partial<IPuzzle> = {}): void {
         traverse(template, (value: any) => {
             if (!_.has(value, "id")) {
                 return;
@@ -185,6 +185,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 order: -1,
                 puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
             };
+            _.assign(lastPuzzle, addition);
             puzzle.puzzles.push({
                 id: uuid(),
                 title: ETerminals.EMPTY,

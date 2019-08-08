@@ -2,13 +2,18 @@
 
 import { css, jsx } from "@emotion/core";
 import * as React from "react";
-import { IFocusedPuzzleProps, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { AddIcon } from "@magnit/icons";
 import { Fab } from "@magnit/components";
 import { Close as CloseIcon } from "@material-ui/icons";
+import { useRef } from "react";
+import _ from "lodash";
+import { ETerminals } from "@magnit/services";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
+    title: string;
+    description: string;
     template: ITemplate;
     // flag indication this asset should render
     // button which adds new asset when clicked
@@ -16,14 +21,26 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
 
     onTemplateChange(template: ITemplate): void;
 
-    onAddAsset(id: string): void;
+    onAddAsset(id: string, addition?: Partial<IPuzzle>): void;
 
     onDeleteAsset(id: string): void;
 }
 
 export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...props }) => {
+    const input = useRef<HTMLInputElement>(null);
+
     function onAddAsset() {
-        props.onAddAsset(props.id);
+        if (input.current) {
+            input.current.click();
+        }
+    }
+
+    function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const file = _.first(event.target.files);
+        if (!file) {
+            return;
+        }
+        props.onAddAsset(props.id, { title: _.get(file, "name", ETerminals.EMPTY) });
     }
 
     function onDeleteAsset() {
@@ -52,8 +69,8 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                                 width: 100%;
                                 height: 100%;
                             `}
-                            alt="asset"
-                            src="https://via.placeholder.com/1920x1024"
+                            alt={props.title}
+                            src={props.description || "https://via.placeholder.com/1920x1024"}
                         />
                         <div
                             onClick={onDeleteAsset}
@@ -77,6 +94,13 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                 )}
                 {props.addAssetButton && (
                     <React.Fragment>
+                        <input
+                            ref={input}
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={onFileChange}
+                        />
                         <Fab
                             css={theme => ({
                                 width: theme.spacing(5),

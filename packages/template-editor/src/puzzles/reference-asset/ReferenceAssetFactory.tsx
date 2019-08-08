@@ -17,6 +17,8 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
             <ReferenceAsset
                 {...rest}
                 {...props}
+                title={puzzle.title}
+                description={puzzle.description}
                 id={puzzle.id}
                 focused={focused}
                 addAssetButton={addAssetButton}
