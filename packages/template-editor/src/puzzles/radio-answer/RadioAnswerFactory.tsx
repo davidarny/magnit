@@ -17,14 +17,14 @@ export class RadioAnswerFactory implements IPuzzleFactory {
 
         return (
             <RadioAnswer
-                {...props}
-                {...rest}
                 id={puzzle.id}
                 title={puzzle.title}
                 focused={focused}
                 onAddRadioButton={onAddAnswerPuzzle}
                 onDeleteRadioButton={onDeleteAnswerPuzzle}
                 addRadioButton={addRadioButton}
+                {...rest}
+                {...props}
             />
         );
     }

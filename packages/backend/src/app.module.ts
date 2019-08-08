@@ -1,16 +1,9 @@
-import {
-    CacheInterceptor,
-    CacheModule,
-    MiddlewareConsumer,
-    Module,
-    NestModule,
-    RequestMethod,
-} from "@nestjs/common";
+import { CacheModule, MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { TemplateModule } from "./modules/template/template.module";
 import { LoggerMiddleware } from "./middleware/logger.middleware";
-import { APP_INTERCEPTOR } from "@nestjs/core";
-import { TaskModule } from "./modules/tasks/task.module";
+import { TaskModule } from "./modules/task/task.module";
+import { AssetModule } from "./modules/asset/asset.module";
 
 const options: TypeOrmModuleOptions = {
     type: "postgres",
@@ -30,15 +23,10 @@ const imports = [
     CacheModule.register(),
     TemplateModule,
     TaskModule,
-];
-const providers = [
-    {
-        provide: APP_INTERCEPTOR,
-        useClass: CacheInterceptor,
-    },
+    AssetModule,
 ];
 
-@Module({ imports, providers })
+@Module({ imports })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         if (process.env.NODE_ENV !== "testing") {

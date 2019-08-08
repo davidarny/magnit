@@ -10,6 +10,7 @@ import { Close as CloseIcon } from "@material-ui/icons";
 import { useRef } from "react";
 import _ from "lodash";
 import { ETerminals } from "@magnit/services";
+import { IUploadAssetResponse } from "TemplateEditor";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
     title: string;
@@ -20,6 +21,8 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
     addAssetButton: boolean;
 
     onTemplateChange(template: ITemplate): void;
+
+    onUploadAsset(file: File): Promise<IUploadAssetResponse>;
 
     onAddAsset(id: string, addition?: Partial<IPuzzle>): void;
 
@@ -40,7 +43,12 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
         if (!file) {
             return;
         }
-        props.onAddAsset(props.id, { title: _.get(file, "name", ETerminals.EMPTY) });
+        props.onUploadAsset(file).then(response => {
+            props.onAddAsset(props.id, {
+                title: _.get(file, "name", ETerminals.EMPTY),
+                description: response.filename,
+            });
+        });
     }
 
     function onDeleteAsset() {
@@ -67,10 +75,9 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                         <img
                             css={css`
                                 width: 100%;
-                                height: 100%;
                             `}
                             alt={props.title}
-                            src={props.description || "https://via.placeholder.com/1920x1024"}
+                            src={props.description}
                         />
                         <div
                             onClick={onDeleteAsset}

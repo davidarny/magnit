@@ -38,6 +38,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ ...props 
                 return;
             }
             puzzle.title = label;
+            return true;
         });
         props.onTemplateChange({ ...props.template });
     }, [label]);

@@ -11,12 +11,12 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
     create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
+
         const addAssetButton =
             !!props.parentPuzzle && props.parentPuzzle.puzzles.length - 1 === props.index;
+
         return (
             <ReferenceAsset
-                {...rest}
-                {...props}
                 title={puzzle.title}
                 description={puzzle.description}
                 id={puzzle.id}
@@ -24,6 +24,9 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
                 addAssetButton={addAssetButton}
                 onAddAsset={onAddAnswerPuzzle}
                 onDeleteAsset={onDeleteAnswerPuzzle}
+                onUploadAsset={context.onUploadAsset}
+                {...rest}
+                {...props}
             />
         );
     }

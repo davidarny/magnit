@@ -38,6 +38,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...pr
                 return;
             }
             puzzle.title = label;
+            return true;
         });
         props.onTemplateChange({ ...template });
     }, [label]);

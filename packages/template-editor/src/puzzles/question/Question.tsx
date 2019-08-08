@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IPuzzle, ISpecificPuzzleProps, ITemplate, TChangeEvent } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { traverse } from "services/json";
@@ -12,10 +12,9 @@ import { InputField, SelectField } from "@magnit/components";
 import { EPuzzleType, ETerminals } from "@magnit/services";
 import uuid from "uuid/v4";
 
-interface IQuestionPuzzleProps extends ISpecificPuzzleProps {
+interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
     template: ITemplate;
     title: string;
-    focused?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -65,11 +64,11 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
             if (answersType !== answerTypeSnapshot.current) {
                 puzzle.puzzles.length = 1;
             }
-            puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+            puzzle.puzzles = puzzle.puzzles.map(child => {
                 return {
-                    ...childPuzzle,
+                    ...child,
                     puzzleType: nextAnswerType,
-                    title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
+                    title: answersType === answerTypeSnapshot.current ? child.title : "",
                 };
             });
             // check if there are nested children of answer
@@ -110,9 +109,17 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
                         ],
                     };
                 });
+            } else if (nextAnswerType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
+                puzzle.puzzles = puzzle.puzzles.map(child => {
+                    return {
+                        ...child,
+                        puzzles: [],
+                    };
+                });
             }
             puzzle.title = questionTitle;
             answerTypeSnapshot.current = nextAnswerType;
+            return true;
         });
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual

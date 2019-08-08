@@ -38,6 +38,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
                 return;
             }
             puzzle.title = label;
+            return true;
         });
         props.onTemplateChange({ ...props.template });
     }, [label]);

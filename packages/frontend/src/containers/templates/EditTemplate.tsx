@@ -9,7 +9,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { getTemplate, updateTemplate } from "services/api/templates";
+import { getTemplate, updateTemplate, uploadFile } from "services/api";
 import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
 import { Redirect } from "@reach/router";
@@ -57,6 +57,13 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             });
     }
 
+    async function onAddAsset(file: File) {
+        return uploadFile(context.courier, file).then(response => ({
+            ...response,
+            filename: `${process.env.REACT_APP_BACKEND_URL}/${response.filename}`,
+        }));
+    }
+
     return (
         <SectionLayout>
             {redirect && <Redirect to={"/templates"} noThrow />}
@@ -83,6 +90,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                         initialState={(template as unknown) as ITemplate}
                         css={theme => ({ background: theme.colors.main })}
                         onChange={onTemplateChange}
+                        onAddAsset={onAddAsset}
                     />
                 )}
             </Grid>

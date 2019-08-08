@@ -1,4 +1,4 @@
-import { Task, TTaskStatus } from "../../modules/tasks/entities/task.entity";
+import { Task, TTaskStatus } from "../../modules/task/entities/task.entity";
 
 export interface ITaskService {
     findAll(

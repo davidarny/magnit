@@ -17,14 +17,14 @@ export class CheckboxAnswerFactory implements IPuzzleFactory {
 
         return (
             <CheckboxAnswer
-                {...rest}
-                {...props}
                 id={puzzle.id}
                 title={puzzle.title}
                 focused={focused}
                 onAddCheckboxButton={onAddAnswerPuzzle}
                 onDeleteCheckboxButton={onDeleteAnswerPuzzle}
                 addCheckboxButton={addCheckboxButton}
+                {...rest}
+                {...props}
             />
         );
     }

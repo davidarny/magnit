@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/DavidArutiunian/magnit">
-    <img src="packages/frontend/src/assets/MagnitIcon.png" alt="Logo" width="40" height="40">
+    <img src="packages/frontend/src/assets/icon.png" alt="Logo" width="40" height="40">
   </a>
 
   <h3 align="center">Магнит "Опросный Лист"</h3>

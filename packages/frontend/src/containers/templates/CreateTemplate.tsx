@@ -14,6 +14,7 @@ import { AppContext } from "context";
 import { Snackbar } from "components/snackbar";
 import { Redirect } from "@reach/router";
 import _ from "lodash";
+import { uploadFile } from "../../services/api/assets";
 
 export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
@@ -47,6 +48,13 @@ export const CreateTemplate: React.FC = () => {
             });
     }
 
+    async function onAddAsset(file: File) {
+        return uploadFile(context.courier, file).then(response => ({
+            ...response,
+            filename: `${process.env.REACT_APP_BACKEND_URL}/${response.filename}`,
+        }));
+    }
+
     return (
         <SectionLayout>
             {redirect && <Redirect to={"/templates"} noThrow />}
@@ -71,6 +79,7 @@ export const CreateTemplate: React.FC = () => {
                 <TemplateEditor
                     css={theme => ({ background: theme.colors.main })}
                     onChange={onTemplateChange}
+                    onAddAsset={onAddAsset}
                 />
             </Grid>
             <Snackbar

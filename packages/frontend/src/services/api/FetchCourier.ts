@@ -57,10 +57,14 @@ export class FetchCourier implements ICourier {
     }
 
     private async fetch(path: string, method: TMethod, body?: object): Promise<Response> {
+        const headers = { "Content-Type": "application/json" };
+        if (body instanceof FormData) {
+            delete headers["Content-Type"];
+        }
         return fetch(`${this.host}/${this.version}/${path}`, {
             method,
-            headers: { "Content-Type": "application/json" },
-            body: body ? JSON.stringify(body) : null,
+            headers,
+            body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null,
         });
     }
 }

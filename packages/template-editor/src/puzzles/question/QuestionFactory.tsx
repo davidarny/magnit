@@ -10,15 +10,15 @@ import { EditorContext } from "TemplateEditor";
 export class QuestionFactory implements IPuzzleFactory {
     create({ puzzle, ...props }: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
-        const { template, onTemplateChange } = context;
+        const { template, ...rest } = context;
 
         return (
             <Question
-                {...props}
                 template={template!}
                 id={puzzle.id}
                 title={puzzle.title}
-                onTemplateChange={onTemplateChange}
+                {...rest}
+                {...props}
             />
         );
     }

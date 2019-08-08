@@ -9,7 +9,7 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { Section } from "./section.entity";
-import { Task } from "../../modules/tasks/entities/task.entity";
+import { Task } from "../../modules/task/entities/task.entity";
 
 export type TTemplateType = "light" | "complex";
 
