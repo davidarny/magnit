@@ -29,7 +29,7 @@ module.exports = {
     entry: {
         index: "./src/index.ts",
     },
-    ...(fastBuildEnabled && isProduction ? {} : { devtool: "eval" }),
+    ...(fastBuildEnabled || isProduction ? {} : { devtool: "eval" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
