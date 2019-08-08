@@ -8,7 +8,6 @@ import { AddIcon } from "@magnit/icons";
 import { Fab } from "@magnit/components";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
-    asset: string;
     template: ITemplate;
     // flag indication this asset should render
     // button which adds new asset when clicked

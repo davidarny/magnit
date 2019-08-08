@@ -52,9 +52,6 @@ export class Puzzle {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @Column({ type: "varchar", nullable: true })
-    asset: string;
-
     @Index()
     @ManyToOne(() => Template, undefined, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "id_template" })
