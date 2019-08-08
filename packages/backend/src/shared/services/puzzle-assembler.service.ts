@@ -18,6 +18,9 @@ export class PuzzleAssemblerService implements IAssemblerService {
         @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
     ) {}
 
+    // TODO: need optimization
+    // maybe better to use "relations"
+    // and then just walk the tree & sort by "order"
     async assemble(template: Template): Promise<void> {
         template.sections = await this.sectionService.findByTemplateId(template.id);
         for (const section of template.sections || []) {
