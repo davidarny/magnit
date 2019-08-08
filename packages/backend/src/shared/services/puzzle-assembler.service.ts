@@ -7,6 +7,10 @@ import { IPuzzleService } from "../interfaces/puzzle.service.interface";
 import { Puzzle } from "../entities/puzzle.entity";
 import { IAssemblerService } from "../interfaces/assembler.service.interface";
 
+interface IPuzzle {
+    puzzles: IPuzzle[];
+}
+
 @Injectable()
 export class PuzzleAssemblerService implements IAssemblerService {
     constructor(
@@ -19,13 +23,27 @@ export class PuzzleAssemblerService implements IAssemblerService {
         for (const section of template.sections || []) {
             section.puzzles = await this.puzzleService.findBySectionId(section.id);
         }
-        const puzzles: Puzzle[] = [
-            ...template.sections.reduce((prev, curr) => [...prev, ...curr.puzzles], []),
-        ];
+        const puzzles = this.flatMapDeeply(template.sections);
         for (const puzzle of puzzles) {
-            if (puzzle.puzzles && puzzle.puzzles.length) {
-                puzzle.puzzles = await this.puzzleService.findByParentId(puzzle.id);
-            }
+            await this.deeplyAssemblePuzzlesChildren(puzzle);
+        }
+    }
+
+    private flatMapDeeply(puzzles: IPuzzle[]) {
+        return puzzles.reduce(
+            (prev, curr) => [
+                ...prev,
+                ...(curr.puzzles || []),
+                ...this.flatMapDeeply(curr.puzzles || []),
+            ],
+            [],
+        );
+    }
+
+    private async deeplyAssemblePuzzlesChildren(puzzle: Puzzle) {
+        puzzle.puzzles = await this.puzzleService.findByParentId(puzzle.id);
+        for (const child of puzzle.puzzles) {
+            await this.deeplyAssemblePuzzlesChildren(child);
         }
     }
 }

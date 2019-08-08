@@ -6,6 +6,7 @@ import { IFocusedPuzzleProps, ITemplate } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { AddIcon } from "@magnit/icons";
 import { Fab } from "@magnit/components";
+import { Close as CloseIcon } from "@material-ui/icons";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
     template: ITemplate;
@@ -25,6 +26,10 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
         props.onAddAsset(props.id);
     }
 
+    function onDeleteAsset() {
+        props.onDeleteAsset(props.id);
+    }
+
     return (
         <Grid css={() => ({ ...(!focused ? { display: "none" } : {}) })} item xs={3}>
             <Grid
@@ -37,17 +42,38 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                     border: `1px solid ${theme.colors.lightGray}`,
                     borderRadius: theme.radius(0.5),
                     minHeight: theme.spacing(20),
+                    position: "relative",
                 })}
             >
                 {!props.addAssetButton && (
-                    <img
-                        css={css`
-                            width: 100%;
-                            height: 100%;
-                        `}
-                        alt="asset"
-                        src="https://via.placeholder.com/1920x1024"
-                    />
+                    <React.Fragment>
+                        <img
+                            css={css`
+                                width: 100%;
+                                height: 100%;
+                            `}
+                            alt="asset"
+                            src="https://via.placeholder.com/1920x1024"
+                        />
+                        <div
+                            onClick={onDeleteAsset}
+                            css={theme => ({
+                                padding: theme.spacing(0.5),
+                                borderRadius: "50%",
+                                background: theme.colors.gray,
+                                color: theme.colors.white,
+                                position: "absolute",
+                                top: "-12px", // TODO: dynamic calculation
+                                right: "-12px", // TODO: dynamic calculation
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                cursor: "pointer",
+                            })}
+                        >
+                            <CloseIcon css={theme => ({ fontSize: theme.fontSize.normal })} />
+                        </div>
+                    </React.Fragment>
                 )}
                 {props.addAssetButton && (
                     <React.Fragment>

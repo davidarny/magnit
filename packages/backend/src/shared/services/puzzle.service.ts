@@ -16,7 +16,7 @@ export class PuzzleService implements IPuzzleService {
     async findBySectionId(id: string) {
         return this.puzzleRepository.find({
             where: { section: { id }, parent: null },
-            relations: ["puzzles", "conditions", "validations"],
+            relations: ["conditions", "validations"],
             order: { order: "ASC" },
         });
     }
@@ -25,7 +25,7 @@ export class PuzzleService implements IPuzzleService {
         return this.puzzleRepository.find({
             where: { parent: { id } },
             order: { order: "ASC" },
-            relations: ["puzzles", "conditions", "validations"],
+            relations: ["conditions", "validations"],
         });
     }
 
