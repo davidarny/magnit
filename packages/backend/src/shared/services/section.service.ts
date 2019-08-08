@@ -11,6 +11,9 @@ export class SectionService implements ISectionService {
     ) {}
 
     async findByTemplateId(id: number) {
-        return this.sectionRepository.find({ where: { template: { id } } });
+        return this.sectionRepository.find({
+            where: { template: { id } },
+            order: { order: "ASC" },
+        });
     }
 }
