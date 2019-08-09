@@ -102,6 +102,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }, [template]);
 
     function onToolbarAddQuestion(): void {
+        // type guards
+        const hasPuzzleType = (object: unknown): object is { puzzleType: EPuzzleType } =>
+            _.has(object, "puzzleType");
+        // whitelist of puzzle which can have questions inside
+        // except TEMPLATE & SECTION as they are handled differently
+        const whitelist = [EPuzzleType.GROUP];
         if (_.isEmpty(focusedPuzzleChain)) {
             return;
         }
@@ -112,7 +118,20 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         // check if adding question to puzzle
         // probably this puzzle is GROUP
         if (cache.puzzles.has(focusedPuzzleId)) {
-            const puzzle = cache.puzzles.get(focusedPuzzleId)!;
+            let puzzle: IPuzzle | ISection = cache.puzzles.get(focusedPuzzleId)!;
+            // if adding to to a group
+            // then trying to find in which section to add
+            if (hasPuzzleType(puzzle) && !whitelist.includes(puzzle.puzzleType)) {
+                const puzzles = Array.from(cache.sections.values());
+                const parentSection = puzzles.find(el =>
+                    el.puzzles.some(child => child.id === puzzle.id),
+                );
+                if (parentSection) {
+                    puzzle = parentSection;
+                } else {
+                    return;
+                }
+            }
             const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
             puzzle.puzzles.push({
                 id: uuid(),
@@ -242,17 +261,19 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             if (!puzzle.puzzles.some(child => child.id === id)) {
                 return;
             }
-            const lastPuzzle = _.last(puzzle.puzzles) || {
+            const prevPuzzle = _.last(puzzle.puzzles) || {
                 order: -1,
                 puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
             };
-            _.assign(lastPuzzle, addition);
+            // update last puzzle with payload
+            _.assign(prevPuzzle, addition);
+            // insert stub puzzle
             puzzle.puzzles.push({
                 id: uuid(),
                 title: ETerminals.EMPTY,
                 puzzles: [],
-                puzzleType: lastPuzzle.puzzleType,
-                order: lastPuzzle.order + 1,
+                puzzleType: prevPuzzle.puzzleType,
+                order: prevPuzzle.order + 1,
                 conditions: [],
                 description: ETerminals.EMPTY,
                 validations: [],
@@ -313,10 +334,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     });
                     // update focused puzzle chain
                     focusedPuzzleChain.splice(0, 1);
-                    const puzzleToFocusOn = _.nth(puzzle.puzzles, indexOfPuzzleToDelete);
+                    let indexToDelete = indexOfPuzzleToDelete - 1;
+                    if (indexToDelete < 0) {
+                        indexToDelete = indexOfPuzzleToDelete;
+                    }
+                    const puzzleToFocusOn = _.nth(puzzle.puzzles, indexToDelete - 1);
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        setFocusedPuzzleChain([...focusedPuzzleChain]);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
                     }
                     return true;
                 }
@@ -336,10 +361,16 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     });
                     // update focused puzzle chain
                     focusedPuzzleChain.splice(0, 1);
-                    const puzzleToFocusOn = _.nth(puzzle.sections, indexOfPuzzleToDelete);
+                    let indexToDelete = indexOfPuzzleToDelete - 1;
+                    if (indexToDelete < 0) {
+                        indexToDelete = indexOfPuzzleToDelete;
+                    }
+                    const puzzleToFocusOn = _.nth(puzzle.sections, indexToDelete);
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        setFocusedPuzzleChain([...focusedPuzzleChain]);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
+                    } else {
+                        service.current.onPuzzleFocus(template.id);
                     }
                     return true;
                 }
