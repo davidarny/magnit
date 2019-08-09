@@ -144,7 +144,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onClick={onAddCheckboxButton}
+                            onFocus={onAddCheckboxButton}
                         />
                     </Grid>
                 </Grid>

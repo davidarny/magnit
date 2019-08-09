@@ -145,7 +145,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...pr
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onClick={onAddRadioButton}
+                            onFocus={onAddRadioButton}
                         />
                     </Grid>
                     <Grid item />
