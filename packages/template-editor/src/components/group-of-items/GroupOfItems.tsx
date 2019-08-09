@@ -17,8 +17,6 @@ interface IGroupOfItemsProps {
     isFocused(id: string): boolean;
 
     onFocus(id: string): void;
-
-    onBlur(event: React.SyntheticEvent): void;
 }
 
 export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
@@ -36,7 +34,6 @@ export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
         <SelectableBlockWrapper
             onFocus={onFocus}
             onMouseDown={onFocus}
-            onBlur={props.onBlur}
             focused={focused}
             css={theme => ({
                 paddingTop: theme.spacing(2),
@@ -59,7 +56,6 @@ export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
                     index={props.index}
                     active={focused}
                     onFocus={onFocus}
-                    onBlur={props.onBlur}
                 />
                 {isGroup && (
                     <ConditionsWrapper
@@ -78,7 +74,6 @@ export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
                                 key={childPuzzle.id}
                                 puzzle={childPuzzle}
                                 onFocus={props.onFocus}
-                                onBlur={props.onBlur}
                                 isFocused={props.isFocused}
                                 index={props.index + index}
                                 parent={childPuzzle}
@@ -92,7 +87,6 @@ export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
                             index={index}
                             active={focused}
                             onFocus={onFocus}
-                            onBlur={props.onBlur}
                             key={childPuzzle.id}
                             parentPuzzle={puzzle}
                         />

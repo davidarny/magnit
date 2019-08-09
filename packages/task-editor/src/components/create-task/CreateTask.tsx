@@ -39,7 +39,6 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                 })}
                 onFocus={service.onPuzzleFocus.bind(service, task.id)}
                 onMouseDown={service.onPuzzleFocus.bind(service, task.id)}
-                onBlur={service.onPuzzleBlur.bind(service)}
                 focused={focusedPuzzleId === task.id}
                 id={task.id}
             >
@@ -114,7 +113,6 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                         key={document.__uuid}
                         onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
                         onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
-                        onBlur={service.onPuzzleBlur.bind(service)}
                         css={theme => ({
                             padding: theme.spacing(3),
                             zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",

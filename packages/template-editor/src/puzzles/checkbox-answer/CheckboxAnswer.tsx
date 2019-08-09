@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
@@ -25,15 +25,14 @@ interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     onDeleteCheckboxButton(id: string): void;
 }
 
-export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props }) => {
+export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
     const onTemplateChange = useCallback(() => {
-        traverse(props.template, (value: any) => {
-            if (!_.has(value, "id")) {
+        traverse(props.template, (puzzle: IPuzzle) => {
+            if (!_.has(puzzle, "id")) {
                 return;
             }
-            const puzzle = value as IPuzzle;
             if (puzzle.id !== props.id) {
                 return;
             }
@@ -42,6 +41,8 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
         });
         props.onTemplateChange({ ...props.template });
     }, [label]);
+
+    useEffect(() => onTemplateChange(), [focused]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -55,7 +56,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
         props.onDeleteCheckboxButton(props.id);
     }
 
-    if (!props.focused) {
+    if (!focused) {
         return (
             <Grid
                 container
@@ -114,7 +115,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ ...props 
                     </IconButton>
                 </Grid>
             </Grid>
-            {props.addCheckboxButton && props.focused && (
+            {props.addCheckboxButton && focused && (
                 <Grid
                     container
                     alignItems="flex-end"

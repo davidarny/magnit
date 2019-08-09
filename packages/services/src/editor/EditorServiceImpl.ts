@@ -35,11 +35,6 @@ export class EditorServiceImpl implements IEditorService {
         setFocusedPuzzleChain([...focusedPuzzleChain]);
     }
 
-    onPuzzleBlur(event: React.SyntheticEvent<Element, Event>): void {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
     updateToolbarTopPosition(): void {
         const [focusedPuzzleChain] = this.focusedPuzzleState;
         const [, setToolbarTopPosition] = this.toolbarTopPositionState;

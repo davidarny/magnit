@@ -11,8 +11,6 @@ interface IPuzzleWrapperProps {
     onFocus?(): void;
 
     onMouseDown?(): void;
-
-    onBlur?(event: React.SyntheticEvent): void;
 }
 
 export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, id, ...props }) => {
@@ -34,7 +32,6 @@ export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, id, ...
             })}
             onFocus={props.onFocus}
             onMouseDown={props.onFocus}
-            onBlur={props.onBlur}
         >
             <Grid item>{children}</Grid>
         </Grid>

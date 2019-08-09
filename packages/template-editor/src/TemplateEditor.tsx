@@ -284,19 +284,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }
 
     function onDeleteAnswerPuzzle(id: string): void {
-        traverse(template, (value: any) => {
-            if (!_.has(value, "id")) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            if (!_.has(puzzle, "puzzles")) {
-                return;
-            }
-            if (!puzzle.puzzles.some(child => child.id === id)) {
-                return;
-            }
-            // do not allow to delete puzzle if only one found
-            if (puzzle.puzzles.length === 1) {
+        traverse(template, (puzzle: IPuzzle) => {
+            if (
+                !_.has(puzzle, "id") ||
+                !_.has(puzzle, "puzzles") ||
+                !puzzle.puzzles.some(child => child.id === id) ||
+                // do not allow to delete puzzle if only one found
+                puzzle.puzzles.length === 1
+            ) {
                 return;
             }
             const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(child => child.id === id);
@@ -433,7 +428,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 focused={focusedPuzzleId === template.id}
                 onFocus={service.current.onPuzzleFocus.bind(service.current, template.id)}
                 onMouseDown={service.current.onPuzzleFocus.bind(service.current, template.id)}
-                onBlur={service.current.onPuzzleBlur.bind(service.current)}
             >
                 <SectionHead
                     template={template}
@@ -451,7 +445,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         focusedPuzzleId={focusedPuzzleId}
                         onTemplateChange={onTemplateChange}
                         onPuzzleFocus={service.current.onPuzzleFocus.bind(service.current)}
-                        onPuzzleBlur={service.current.onPuzzleBlur.bind(service.current)}
                     />
                 ))}
             {process.env.NODE_ENV !== "production" && (

@@ -16,8 +16,6 @@ interface ITemplateSectionProps {
     onTemplateChange(template: ITemplate): void;
 
     onPuzzleFocus(id: string): void;
-
-    onPuzzleBlur(event: React.SyntheticEvent): void;
 }
 
 export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
@@ -37,7 +35,6 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
             })}
             onFocus={props.onPuzzleFocus.bind(null, section.id)}
             onMouseDown={props.onPuzzleFocus.bind(null, section.id)}
-            onBlur={props.onPuzzleBlur}
             focused={focused}
         >
             <Section
@@ -51,7 +48,6 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
                 <Item
                     puzzles={section.puzzles}
                     onFocus={props.onPuzzleFocus}
-                    onBlur={props.onPuzzleBlur}
                     isFocused={isFocused}
                 />
             </Section>

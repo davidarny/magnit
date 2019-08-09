@@ -30,7 +30,7 @@ const answerMenuItems = [
     { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER },
 ];
 
-export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...props }) => {
+export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused, ...props }) => {
     const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
     const [questionTitle, setQuestionTitle] = useState(props.title);
 
@@ -131,7 +131,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
         props.onTemplateChange(templateSnapshot.current);
     }, [answersType, questionTitle, template]);
 
-    useEffect(() => onTemplateChange(), [answersType]);
+    useEffect(() => onTemplateChange(), [answersType, focused]);
 
     function onAnswerTypeChange(event: TChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
@@ -141,7 +141,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, ...prop
         setQuestionTitle(event.target.value as string);
     }
 
-    if (!props.focused) {
+    if (!focused) {
         return (
             <Grid
                 container

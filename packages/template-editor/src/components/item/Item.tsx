@@ -10,8 +10,6 @@ interface IContentProps {
 
     onFocus(id: string): void;
 
-    onBlur(event: React.SyntheticEvent): void;
-
     isFocused(id: string): boolean;
 }
 
@@ -27,7 +25,6 @@ export const Item: React.FC<IContentProps> = ({ puzzles, ...props }) => {
                         key={puzzle.id}
                         puzzle={puzzle}
                         onFocus={props.onFocus}
-                        onBlur={props.onBlur}
                         isFocused={props.isFocused}
                         index={index}
                     />

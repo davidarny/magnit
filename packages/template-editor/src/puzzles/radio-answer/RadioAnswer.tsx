@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
@@ -25,23 +25,24 @@ interface IRadioAnswerPuzzleProps extends IFocusedPuzzleProps {
     onDeleteRadioButton(id: string): void;
 }
 
-export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...props }) => {
+export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ focused, ...props }) => {
     const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
 
     const onTemplateChange = useCallback(() => {
-        traverse(template, (value: any) => {
-            if (!_.has(value, "id")) {
+        traverse(props.template, (puzzle: IPuzzle) => {
+            if (!_.has(puzzle, "id")) {
                 return;
             }
-            const puzzle = value as IPuzzle;
             if (puzzle.id !== props.id) {
                 return;
             }
             puzzle.title = label;
             return true;
         });
-        props.onTemplateChange({ ...template });
+        props.onTemplateChange({ ...props.template });
     }, [label]);
+
+    useEffect(() => onTemplateChange(), [focused]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
@@ -55,7 +56,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...pr
         props.onDeleteRadioButton(props.id);
     }
 
-    if (!props.focused) {
+    if (!focused) {
         return (
             <Grid
                 container
@@ -115,7 +116,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = ({ template, ...pr
                 </Grid>
             </Grid>
 
-            {props.addRadioButton && props.focused && (
+            {props.addRadioButton && focused && (
                 <Grid
                     container
                     alignItems="flex-end"

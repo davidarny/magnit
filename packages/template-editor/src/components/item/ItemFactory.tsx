@@ -16,8 +16,6 @@ interface IContentItemProps {
     noWrapper?: boolean;
 
     onFocus(): void;
-
-    onBlur(event: React.SyntheticEvent): void;
 }
 
 export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false, ...props }) => {
@@ -28,7 +26,6 @@ export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false,
                 id={puzzle.id}
                 onFocus={props.onFocus}
                 onMouseDown={props.onFocus}
-                onBlur={props.onBlur}
                 noWrapper={props.noWrapper}
             >
                 {factory.create({
@@ -47,7 +44,6 @@ export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false,
                                     index={index}
                                     active={props.active}
                                     onFocus={props.onFocus}
-                                    onBlur={props.onBlur}
                                     key={childPuzzle.id}
                                     parentPuzzle={puzzle}
                                 />

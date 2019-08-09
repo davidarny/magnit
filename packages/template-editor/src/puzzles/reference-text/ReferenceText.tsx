@@ -6,7 +6,6 @@ import * as React from "react";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
 import { Grid, TextField } from "@material-ui/core";
 import { useState } from "react";
-import { ETerminals } from "@magnit/services";
 import { useCallback } from "react";
 import { traverse } from "services/json";
 import _ from "lodash";
