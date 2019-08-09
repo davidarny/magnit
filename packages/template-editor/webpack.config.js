@@ -6,15 +6,16 @@ const externals = require("webpack-node-externals");
 const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const PeerDepsExternalsPlugin = require("peer-deps-externals-webpack-plugin");
+const CircularDependencyPlugin = require("circular-dependency-plugin");
+
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const smp = new SpeedMeasurePlugin();
 
 const env = {
-    raw: {
-        NODE_ENV: process.env.NODE_ENV || "development",
-    },
     get stringified() {
         return {
-            "process.env": Object.keys(this.raw).reduce((env, key) => {
-                env[key] = JSON.stringify(this.raw[key]);
+            "process.env": Object.keys(process.env).reduce((env, key) => {
+                env[key] = JSON.stringify(process.env[key]);
                 return env;
             }, {}),
         };
@@ -23,13 +24,12 @@ const env = {
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 const isProduction = process.env.NODE_ENV === "production";
-const fastBuildEnabled = !!process.env.FAST_BUILD_ENABLED;
 
-module.exports = {
+module.exports = smp.wrap({
     entry: {
         index: "./src/index.ts",
     },
-    ...(fastBuildEnabled || isProduction ? {} : { devtool: "eval" }),
+    ...(isProduction ? {} : { devtool: "eval" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
@@ -42,10 +42,10 @@ module.exports = {
         modules: ["node_modules", "src"],
     },
     optimization: {
-        minimize: isProduction && !fastBuildEnabled,
-        removeAvailableModules: isProduction && !fastBuildEnabled,
-        removeEmptyChunks: isProduction && !fastBuildEnabled,
-        splitChunks: isProduction && !fastBuildEnabled && {},
+        minimize: isProduction,
+        removeAvailableModules: isProduction,
+        removeEmptyChunks: isProduction,
+        splitChunks: isProduction && {},
     },
     module: {
         rules: [
@@ -79,13 +79,13 @@ module.exports = {
     plugins: [
         new HardSourceWebpackPlugin(),
         new PeerDepsExternalsPlugin(),
+        new CircularDependencyPlugin(),
         new webpack.DefinePlugin(env.stringified),
-        !fastBuildEnabled &&
-            new ForkTsCheckerWebpackPlugin({
-                watch: isDevelopment && "./src",
-                checkSyntacticErrors: true,
-            }),
-    ].filter(Boolean),
+        new ForkTsCheckerWebpackPlugin({
+            watch: isDevelopment && "./src",
+            checkSyntacticErrors: true,
+        }),
+    ],
     node: {
         dgram: "empty",
         fs: "empty",
@@ -96,4 +96,4 @@ module.exports = {
     performance: {
         hints: false,
     },
-};
+});

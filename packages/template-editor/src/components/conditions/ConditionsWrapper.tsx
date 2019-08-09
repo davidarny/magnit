@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { jsx } from "@emotion/core";
-import { EditorContext, IEditorContext } from "TemplateEditor";
+import { EditorContext, IEditorContext } from "context";
 import { Conditions } from "./Conditions";
 import { Validations } from "./Validations";
 import { EPuzzleType } from "@magnit/services";

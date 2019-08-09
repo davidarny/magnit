@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { jsx } from "@emotion/core";
-import { PuzzleWrapper } from "components/puzzle";
+import { PuzzleWrapper } from "components/puzzle-wrapper";
 import { IPuzzle } from "entities";
 import { getPuzzleFactory } from "services/item";
 import { Grid } from "@material-ui/core";

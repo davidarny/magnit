@@ -3,7 +3,7 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ETemplateType, IPuzzle, ISection, ITemplate } from "./entities";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
@@ -11,10 +11,11 @@ import _ from "lodash";
 import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
 import { SectionHead } from "./components/section-head";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
-import { TemplateSection } from "./components/template-section";
+import { SectionWrapper } from "./components/section-wrapper";
 import { EEditorType, EPuzzleType, ETerminals, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
+import { EditorContext, ICache } from "./context";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -26,29 +27,8 @@ interface ITemplateEditorProps {
     onDeleteAsset?(filename: string): Promise<unknown>;
 }
 
-interface ICache {
-    sections: Map<string, ISection>;
-    puzzles: Map<string, IPuzzle>;
-}
-
-export interface IEditorContext {
-    template: ITemplate;
-    cache: ICache;
-
-    onTemplateChange(template: ITemplate): void;
-
-    onAddAnswerPuzzle(id: string, addition?: Partial<IPuzzle>): void;
-
-    onDeleteAnswerPuzzle(id: string): void;
-
-    onUploadAsset(file: File): Promise<{ filename: string }>;
-
-    onDeleteAsset(filename: string): Promise<unknown>;
-}
-
-export const EditorContext = React.createContext<IEditorContext>(({} as unknown) as IEditorContext);
-
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
+    const context = useContext(EditorContext);
     const cache = useRef<ICache>({
         sections: new Map<string, ISection>(),
         puzzles: new Map<string, IPuzzle>(),
@@ -380,20 +360,16 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     const focusedPuzzleId = _.first(focusedPuzzleChain);
 
+    context.template = template;
+    context.cache = cache;
+    context.onDeleteAsset = props.onDeleteAsset || context.onDeleteAsset;
+    context.onUploadAsset = props.onAddAsset || context.onUploadAsset;
+    context.onTemplateChange = onTemplateChange;
+    context.onAddAnswerPuzzle = onAddAnswerPuzzle;
+    context.onDeleteAnswerPuzzle = onDeleteAnswerPuzzle;
+
     return (
-        <EditorContext.Provider
-            value={
-                ({
-                    template,
-                    cache,
-                    onTemplateChange,
-                    onAddAnswerPuzzle,
-                    onDeleteAnswerPuzzle,
-                    onUploadAsset: props.onAddAsset,
-                    onDeleteAsset: props.onDeleteAsset,
-                } as unknown) as IEditorContext
-            }
-        >
+        <React.Fragment>
             <EditorToolbar
                 top={toolbarTopPosition}
                 items={[
@@ -437,7 +413,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             </SelectableBlockWrapper>
             {template.sections &&
                 template.sections.map((section, index) => (
-                    <TemplateSection
+                    <SectionWrapper
                         key={section.id}
                         section={section}
                         index={index}
@@ -457,6 +433,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             )}
-        </EditorContext.Provider>
+        </React.Fragment>
     );
 };

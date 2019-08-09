@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { SelectableBlockWrapper } from "@magnit/components";
-import { Section } from "components/section";
-import { Item } from "components/item";
+import { SectionView } from "components/section-view";
 import { jsx } from "@emotion/core";
 import { ISection, ITemplate } from "entities";
+import { GroupView } from "components/group-view";
 
 interface ITemplateSectionProps {
     template: ITemplate;
@@ -18,7 +18,7 @@ interface ITemplateSectionProps {
     onPuzzleFocus(id: string): void;
 }
 
-export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
+export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
     const focused = props.focusedPuzzleId === section.id;
 
     function isFocused(id: string) {
@@ -37,7 +37,7 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
             onMouseDown={props.onPuzzleFocus.bind(null, section.id)}
             focused={focused}
         >
-            <Section
+            <SectionView
                 id={section.id}
                 title={section.title}
                 index={props.index}
@@ -45,12 +45,18 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
                 template={props.template}
                 onTemplateChange={props.onTemplateChange}
             >
-                <Item
-                    puzzles={section.puzzles}
-                    onFocus={props.onPuzzleFocus}
-                    isFocused={isFocused}
-                />
-            </Section>
+                {section.puzzles.map((puzzle, index) => {
+                    return (
+                        <GroupView
+                            key={puzzle.id}
+                            puzzle={puzzle}
+                            onFocus={props.onPuzzleFocus}
+                            isFocused={isFocused}
+                            index={index}
+                        />
+                    );
+                })}
+            </SectionView>
         </SelectableBlockWrapper>
     );
 };

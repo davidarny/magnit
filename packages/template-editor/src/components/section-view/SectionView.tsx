@@ -17,7 +17,7 @@ interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     onTemplateChange(template: ITemplate): void;
 }
 
-export const Section: React.FC<ISectionPuzzleProps> = props => {
+export const SectionView: React.FC<ISectionPuzzleProps> = props => {
     const { id, title, index, focused, children, ...rest } = props;
     const [sectionTitle, setSectionTitle] = useState<string>(title);
 

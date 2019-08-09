@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { jsx } from "@emotion/core";
 import { Question } from "./Question";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import { EditorContext } from "TemplateEditor";
+import { EditorContext } from "context";
 
 export class QuestionFactory implements IPuzzleFactory {
     create({ puzzle, ...props }: IPuzzleFactoryProps): React.ReactNode {

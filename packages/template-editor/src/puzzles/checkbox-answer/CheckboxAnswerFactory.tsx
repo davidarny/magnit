@@ -3,7 +3,7 @@
 import * as React from "react";
 import { jsx } from "@emotion/core";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import { EditorContext } from "TemplateEditor";
+import { EditorContext } from "context";
 import { CheckboxAnswer } from "./CheckboxAnswer";
 import { useContext } from "react";
 

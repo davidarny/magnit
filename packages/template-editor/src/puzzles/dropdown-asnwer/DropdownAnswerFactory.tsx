@@ -4,7 +4,7 @@ import * as React from "react";
 import { useContext } from "react";
 import { jsx } from "@emotion/core";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import { EditorContext } from "TemplateEditor";
+import { EditorContext } from "context";
 import { DropdownAnswer } from "./DropdownAnswer";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {

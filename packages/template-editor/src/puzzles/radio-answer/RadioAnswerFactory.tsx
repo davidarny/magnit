@@ -4,7 +4,7 @@ import * as React from "react";
 import { useContext } from "react";
 import { jsx } from "@emotion/core";
 import { RadioAnswer } from "./RadioAnswer";
-import { EditorContext } from "TemplateEditor";
+import { EditorContext } from "context";
 import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 
 export class RadioAnswerFactory implements IPuzzleFactory {

@@ -5,7 +5,7 @@ import { SelectableBlockWrapper } from "@magnit/components";
 import { jsx } from "@emotion/core";
 import { IPuzzle } from "entities";
 import { EPuzzleType } from "@magnit/services";
-import { ItemFactory } from "components/item";
+import { ItemFactory } from "components/item-factory";
 import { ConditionsWrapper } from "components/conditions";
 import _ from "lodash";
 
@@ -19,7 +19,7 @@ interface IGroupOfItemsProps {
     onFocus(id: string): void;
 }
 
-export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
+export const GroupView: React.FC<IGroupOfItemsProps> = props => {
     const { puzzle, parent } = props;
 
     function onFocus(): void {
@@ -70,7 +70,7 @@ export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
                 {(puzzle.puzzles || []).map((childPuzzle, index) => {
                     if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
                         return (
-                            <GroupOfItems
+                            <GroupView
                                 key={childPuzzle.id}
                                 puzzle={childPuzzle}
                                 onFocus={props.onFocus}

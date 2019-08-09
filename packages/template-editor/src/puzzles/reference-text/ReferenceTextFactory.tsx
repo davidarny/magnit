@@ -5,7 +5,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import * as React from "react";
 import { ReferenceText } from "./ReferenceText";
 import { useContext } from "react";
-import { EditorContext } from "TemplateEditor";
+import { EditorContext } from "context";
 
 export class ReferenceTextFactory implements IPuzzleFactory {
     create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
