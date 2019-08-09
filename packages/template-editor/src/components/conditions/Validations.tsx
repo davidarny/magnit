@@ -356,7 +356,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={3} css={theme => ({ maxWidth: theme.spacing(32) })}>
                             {!!validation.leftHandPuzzle && (
                                 <SelectField
                                     id={"validation-type"}
