@@ -334,14 +334,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     });
                     // update focused puzzle chain
                     focusedPuzzleChain.splice(0, 1);
-                    let indexToDelete = indexOfPuzzleToDelete - 1;
-                    if (indexToDelete < 0) {
-                        indexToDelete = indexOfPuzzleToDelete;
-                    }
-                    const puzzleToFocusOn = _.nth(puzzle.puzzles, indexToDelete - 1);
+                    const puzzleToFocusOn = _.nth(
+                        puzzle.puzzles,
+                        Math.max(indexOfPuzzleToDelete - 1, 0),
+                    );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
                         service.current.onPuzzleFocus(puzzleToFocusOn.id);
+                    } else {
+                        service.current.onPuzzleFocus(_.first(template.sections)!.id);
                     }
                     return true;
                 }
@@ -361,11 +362,10 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     });
                     // update focused puzzle chain
                     focusedPuzzleChain.splice(0, 1);
-                    let indexToDelete = indexOfPuzzleToDelete - 1;
-                    if (indexToDelete < 0) {
-                        indexToDelete = indexOfPuzzleToDelete;
-                    }
-                    const puzzleToFocusOn = _.nth(puzzle.sections, indexToDelete);
+                    const puzzleToFocusOn = _.nth(
+                        puzzle.sections,
+                        Math.max(indexOfPuzzleToDelete - 1, 0),
+                    );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
                         service.current.onPuzzleFocus(puzzleToFocusOn.id);
