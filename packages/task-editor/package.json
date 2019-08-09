@@ -1,32 +1,19 @@
 {
     "name": "@magnit/task-editor",
     "version": "0.1.0",
+    "private": true,
     "main": "dist/index.js",
     "module": "dist/index.js",
     "typings": "dist/index.d.ts",
-    "private": true,
     "scripts": {
-        "clean": "rimraf dist ./node_modules/.cache",
         "build:lib": "concurrently -n webpack,tsc \"cross-env NODE_ENV=production webpack --mode production\" \"tsc --emitDeclarationOnly -p tsconfig.json\"",
+        "clean": "rimraf dist ./node_modules/.cache",
         "watch:lib": "concurrently -n webpack,tsc \"webpack --mode development --watch\" \"tsc --emitDeclarationOnly -p tsconfig.json -w\""
     },
     "dependencies": {
-        "@magnit/icons": "^0.1.0",
         "@magnit/components": "^0.1.0",
+        "@magnit/icons": "^0.1.0",
         "@magnit/services": "^0.1.0"
-    },
-    "peerDependencies": {
-        "@emotion/core": "^10.0.14",
-        "@material-ui/core": "^4.2.0",
-        "@material-ui/icons": "^4.2.1",
-        "@magnit/icons": "^0.1.0",
-        "@magnit/components": "^0.1.0",
-        "@magnit/services": "^0.1.0",
-        "@types/lodash": "^4.14.136",
-        "lodash": "^4.17.14",
-        "react": "^16.8.6",
-        "react-dom": "^16.8.6",
-        "uuid": "^3.3.2"
     },
     "devDependencies": {
         "@babel/core": "^7.4.5",
@@ -34,16 +21,29 @@
         "@babel/preset-react": "^7.0.0",
         "babel-loader": "^8.0.6",
         "babel-plugin-emotion": "^10.0.14",
+        "concurrently": "^4.1.1",
         "fork-ts-checker-webpack-plugin": "^1.4.0",
         "hard-source-webpack-plugin": "^0.13.1",
         "peer-deps-externals-webpack-plugin": "^1.0.4",
+        "rimraf": "^2.6.3",
         "thread-loader": "^2.1.2",
         "ts-loader": "^6.0.4",
         "typescript": "^3.5.3",
         "webpack": "^4.34.0",
         "webpack-cli": "^3.3.5",
-        "webpack-node-externals": "^1.7.2",
-        "concurrently": "^4.1.1",
-        "rimraf": "^2.6.3"
+        "webpack-node-externals": "^1.7.2"
+    },
+    "peerDependencies": {
+        "@emotion/core": "^10.0.14",
+        "@magnit/components": "^0.1.0",
+        "@magnit/icons": "^0.1.0",
+        "@magnit/services": "^0.1.0",
+        "@material-ui/core": "^4.2.0",
+        "@material-ui/icons": "^4.2.1",
+        "@types/lodash": "^4.14.136",
+        "lodash": "^4.17.14",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
+        "uuid": "^3.3.2"
     }
 }

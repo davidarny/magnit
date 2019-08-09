@@ -4,7 +4,7 @@
 import { jsx } from "@emotion/core";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { ETemplateType, IPuzzle, ITemplate } from "./entities";
+import { ETemplateType, IPuzzle, ISection, ITemplate } from "./entities";
 import uuid from "uuid/v4";
 import { traverse } from "./services/json";
 import _ from "lodash";
@@ -26,8 +26,14 @@ interface ITemplateEditorProps {
     onDeleteAsset?(filename: string): Promise<unknown>;
 }
 
+interface ICache {
+    sections: Map<string, ISection>;
+    puzzles: Map<string, IPuzzle>;
+}
+
 export interface IEditorContext {
     template: ITemplate;
+    cache: ICache;
 
     onTemplateChange(template: ITemplate): void;
 
@@ -43,6 +49,10 @@ export interface IEditorContext {
 export const EditorContext = React.createContext<IEditorContext>(({} as unknown) as IEditorContext);
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
+    const cache = useRef<ICache>({
+        sections: new Map<string, ISection>(),
+        puzzles: new Map<string, IPuzzle>(),
+    }).current;
     const [template, setTemplate] = useState<ITemplate>(
         props.initialState || {
             id: uuid(),
@@ -69,30 +79,40 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }, [focusedPuzzleChain]);
 
     // handle passed onChange callback
+    // update cache
     useEffect(() => {
         if (props.onChange) {
             props.onChange(template);
         }
+        const isSection = (object: unknown): object is ISection =>
+            !_.has(object, "puzzleType") && _.has(object, "puzzles");
+        const isPuzzle = (object: unknown): object is IPuzzle =>
+            _.has(object, "puzzleType") && _.has(object, "puzzles");
+
+        cache.puzzles.clear();
+        cache.sections.clear();
+        traverse(template, (element: IPuzzle | ISection) => {
+            if (isPuzzle(element)) {
+                cache.puzzles.set(element.id, element);
+            }
+            if (isSection(element)) {
+                cache.sections.set(element.id, element);
+            }
+        });
     }, [template]);
 
     function onToolbarAddQuestion(): void {
-        const whitelist = [EPuzzleType.GROUP];
-        traverse(template, (value: any) => {
-            if (_.isEmpty(focusedPuzzleChain) || !_.has(value, "id")) {
-                return;
-            }
-            const focusedPuzzleId = _.head(focusedPuzzleChain);
-            if (value.id !== focusedPuzzleId || !focusedPuzzleChain.includes(value.id)) {
-                return;
-            }
-            // do not allow to add question in template, section, question, answer, etc...
-            if (
-                !_.has(value, "puzzles") ||
-                (_.has(value, "puzzleType") && !whitelist.includes(value.puzzleType))
-            ) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
+        if (_.isEmpty(focusedPuzzleChain)) {
+            return;
+        }
+        const focusedPuzzleId = _.first(focusedPuzzleChain);
+        if (!focusedPuzzleId) {
+            return;
+        }
+        // check if adding question to puzzle
+        // probably this puzzle is GROUP
+        if (cache.puzzles.has(focusedPuzzleId)) {
+            const puzzle = cache.puzzles.get(focusedPuzzleId)!;
             const prevPuzzle = puzzle.puzzles[puzzle.puzzles.length - 1];
             puzzle.puzzles.push({
                 id: uuid(),
@@ -115,8 +135,40 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.QUESTION,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-            return true;
-        });
+        } else {
+            // initially adding to last section
+            // if not focused to any
+            let section = _.last(Array.from(cache.sections.values())) as ISection | undefined;
+            if (cache.sections.has(focusedPuzzleId)) {
+                section = cache.sections.get(focusedPuzzleId);
+            }
+            if (section) {
+                if (!_.has(section, "puzzles")) {
+                    section.puzzles = [];
+                }
+                section.puzzles!.push({
+                    id: uuid(),
+                    puzzles: [
+                        {
+                            id: uuid(),
+                            puzzleType: EPuzzleType.TEXT_ANSWER,
+                            title: ETerminals.EMPTY,
+                            description: ETerminals.EMPTY,
+                            order: 0,
+                            puzzles: [],
+                            conditions: [],
+                            validations: [],
+                        },
+                    ],
+                    validations: [],
+                    conditions: [],
+                    title: ETerminals.EMPTY,
+                    description: ETerminals.EMPTY,
+                    puzzleType: EPuzzleType.QUESTION,
+                    order: 0,
+                });
+            }
+        }
         setTemplate({ ...template });
     }
 
@@ -124,13 +176,14 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         // if we are focused in template
         // adding to first section if exists
         if (template.sections.every(section => !focusedPuzzleChain.includes(section.id))) {
-            const firstSection = _.head(template.sections);
-            if (!firstSection) {
+            const section = _.last(template.sections);
+            if (!section) {
                 return;
             }
-            const prevPuzzle = firstSection.puzzles[firstSection.puzzles.length - 1];
-            firstSection.puzzles.push({
-                id: uuid(),
+            const prevPuzzle = section.puzzles[section.puzzles.length - 1];
+            const id = uuid();
+            section.puzzles.push({
+                id,
                 puzzles: [],
                 validations: [],
                 conditions: [],
@@ -139,6 +192,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
+            cache.puzzles.set(id, _.last(section.puzzles)!);
         }
         // else adding to section which is in focused puzzle chain
         else {
@@ -147,8 +201,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     return;
                 }
                 const prevPuzzle = section.puzzles[section.puzzles.length - 1];
+                const id = uuid();
                 section.puzzles.push({
-                    id: uuid(),
+                    id,
                     puzzles: [],
                     validations: [],
                     conditions: [],
@@ -157,6 +212,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
+                cache.puzzles.set(id, _.last(section.puzzles)!);
             });
         }
         setTemplate({ ...template });
@@ -164,25 +220,22 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     function onToolbarAddSection(): void {
         const prevSection = template.sections[template.sections.length - 1];
+        const id = uuid();
         template.sections.push({
-            id: uuid(),
+            id,
             puzzles: [],
             title: ETerminals.EMPTY,
             order: (prevSection || { order: -1 }).order + 1,
         });
-        setTemplate({ ...template });
-    }
-
-    function onTemplateChange(template: ITemplate) {
+        cache.sections.set(id, _.last(template.sections)!);
         setTemplate({ ...template });
     }
 
     function onAddAnswerPuzzle(id: string, addition: Partial<IPuzzle> = {}): void {
-        traverse(template, (value: any) => {
-            if (!_.has(value, "id")) {
+        traverse(template, (puzzle: IPuzzle) => {
+            if (!_.has(puzzle, "id")) {
                 return;
             }
-            const puzzle = value as IPuzzle;
             if (!_.has(puzzle, "puzzles")) {
                 return;
             }
@@ -240,12 +293,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }
 
     function onDeletePuzzle(): void {
-        traverse(template, (value: any) => {
-            if (!_.has(value, "id")) {
+        traverse(template, (puzzle: IPuzzle | ITemplate) => {
+            if (!_.has(puzzle, "id")) {
                 return;
             }
             const focusedPuzzleId = _.head(focusedPuzzleChain);
-            const puzzle = value as IPuzzle | ITemplate;
             if ("puzzles" in puzzle) {
                 if (puzzle.puzzles.some(child => child.id === focusedPuzzleId)) {
                     const indexOfPuzzleToDelete = puzzle.puzzles.findIndex(
@@ -259,6 +311,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             ...element,
                         };
                     });
+                    // update focused puzzle chain
+                    focusedPuzzleChain.splice(0, 1);
+                    const puzzleToFocusOn = _.nth(puzzle.puzzles, indexOfPuzzleToDelete);
+                    if (puzzleToFocusOn) {
+                        focusedPuzzleChain.unshift(puzzleToFocusOn.id);
+                        setFocusedPuzzleChain([...focusedPuzzleChain]);
+                    }
                     return true;
                 }
             }
@@ -275,6 +334,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                             ...element,
                         };
                     });
+                    // update focused puzzle chain
+                    focusedPuzzleChain.splice(0, 1);
+                    const puzzleToFocusOn = _.nth(puzzle.sections, indexOfPuzzleToDelete);
+                    if (puzzleToFocusOn) {
+                        focusedPuzzleChain.unshift(puzzleToFocusOn.id);
+                        setFocusedPuzzleChain([...focusedPuzzleChain]);
+                    }
                     return true;
                 }
             }
@@ -282,13 +348,18 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         setTemplate({ ...template });
     }
 
-    const focusedPuzzleId = _.head(focusedPuzzleChain);
+    function onTemplateChange(template: ITemplate) {
+        setTemplate({ ...template });
+    }
+
+    const focusedPuzzleId = _.first(focusedPuzzleChain);
 
     return (
         <EditorContext.Provider
             value={
                 ({
                     template,
+                    cache,
                     onTemplateChange,
                     onAddAnswerPuzzle,
                     onDeleteAnswerPuzzle,

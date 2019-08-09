@@ -23,6 +23,10 @@ interface ITemplateSectionProps {
 export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
     const focused = props.focusedPuzzleId === section.id;
 
+    function isFocused(id: string) {
+        return id === props.focusedPuzzleId;
+    }
+
     return (
         <SelectableBlockWrapper
             id={section.id}
@@ -48,7 +52,7 @@ export const TemplateSection: React.FC<ITemplateSectionProps> = ({ section, ...p
                     puzzles={section.puzzles}
                     onFocus={props.onPuzzleFocus}
                     onBlur={props.onPuzzleBlur}
-                    isFocused={id => id === props.focusedPuzzleId}
+                    isFocused={isFocused}
                 />
             </Section>
         </SelectableBlockWrapper>

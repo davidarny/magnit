@@ -16,21 +16,23 @@ interface IContentProps {
 }
 
 export const Item: React.FC<IContentProps> = ({ puzzles, ...props }) => {
+    if (!puzzles) {
+        return null;
+    }
     return (
         <React.Fragment>
-            {puzzles &&
-                puzzles.map((puzzle, index) => {
-                    return (
-                        <GroupOfItems
-                            key={puzzle.id}
-                            puzzle={puzzle}
-                            onFocus={props.onFocus}
-                            onBlur={props.onBlur}
-                            isFocused={props.isFocused}
-                            index={index}
-                        />
-                    );
-                })}
+            {puzzles.map((puzzle, index) => {
+                return (
+                    <GroupOfItems
+                        key={puzzle.id}
+                        puzzle={puzzle}
+                        onFocus={props.onFocus}
+                        onBlur={props.onBlur}
+                        isFocused={props.isFocused}
+                        index={index}
+                    />
+                );
+            })}
         </React.Fragment>
     );
 };

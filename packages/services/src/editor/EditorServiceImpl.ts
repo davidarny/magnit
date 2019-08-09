@@ -6,22 +6,27 @@ export type TFocusedPuzzleState = [string[], React.Dispatch<React.SetStateAction
 export type TToolbarTopPositionState = [number, React.Dispatch<React.SetStateAction<number>>];
 
 export class EditorServiceImpl implements IEditorService {
-    private readonly throttledChainCleaning: () => void;
+    private WAIT = 250;
+
+    private readonly debouncedChainCleaning: () => void;
 
     constructor(
         private focusedPuzzleState: TFocusedPuzzleState,
         private toolbarTopPositionState: TToolbarTopPositionState,
     ) {
-        const wait = 100;
-        this.throttledChainCleaning = _.throttle(() => {
-            const [focusedPuzzleChain] = this.focusedPuzzleState;
-            focusedPuzzleChain.length = 0;
-        }, wait);
+        this.debouncedChainCleaning = _.debounce(
+            () => {
+                const [focusedPuzzleChain] = this.focusedPuzzleState;
+                focusedPuzzleChain.length = 0;
+            },
+            this.WAIT,
+            { leading: true, trailing: false },
+        );
     }
 
     onPuzzleFocus(id: string): void {
         const [focusedPuzzleChain, setFocusedPuzzleChain] = this.focusedPuzzleState;
-        this.throttledChainCleaning();
+        this.debouncedChainCleaning();
         if (focusedPuzzleChain.includes(id)) {
             setFocusedPuzzleChain([...focusedPuzzleChain]);
             return;
@@ -41,7 +46,7 @@ export class EditorServiceImpl implements IEditorService {
         if (!focusedPuzzleChain.length) {
             return;
         }
-        const focusedPuzzleId = _.head(focusedPuzzleChain);
+        const focusedPuzzleId = _.first(focusedPuzzleChain);
         if (!focusedPuzzleId) {
             return;
         }

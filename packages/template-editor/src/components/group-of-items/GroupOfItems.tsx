@@ -9,10 +9,10 @@ import { ItemFactory } from "components/item";
 import { ConditionsWrapper } from "components/conditions";
 import _ from "lodash";
 
-interface IContentGroupProps {
+interface IGroupOfItemsProps {
     index: number;
     puzzle: IPuzzle;
-    parentPuzzle?: IPuzzle;
+    parent?: IPuzzle;
 
     isFocused(id: string): boolean;
 
@@ -21,14 +21,14 @@ interface IContentGroupProps {
     onBlur(event: React.SyntheticEvent): void;
 }
 
-export const GroupOfItems: React.FC<IContentGroupProps> = props => {
-    const { isFocused, puzzle, parentPuzzle } = props;
+export const GroupOfItems: React.FC<IGroupOfItemsProps> = props => {
+    const { puzzle, parent } = props;
 
     function onFocus(): void {
         props.onFocus(puzzle.id);
     }
 
-    const focused = isFocused(puzzle.id);
+    const focused = props.isFocused(puzzle.id);
     const isGroup = puzzle.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
 
@@ -46,7 +46,7 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
         >
             <div
                 css={theme => ({
-                    paddingLeft: !!parentPuzzle ? theme.spacing(4) : 0,
+                    paddingLeft: !!parent ? theme.spacing(4) : 0,
                     paddingTop: theme.spacing(),
                     paddingBottom: theme.spacing(),
                     borderTop: hasBorder ? `1px dashed ${theme.colors.gray}` : "none",
@@ -55,7 +55,7 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
             >
                 <ItemFactory
                     puzzle={puzzle}
-                    parentPuzzle={parentPuzzle}
+                    parentPuzzle={parent}
                     index={props.index}
                     active={focused}
                     onFocus={onFocus}
@@ -79,9 +79,9 @@ export const GroupOfItems: React.FC<IContentGroupProps> = props => {
                                 puzzle={childPuzzle}
                                 onFocus={props.onFocus}
                                 onBlur={props.onBlur}
-                                isFocused={isFocused}
+                                isFocused={props.isFocused}
                                 index={props.index + index}
-                                parentPuzzle={childPuzzle}
+                                parent={childPuzzle}
                             />
                         );
                     }

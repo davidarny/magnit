@@ -2,19 +2,27 @@
     "name": "magnit",
     "version": "0.1.0",
     "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
     "scripts": {
-        "clean": "lerna run clean",
-        "lint": "eslint . --fix",
-        "docs:build": "lerna run docs:build --stream",
-        "start:frontend": "lerna run --scope @magnit/frontend start --stream",
-        "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
-        "build:frontend": "lerna run --scope @magnit/frontend build --stream --no-prefix",
         "build:backend": "lerna run --scope @magnit/backend build --stream --no-prefix",
-        "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
-        "deploy:frontend": "yarn build:frontend && gh-pages -d packages/frontend/build -b release/frontend",
-        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail",
+        "build:frontend": "lerna run --scope @magnit/frontend build --stream --no-prefix",
         "build:lib": "lerna run build:lib --stream",
-        "commit": "git-cz"
+        "clean": "lerna run clean",
+        "commit": "git-cz",
+        "deploy:frontend": "yarn build:frontend && gh-pages -d packages/frontend/build -b release/frontend",
+        "docs:build": "lerna run docs:build --stream",
+        "lint": "eslint . --fix",
+        "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
+        "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
+        "start:frontend": "lerna run --scope @magnit/frontend start --stream",
+        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
     },
     "dependencies": {
         "concurrently": "^4.1.0",
@@ -36,13 +44,5 @@
         "lint-staged": "^8.1.7",
         "prettier": "^1.17.1",
         "pretty-quick": "^1.11.0"
-    },
-    "config": {
-        "commitizen": {
-            "path": "./node_modules/cz-conventional-changelog"
-        }
-    },
-    "workspaces": [
-        "packages/*"
-    ]
+    }
 }
