@@ -38,8 +38,12 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                     puzzleType === EPuzzleType.GROUP
                         ? "Условия показа группы"
                         : "Условия показа вопроса";
+
                 const validationsTitle =
                     puzzleType === EPuzzleType.QUESTION ? "Условия валидации поля ответа" : "";
+
+                const validationsEnabled = answerType === EPuzzleType.NUMERIC_ANSWER;
+
                 return (
                     <Grid
                         container
@@ -70,6 +74,9 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                                         borderTopLeftRadius: theme.radius(0.5),
                                         borderTopRightRadius: theme.radius(0.5),
                                         height: "3px",
+                                        // hide via `width` so that animation works
+                                        // when indicator appears
+                                        ...(!validationsEnabled ? { width: "0px !important" } : {}),
                                     },
                                 })}
                                 classes={{ indicator: "indicator" }}
@@ -87,7 +94,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                                     })}
                                     label={conditionsTitle}
                                 />
-                                {!!validationsTitle && answerType === EPuzzleType.NUMERIC_ANSWER && (
+                                {!!validationsTitle && validationsEnabled && (
                                     <Tab
                                         label={validationsTitle}
                                         css={theme => ({
@@ -125,10 +132,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
                             </div>
                             <div
                                 css={{
-                                    display:
-                                        tab === 1 && answerType === EPuzzleType.NUMERIC_ANSWER
-                                            ? "block"
-                                            : "none",
+                                    display: tab === 1 && validationsEnabled ? "block" : "none",
                                 }}
                             >
                                 <Validations
