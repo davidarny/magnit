@@ -377,15 +377,17 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                         : onValueChange,
                                 )}
                         </Grid>
-                        <Grid item xs>
-                            <Grid container justify="flex-end">
-                                <Grid item>
-                                    <IconButton onClick={onConditionDeleteHandler}>
-                                        <DeleteIcon />
-                                    </IconButton>
+                        {condition.questionPuzzle && (
+                            <Grid item xs>
+                                <Grid container justify="flex-end">
+                                    <Grid item>
+                                        <IconButton onClick={onConditionDeleteHandler}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        )}
                     </React.Fragment>
                 );
             })}

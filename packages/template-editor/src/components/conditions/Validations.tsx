@@ -379,15 +379,17 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                         : onValueChange,
                                 )}
                         </Grid>
-                        <Grid item xs>
-                            <Grid container justify="flex-end">
-                                <Grid item>
-                                    <IconButton onClick={onDeleteValidationHandler}>
-                                        <DeleteIcon />
-                                    </IconButton>
+                        {validation.operatorType && (
+                            <Grid item xs>
+                                <Grid container justify="flex-end">
+                                    <Grid item>
+                                        <IconButton onClick={onDeleteValidationHandler}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        )}
                     </React.Fragment>
                 );
             })}
