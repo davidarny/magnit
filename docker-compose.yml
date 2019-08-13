@@ -8,6 +8,11 @@ services:
         restart: unless-stopped
         networks:
             - magnit
+        environment:
+            REACT_APP_BACKEND_URL: http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
+        depends_on:
+            - backend
+            - db
         ports:
             - ${FRONTEND_PORT:-80}:80
 
