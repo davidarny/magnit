@@ -29,7 +29,7 @@ import uuid from "uuid/v4";
 import { Button, InputField, SelectField } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getValidationService } from "services/condition";
-import { ETerminals, EPuzzleType } from "@magnit/services";
+import { EPuzzleType, ETerminals } from "@magnit/services";
 
 interface IValidationsProps {
     initialState?: IValidation[];
@@ -42,19 +42,17 @@ interface IValidationsProps {
 
 export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
-    const [validations, setValidations] = useState<IValidation[]>(
-        (props.initialState && props.initialState.length && props.initialState) || [
-            {
-                id: uuid(),
-                order: 0,
-                leftHandPuzzle: ETerminals.EMPTY,
-                errorMessage: ETerminals.EMPTY,
-                operatorType: EOperatorType.NONE,
-                validationType: EValidationType.NONE,
-                conditionType: EConditionType.OR,
-            },
-        ],
-    );
+    const initialState = props.initialState && props.initialState.length && props.initialState;
+    const defaultState = {
+        id: uuid(),
+        order: 0,
+        leftHandPuzzle: ETerminals.EMPTY,
+        errorMessage: ETerminals.EMPTY,
+        operatorType: EOperatorType.NONE,
+        validationType: EValidationType.NONE,
+        conditionType: EConditionType.OR,
+    };
+    const [validations, setValidations] = useState<IValidation[]>(initialState || [defaultState]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
 
@@ -168,6 +166,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     // disallow referencing to questions in GROUPS
                     if (
                         puzzle.puzzleType === EPuzzleType.QUESTION &&
+                        // check if all children of questions are numeric
+                        (puzzle.puzzles || []).every(
+                            child => child.puzzleType === EPuzzleType.NUMERIC_ANSWER,
+                        ) &&
                         puzzle.title.length > 0 &&
                         !isGroupParent
                     ) {
@@ -192,6 +194,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
     function onDeleteValidation(id: string) {
         // do not allow to delete if only one validation present
         if (validations.length === 1) {
+            setValidations([defaultState]);
             return;
         }
         setValidations([...validations.filter(validation => validation.id !== id)]);
@@ -266,6 +269,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     });
                 }
 
+                function onDeleteValidationHandler() {
+                    onDeleteValidation(validation.id);
+                }
+
                 const validationService = getValidationService({
                     index,
                     validation,
@@ -281,54 +288,48 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 <Typography>{validationService.getConditionLiteral()}</Typography>
                             </Grid>
                         )}
-                        <Grid
-                            xs={isFirstRow ? "auto" : 3}
-                            item
-                            css={theme => ({ marginLeft: isFirstRow ? 0 : theme.spacing(9) })}
-                        >
-                            {!isFirstRow && (
-                                <React.Fragment>
-                                    <RadioGroup
-                                        value={validation.conditionType}
-                                        onChange={onConditionTypeChange}
-                                        row
-                                    >
-                                        <FormControlLabel
-                                            value={EConditionType.AND}
-                                            control={
-                                                <Radio
-                                                    css={theme => ({
-                                                        color: `${theme.colors.primary} !important`,
-                                                        ":hover": {
-                                                            background: `${theme.colors.primary}14 !important`,
-                                                        },
-                                                    })}
-                                                />
-                                            }
-                                            label="И"
-                                            labelPlacement="end"
-                                        />
-                                        <FormControlLabel
-                                            value={EConditionType.OR}
-                                            control={
-                                                <Radio
-                                                    css={theme => ({
-                                                        color: `${theme.colors.primary} !important`,
-                                                        ":hover": {
-                                                            background: `${theme.colors.primary}14 !important`,
-                                                        },
-                                                    })}
-                                                />
-                                            }
-                                            label="Или"
-                                            labelPlacement="end"
-                                        />
-                                    </RadioGroup>
-                                </React.Fragment>
-                            )}
-                        </Grid>
+                        {!isFirstRow && (
+                            <Grid xs={3} item css={theme => ({ marginLeft: theme.spacing(9) })}>
+                                <RadioGroup
+                                    value={validation.conditionType}
+                                    onChange={onConditionTypeChange}
+                                    row
+                                >
+                                    <FormControlLabel
+                                        value={EConditionType.AND}
+                                        control={
+                                            <Radio
+                                                css={theme => ({
+                                                    color: `${theme.colors.primary} !important`,
+                                                    ":hover": {
+                                                        background: `${theme.colors.primary}14 !important`,
+                                                    },
+                                                })}
+                                            />
+                                        }
+                                        label="И"
+                                        labelPlacement="end"
+                                    />
+                                    <FormControlLabel
+                                        value={EConditionType.OR}
+                                        control={
+                                            <Radio
+                                                css={theme => ({
+                                                    color: `${theme.colors.primary} !important`,
+                                                    ":hover": {
+                                                        background: `${theme.colors.primary}14 !important`,
+                                                    },
+                                                })}
+                                            />
+                                        }
+                                        label="Или"
+                                        labelPlacement="end"
+                                    />
+                                </RadioGroup>
+                            </Grid>
+                        )}
                         {isFirstRow && currentQuestion && (
-                            <Grid item xs={3}>
+                            <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
                                 <SelectField
                                     id={"left-hand-puzzle"}
                                     fullWidth
@@ -338,7 +339,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                     displayEmpty={false}
                                 >
                                     <MenuItem key={currentQuestion.id} value={currentQuestion.id}>
-                                        {currentQuestion.title}
+                                        {currentQuestion.title || "<Текущий вопрос>"}
                                     </MenuItem>
                                 </SelectField>
                             </Grid>
@@ -356,8 +357,8 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs={3} css={theme => ({ maxWidth: theme.spacing(32) })}>
-                            {!!validation.leftHandPuzzle && (
+                        <Grid item xs={2}>
+                            {!!validation.operatorType && (
                                 <SelectField
                                     id={"validation-type"}
                                     fullWidth
@@ -369,8 +370,8 @@ export const Validations: React.FC<IValidationsProps> = props => {
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs css={theme => ({ maxWidth: theme.spacing(32) })}>
-                            {!!validation.leftHandPuzzle &&
+                        <Grid item xs={3}>
+                            {!!validation.validationType &&
                                 validationService.getRightHandPuzzle(questions)(
                                     validation.validationType ===
                                         EValidationType.COMPARE_WITH_ANSWER
@@ -381,7 +382,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                         <Grid item xs>
                             <Grid container justify="flex-end">
                                 <Grid item>
-                                    <IconButton onClick={() => onDeleteValidation(validation.id)}>
+                                    <IconButton onClick={onDeleteValidationHandler}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Grid>

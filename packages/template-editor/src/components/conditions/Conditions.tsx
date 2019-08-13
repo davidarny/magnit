@@ -41,19 +41,17 @@ interface IConditionsProps {
 
 export const Conditions: React.FC<IConditionsProps> = props => {
     const { puzzleId, template, disabled = false } = props;
-    const [conditions, setConditions] = useState<ICondition[]>(
-        (props.initialState && props.initialState.length && props.initialState) || [
-            {
-                id: uuid(),
-                order: 0,
-                questionPuzzle: ETerminals.EMPTY,
-                answerPuzzle: ETerminals.EMPTY,
-                value: ETerminals.EMPTY,
-                actionType: EActionType.NONE,
-                conditionType: EConditionType.OR,
-            },
-        ],
-    );
+    const defaultState = {
+        id: uuid(),
+        order: 0,
+        questionPuzzle: ETerminals.EMPTY,
+        answerPuzzle: ETerminals.EMPTY,
+        value: ETerminals.EMPTY,
+        actionType: EActionType.NONE,
+        conditionType: EConditionType.OR,
+    };
+    const initialState = props.initialState && props.initialState.length && props.initialState;
+    const [conditions, setConditions] = useState<ICondition[]>(initialState || [defaultState]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
@@ -184,6 +182,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     function onConditionDelete(id: string) {
         // do not allow to delete if only one condition present
         if (conditions.length === 1) {
+            setConditions([defaultState]);
             return;
         }
         setConditions([...conditions.filter(condition => condition.id !== id)]);
@@ -262,6 +261,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     });
                 }
 
+                function onConditionDeleteHandler() {
+                    onConditionDelete(condition.id);
+                }
+
                 const questionAnswers = answers.filter(answer => {
                     const question = questions.find(
                         question => question.id === condition.questionPuzzle,
@@ -291,54 +294,48 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                 <Typography>{conditionService.getConditionLiteral()}</Typography>
                             </Grid>
                         )}
-                        <Grid
-                            xs={isFirstRow ? "auto" : 4}
-                            item
-                            css={theme => ({ marginLeft: isFirstRow ? 0 : theme.spacing(9) })}
-                        >
-                            {!isFirstRow && (
-                                <React.Fragment>
-                                    <RadioGroup
-                                        value={condition.conditionType}
-                                        onChange={onConditionTypeChange}
-                                        row
-                                    >
-                                        <FormControlLabel
-                                            value={EConditionType.AND}
-                                            control={
-                                                <Radio
-                                                    css={theme => ({
-                                                        color: `${theme.colors.primary} !important`,
-                                                        ":hover": {
-                                                            background: `${theme.colors.primary}14 !important`,
-                                                        },
-                                                    })}
-                                                />
-                                            }
-                                            label="И"
-                                            labelPlacement="end"
-                                        />
-                                        <FormControlLabel
-                                            value={EConditionType.OR}
-                                            control={
-                                                <Radio
-                                                    css={theme => ({
-                                                        color: `${theme.colors.primary} !important`,
-                                                        ":hover": {
-                                                            background: `${theme.colors.primary}14 !important`,
-                                                        },
-                                                    })}
-                                                />
-                                            }
-                                            label="Или"
-                                            labelPlacement="end"
-                                        />
-                                    </RadioGroup>
-                                </React.Fragment>
-                            )}
-                        </Grid>
+                        {!isFirstRow && (
+                            <Grid xs={4} item css={theme => ({ marginLeft: theme.spacing(9) })}>
+                                <RadioGroup
+                                    value={condition.conditionType}
+                                    onChange={onConditionTypeChange}
+                                    row
+                                >
+                                    <FormControlLabel
+                                        value={EConditionType.AND}
+                                        control={
+                                            <Radio
+                                                css={theme => ({
+                                                    color: `${theme.colors.primary} !important`,
+                                                    ":hover": {
+                                                        background: `${theme.colors.primary}14 !important`,
+                                                    },
+                                                })}
+                                            />
+                                        }
+                                        label="И"
+                                        labelPlacement="end"
+                                    />
+                                    <FormControlLabel
+                                        value={EConditionType.OR}
+                                        control={
+                                            <Radio
+                                                css={theme => ({
+                                                    color: `${theme.colors.primary} !important`,
+                                                    ":hover": {
+                                                        background: `${theme.colors.primary}14 !important`,
+                                                    },
+                                                })}
+                                            />
+                                        }
+                                        label="Или"
+                                        labelPlacement="end"
+                                    />
+                                </RadioGroup>
+                            </Grid>
+                        )}
                         {isFirstRow && (
-                            <Grid item xs={4}>
+                            <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(2) })}>
                                 <SelectField
                                     id={"question-puzzle"}
                                     fullWidth={true}
@@ -359,7 +356,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                 </SelectField>
                             </Grid>
                         )}
-                        <Grid item xs={3}>
+                        <Grid item xs={2}>
                             {!!condition.questionPuzzle && (
                                 <SelectField
                                     id={"action-type"}
@@ -372,18 +369,18 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                                 </SelectField>
                             )}
                         </Grid>
-                        <Grid item xs={2}>
-                            {!!condition.questionPuzzle &&
+                        <Grid item xs={4}>
+                            {!!condition.actionType &&
                                 conditionService.getAnswerPuzzle(answers, questions)(
                                     condition.actionType === EActionType.CHOSEN_ANSWER
                                         ? onAnswerPuzzleChange
                                         : onValueChange,
                                 )}
                         </Grid>
-                        <Grid item xs={2}>
+                        <Grid item xs>
                             <Grid container justify="flex-end">
                                 <Grid item>
-                                    <IconButton onClick={() => onConditionDelete(condition.id)}>
+                                    <IconButton onClick={onConditionDeleteHandler}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Grid>

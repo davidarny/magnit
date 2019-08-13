@@ -22,14 +22,14 @@ const env = {
     },
 };
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-const isProduction = process.env.NODE_ENV === "production";
+const development = process.env.NODE_ENV !== "production";
+const production = process.env.NODE_ENV === "production";
 
-module.exports = smp.wrap({
+const config = {
     entry: {
         index: "./src/index.ts",
     },
-    ...(isProduction ? {} : { devtool: "eval" }),
+    ...(production ? {} : { devtool: "eval" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
@@ -42,10 +42,10 @@ module.exports = smp.wrap({
         modules: ["node_modules", "src"],
     },
     optimization: {
-        minimize: isProduction,
-        removeAvailableModules: isProduction,
-        removeEmptyChunks: isProduction,
-        splitChunks: isProduction && {},
+        minimize: production,
+        removeAvailableModules: production,
+        removeEmptyChunks: production,
+        splitChunks: production && {},
     },
     module: {
         rules: [
@@ -82,7 +82,7 @@ module.exports = smp.wrap({
         new CircularDependencyPlugin(),
         new webpack.DefinePlugin(env.stringified),
         new ForkTsCheckerWebpackPlugin({
-            watch: isDevelopment && "./src",
+            watch: development && "./src",
             checkSyntacticErrors: true,
         }),
     ],
@@ -96,4 +96,10 @@ module.exports = smp.wrap({
     performance: {
         hints: false,
     },
-});
+};
+
+if (production) {
+    module.exports = smp.wrap(config);
+} else {
+    module.exports = config;
+}

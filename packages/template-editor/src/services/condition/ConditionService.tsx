@@ -120,7 +120,7 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
                     return (
                         <InputField
                             fullWidth
-                            value={condition.value}
+                            value={condition.value || ""}
                             onChange={onValueChange}
                             css={theme => ({ marginTop: theme.spacing(-2) })}
                             placeholder="Ответ"

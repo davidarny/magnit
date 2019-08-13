@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { jsx } from "@emotion/core";
 import { EditorContext, IEditorContext } from "context";
 import { Conditions } from "./Conditions";
@@ -27,6 +27,9 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
     function onTabChange(event: React.ChangeEvent<{}>, nextTab: number): void {
         setTab(nextTab);
     }
+
+    // reset tab if question type changed
+    useEffect(() => setTab(0), [answerType]);
 
     return (
         <EditorContext.Consumer>

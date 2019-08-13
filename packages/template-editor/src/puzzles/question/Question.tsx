@@ -71,6 +71,9 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                     title: answersType === answerTypeSnapshot.current ? child.title : "",
                 };
             });
+            // reset conditions and validations
+            puzzle.validations = [];
+            puzzle.conditions = [];
             // check if there are nested children of answer
             // if there aren't any, we proceed with adding stub ones
             const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
@@ -83,28 +86,24 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
             // so we have to add it's children when choosing this type
             if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
                 puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+                    const puzzle = {
+                        id: uuid(),
+                        puzzleType: EPuzzleType.REFERENCE_TEXT,
+                        title: ETerminals.EMPTY,
+                        description: ETerminals.EMPTY,
+                        order: childPuzzle.puzzles.length,
+                        puzzles: [],
+                        conditions: [],
+                        validations: [],
+                    };
                     return {
                         ...childPuzzle,
                         puzzles: [
+                            puzzle,
                             {
-                                id: uuid(),
-                                puzzleType: EPuzzleType.REFERENCE_TEXT,
-                                title: ETerminals.EMPTY,
-                                description: ETerminals.EMPTY,
-                                order: childPuzzle.puzzles.length,
-                                puzzles: [],
-                                conditions: [],
-                                validations: [],
-                            },
-                            {
-                                id: uuid(),
+                                ...puzzle,
                                 puzzleType: EPuzzleType.REFERENCE_ASSET,
-                                title: ETerminals.EMPTY,
-                                description: ETerminals.EMPTY,
                                 order: childPuzzle.puzzles.length + 1,
-                                puzzles: [],
-                                conditions: [],
-                                validations: [],
                             },
                         ],
                     };
