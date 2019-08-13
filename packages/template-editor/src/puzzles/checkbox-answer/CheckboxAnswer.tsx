@@ -82,7 +82,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, 
         <React.Fragment>
             <Grid
                 container
-                alignItems="flex-end"
+                alignItems="center"
                 spacing={2}
                 css={theme => ({ marginTop: `${theme.spacing(-1)} !important` })}
             >

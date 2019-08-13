@@ -92,7 +92,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
         <React.Fragment>
             <Grid
                 container
-                alignItems="flex-end"
+                alignItems="center"
                 spacing={2}
                 css={theme => ({
                     marginTop: `${theme.spacing(-1)} !important`,
