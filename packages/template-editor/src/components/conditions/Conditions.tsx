@@ -291,7 +291,9 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     <React.Fragment key={condition.id}>
                         {isFirstRow && (
                             <Grid item>
-                                <Typography>{conditionService.getConditionLiteral()}</Typography>
+                                <Typography css={theme => ({ color: theme.colors.secondary })}>
+                                    {conditionService.getConditionLiteral()}
+                                </Typography>
                             </Grid>
                         )}
                         {!isFirstRow && (

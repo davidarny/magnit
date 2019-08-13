@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import {
+    IRightHandPuzzleBuilder,
     IValidationService,
     IValidationServiceOptions,
-    TGetRightHandPuzzleResult,
 } from "./IValidationService";
 import { ServiceImpl } from "./ServiceImpl";
 import { MenuItem } from "@material-ui/core";
-import { EOperatorType, EValidationType, IPuzzle, TChangeEvent } from "entities";
+import { EOperatorType, EValidationType, IPuzzle, IValidation, TChangeEvent } from "entities";
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
 import { ETerminals } from "@magnit/services";
@@ -57,17 +57,21 @@ export class ValidationService extends ServiceImpl implements IValidationService
         ];
     }
 
-    getRightHandPuzzle(questions: IPuzzle[]): TGetRightHandPuzzleResult {
-        const { validation } = this.options;
-        switch (validation.validationType) {
-            case EValidationType.COMPARE_WITH_ANSWER:
-                return (onRightHandPuzzleChange: (event: TChangeEvent) => void) => {
+    getRightHandPuzzle(questions: IPuzzle[]): IRightHandPuzzleBuilder {
+        return new (class implements IRightHandPuzzleBuilder {
+            private onRightHandPuzzleChange?: (event: TChangeEvent) => void;
+            private onValueChange?: (event: TChangeEvent) => void;
+            private onValueBlur?: () => void;
+
+            build(validation: IValidation, value: number): React.ReactNode {
+                const { validationType, rightHandPuzzle } = validation;
+                if (validationType === EValidationType.COMPARE_WITH_ANSWER) {
                     return (
                         <SelectField
                             fullWidth
                             placeholder="Выберите вопрос"
-                            onChange={onRightHandPuzzleChange}
-                            value={validation.rightHandPuzzle || ETerminals.EMPTY}
+                            onChange={this.onRightHandPuzzleChange}
+                            value={rightHandPuzzle || ETerminals.EMPTY}
                         >
                             {questions.length !== 0 &&
                                 questions.map(question => {
@@ -79,21 +83,37 @@ export class ValidationService extends ServiceImpl implements IValidationService
                                 })}
                         </SelectField>
                     );
-                };
-            case EValidationType.SET_VALUE:
-            default:
-                return (onValueChange: (event: TChangeEvent) => void) => {
+                } else if (validationType === EValidationType.SET_VALUE) {
                     return (
                         <InputField
                             fullWidth
-                            value={validation.value || ""}
-                            onChange={onValueChange}
+                            value={value || ""}
+                            onChange={this.onValueChange}
+                            onBlur={this.onValueBlur}
                             css={theme => ({ marginTop: theme.spacing(-2) })}
                             placeholder="Ответ"
                         />
                     );
-                };
-        }
+                }
+            }
+
+            setRightHandPuzzleChangeHandler(
+                handler: (event: TChangeEvent) => void,
+            ): IRightHandPuzzleBuilder {
+                this.onRightHandPuzzleChange = handler;
+                return this;
+            }
+
+            setValueBlurHandler(handler: () => void): IRightHandPuzzleBuilder {
+                this.onValueBlur = handler;
+                return this;
+            }
+
+            setValueChangeHandler(handler: (event: TChangeEvent) => void): IRightHandPuzzleBuilder {
+                this.onValueChange = handler;
+                return this;
+            }
+        })();
     }
 
     getValidationVariants(): React.ReactNode {

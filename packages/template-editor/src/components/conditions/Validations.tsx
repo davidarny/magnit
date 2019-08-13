@@ -52,6 +52,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         validationType: EValidationType.NONE,
         conditionType: EConditionType.OR,
     };
+    const [errorMessage, setErrorMessage] = useState<string>(ETerminals.EMPTY);
     const [validations, setValidations] = useState<IValidation[]>(initialState || [defaultState]);
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
@@ -229,6 +230,18 @@ export const Validations: React.FC<IValidationsProps> = props => {
         setValidations([...validations]);
     }
 
+    function onErrorMessageChange(event: TChangeEvent) {
+        setErrorMessage(event.target.value as string);
+    }
+
+    function onErrorMessageBlur() {
+        const firstValidation = _.first(validations);
+        if (firstValidation) {
+            firstValidation.errorMessage = errorMessage;
+        }
+        setValidations([...validations]);
+    }
+
     return (
         <Grid
             container
@@ -238,161 +251,16 @@ export const Validations: React.FC<IValidationsProps> = props => {
             `}
             alignItems="center"
         >
-            {validations.map((validation, index) => {
-                function onOperatorTypeChange(event: TChangeEvent): void {
-                    onValidationChange(validation.id, {
-                        operatorType: event.target.value as EOperatorType,
-                    });
-                }
-
-                function onRightHandPuzzleChange(event: TChangeEvent): void {
-                    onValidationChange(validation.id, {
-                        rightHandPuzzle: event.target.value as string,
-                    });
-                }
-
-                function onValueChange(event: TChangeEvent): void {
-                    onValidationChange(validation.id, {
-                        value: event.target.value as number,
-                    });
-                }
-
-                function onValidationTypeChange(event: TChangeEvent): void {
-                    onValidationChange(validation.id, {
-                        validationType: event.target.value as EValidationType,
-                    });
-                }
-
-                function onConditionTypeChange(event: unknown, value: unknown): void {
-                    onValidationChange(validation.id, {
-                        conditionType: value as EConditionType,
-                    });
-                }
-
-                function onDeleteValidationHandler() {
-                    onDeleteValidation(validation.id);
-                }
-
-                const validationService = getValidationService({
-                    index,
-                    validation,
-                    conditionType: validation.conditionType,
-                });
-
-                const isFirstRow = index === 0;
-
-                return (
-                    <React.Fragment key={validation.id}>
-                        {isFirstRow && (
-                            <Grid item>
-                                <Typography>{validationService.getConditionLiteral()}</Typography>
-                            </Grid>
-                        )}
-                        {!isFirstRow && (
-                            <Grid xs={3} item css={theme => ({ marginLeft: theme.spacing(9) })}>
-                                <RadioGroup
-                                    value={validation.conditionType}
-                                    onChange={onConditionTypeChange}
-                                    row
-                                >
-                                    <FormControlLabel
-                                        value={EConditionType.AND}
-                                        control={
-                                            <Radio
-                                                css={theme => ({
-                                                    color: `${theme.colors.primary} !important`,
-                                                    ":hover": {
-                                                        background: `${theme.colors.primary}14 !important`,
-                                                    },
-                                                })}
-                                            />
-                                        }
-                                        label="И"
-                                        labelPlacement="end"
-                                    />
-                                    <FormControlLabel
-                                        value={EConditionType.OR}
-                                        control={
-                                            <Radio
-                                                css={theme => ({
-                                                    color: `${theme.colors.primary} !important`,
-                                                    ":hover": {
-                                                        background: `${theme.colors.primary}14 !important`,
-                                                    },
-                                                })}
-                                            />
-                                        }
-                                        label="Или"
-                                        labelPlacement="end"
-                                    />
-                                </RadioGroup>
-                            </Grid>
-                        )}
-                        {isFirstRow && currentQuestion && (
-                            <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
-                                <SelectField
-                                    id={"left-hand-puzzle"}
-                                    fullWidth
-                                    value={currentQuestion.id || ETerminals.EMPTY}
-                                    placeholder={"Выберите вопрос"}
-                                    disabled
-                                    displayEmpty={false}
-                                >
-                                    <MenuItem key={currentQuestion.id} value={currentQuestion.id}>
-                                        {currentQuestion.title || "<Текущий вопрос>"}
-                                    </MenuItem>
-                                </SelectField>
-                            </Grid>
-                        )}
-                        <Grid item xs={2}>
-                            {!!validation.leftHandPuzzle && (
-                                <SelectField
-                                    id={"operator-type"}
-                                    fullWidth
-                                    value={validation.operatorType || ETerminals.EMPTY}
-                                    onChange={onOperatorTypeChange}
-                                    placeholder={"Выберите значение"}
-                                >
-                                    {validationService.getOperatorVariants()}
-                                </SelectField>
-                            )}
-                        </Grid>
-                        <Grid item xs={2}>
-                            {!!validation.operatorType && (
-                                <SelectField
-                                    id={"validation-type"}
-                                    fullWidth
-                                    value={validation.validationType || ETerminals.EMPTY}
-                                    onChange={onValidationTypeChange}
-                                    placeholder={"Тип сравнения"}
-                                >
-                                    {validationService.getValidationVariants()}
-                                </SelectField>
-                            )}
-                        </Grid>
-                        <Grid item xs={3}>
-                            {!!validation.validationType &&
-                                validationService.getRightHandPuzzle(questions)(
-                                    validation.validationType ===
-                                        EValidationType.COMPARE_WITH_ANSWER
-                                        ? onRightHandPuzzleChange
-                                        : onValueChange,
-                                )}
-                        </Grid>
-                        {validation.operatorType && (
-                            <Grid item xs>
-                                <Grid container justify="flex-end">
-                                    <Grid item>
-                                        <IconButton onClick={onDeleteValidationHandler}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        )}
-                    </React.Fragment>
-                );
-            })}
+            {validations.map((validation, index) => (
+                <Validation
+                    validation={validation}
+                    index={index}
+                    currentQuestion={currentQuestion}
+                    onDeleteValidation={onDeleteValidation}
+                    onValidationChange={onValidationChange}
+                    questions={questions}
+                />
+            ))}
             <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(9) })}>
                 <Button
                     fullWidth
@@ -417,13 +285,196 @@ export const Validations: React.FC<IValidationsProps> = props => {
                             align-items: center;
                         `}
                     >
-                        <Typography variant="subtitle1">То</Typography>
+                        <Typography
+                            css={theme => ({ color: theme.colors.secondary })}
+                            variant="subtitle1"
+                        >
+                            То
+                        </Typography>
                     </Grid>
                     <Grid item xs={11} css={theme => ({ marginRight: theme.spacing(2) })}>
-                        <InputField fullWidth />
+                        <InputField
+                            onChange={onErrorMessageChange}
+                            onBlur={onErrorMessageBlur}
+                            fullWidth
+                        />
                     </Grid>
                 </Grid>
             </Grid>
         </Grid>
+    );
+};
+
+interface IValidationProps {
+    index: number;
+    validation: IValidation;
+    currentQuestion: IPuzzle | null;
+    questions: IPuzzle[];
+
+    onValidationChange(id: string, update: Partial<IValidation>): void;
+
+    onDeleteValidation(id: string): void;
+}
+
+const Validation: React.FC<IValidationProps> = props => {
+    const [value, setValue] = useState(0);
+    const { validation, index, questions, currentQuestion } = props;
+
+    function onOperatorTypeChange(event: TChangeEvent): void {
+        props.onValidationChange(validation.id, {
+            operatorType: event.target.value as EOperatorType,
+        });
+    }
+
+    function onRightHandPuzzleChange(event: TChangeEvent): void {
+        props.onValidationChange(validation.id, {
+            rightHandPuzzle: event.target.value as string,
+        });
+    }
+
+    function onValueChange(event: TChangeEvent): void {
+        setValue(event.target.value as number);
+    }
+
+    function onValueBlur() {
+        props.onValidationChange(validation.id, { value });
+    }
+
+    function onValidationTypeChange(event: TChangeEvent): void {
+        props.onValidationChange(validation.id, {
+            validationType: event.target.value as EValidationType,
+        });
+    }
+
+    function onConditionTypeChange(event: unknown, value: unknown): void {
+        props.onValidationChange(validation.id, {
+            conditionType: value as EConditionType,
+        });
+    }
+
+    function onDeleteValidationHandler() {
+        props.onDeleteValidation(validation.id);
+    }
+
+    const validationService = getValidationService({
+        index,
+        validation,
+        conditionType: validation.conditionType,
+    });
+
+    const isFirstRow = index === 0;
+
+    return (
+        <React.Fragment key={validation.id}>
+            {isFirstRow && (
+                <Grid item>
+                    <Typography css={theme => ({ color: theme.colors.secondary })}>
+                        {validationService.getConditionLiteral()}
+                    </Typography>
+                </Grid>
+            )}
+            {!isFirstRow && (
+                <Grid xs={3} item css={theme => ({ marginLeft: theme.spacing(9) })}>
+                    <RadioGroup
+                        value={validation.conditionType}
+                        onChange={onConditionTypeChange}
+                        row
+                    >
+                        <FormControlLabel
+                            value={EConditionType.AND}
+                            control={
+                                <Radio
+                                    css={theme => ({
+                                        color: `${theme.colors.primary} !important`,
+                                        ":hover": {
+                                            background: `${theme.colors.primary}14 !important`,
+                                        },
+                                    })}
+                                />
+                            }
+                            label="И"
+                            labelPlacement="end"
+                        />
+                        <FormControlLabel
+                            value={EConditionType.OR}
+                            control={
+                                <Radio
+                                    css={theme => ({
+                                        color: `${theme.colors.primary} !important`,
+                                        ":hover": {
+                                            background: `${theme.colors.primary}14 !important`,
+                                        },
+                                    })}
+                                />
+                            }
+                            label="Или"
+                            labelPlacement="end"
+                        />
+                    </RadioGroup>
+                </Grid>
+            )}
+            {isFirstRow && currentQuestion && (
+                <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
+                    <SelectField
+                        id={"left-hand-puzzle"}
+                        fullWidth
+                        value={currentQuestion.id || ETerminals.EMPTY}
+                        placeholder={"Выберите вопрос"}
+                        disabled
+                        displayEmpty={false}
+                    >
+                        <MenuItem key={currentQuestion.id} value={currentQuestion.id}>
+                            {currentQuestion.title || "<Текущий вопрос>"}
+                        </MenuItem>
+                    </SelectField>
+                </Grid>
+            )}
+            <Grid item xs={2}>
+                {!!validation.leftHandPuzzle && (
+                    <SelectField
+                        id={"operator-type"}
+                        fullWidth
+                        value={validation.operatorType || ETerminals.EMPTY}
+                        onChange={onOperatorTypeChange}
+                        placeholder={"Выберите значение"}
+                    >
+                        {validationService.getOperatorVariants()}
+                    </SelectField>
+                )}
+            </Grid>
+            <Grid item xs={2}>
+                {!!validation.operatorType && (
+                    <SelectField
+                        id={"validation-type"}
+                        fullWidth
+                        value={validation.validationType || ETerminals.EMPTY}
+                        onChange={onValidationTypeChange}
+                        placeholder={"Тип сравнения"}
+                    >
+                        {validationService.getValidationVariants()}
+                    </SelectField>
+                )}
+            </Grid>
+            <Grid item xs={3}>
+                {!!validation.validationType &&
+                    validationService
+                        .getRightHandPuzzle(questions)
+                        .setRightHandPuzzleChangeHandler(onRightHandPuzzleChange)
+                        .setValueChangeHandler(onValueChange)
+                        .setValueBlurHandler(onValueBlur)
+                        .build(validation, value)}
+            </Grid>
+            {validation.operatorType && (
+                <Grid item xs>
+                    <Grid container justify="flex-end">
+                        <Grid item>
+                            <IconButton onClick={onDeleteValidationHandler}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            )}
+        </React.Fragment>
     );
 };
