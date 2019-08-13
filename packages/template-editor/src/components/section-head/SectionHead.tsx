@@ -5,8 +5,8 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { jsx } from "@emotion/core";
 import { ETemplateType, ITemplate, TChangeEvent } from "entities";
-import { InputField, SelectField } from "@magnit/components";
-import { Grid, MenuItem } from "@material-ui/core";
+import { Checkbox, InputField } from "@magnit/components";
+import { FormControl, FormControlLabel, Grid } from "@material-ui/core";
 
 interface IContentSectionProps {
     template: ITemplate;
@@ -20,8 +20,12 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
     const [templateTitle, setTemplateTitle] = useState(template.title);
     const [templateDescription, setTemplateDescription] = useState(template.description);
 
-    function onTemplateTypeChange(event: TChangeEvent): void {
-        setTemplateType(event.target.value as ETemplateType);
+    function onTemplateTypeChange(event: TChangeEvent, checked: boolean): void {
+        if (checked) {
+            setTemplateType(ETemplateType.COMPLEX);
+        } else {
+            setTemplateType(ETemplateType.LIGHT);
+        }
     }
 
     function onTemplateTitleChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -68,10 +72,19 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                         />
                     </Grid>
                     <Grid item xs={2}>
-                        <SelectField value={templateType} fullWidth onChange={onTemplateTypeChange}>
-                            <MenuItem value={ETemplateType.LIGHT}>Простой</MenuItem>
-                            <MenuItem value={ETemplateType.COMPLEX}>Сложный</MenuItem>
-                        </SelectField>
+                        <Grid container justify="center" alignItems="flex-end">
+                            <FormControl>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            css={theme => ({ marginRight: theme.spacing() })}
+                                            onChange={onTemplateTypeChange}
+                                        />
+                                    }
+                                    label="Нужна смета"
+                                />
+                            </FormControl>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>

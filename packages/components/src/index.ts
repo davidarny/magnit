@@ -8,3 +8,4 @@ export * from "./route-matcher";
 export * from "./editor-toolbar";
 export * from "./button-like-text";
 export * from "./fab";
+export * from "./checkbox";
