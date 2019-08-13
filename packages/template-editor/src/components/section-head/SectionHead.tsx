@@ -87,7 +87,7 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
             >
                 <InputField
                     fullWidth={true}
-                    placeholder="Описание шаблона (необязательно)"
+                    placeholder="Описание (необязательно)"
                     defaultValue={template.description}
                     simple={!focused}
                     css={theme => ({
