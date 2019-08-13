@@ -389,15 +389,18 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     </React.Fragment>
                 );
             })}
-            <Grid item css={theme => ({ marginLeft: theme.spacing(9) })}>
+            <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(9) })}>
                 <Button
+                    fullWidth
                     variant="outlined"
                     color="primary"
                     onClick={onAddCondition}
                     scheme={"outline"}
                 >
                     <AddIcon css={theme => ({ color: theme.colors.primary })} />
-                    <Typography>Добавить внутреннее условие</Typography>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                        Добавить внутреннее условие
+                    </Typography>
                 </Button>
             </Grid>
         </Grid>

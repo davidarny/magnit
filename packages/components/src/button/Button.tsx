@@ -66,9 +66,10 @@ export const Button: React.FC<TButtonProps> = props => {
         <MaterialButton
             css={theme => ({
                 textTransform: "none",
-                transition: "all 0.3s ease-in-out",
+                transitionDuration: "0.3s",
+                transitionProperty: "box-shadow, background, color",
+                transitionTimingFunction: "ease-in-out",
                 boxShadow: "none",
-                width: "auto",
                 padding: `${theme.spacing()} ${theme.spacing(2)}`,
                 borderRadius: theme.radius(5),
                 ":hover": { ..._.get(variant(theme), "hover", {}) },

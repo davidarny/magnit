@@ -391,15 +391,18 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     </React.Fragment>
                 );
             })}
-            <Grid item css={theme => ({ marginLeft: theme.spacing(9) })}>
+            <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(9) })}>
                 <Button
+                    fullWidth
                     variant="outlined"
                     color="primary"
                     onClick={onAddValidation}
                     scheme={"outline"}
                 >
                     <AddIcon css={theme => ({ color: theme.colors.primary })} />
-                    <Typography>Добавить внутреннее условие</Typography>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                        Добавить внутреннее условие
+                    </Typography>
                 </Button>
             </Grid>
             <Grid item xs={12}>
