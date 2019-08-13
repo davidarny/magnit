@@ -21,15 +21,14 @@ const env = {
     },
 };
 
-const isDevelopment = process.env.NODE_ENV !== "production";
-const isProduction = process.env.NODE_ENV === "production";
-const fastBuildEnabled = !!process.env.FAST_BUILD_ENABLED;
+const development = process.env.NODE_ENV !== "production";
+const production = process.env.NODE_ENV === "production";
 
 module.exports = {
     entry: {
         index: "./src/index.ts",
     },
-    ...(fastBuildEnabled || isProduction ? {} : { devtool: "eval" }),
+    ...(production ? {} : { devtool: "eval" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
@@ -42,10 +41,10 @@ module.exports = {
         modules: ["node_modules", "src"],
     },
     optimization: {
-        minimize: isProduction && !fastBuildEnabled,
-        removeAvailableModules: isProduction && !fastBuildEnabled,
-        removeEmptyChunks: isProduction && !fastBuildEnabled,
-        splitChunks: isProduction && !fastBuildEnabled && {},
+        minimize: production,
+        removeAvailableModules: production,
+        removeEmptyChunks: production,
+        splitChunks: production && {},
     },
     module: {
         rules: [
@@ -80,12 +79,11 @@ module.exports = {
         new HardSourceWebpackPlugin(),
         new PeerDepsExternalsPlugin(),
         new webpack.DefinePlugin(env.stringified),
-        !fastBuildEnabled &&
-            new ForkTsCheckerWebpackPlugin({
-                watch: isDevelopment && "./src",
-                checkSyntacticErrors: true,
-            }),
-    ].filter(Boolean),
+        new ForkTsCheckerWebpackPlugin({
+            watch: development && "./src",
+            checkSyntacticErrors: true,
+        }),
+    ],
     node: {
         dgram: "empty",
         fs: "empty",
