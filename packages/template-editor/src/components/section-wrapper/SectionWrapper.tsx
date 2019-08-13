@@ -6,6 +6,7 @@ import { SectionView } from "components/section-view";
 import { jsx } from "@emotion/core";
 import { ISection, ITemplate } from "entities";
 import { GroupView } from "components/group-view";
+import { EPuzzleType } from "@magnit/services";
 
 interface ITemplateSectionProps {
     template: ITemplate;
@@ -24,6 +25,8 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...pr
     function isFocused(id: string) {
         return id === props.focusedPuzzleId;
     }
+
+    let offset = 0;
 
     return (
         <SelectableBlockWrapper
@@ -46,15 +49,20 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...pr
                 onTemplateChange={props.onTemplateChange}
             >
                 {section.puzzles.map((puzzle, index) => {
-                    return (
+                    const result = (
                         <GroupView
                             key={puzzle.id}
                             puzzle={puzzle}
                             onFocus={props.onPuzzleFocus}
                             isFocused={isFocused}
-                            index={index}
+                            index={index + offset}
                         />
                     );
+                    if (puzzle.puzzleType === EPuzzleType.GROUP) {
+                        offset -= 1;
+                        offset += puzzle.puzzles.length;
+                    }
+                    return result;
                 })}
             </SectionView>
         </SelectableBlockWrapper>
