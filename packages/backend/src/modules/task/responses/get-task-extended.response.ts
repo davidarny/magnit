@@ -1,7 +1,8 @@
 import { BaseResponse } from "../../../shared/responses/base.response";
 import { ApiModelProperty } from "@nestjs/swagger";
-import { TaskExtendedBody } from "../bodies/task-extended.body";
+import { TaskWithTemplatesExtendedDto } from "../dto/task-with-templates-extended.dto";
 
 export class GetTaskExtendedResponse extends BaseResponse {
-    @ApiModelProperty({ type: TaskExtendedBody }) readonly task: TaskExtendedBody;
+    @ApiModelProperty({ type: TaskWithTemplatesExtendedDto })
+    readonly task: TaskWithTemplatesExtendedDto;
 }
