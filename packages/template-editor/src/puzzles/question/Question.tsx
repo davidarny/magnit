@@ -166,7 +166,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                         component="span"
                         css={theme => ({ color: !questionTitle ? theme.colors.gray : "initial" })}
                     >
-                        {questionTitle || "Название вопроса"}
+                        {questionTitle || "Введите вопрос"}
                     </Typography>
                 </Grid>
             </Grid>
@@ -206,7 +206,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                     >
                         <InputField
                             fullWidth
-                            placeholder="Название вопроса"
+                            placeholder="Введите вопрос"
                             value={questionTitle}
                             onChange={onQuestionTitleChange}
                             onBlur={onTemplateChange}
