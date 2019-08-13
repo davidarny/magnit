@@ -12,9 +12,12 @@ services:
             - ${FRONTEND_PORT:-80}:80
 
     backend:
-        build:
-            context: .
-            dockerfile: Dockerfile.backend
+        image: node:10-alpine
+        build: .
+        volumes:
+            - .:/devel
+        working_dir: /devel/packages/backend
+        command: npm run start:dev
         environment:
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
@@ -40,8 +43,8 @@ services:
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
         networks:
             - magnit
-        volumes:
-            - ${POSTGRES_DATA}:/var/lib/postgresql/data
+        ports:
+            - ${POSTGRES_PORT:-5432}:5432
 
 networks:
     magnit:
