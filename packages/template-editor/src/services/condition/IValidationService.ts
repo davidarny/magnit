@@ -11,7 +11,7 @@ export interface IRightHandPuzzleBuilder {
 
     setValueBlurHandler(handler: () => void): IRightHandPuzzleBuilder;
 
-    build(validation: IValidation, value: number): React.ReactNode;
+    build(): React.ReactNode;
 }
 
 export interface IValidationService extends IService {
@@ -24,4 +24,5 @@ export interface IValidationService extends IService {
 
 export interface IValidationServiceOptions extends IServiceOptions {
     validation: IValidation;
+    value: number;
 }

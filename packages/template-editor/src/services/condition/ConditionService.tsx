@@ -3,15 +3,15 @@
 import { jsx } from "@emotion/core";
 import * as React from "react";
 import {
+    IAnswerPuzzleBuilder,
     IConditionsService,
     IConditionsServiceOptions,
-    TGetAnswerPuzzleResult,
 } from "./IConditionsService";
 import { EActionType, IPuzzle, TChangeEvent } from "entities";
 import { MenuItem } from "@material-ui/core";
 import { InputField, SelectField } from "@magnit/components";
 import { ServiceImpl } from "./ServiceImpl";
-import { ETerminals, EPuzzleType } from "@magnit/services";
+import { EPuzzleType, ETerminals } from "@magnit/services";
 
 export class ConditionService extends ServiceImpl implements IConditionsService {
     constructor(protected readonly options: IConditionsServiceOptions) {
@@ -72,64 +72,88 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
         }
     }
 
-    getAnswerPuzzle(answers: IPuzzle[], questions: IPuzzle[]): TGetAnswerPuzzleResult {
-        const { condition } = this.options;
-        switch (condition.actionType) {
-            case EActionType.CHOSEN_ANSWER:
-                return (onAnswerPuzzleChange: (event: TChangeEvent) => void) => {
-                    return (
-                        <SelectField
-                            fullWidth
-                            placeholder="Выберите ответ"
-                            onChange={onAnswerPuzzleChange}
-                            value={condition.answerPuzzle || ETerminals.EMPTY}
-                        >
-                            {answers.length !== 0 &&
-                                answers
-                                    .filter(answer => {
-                                        // find which question references to current condition
-                                        const currentQuestion = questions.find(
-                                            question => condition.questionPuzzle === question.id,
-                                        );
-                                        if (!currentQuestion) {
-                                            return false;
-                                        }
-                                        // check if current answer is referenced to found question
-                                        // if true then this answer is transition-referenced
-                                        // to current condition
-                                        // condition -> question -> answer ~ condition -> answer
-                                        return currentQuestion.puzzles.some(
-                                            puzzle => puzzle.id === answer.id,
-                                        );
-                                    })
-                                    .map(answer => {
-                                        return (
-                                            <MenuItem key={answer.id} value={answer.id}>
-                                                {answer.title}
-                                            </MenuItem>
-                                        );
-                                    })}
-                        </SelectField>
-                    );
-                };
-            case EActionType.EQUAL:
-            case EActionType.LESS_THAN:
-            case EActionType.MORE_THAN:
-            case EActionType.NOT_EQUAL:
-                return (onValueChange: (event: TChangeEvent) => void) => {
-                    return (
-                        <InputField
-                            fullWidth
-                            value={condition.value || ""}
-                            onChange={onValueChange}
-                            css={theme => ({ marginTop: theme.spacing(-2) })}
-                            placeholder="Ответ"
-                        />
-                    );
-                };
-            case EActionType.GIVEN_ANSWER:
-            default:
-                return () => <React.Fragment />;
-        }
+    getAnswerPuzzle(answers: IPuzzle[], questions: IPuzzle[]): IAnswerPuzzleBuilder {
+        const self = this;
+        return new (class implements IAnswerPuzzleBuilder {
+            private onAnswerPuzzleChange?: (event: TChangeEvent) => void;
+            private onValueChange?: (event: TChangeEvent) => void;
+            private onValueBlur?: () => void;
+
+            build(): React.ReactNode {
+                const { actionType, answerPuzzle, questionPuzzle } = self.options.condition;
+                const { value } = self.options;
+                switch (actionType) {
+                    case EActionType.CHOSEN_ANSWER:
+                        return (
+                            <SelectField
+                                fullWidth
+                                placeholder="Выберите ответ"
+                                onChange={this.onAnswerPuzzleChange}
+                                value={answerPuzzle || ETerminals.EMPTY}
+                            >
+                                {answers.length !== 0 &&
+                                    answers
+                                        .filter(answer => {
+                                            // find which question references to current condition
+                                            const currentQuestion = questions.find(
+                                                question => questionPuzzle === question.id,
+                                            );
+                                            if (!currentQuestion) {
+                                                return false;
+                                            }
+                                            // check if current answer is referenced to found question
+                                            // if true then this answer is transition-referenced
+                                            // to current condition
+                                            // condition -> question -> answer ~ condition -> answer
+                                            return currentQuestion.puzzles.some(
+                                                puzzle => puzzle.id === answer.id,
+                                            );
+                                        })
+                                        .map(answer => {
+                                            return (
+                                                <MenuItem key={answer.id} value={answer.id}>
+                                                    {answer.title}
+                                                </MenuItem>
+                                            );
+                                        })}
+                            </SelectField>
+                        );
+                    case EActionType.EQUAL:
+                    case EActionType.LESS_THAN:
+                    case EActionType.MORE_THAN:
+                    case EActionType.NOT_EQUAL:
+                        return (
+                            <InputField
+                                fullWidth
+                                value={value || ""}
+                                onChange={this.onValueChange}
+                                onBlur={this.onValueBlur}
+                                css={theme => ({ marginTop: theme.spacing(-2) })}
+                                placeholder="Ответ"
+                            />
+                        );
+                    case EActionType.GIVEN_ANSWER:
+                    default:
+                        return <React.Fragment />;
+                }
+            }
+
+            setAnswerPuzzleChangeHandler(
+                handler: (event: TChangeEvent) => void,
+            ): IAnswerPuzzleBuilder {
+                this.onAnswerPuzzleChange = handler;
+                return this;
+            }
+
+            setValueChangeHandler(handler: (event: TChangeEvent) => void): IAnswerPuzzleBuilder {
+                this.onValueChange = handler;
+                return this;
+            }
+
+            setValueBlurHandler(handler: () => void): IAnswerPuzzleBuilder {
+                this.onValueBlur = handler;
+                return this;
+            }
+        })();
     }
 }

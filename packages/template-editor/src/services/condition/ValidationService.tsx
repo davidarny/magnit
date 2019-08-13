@@ -58,13 +58,15 @@ export class ValidationService extends ServiceImpl implements IValidationService
     }
 
     getRightHandPuzzle(questions: IPuzzle[]): IRightHandPuzzleBuilder {
+        const self = this;
         return new (class implements IRightHandPuzzleBuilder {
             private onRightHandPuzzleChange?: (event: TChangeEvent) => void;
             private onValueChange?: (event: TChangeEvent) => void;
             private onValueBlur?: () => void;
 
-            build(validation: IValidation, value: number): React.ReactNode {
-                const { validationType, rightHandPuzzle } = validation;
+            build(): React.ReactNode {
+                const { validationType, rightHandPuzzle } = self.options.validation;
+                const { value } = self.options;
                 if (validationType === EValidationType.COMPARE_WITH_ANSWER) {
                     return (
                         <SelectField
@@ -94,6 +96,8 @@ export class ValidationService extends ServiceImpl implements IValidationService
                             placeholder="Ответ"
                         />
                     );
+                } else {
+                    return <React.Fragment />;
                 }
             }
 

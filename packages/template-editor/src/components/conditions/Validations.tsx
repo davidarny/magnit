@@ -239,7 +239,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         if (firstValidation) {
             firstValidation.errorMessage = errorMessage;
         }
-        setValidations([...validations]);
+        setValidations([...validations.map(validation => ({ ...validation, errorMessage }))]);
     }
 
     return (
@@ -253,6 +253,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         >
             {validations.map((validation, index) => (
                 <Validation
+                    key={validation.id}
                     validation={validation}
                     index={index}
                     currentQuestion={currentQuestion}
@@ -357,9 +358,10 @@ const Validation: React.FC<IValidationProps> = props => {
     }
 
     const validationService = getValidationService({
+        ...validation,
         index,
         validation,
-        conditionType: validation.conditionType,
+        value,
     });
 
     const isFirstRow = index === 0;
@@ -462,7 +464,7 @@ const Validation: React.FC<IValidationProps> = props => {
                         .setRightHandPuzzleChangeHandler(onRightHandPuzzleChange)
                         .setValueChangeHandler(onValueChange)
                         .setValueBlurHandler(onValueBlur)
-                        .build(validation, value)}
+                        .build()}
             </Grid>
             {validation.operatorType && (
                 <Grid item xs>
