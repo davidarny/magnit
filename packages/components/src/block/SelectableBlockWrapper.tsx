@@ -6,25 +6,21 @@ import { Paper } from "@material-ui/core";
 
 export interface ISelectableBlockWrapperProps {
     focused?: boolean;
-    css?: (theme: any) => React.CSSProperties;
 }
 
-type TPaperProps = React.ComponentProps<typeof Paper>;
-type TSelectableBlockWrapperProps = ISelectableBlockWrapperProps & TPaperProps;
+type TSelectableBlockWrapperProps = ISelectableBlockWrapperProps &
+    React.ComponentProps<typeof Paper>;
 
 export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = props => {
-    const { children, focused = false, css = () => {}, ...rest } = props;
+    const { children, focused = false, ...rest } = props;
     return (
         <Paper
-            {...rest}
-            css={theme => ({
-                boxShadow: focused ? `0 0 ${theme.spacing(2)} ${theme.colors.shadowGray}` : "none",
+            square
+            css={({ spacing, colors }) => ({
+                boxShadow: focused ? `0 0 ${spacing(2)} ${colors.shadowGray}` : "none",
                 position: "relative",
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                ...css(theme),
             })}
-            square={false}
+            {...rest}
         >
             <div
                 css={theme => ({
@@ -40,6 +36,19 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
                 })}
             />
             {children}
+            <div
+                css={theme => ({
+                    position: "absolute",
+                    width: theme.spacing(0.5),
+                    right: theme.spacing(-0.5),
+                    borderRadius: `0 ${theme.radius(0.5)} ${theme.radius(0.5)} 0`,
+                    top: 0,
+                    bottom: 0,
+                    backgroundColor: theme.colors.white,
+                    zIndex: 1000,
+                    display: focused ? "block" : "none",
+                })}
+            />
         </Paper>
     );
 };
