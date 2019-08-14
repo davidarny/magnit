@@ -123,7 +123,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
             >
                 <div css={{ display: tab === 0 ? "block" : "none" }}>
                     <Conditions
-                        disabled={alwaysVisible ? false : !focused || tab !== 1}
+                        disabled={alwaysVisible ? false : !focused || tab !== 0}
                         puzzleId={puzzleId}
                         initialState={props.conditions}
                         onTemplateChange={onTemplateChange}
