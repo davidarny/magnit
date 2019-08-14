@@ -36,12 +36,13 @@ interface IValidationsProps {
     puzzleId: string;
     template: ITemplate;
     disabled?: boolean;
+    focused?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
 
 export const Validations: React.FC<IValidationsProps> = props => {
-    const { puzzleId, template, disabled = false } = props;
+    const { puzzleId, template, disabled = false, focused = true } = props;
     const initialState = props.initialState && props.initialState.length && props.initialState;
     const defaultState = {
         id: uuid(),
@@ -260,22 +261,25 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     onDeleteValidation={onDeleteValidation}
                     onValidationChange={onValidationChange}
                     questions={questions}
+                    noDeleteButton={!focused}
                 />
             ))}
-            <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(9) })}>
-                <Button
-                    fullWidth
-                    variant="outlined"
-                    color="primary"
-                    onClick={onAddValidation}
-                    scheme={"outline"}
-                >
-                    <AddIcon css={theme => ({ color: theme.colors.primary })} />
-                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
-                        Добавить внутреннее условие
-                    </Typography>
-                </Button>
-            </Grid>
+            {focused && (
+                <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(9) })}>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        onClick={onAddValidation}
+                        scheme={"outline"}
+                    >
+                        <AddIcon css={theme => ({ color: theme.colors.primary })} />
+                        <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                            Добавить внутреннее условие
+                        </Typography>
+                    </Button>
+                </Grid>
+            )}
             <Grid item xs={12}>
                 <Grid container>
                     <Grid
@@ -308,6 +312,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
 
 interface IValidationProps {
     index: number;
+    noDeleteButton: boolean;
     validation: IValidation;
     currentQuestion: IPuzzle | null;
     questions: IPuzzle[];
@@ -319,7 +324,7 @@ interface IValidationProps {
 
 const Validation: React.FC<IValidationProps> = props => {
     const [value, setValue] = useState(0);
-    const { validation, index, questions, currentQuestion } = props;
+    const { validation, index, questions, currentQuestion, noDeleteButton = false } = props;
 
     function onOperatorTypeChange(event: TChangeEvent): void {
         props.onValidationChange(validation.id, {
@@ -466,7 +471,7 @@ const Validation: React.FC<IValidationProps> = props => {
                         .setValueBlurHandler(onValueBlur)
                         .build()}
             </Grid>
-            {validation.operatorType && (
+            {!noDeleteButton && validation.operatorType && (
                 <Grid item xs>
                     <Grid container justify="flex-end">
                         <Grid item>

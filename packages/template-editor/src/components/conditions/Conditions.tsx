@@ -35,12 +35,13 @@ interface IConditionsProps {
     puzzleId: string;
     template: ITemplate;
     disabled?: boolean;
+    focused?: boolean;
 
     onTemplateChange(template: ITemplate): void;
 }
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const { puzzleId, template, disabled = false } = props;
+    const { puzzleId, template, disabled = false, focused = true } = props;
     const defaultState = {
         id: uuid(),
         order: 0,
@@ -233,28 +234,32 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     onConditionChange={onConditionChange}
                     onConditionDelete={onConditionDelete}
                     questions={questions}
+                    noDeleteButton={!focused}
                 />
             ))}
-            <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(9) })}>
-                <Button
-                    fullWidth
-                    variant="outlined"
-                    color="primary"
-                    onClick={onAddCondition}
-                    scheme={"outline"}
-                >
-                    <AddIcon css={theme => ({ color: theme.colors.primary })} />
-                    <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
-                        Добавить внутреннее условие
-                    </Typography>
-                </Button>
-            </Grid>
+            {focused && (
+                <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(9) })}>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        color="primary"
+                        onClick={onAddCondition}
+                        scheme={"outline"}
+                    >
+                        <AddIcon css={theme => ({ color: theme.colors.primary })} />
+                        <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
+                            Добавить внутреннее условие
+                        </Typography>
+                    </Button>
+                </Grid>
+            )}
         </Grid>
     );
 };
 
 interface IConditionProps {
     index: number;
+    noDeleteButton: boolean;
     condition: ICondition;
     conditions: ICondition[];
     questions: IPuzzle[];
@@ -266,7 +271,7 @@ interface IConditionProps {
 }
 
 const Condition: React.FC<IConditionProps> = props => {
-    const { condition, conditions, answers, questions, index } = props;
+    const { condition, conditions, answers, questions, index, noDeleteButton = false } = props;
     const [value, setValue] = useState<string>(ETerminals.EMPTY);
 
     function onQuestionPuzzleChange(event: TChangeEvent): void {
@@ -426,7 +431,7 @@ const Condition: React.FC<IConditionProps> = props => {
                         .setValueBlurHandler(onValueBlur)
                         .build()}
             </Grid>
-            {condition.questionPuzzle && (
+            {!noDeleteButton && condition.questionPuzzle && (
                 <Grid item xs>
                     <Grid container justify="flex-end">
                         <Grid item>

@@ -19,7 +19,7 @@ interface IGroupOfItemsProps {
     onFocus(id: string): void;
 }
 
-export const GroupView: React.FC<IGroupOfItemsProps> = props => {
+export const SectionContent: React.FC<IGroupOfItemsProps> = props => {
     const { puzzle, parent } = props;
 
     function onFocus(): void {
@@ -59,6 +59,7 @@ export const GroupView: React.FC<IGroupOfItemsProps> = props => {
                 />
                 {isGroup && (
                     <ConditionsWrapper
+                        alwaysVisible
                         puzzleId={puzzle.id}
                         conditions={puzzle.conditions}
                         validations={puzzle.validations}
@@ -70,7 +71,7 @@ export const GroupView: React.FC<IGroupOfItemsProps> = props => {
                 {(puzzle.puzzles || []).map((childPuzzle, index) => {
                     if (childPuzzle.puzzleType === EPuzzleType.QUESTION) {
                         return (
-                            <GroupView
+                            <SectionContent
                                 key={childPuzzle.id}
                                 puzzle={childPuzzle}
                                 onFocus={props.onFocus}

@@ -8,7 +8,9 @@ export const Group: React.FC = () => {
     return (
         <Grid container direction="column">
             <Grid item css={theme => ({ marginRight: theme.spacing(2) })}>
-                <Typography variant="h6">Группа связанных вопросов</Typography>
+                <Typography css={theme => ({ color: theme.colors.primary })} variant="h6">
+                    Группа связанных вопросов
+                </Typography>
             </Grid>
         </Grid>
     );

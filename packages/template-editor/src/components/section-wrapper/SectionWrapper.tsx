@@ -5,7 +5,7 @@ import { SelectableBlockWrapper } from "@magnit/components";
 import { SectionView } from "components/section-view";
 import { jsx } from "@emotion/core";
 import { ISection, ITemplate } from "entities";
-import { GroupView } from "components/group-view";
+import { SectionContent } from "components/section-content";
 import { EPuzzleType } from "@magnit/services";
 
 interface ITemplateSectionProps {
@@ -50,7 +50,7 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...pr
             >
                 {section.puzzles.map((puzzle, index) => {
                     const result = (
-                        <GroupView
+                        <SectionContent
                             key={puzzle.id}
                             puzzle={puzzle}
                             onFocus={props.onPuzzleFocus}

@@ -28,7 +28,7 @@ export const PuzzleWrapper: React.FC<IPuzzleWrapperProps> = ({ children, id, ...
                 // need for correct toolbar positioning
                 // see https://github.com/DavidArutiunian/magnit/issues/46
                 marginTop: theme.spacing(-3),
-                paddingTop: theme.spacing(4),
+                paddingTop: theme.spacing(3),
             })}
             onFocus={props.onFocus}
             onMouseDown={props.onFocus}
