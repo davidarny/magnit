@@ -56,7 +56,7 @@ export class TaskController {
         )
         query?: FindAllQuery,
     ) {
-        const { offset, limit, sort, statuses, status, name } = query || new FindAllQuery();
+        const { offset, limit, sort, statuses, status, name } = { ...new FindAllQuery(), ...query };
         const tasks = await this.taskService.findAll(offset, limit, sort, status, statuses, name);
         return { success: 1, total: tasks.length, tasks };
     }

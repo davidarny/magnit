@@ -40,7 +40,7 @@ export class TemplateController {
     @Get("/")
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
     async findAll(@Query() query?: FindAllQuery) {
-        const { offset, limit, sort, title } = query || new FindAllQuery();
+        const { offset, limit, sort, title } = { ...new FindAllQuery(), ...query };
         const templates = await this.templateService.findAll(offset, limit, sort, title);
         return { success: 1, total: templates.length, templates };
     }
