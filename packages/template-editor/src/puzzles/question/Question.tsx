@@ -11,6 +11,16 @@ import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
 import { EPuzzleType, ETerminals } from "@magnit/services";
 import uuid from "uuid/v4";
+import {
+    CalendarIcon,
+    CheckboxIcon,
+    DropdownIcon,
+    NumericFieldIcon,
+    RadioIcon,
+    ReferenceFieldIcon,
+    TextFieldIcon,
+    UploadFilesIcon,
+} from "@magnit/icons";
 
 interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
     template: ITemplate;
@@ -20,14 +30,14 @@ interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
 }
 
 const answerMenuItems = [
-    { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER },
-    { label: "Числовое поле", type: EPuzzleType.NUMERIC_ANSWER },
-    { label: "Один из списка", type: EPuzzleType.RADIO_ANSWER },
-    { label: "Несколько из списка", type: EPuzzleType.CHECKBOX_ANSWER },
-    { label: "Дата", type: EPuzzleType.DATE_ANSWER },
-    { label: "Выпадающий список", type: EPuzzleType.DROPDOWN_ANSWER },
-    { label: "Загрузка файлов", type: EPuzzleType.UPLOAD_FILES },
-    { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER },
+    { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER, icon: TextFieldIcon },
+    { label: "Числовое поле", type: EPuzzleType.NUMERIC_ANSWER, icon: NumericFieldIcon },
+    { label: "Один из списка", type: EPuzzleType.RADIO_ANSWER, icon: RadioIcon },
+    { label: "Несколько из списка", type: EPuzzleType.CHECKBOX_ANSWER, icon: CheckboxIcon },
+    { label: "Дата", type: EPuzzleType.DATE_ANSWER, icon: CalendarIcon },
+    { label: "Выпадающий список", type: EPuzzleType.DROPDOWN_ANSWER, icon: DropdownIcon },
+    { label: "Загрузка файлов", type: EPuzzleType.UPLOAD_FILES, icon: UploadFilesIcon },
+    { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER, icon: ReferenceFieldIcon },
 ];
 
 export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused, ...props }) => {
@@ -219,9 +229,15 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                             value={answersType || ETerminals.EMPTY}
                             onChange={onAnswerTypeChange}
                         >
-                            {answerMenuItems.map(({ label, type }, index) => (
+                            {answerMenuItems.map(({ label, type, icon: Icon }, index) => (
                                 <MenuItem value={type} key={index}>
-                                    {label}
+                                    <Icon
+                                        css={theme => ({
+                                            marginRight: theme.spacing(1.5),
+                                            verticalAlign: "middle",
+                                        })}
+                                    />
+                                    <Typography component="span">{label}</Typography>
                                 </MenuItem>
                             ))}
                         </SelectField>
