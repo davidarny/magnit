@@ -5,7 +5,7 @@ import {
     NotFoundException,
     PipeTransform,
 } from "@nestjs/common";
-import { TemplateService } from "../../../shared/services/template.service";
+import { TemplateService } from "../services/template.service";
 
 @Injectable()
 export class TemplateByIdPipe implements PipeTransform<string, Promise<string>> {

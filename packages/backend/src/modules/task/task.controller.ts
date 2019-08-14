@@ -7,13 +7,12 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { Template } from "../../shared/entities/template.entity";
+import { Template } from "../template/entities/template.entity";
 import { ITaskService } from "./interfaces/task.service.interface";
-import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { ITemplateService } from "../template/interfaces/template.service.interface";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { TemplateService } from "../../shared/services/template.service";
-import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
+import { TemplateService } from "../template/services/template.service";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
 import { TaskDto } from "./dto/task.dto";
@@ -106,7 +105,7 @@ export class TaskController {
     @Delete("/:id")
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
-    async deleteById(@Param("id", TemplateByIdPipe) id: string) {
+    async deleteById(@Param("id", TaskByIdPipe) id: string) {
         await this.taskService.deleteById(id);
         return { success: 1 };
     }

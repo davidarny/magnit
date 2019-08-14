@@ -60,11 +60,11 @@ export class TemplateService implements ITemplateService {
     ) {
         const response = await templateRepository.query(
             `
-            INSERT INTO "template" ("title", "description", "json", "type", "created_at", "updated_at") 
+            INSERT INTO "template" ("title", "description", "sections", "type", "created_at", "updated_at") 
             VALUES ($1, $2, json_strip_nulls($3), $4, DEFAULT, DEFAULT)
             RETURNING "id", "type", "created_at", "updated_at"
         `,
-            [template.title, template.description, template.json, template.type],
+            [template.title, template.description, template.sections, template.type],
         );
         if (Array.isArray(response) && response.length > 0) {
             const inserted = response.pop();
@@ -95,8 +95,8 @@ export class TemplateService implements ITemplateService {
         if (template.type) {
             values.type = template.type;
         }
-        if (template.json) {
-            values.json = template.json;
+        if (template.sections) {
+            values.sections = template.sections;
         }
         builder.set(values).where("id = :id", { id: Number(id) });
         await builder.execute();

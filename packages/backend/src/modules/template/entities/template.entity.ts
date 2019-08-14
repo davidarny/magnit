@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Task } from "../../modules/task/entities/task.entity";
+import { Task } from "../../task/entities/task.entity";
 
 export type TTemplateType = "light" | "complex";
 
@@ -31,7 +31,7 @@ export class Template {
     description: string;
 
     @Column({ type: "json", nullable: true })
-    json: object;
+    sections: object;
 
     @ManyToMany(() => Task, task => task.templates)
     tasks: Task[];

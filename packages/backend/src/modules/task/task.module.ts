@@ -3,8 +3,8 @@ import { TaskController } from "./task.controller";
 import { TaskService } from "./services/task.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Task } from "./entities/task.entity";
-import { TemplateService } from "../../shared/services/template.service";
-import { Template } from "../../shared/entities/template.entity";
+import { TemplateService } from "../template/services/template.service";
+import { Template } from "../template/entities/template.entity";
 
 const controllers = [TaskController];
 const providers = [TaskService, TemplateService];

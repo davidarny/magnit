@@ -6,11 +6,11 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { Template } from "../../shared/entities/template.entity";
-import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { Template } from "./entities/template.entity";
+import { ITemplateService } from "./interfaces/template.service.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
-import { TemplateService } from "../../shared/services/template.service";
+import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
@@ -37,7 +37,7 @@ export class TemplateController {
     @ApiCreatedResponse({ type: CreateTemplateResponse, description: "ID of created Template" })
     async create(@Body("template") templateDto: TemplateDto) {
         const template = new Template(templateDto);
-        template.json = { sections: templateDto.sections || [] };
+        template.sections = { sections: templateDto.sections || [] };
         const saved = await this.templateService.insert(template);
         return { success: 1, template_id: saved.id };
     }
@@ -51,7 +51,7 @@ export class TemplateController {
         @Body("template") templateDto: TemplateDto,
     ) {
         const template = new Template(templateDto);
-        template.json = templateDto.sections ? { sections: templateDto.sections } : null;
+        template.sections = templateDto.sections ? { sections: templateDto.sections } : null;
         const saved = await this.templateService.update(id, template);
         return { success: 1, template_id: saved.id };
     }
@@ -63,7 +63,7 @@ export class TemplateController {
         const template = await this.templateService.findById(id);
         return {
             success: 1,
-            template: JSON.stringify({ ...template, ...template.json }),
+            template: JSON.stringify({ ...template, ...template.sections }),
         };
     }
 
