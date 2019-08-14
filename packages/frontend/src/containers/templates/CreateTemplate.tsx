@@ -60,7 +60,7 @@ export const CreateTemplate: React.FC = () => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button variant="contained" scheme="blue" onClick={onTemplateSave}>
+                    <Button variant="contained" scheme="green" onClick={onTemplateSave}>
                         <CheckIcon />
                         <Typography>Сохранить</Typography>
                     </Button>
