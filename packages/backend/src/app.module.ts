@@ -1,11 +1,12 @@
 import { CacheModule, MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { TemplateModule } from "./modules/template/template.module";
-import { LoggerMiddleware } from "./middleware/logger.middleware";
-import { TaskModule } from "./modules/task/task.module";
-import { AssetModule } from "./modules/asset/asset.module";
-import { ConnectionOptionsReader } from "typeorm";
 import { resolve } from "path";
+import { ConnectionOptionsReader } from "typeorm";
+import { LoggerMiddleware } from "./middleware/logger.middleware";
+import { AssetModule } from "./modules/asset/asset.module";
+import { AirwatchAuthModule } from "./modules/auth/airwatch.auth.module";
+import { TaskModule } from "./modules/task/task.module";
+import { TemplateModule } from "./modules/template/template.module";
 
 const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
 
@@ -20,6 +21,7 @@ const imports = [
     TemplateModule,
     TaskModule,
     AssetModule,
+    AirwatchAuthModule,
 ];
 
 @Module({ imports })
