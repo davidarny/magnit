@@ -19,7 +19,6 @@ import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.s
 import { PuzzleService } from "../../shared/services/puzzle.service";
 import { SectionService } from "../../shared/services/section.service";
 import { TemplateService } from "../../shared/services/template.service";
-import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
 import { TaskDto } from "./dto/task.dto";
@@ -115,7 +114,7 @@ export class TaskController {
     @Delete("/:id")
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "No Task with this ID found" })
-    async deleteById(@Param("id", TemplateByIdPipe) id: string) {
+    async deleteById(@Param("id", TaskByIdPipe) id: string) {
         await this.taskService.deleteById(id);
         return { success: 1 };
     }
