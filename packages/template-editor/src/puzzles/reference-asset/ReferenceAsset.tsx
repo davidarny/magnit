@@ -2,24 +2,21 @@
 
 import { jsx } from "@emotion/core";
 import * as React from "react";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle } from "entities";
 import { Grid, Typography } from "@material-ui/core";
 import { AddIcon } from "@magnit/icons";
 import { Fab } from "@magnit/components";
 import { Close as CloseIcon } from "@material-ui/icons";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import _ from "lodash";
 import { ETerminals } from "@magnit/services";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
     title: string;
     description: string;
-    template: ITemplate;
     // flag indication this asset should render
     // button which adds new asset when clicked
     addAssetButton: boolean;
-
-    onTemplateChange(template: ITemplate): void;
 
     onUploadAsset(file: File): Promise<{ filename: string }>;
 
@@ -30,33 +27,39 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
     onDeleteAssetPuzzle(id: string): void;
 }
 
-export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...props }) => {
+export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
+    const { focused, id, description, addAssetButton } = props;
+    const { onUploadAsset, onAddAsset, onDeleteAsset, onDeleteAssetPuzzle } = props;
+
     const input = useRef<HTMLInputElement>(null);
 
-    function onAddAsset() {
+    function onAddAssetTrigger() {
         if (input.current) {
             input.current.click();
         }
     }
 
-    function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const file = _.first(event.target.files);
-        if (!file) {
-            return;
-        }
-        props.onUploadAsset(file).then(response => {
-            props.onAddAsset(props.id, {
-                title: _.get(file, "name", ETerminals.EMPTY),
-                description: response.filename,
+    const onFileChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const file = _.first(event.target.files);
+            if (!file) {
+                return;
+            }
+            onUploadAsset(file).then(response => {
+                onAddAsset(id, {
+                    title: _.get(file, "name", ETerminals.EMPTY),
+                    description: response.filename,
+                });
             });
-        });
-    }
+        },
+        [id, onUploadAsset, onAddAsset],
+    );
 
-    function onDeleteAsset() {
-        const url = props.description;
+    const onDeleteAssetCallback = useCallback(() => {
+        const url = description;
         const filename = url.substring(url.lastIndexOf("/") + 1);
-        props.onDeleteAsset(filename).then(() => props.onDeleteAssetPuzzle(props.id));
-    }
+        onDeleteAsset(filename).then(() => onDeleteAssetPuzzle(id));
+    }, [description, id, onDeleteAsset, onDeleteAssetPuzzle]);
 
     return (
         <Grid css={() => ({ ...(!focused ? { display: "none" } : {}) })} item xs={3}>
@@ -73,7 +76,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                     position: "relative",
                 })}
             >
-                {!props.addAssetButton && (
+                {!addAssetButton && (
                     <React.Fragment>
                         <img
                             css={theme => ({
@@ -84,7 +87,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                             src={props.description}
                         />
                         <div
-                            onClick={onDeleteAsset}
+                            onClick={onDeleteAssetCallback}
                             css={theme => ({
                                 padding: theme.spacing(0.5),
                                 borderRadius: "50%",
@@ -103,14 +106,14 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                         </div>
                     </React.Fragment>
                 )}
-                {props.addAssetButton && (
+                {addAssetButton && (
                     <React.Fragment>
                         <input
                             ref={input}
                             type="file"
                             accept="image/*"
                             hidden
-                            onChange={onFileChange}
+                            onChange={onFileChangeCallback}
                         />
                         <Fab
                             css={theme => ({
@@ -118,7 +121,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = ({ focused, ...pro
                                 height: theme.spacing(5),
                                 marginBottom: theme.spacing(),
                             })}
-                            onClick={onAddAsset}
+                            onClick={onAddAssetTrigger}
                         >
                             <AddIcon />
                         </Fab>

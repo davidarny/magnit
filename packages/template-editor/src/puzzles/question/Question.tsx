@@ -1,16 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
-import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
-import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { traverse } from "services/json";
-import _ from "lodash";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, ETerminals } from "@magnit/services";
-import uuid from "uuid/v4";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -21,6 +12,14 @@ import {
     TextFieldIcon,
     UploadFilesIcon,
 } from "@magnit/icons";
+import { EPuzzleType, ETerminals } from "@magnit/services";
+import { Grid, MenuItem, Typography } from "@material-ui/core";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
+import _ from "lodash";
+import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { traverse } from "services/json";
+import uuid from "uuid/v4";
 
 interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
     template: ITemplate;
@@ -40,14 +39,16 @@ const answerMenuItems = [
     { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER, icon: ReferenceFieldIcon },
 ];
 
-export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused, ...props }) => {
+export const Question: React.FC<IQuestionPuzzleProps> = props => {
+    const { index: index1, title, template, id, focused } = props;
+    const { onTemplateChange } = props;
     const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
-    const [questionTitle, setQuestionTitle] = useState(props.title);
+    const [questionTitle, setQuestionTitle] = useState(title);
 
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const answerTypeSnapshot = useRef<EPuzzleType>((ETerminals.EMPTY as unknown) as EPuzzleType);
 
-    const onTemplateChange = useCallback(() => {
+    const onTemplateChangeCallback = useCallback(() => {
         traverse(template, (value: any) => {
             if (!_.isObject(value) || !("puzzles" in value)) {
                 return;
@@ -112,6 +113,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                             puzzle,
                             {
                                 ...puzzle,
+                                id: uuid(),
                                 puzzleType: EPuzzleType.REFERENCE_ASSET,
                                 order: childPuzzle.puzzles.length + 1,
                             },
@@ -137,10 +139,11 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
             return;
         }
         templateSnapshot.current = _.cloneDeep(template);
-        props.onTemplateChange(templateSnapshot.current);
-    }, [answersType, questionTitle, template]);
+        onTemplateChange(templateSnapshot.current);
+    }, [answersType, questionTitle, template, id, onTemplateChange]);
 
-    useEffect(() => onTemplateChange(), [answersType, focused]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => onTemplateChangeCallback(), [answersType, focused]);
 
     function onAnswerTypeChange(event: TChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
@@ -167,7 +170,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                         variant="body1"
                         css={theme => ({ paddingRight: theme.spacing() })}
                     >
-                        {props.index + 1}.
+                        {index1 + 1}.
                     </Typography>
                 </Grid>
                 <Grid item>
@@ -204,7 +207,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                                 marginBottom: theme.spacing(0.25),
                             })}
                         >
-                            {props.index + 1}.
+                            {index1 + 1}.
                         </Typography>
                     </Grid>
                     <Grid
@@ -219,7 +222,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = ({ template, id, focused
                             placeholder="Введите вопрос"
                             value={questionTitle}
                             onChange={onQuestionTitleChange}
-                            onBlur={onTemplateChange}
+                            onBlur={onTemplateChangeCallback}
                         />
                     </Grid>
                     <Grid item xs={3}>
