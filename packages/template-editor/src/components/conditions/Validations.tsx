@@ -124,7 +124,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
                             return;
                         }
                         // check if dependent question has changed
-                        hasDependentQuestionChanged = !_.isEqual(dependentQuestion, puzzle);
+                        hasDependentQuestionChanged = !_.isEqual(
+                            _.omit(dependentQuestion, "validations"),
+                            _.omit(puzzle, "validations"),
+                        );
                     });
                     if (hasDependentQuestionChanged) {
                         validation.rightHandPuzzle = undefined;

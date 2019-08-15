@@ -1,15 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
+import { css, jsx } from "@emotion/core";
+import { InputField } from "@magnit/components";
+import { Grid, IconButton, Typography } from "@material-ui/core";
+import { Close as DeleteIcon } from "@material-ui/icons";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
+import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { Grid, IconButton, Typography } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import { traverse } from "services/json";
-import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "@magnit/components";
-import _ from "lodash";
 
 interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;
@@ -25,36 +24,40 @@ interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
     onDeleteDropdownButton(id: string): void;
 }
 
-export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, ...props }) => {
-    const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
+export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
+    const { focused, template, addDropdownButton, index, id, title } = props;
+    const { onAddDropdownButton, onTemplateChange, onDeleteDropdownButton } = props;
 
-    const onTemplateChange = useCallback(() => {
-        traverse(props.template, (puzzle: IPuzzle) => {
+    const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
+
+    const onTemplateChangeCallback = useCallback(() => {
+        traverse(template, (puzzle: IPuzzle) => {
             if (!_.has(puzzle, "id")) {
                 return;
             }
-            if (puzzle.id !== props.id) {
+            if (puzzle.id !== id) {
                 return;
             }
             puzzle.title = label;
             return true;
         });
-        props.onTemplateChange({ ...props.template });
-    }, [label]);
+        onTemplateChange(template);
+    }, [label, template, id, onTemplateChange]);
 
-    useEffect(() => onTemplateChange(), [focused]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => onTemplateChangeCallback(), [focused]);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
     }
 
-    function onAddDropdownButton(): void {
-        props.onAddDropdownButton(props.id);
-    }
+    const onAddDropdownButtonCallback = useCallback(() => {
+        onAddDropdownButton(id);
+    }, [onAddDropdownButton, id]);
 
-    function onDeleteDropdownButton(): void {
-        props.onDeleteDropdownButton(props.id);
-    }
+    const onDeleteDropdownButtonCallback = useCallback(() => {
+        onDeleteDropdownButton(id);
+    }, [onDeleteDropdownButton, id]);
 
     if (!focused) {
         return (
@@ -72,7 +75,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                         component="span"
                         css={theme => ({ paddingRight: theme.spacing() })}
                     >
-                        {props.index + 1}.
+                        {index + 1}.
                     </Typography>
                 </Grid>
                 <Grid item>
@@ -81,7 +84,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                         component="span"
                         css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
                     >
-                        {label || `Вариант ${props.index + 1}`}
+                        {label || `Вариант ${index + 1}`}
                     </Typography>
                 </Grid>
             </Grid>
@@ -108,7 +111,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                             marginRight: theme.spacing(2),
                         })}
                     >
-                        {props.index + 1}.
+                        {index + 1}.
                     </Typography>
                 </Grid>
                 <Grid
@@ -122,17 +125,17 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onTemplateChange}
+                        onBlur={onTemplateChangeCallback}
                     />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
-                    <IconButton onClick={onDeleteDropdownButton}>
+                    <IconButton onClick={onDeleteDropdownButtonCallback}>
                         <DeleteIcon />
                     </IconButton>
                 </Grid>
             </Grid>
 
-            {props.addDropdownButton && focused && (
+            {addDropdownButton && focused && (
                 <Grid
                     container
                     alignItems="flex-end"
@@ -152,7 +155,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                                 marginRight: theme.spacing(2),
                             })}
                         >
-                            {props.index + 2}.
+                            {index + 2}.
                         </Typography>
                     </Grid>
                     <Grid
@@ -166,7 +169,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = ({ focused, 
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onFocus={onAddDropdownButton}
+                            onFocus={onAddDropdownButtonCallback}
                         />
                     </Grid>
                 </Grid>

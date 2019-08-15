@@ -1,15 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
+import { css, jsx } from "@emotion/core";
+import { InputField } from "@magnit/components";
+import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
+import { Close as DeleteIcon } from "@material-ui/icons";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
+import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
-import { css, jsx } from "@emotion/core";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import { traverse } from "services/json";
-import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "@magnit/components";
-import _ from "lodash";
 
 interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     title: string;
@@ -25,36 +24,40 @@ interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     onDeleteCheckboxButton(id: string): void;
 }
 
-export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, ...props }) => {
-    const [label, setLabel] = useState(props.title || `Вариант ${props.index + 1}`);
+export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
+    const { focused, template, index, addCheckboxButton, id, title } = props;
+    const { onTemplateChange, onAddCheckboxButton, onDeleteCheckboxButton } = props;
 
-    const onTemplateChange = useCallback(() => {
-        traverse(props.template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id")) {
-                return;
-            }
-            if (puzzle.id !== props.id) {
-                return;
-            }
-            puzzle.title = label;
-            return true;
-        });
-        props.onTemplateChange({ ...props.template });
-    }, [label]);
-
-    useEffect(() => onTemplateChange(), [focused]);
+    const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
 
     function onLabelChange(event: TChangeEvent): void {
         setLabel(event.target.value as string);
     }
 
-    function onAddCheckboxButton(): void {
-        props.onAddCheckboxButton(props.id);
-    }
+    const onTemplateChangeCallback = useCallback(() => {
+        traverse(template, (puzzle: IPuzzle) => {
+            if (!_.has(puzzle, "id")) {
+                return;
+            }
+            if (puzzle.id !== id) {
+                return;
+            }
+            puzzle.title = label;
+            return true;
+        });
+        onTemplateChange(template);
+    }, [label, template, onTemplateChange, id]);
 
-    function onDeleteCheckboxButton(): void {
-        props.onDeleteCheckboxButton(props.id);
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => onTemplateChangeCallback(), [focused]);
+
+    const onAddCheckboxButtonCallback = useCallback(() => {
+        onAddCheckboxButton(id);
+    }, [onAddCheckboxButton, id]);
+
+    const onDeleteCheckboxButtonCallback = useCallback(() => {
+        onDeleteCheckboxButton(id);
+    }, [onDeleteCheckboxButton, id]);
 
     if (!focused) {
         return (
@@ -71,7 +74,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, 
                         css={theme => ({ color: !label ? theme.colors.gray : "initial" })}
                         variant="body1"
                     >
-                        {label || `Вариант ${props.index + 1}`}
+                        {label || `Вариант ${index + 1}`}
                     </Typography>
                 </Grid>
             </Grid>
@@ -106,16 +109,16 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, 
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onTemplateChange}
+                        onBlur={onTemplateChangeCallback}
                     />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
-                    <IconButton onClick={onDeleteCheckboxButton}>
+                    <IconButton onClick={onDeleteCheckboxButtonCallback}>
                         <DeleteIcon />
                     </IconButton>
                 </Grid>
             </Grid>
-            {props.addCheckboxButton && focused && (
+            {addCheckboxButton && focused && (
                 <Grid
                     container
                     alignItems="flex-end"
@@ -145,7 +148,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = ({ focused, 
                         <InputField
                             fullWidth
                             placeholder={"Добавить вариант"}
-                            onFocus={onAddCheckboxButton}
+                            onFocus={onAddCheckboxButtonCallback}
                         />
                     </Grid>
                 </Grid>

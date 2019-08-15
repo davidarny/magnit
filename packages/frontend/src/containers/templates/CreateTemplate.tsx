@@ -1,20 +1,20 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import * as React from "react";
-import { useContext, useState } from "react";
-import { SectionLayout } from "components/section-layout";
-import { SectionTitle } from "components/section-title";
-import { Grid, Typography } from "@material-ui/core";
-import { TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { createTemplate } from "services/api/templates";
-import { AppContext } from "context";
-import { Snackbar } from "components/snackbar";
+import { TemplateEditor } from "@magnit/template-editor";
+import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
+import { Snackbar } from "components/snackbar";
+import { AppContext } from "context";
 import _ from "lodash";
-import { uploadFile } from "../../services/api/assets";
+import * as React from "react";
+import { useContext, useState } from "react";
+import { deleteFile, uploadFile } from "services/api/assets";
+import { createTemplate } from "services/api/templates";
 
 export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
@@ -55,6 +55,10 @@ export const CreateTemplate: React.FC = () => {
         }));
     }
 
+    async function onDeleteAsset(filename: string) {
+        return deleteFile(context.courier, filename);
+    }
+
     return (
         <SectionLayout>
             {redirect && <Redirect to={"/templates"} noThrow />}
@@ -80,6 +84,7 @@ export const CreateTemplate: React.FC = () => {
                     css={theme => ({ background: theme.colors.main })}
                     onChange={onTemplateChange}
                     onAddAsset={onAddAsset}
+                    onDeleteAsset={onDeleteAsset}
                 />
             </Grid>
             <Snackbar

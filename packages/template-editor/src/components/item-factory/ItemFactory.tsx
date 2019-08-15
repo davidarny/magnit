@@ -44,7 +44,7 @@ export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false,
                                     index={index}
                                     active={props.active}
                                     onFocus={props.onFocus}
-                                    key={childPuzzle.id}
+                                    key={index}
                                     parentPuzzle={puzzle}
                                 />
                             );
