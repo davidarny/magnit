@@ -1,5 +1,5 @@
-import { IPublicUser } from "../entities/user.entity";
+import { User } from "../entities/user.entity";
 
 export interface IAuthService {
-    validateUser(username: string, password: string): Promise<IPublicUser | null>;
+    validateUser(username: string, password: string): Promise<User | undefined>;
 }

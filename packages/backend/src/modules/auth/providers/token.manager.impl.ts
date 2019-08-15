@@ -6,9 +6,15 @@ export abstract class TokenManagerImpl<T> implements ITokenManager<T> {
     private static readonly IV_LENGTH = 16;
 
     // must be 256 bits (32 characters)
-    protected readonly secret = process.env.AUTH_SECRET || "magnit-development-secret-key-xx";
+    protected readonly secret = process.env.AUTH_SECRET;
     protected readonly algorithm = process.env.AUTH_ALGORITHM || "HS256";
     protected readonly expires = process.env.AUTH_EXPIRES_IN || "1h";
+
+    constructor() {
+        if (process.env.NODE_ENV !== "testing" && !this.secret) {
+            throw new Error("Auth secret is undefined");
+        }
+    }
 
     protected encrypt(token: string): string {
         const iv = crypto.randomBytes(TokenManagerImpl.IV_LENGTH);

@@ -2,19 +2,20 @@ import { ForbiddenException, Inject, NestMiddleware, UnauthorizedException } fro
 import { Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
-import { IPublicUser } from "../entities/user.entity";
+import { User } from "../entities/user.entity";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { ITokenManager } from "../interfaces/token.manager.interface";
 import { AirwatchAuthService } from "../services/airwatch-auth.service";
 import { JwtTokenManager } from "../providers/jwt.token.manager";
+import _ = require("lodash");
 
 export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
     constructor(
         @Inject(AirwatchAuthService) private readonly authService: IAuthService,
-        @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<IPublicUser>,
+        @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<User>,
     ) {}
 
-    use(req: IAuthRequest, res: Response, next: () => void): void {
+    async use(req: IAuthRequest, res: Response, next: () => void): Promise<void> {
         const authorization = req.header("Authorization");
         const token = req.header("X-Access-Token");
         if (token) {
@@ -33,8 +34,12 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
         if (authorization) {
             const credentials = authorization.split(" ")[1];
             const data = Buffer.from(credentials, "base64").toString();
-            req.user = { name: data.split(":")[0] };
-            // TODO: validate user
+            const username = _.first(data.split(":"));
+            const password = _.last(data.split(":"));
+            req.user = await this.authService.validateUser(username, password);
+            if (!req.user) {
+                throw new UnauthorizedException("Cannot authorize user");
+            }
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
             return next();
         }

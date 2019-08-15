@@ -3,11 +3,10 @@ import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import * as request from "supertest";
 import { AirwatchAuthModule } from "../src/modules/auth/airwatch.auth.module";
-import { IPublicUser, User } from "../src/modules/auth/entities/user.entity";
-import { IAuthService } from "../src/modules/auth/interfaces/auth.service.interface";
-import { IUserService } from "../src/modules/auth/interfaces/user.service.interface";
+import { User } from "../src/modules/auth/entities/user.entity";
 import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
 import { AirwatchUserService } from "../src/modules/auth/services/airwatch-user.service";
+import { createMockFrom } from "../src/utils/create-mock.util";
 
 @Controller("mock")
 class ControllerMock {
@@ -15,45 +14,32 @@ class ControllerMock {
     get() {}
 }
 
-export abstract class AirwatchAuthServiceMock implements IAuthService {
-    abstract validateUser(username: string, password: string): Promise<IPublicUser | null>;
-}
-
-export abstract class AirwatchUserServiceMock implements IUserService {
-    abstract findOne(username: string): Promise<User | undefined>;
-}
-
 describe("Airwatch Auth", () => {
     let app: NestApplication;
+    const airwatchUserService = createMockFrom(AirwatchUserService.prototype);
+    const airwatchAuthService = createMockFrom(AirwatchAuthService.prototype);
 
     beforeAll(() => {
         // allow auth middleware
         process.env.ALLOW_AUTH = "true";
+        process.env.AUTH_SECRET = "<test-32-characters-auth-secret>";
     });
 
     afterAll(() => {
         // reset allowance
         process.env.ALLOW_AUTH = undefined;
+        process.env.AUTH_SECRET = undefined;
     });
 
     beforeEach(async () => {
-        const providers = [
-            {
-                provide: AirwatchAuthService,
-                useValue: AirwatchAuthServiceMock,
-            },
-            {
-                provide: AirwatchUserService,
-                useValue: AirwatchUserServiceMock,
-            },
-        ];
         const controllers = [ControllerMock];
         const imports = [AirwatchAuthModule];
-        const moduleFixture = await Test.createTestingModule({
-            imports,
-            controllers,
-            providers,
-        }).compile();
+        const moduleFixture = await Test.createTestingModule({ imports, controllers })
+            .overrideProvider(AirwatchAuthService)
+            .useValue(airwatchAuthService)
+            .overrideProvider(AirwatchUserService)
+            .useValue(airwatchUserService)
+            .compile();
 
         app = moduleFixture.createNestApplication();
         (await app.setGlobalPrefix("v1")).init();
@@ -72,6 +58,8 @@ describe("Airwatch Auth", () => {
 
     let token;
     it("should get X-Access-Token when sending Authorization", async () => {
+        const user = { username: "test" } as User;
+        jest.spyOn(airwatchAuthService, "validateUser").mockResolvedValue(user);
         return request(app.getHttpServer())
             .get("/v1/mock")
             .set("Authorization", "Basic dGVzdDp0ZXN0")
@@ -83,6 +71,8 @@ describe("Airwatch Auth", () => {
     });
 
     it("should get access with X-Access-Token", async () => {
+        const user = { username: "test" } as User;
+        jest.spyOn(airwatchAuthService, "validateUser").mockResolvedValue(user);
         return request(app.getHttpServer())
             .get("/v1/mock")
             .set("X-Access-Token", token)
