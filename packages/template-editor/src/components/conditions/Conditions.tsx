@@ -2,8 +2,9 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { Button, SelectField } from "@magnit/components";
+import { AddIcon } from "@magnit/icons";
+import { EPuzzleType, ETerminals } from "@magnit/services";
 import {
     FormControlLabel,
     Grid,
@@ -22,13 +23,12 @@ import {
     ITemplate,
     TChangeEvent,
 } from "entities";
-import { traverse } from "services/json";
 import _ from "lodash";
-import uuid from "uuid/v4";
-import { Button, SelectField } from "@magnit/components";
-import { AddIcon } from "@magnit/icons";
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import { getConditionService } from "services/condition";
-import { ETerminals, EPuzzleType } from "@magnit/services";
+import { traverse } from "services/json";
+import uuid from "uuid/v4";
 
 interface IConditionsProps {
     initialState?: ICondition[];
@@ -74,7 +74,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
         });
-    }, [template, props.disabled]);
+    }, [template, disabled]);
 
     useEffect(() => {
         if (disabled) {
@@ -102,7 +102,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                             return;
                         }
                         // check if dependent question has changed
-                        hasDependentQuestionChanged = !_.isEqual(dependentQuestion, puzzle);
+                        hasDependentQuestionChanged = !_.isEqual(
+                            _.omit(dependentQuestion, "conditions"),
+                            _.omit(puzzle, "conditions"),
+                        );
                     });
                     if (hasDependentQuestionChanged) {
                         condition.answerPuzzle = ETerminals.EMPTY;
@@ -154,11 +157,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     }
                     // if puzzle is one of answers types
                     // then it's allowed to be selected as an answerPuzzle
-                    const excludedPuzzleTypes = [
-                        EPuzzleType.GROUP,
-                        EPuzzleType.QUESTION,
-                        EPuzzleType.UPLOAD_FILES,
-                    ];
+                    const excludedPuzzleTypes = [EPuzzleType.GROUP, EPuzzleType.QUESTION];
                     if (!excludedPuzzleTypes.includes(puzzle.puzzleType)) {
                         answers.push(puzzle);
                         return;
@@ -177,8 +176,8 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             return;
         }
         templateSnapshot.current = _.cloneDeep(template);
-        props.onTemplateChange(template);
-    }, [conditions, template, props.disabled]);
+        props.onTemplateChange(templateSnapshot.current);
+    }, [conditions, template, disabled]);
 
     function onConditionDelete(id: string) {
         // do not allow to delete if only one condition present
