@@ -1,0 +1,10 @@
+/var/www/magnit/logs/*.log {
+       su root
+       daily
+       rotate 7
+       delaycompress
+       compress
+       notifempty
+       missingok
+       copytruncate
+}

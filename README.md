@@ -20,6 +20,7 @@
 ## Table of Contents
 
 -   [Table of Contents](#Table-of-Contents)
+    -   [Technologies](#Technologies)
     -   [Requirements](#Requirements)
     -   [Project structure](#Project-structure)
     -   [Installation](#Installation)
@@ -35,7 +36,27 @@
 
 -   [Node.js](https://nodejs.org/en/) - runtime for backend & tooling
 -   [Yarn](https://yarnpkg.com/lang/en/) - package management
--   [Lerna](https://github.com/lerna/lerna) - a tool for managing projects with multiple packages
+-   [Lerna](https://github.com/lerna/lerna) - tool for managing projects with multiple packages
+
+### Technologies
+
+-   [TypeScript](https://www.typescriptlang.org/) - main language
+-   [Node.js](https://nodejs.org/en/) - runtime for backend & tooling
+-   [nest](https://nestjs.com/) - Node.js REST framework
+-   [pino](http://getpino.io/) - super fast, all natural json logger
+-   [Swagger](https://swagger.io/) - OpenAPI documentation
+-   [compodoc](https://compodoc.app/) - code documentation
+-   [React](https://reactjs.org/) - a JavaScript library for building user interfaces
+-   [Material-UI](https://material-ui.com) - React UI framework
+-   [Yarn](https://yarnpkg.com/lang/en/) - package management
+-   [Lerna](https://github.com/lerna/lerna) - tool for managing projects with multiple packages
+-   [Docker](https://www.docker.com/) - container platform
+-   [nginx](https://nginx.org) - reverse proxy for frontend
+-   [PostgreSQL](https://www.postgresql.org/) - relational DB
+-   [Prettier](https://prettier.io/) - opinionated code formatter
+-   [Husky](https://github.com/typicode/husky) - git hooks management
+-   [webpack](https://webpack.js.org/) - package bundler
+-   [logrotate](https://github.com/logrotate/logrotate) - tool for logs rotation
 
 ### Project structure
 
