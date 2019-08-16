@@ -45,7 +45,7 @@ services:
         networks:
             - magnit
         ports:
-            - ${BACKEND_PORT:-1337}:1337
+            - ${BACKEND_PORT:-1337}:${BACKEND_PORT:-1337}
         depends_on:
             - db
 
