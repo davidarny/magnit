@@ -5,7 +5,7 @@ module.exports = {
     username: process.env.POSTGRES_USER || "magnit",
     password: process.env.POSTGRES_PASSWORD || "magnit",
     database: process.env.POSTGRES_DB || "magnit",
-    logger: "advanced-console",
+    logger: "advanced-console", // custom file logger in production
     logging: process.env.NODE_ENV !== "testing",
     synchronize: true,
 };

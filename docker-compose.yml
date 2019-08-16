@@ -9,7 +9,8 @@ services:
         networks:
             - magnit
         environment:
-            REACT_APP_BACKEND_URL: http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
+            - NODE_ENV=production
+            - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
         depends_on:
             - backend
             - db
@@ -21,6 +22,7 @@ services:
             context: .
             dockerfile: Dockerfile.backend
         environment:
+            - NODE_ENV=production
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
             - GLOBAL_CONTROLLER_PREFIX=${GLOBAL_CONTROLLER_PREFIX:-v1}
@@ -35,6 +37,8 @@ services:
             - ${BACKEND_PORT:-1337}:1337
         depends_on:
             - db
+        volumes:
+            - ${BACKEND_LOGS_DIR}:/var/www/magnit/logs
 
     db:
         image: postgres:11-alpine

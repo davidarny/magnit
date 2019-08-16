@@ -10,7 +10,8 @@ services:
         command: npm run start
         restart: unless-stopped
         environment:
-            REACT_APP_BACKEND_URL: http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
+            - NODE_ENV=development
+            - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
         networks:
             - magnit
         depends_on:
@@ -27,6 +28,7 @@ services:
         working_dir: /devel/packages/backend
         command: npm run start:dev
         environment:
+            - NODE_ENV=development
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
             - GLOBAL_CONTROLLER_PREFIX=${GLOBAL_CONTROLLER_PREFIX:-v1}

@@ -16,12 +16,20 @@ RUN yarn build:backend && yarn docs:build
 # serve backend step
 FROM node:10-alpine AS serve
 
+RUN apk update && \
+    apk add logrotate
+
+COPY logrotate.txt /etc/logrotate.d/backend
+
 WORKDIR /var/www/magnit
 
 COPY --from=build /devel/packages/backend/dist dist
-COPY --from=build /devel/packages/backend/ormconfig.js ormconfig.js
 COPY --from=build /devel/packages/backend/docs docs
 COPY --from=build /devel/node_modules node_modules
 COPY --from=build /devel/packages/backend/node_modules node_modules
+COPY --from=build /devel/packages/backend/ormconfig.js ormconfig.js
+COPY --from=build /devel/packages/backend/package.json package.json
 
-ENTRYPOINT ["node", "dist/main.js"]
+RUN mkdir -p logs docs
+
+ENTRYPOINT ["yarn", "start:prod"]

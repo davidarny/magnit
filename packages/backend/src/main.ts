@@ -4,11 +4,31 @@ import * as compression from "compression";
 import { AppModule } from "./app.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
-import { existsSync, mkdirSync } from "fs";
+import { closeSync, existsSync, mkdirSync, openSync } from "fs";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+
+const development = process.env.NODE_ENV === "development";
+
+const pino = require("pino");
+const logger = pino({
+    prettyPrint: development && {
+        colorize: true,
+        translateTime: true,
+        levelFirst: true,
+    },
+});
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+    // logger
+    app.use(require("express-pino-logger")({ logger }));
+    const pathToLogs = join(__dirname, "..", "logs");
+    if (development && !existsSync(pathToLogs)) {
+        mkdirSync(pathToLogs);
+        closeSync(openSync(join(pathToLogs, "magnit.log"), "w"));
+        closeSync(openSync(join(pathToLogs, "ormlogs.log"), "w"));
+    }
 
     // controller prefix
     app.setGlobalPrefix(process.env.GLOBAL_CONTROLLER_PREFIX || "v1");
@@ -20,13 +40,14 @@ async function bootstrap() {
 
     // code docs
     const pathToDocs = join(__dirname, "..", "docs");
-    if (existsSync(pathToDocs)) {
-        app.useStaticAssets(pathToDocs);
+    if (development && !existsSync(pathToDocs)) {
+        mkdirSync(pathToDocs);
     }
+    app.useStaticAssets(pathToDocs);
 
     // static assets
     const pathToStatics = join(__dirname, "..", "public");
-    if (!existsSync(pathToStatics)) {
+    if (development && !existsSync(pathToStatics)) {
         mkdirSync(pathToStatics);
     }
     app.useStaticAssets(pathToStatics);
@@ -48,4 +69,20 @@ async function bootstrap() {
     await app.listen(process.env.BACKEND_PORT || 1337);
 }
 
-bootstrap().catch(console.error);
+process.on(
+    "uncaughtException",
+    pino.final(logger, (error, final) => {
+        final.error(error, "uncaughtException");
+        process.exit(1);
+    }),
+);
+
+process.on(
+    "unhandledRejection",
+    pino.final(logger, (err, final) => {
+        final.error(err, "unhandledRejection");
+        process.exit(1);
+    }),
+);
+
+bootstrap().catch(error => logger.error(error));
