@@ -4,17 +4,13 @@ import * as request from "supertest";
 import { NestApplication } from "@nestjs/core";
 import { Task } from "../src/modules/task/entities/task.entity";
 import { TaskService } from "../src/modules/task/services/task.service";
-import { PuzzleService } from "../src/shared/services/puzzle.service";
-import { SectionService } from "../src/shared/services/section.service";
-import { TemplateService } from "../src/shared/services/template.service";
+import { TemplateService } from "../src/modules/template/services/template.service";
 import { createMockFrom } from "../src/utils/create-mock.util";
 
 describe("TaskController (e2e)", () => {
     let app: NestApplication;
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
-    const puzzleService = createMockFrom(PuzzleService.prototype);
-    const sectionService = createMockFrom(SectionService.prototype);
     const task: Task = {
         id: 0,
         name: "task",
@@ -32,10 +28,6 @@ describe("TaskController (e2e)", () => {
             .useValue(taskService)
             .overrideProvider(TemplateService)
             .useValue(templateService)
-            .overrideProvider(PuzzleService)
-            .useValue(puzzleService)
-            .overrideProvider(SectionService)
-            .useValue(sectionService)
             .compile();
 
         app = moduleFixture.createNestApplication();

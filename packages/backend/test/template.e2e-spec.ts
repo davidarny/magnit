@@ -1,10 +1,8 @@
 import { AppModule } from "../src/app.module";
 import { Test } from "@nestjs/testing";
 import * as request from "supertest";
-import { TemplateService } from "../src/shared/services/template.service";
+import { TemplateService } from "../src/modules/template/services/template.service";
 import { NestApplication } from "@nestjs/core";
-import { PuzzleService } from "../src/shared/services/puzzle.service";
-import { SectionService } from "../src/shared/services/section.service";
 import { createMockFrom } from "../src/utils/create-mock.util";
 
 const payload = require("../src/modules/template/test/template.json");
@@ -12,18 +10,12 @@ const payload = require("../src/modules/template/test/template.json");
 describe("TemplateController (e2e)", () => {
     let app: NestApplication;
     const templateService = createMockFrom(TemplateService.prototype);
-    const puzzleService = createMockFrom(PuzzleService.prototype);
-    const sectionService = createMockFrom(SectionService.prototype);
 
     beforeEach(async () => {
         const imports = [AppModule];
         const moduleFixture = await Test.createTestingModule({ imports })
             .overrideProvider(TemplateService)
             .useValue(templateService)
-            .overrideProvider(PuzzleService)
-            .useValue(puzzleService)
-            .overrideProvider(SectionService)
-            .useValue(sectionService)
             .compile();
 
         app = moduleFixture.createNestApplication();
@@ -41,7 +33,7 @@ describe("TemplateController (e2e)", () => {
     });
 
     it("should create template", async () => {
-        jest.spyOn(templateService, "save").mockResolvedValue(payload);
+        jest.spyOn(templateService, "insert").mockResolvedValue(payload);
         return request(app.getHttpServer())
             .post("/v1/templates")
             .send({ template: payload })
@@ -94,7 +86,7 @@ describe("TemplateController (e2e)", () => {
 
     it("should update template", async () => {
         jest.spyOn(templateService, "findById").mockResolvedValue(payload);
-        jest.spyOn(templateService, "save").mockResolvedValue(payload);
+        jest.spyOn(templateService, "update").mockResolvedValue(payload);
         return request(app.getHttpServer())
             .put("/v1/templates/0")
             .send({ template: payload })

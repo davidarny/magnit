@@ -4,12 +4,10 @@ import {
     DeepPartial,
     Entity,
     ManyToMany,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Section } from "./section.entity";
-import { Task } from "../../modules/task/entities/task.entity";
+import { Task } from "../../task/entities/task.entity";
 
 export type TTemplateType = "light" | "complex";
 
@@ -32,8 +30,8 @@ export class Template {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @OneToMany(() => Section, section => section.template, { cascade: true })
-    sections: Section[];
+    @Column({ type: "json", nullable: true })
+    sections: object;
 
     @ManyToMany(() => Task, task => task.templates)
     tasks: Task[];

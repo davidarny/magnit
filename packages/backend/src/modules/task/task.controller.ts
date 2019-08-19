@@ -7,18 +7,12 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { Template } from "../../shared/entities/template.entity";
-import { IAssemblerService } from "../../shared/interfaces/assembler.service.interface";
-import { IPuzzleService } from "../../shared/interfaces/puzzle.service.interface";
-import { ISectionService } from "../../shared/interfaces/section.service.interface";
-import { ITaskService } from "../../shared/interfaces/task.service.interface";
-import { ITemplateService } from "../../shared/interfaces/template.service.interface";
+import { Template } from "../template/entities/template.entity";
+import { ITaskService } from "./interfaces/task.service.interface";
+import { ITemplateService } from "../template/interfaces/template.service.interface";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { PuzzleAssemblerService } from "../../shared/services/puzzle-assembler.service";
-import { PuzzleService } from "../../shared/services/puzzle.service";
-import { SectionService } from "../../shared/services/section.service";
-import { TemplateService } from "../../shared/services/template.service";
+import { TemplateService } from "../template/services/template.service";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
 import { TaskDto } from "./dto/task.dto";
@@ -40,9 +34,6 @@ export class TaskController {
     constructor(
         @Inject(TaskService) private readonly taskService: ITaskService,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
-        @Inject(PuzzleService) private readonly puzzleService: IPuzzleService,
-        @Inject(SectionService) private readonly sectionService: ISectionService,
-        @Inject(PuzzleAssemblerService) private readonly assemblerService: IAssemblerService,
     ) {}
 
     @Get("/")
@@ -125,12 +116,6 @@ export class TaskController {
     async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
         const task = await this.taskService.findById(id);
         const templates = await this.templateService.findByTaskId(task.id.toString());
-        const assembledTemplates = await Promise.all(
-            templates.map(async template => {
-                await this.assemblerService.assemble(template);
-                return template;
-            }),
-        );
-        return { success: 1, task: { ...task, templates: assembledTemplates } };
+        return { success: 1, task: { ...task, templates } };
     }
 }

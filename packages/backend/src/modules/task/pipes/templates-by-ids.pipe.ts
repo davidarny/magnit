@@ -1,5 +1,5 @@
 import { ArgumentMetadata, Inject, NotFoundException, PipeTransform } from "@nestjs/common";
-import { TemplateService } from "../../../shared/services/template.service";
+import { TemplateService } from "../../template/services/template.service";
 
 export class TemplatesByIdsPipe implements PipeTransform<number[], Promise<number[]>> {
     constructor(@Inject(TemplateService) private readonly templateService: TemplateService) {}

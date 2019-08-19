@@ -1,4 +1,3 @@
-import { TActionType, TConditionType } from "../../../shared/entities/condition.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
 export class ConditionDto {
@@ -10,6 +9,6 @@ export class ConditionDto {
     @ApiModelProperty({
         enum: ["chosen_answer", "given_answer", "equal", "not_equal", "more_than", "less_than"],
     })
-    readonly action_type: TActionType;
-    @ApiModelProperty({ enum: ["or", "and"] }) readonly condition_type: TConditionType;
+    readonly action_type: string;
+    @ApiModelProperty({ enum: ["or", "and"] }) readonly condition_type: string;
 }

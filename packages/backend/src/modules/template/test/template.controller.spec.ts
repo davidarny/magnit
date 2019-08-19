@@ -1,18 +1,13 @@
 import { createMockFrom } from "../../../utils/create-mock.util";
 import { TemplateController } from "../template.controller";
 import { Test } from "@nestjs/testing";
-import { TemplateService } from "../../../shared/services/template.service";
-import { SectionService } from "../../../shared/services/section.service";
-import { PuzzleService } from "../../../shared/services/puzzle.service";
-import { PuzzleAssemblerService } from "../../../shared/services/puzzle-assembler.service";
+import { TemplateService } from "../services/template.service";
 
 const payload = require("./template.json");
 
 describe("TemplateController", () => {
     let templateController: TemplateController;
     const templateService = createMockFrom(TemplateService.prototype);
-    const sectionService = createMockFrom(SectionService.prototype);
-    const puzzleService = createMockFrom(PuzzleService.prototype);
 
     beforeEach(async () => {
         const providers = [
@@ -20,15 +15,6 @@ describe("TemplateController", () => {
                 provide: TemplateService,
                 useValue: templateService,
             },
-            {
-                provide: SectionService,
-                useValue: sectionService,
-            },
-            {
-                provide: PuzzleService,
-                useValue: puzzleService,
-            },
-            PuzzleAssemblerService,
         ];
         const controllers = [TemplateController];
         const app = await Test.createTestingModule({ providers, controllers }).compile();
@@ -44,7 +30,7 @@ describe("TemplateController", () => {
 
     it("should create template", async () => {
         const result = { success: 1, template_id: 0 };
-        jest.spyOn(templateService, "save").mockResolvedValue(payload);
+        jest.spyOn(templateService, "insert").mockResolvedValue(payload);
         expect(await templateController.create(payload)).toStrictEqual(result);
     });
 

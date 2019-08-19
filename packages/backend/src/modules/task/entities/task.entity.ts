@@ -9,7 +9,7 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Template } from "../../../shared/entities/template.entity";
+import { Template } from "../../template/entities/template.entity";
 
 export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
 

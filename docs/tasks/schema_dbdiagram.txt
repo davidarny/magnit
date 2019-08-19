@@ -18,5 +18,14 @@ Table task_document {
 Table template {
  id int [pk]
  title varchar
+ description varchar
+ sections json
+ created_at datetime
+ updated_at datetime
  type template_type
+}
+
+enum template_type {
+  light
+  complex
 }
