@@ -1,22 +1,15 @@
-import { PuzzleServiceMock } from "../../../shared/mocks/puzzle.service.mock";
-import { SectionServiceMock } from "../../../shared/mocks/section.service.mock";
-import { PuzzleService } from "../../../shared/services/puzzle.service";
-import { SectionService } from "../../../shared/services/section.service";
 import { TaskController } from "../task.controller";
 import { TaskService } from "../services/task.service";
-import { TaskServiceMock } from "../../../shared/mocks/task.service.mock";
+import { TaskServiceMock } from "../mocks/task.service.mock";
 import { Test } from "@nestjs/testing";
 import { TaskDto } from "../dto/task.dto";
 import { TemplateService } from "../../../shared/services/template.service";
 import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock";
-import { PuzzleAssemblerService } from "../../../shared/services/puzzle-assembler.service";
 
 describe("TaskController", () => {
     let taskController: TaskController;
     const taskService = new TaskServiceMock();
     const templateService = new TemplateServiceMock();
-    const sectionService = new SectionServiceMock();
-    const puzzleService = new PuzzleServiceMock();
     const payload: TaskDto = {
         id: 0,
         name: "task",
@@ -34,15 +27,6 @@ describe("TaskController", () => {
                 provide: TemplateService,
                 useValue: templateService,
             },
-            {
-                provide: SectionService,
-                useValue: sectionService,
-            },
-            {
-                provide: PuzzleService,
-                useValue: puzzleService,
-            },
-            PuzzleAssemblerService,
         ];
         const controllers = [TaskController];
         const app = await Test.createTestingModule({ providers, controllers }).compile();

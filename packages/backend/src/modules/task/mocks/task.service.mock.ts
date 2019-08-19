@@ -1,4 +1,4 @@
-import { Task, TTaskStatus } from "../../modules/task/entities/task.entity";
+import { Task, TTaskStatus } from "../entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 
 export class TaskServiceMock implements ITaskService {

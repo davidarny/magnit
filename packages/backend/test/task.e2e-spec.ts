@@ -2,13 +2,9 @@ import { AppModule } from "../src/app.module";
 import { Test } from "@nestjs/testing";
 import * as request from "supertest";
 import { NestApplication } from "@nestjs/core";
+import { TaskServiceMock } from "../src/modules/task/mocks/task.service.mock";
 import { TaskService } from "../src/modules/task/services/task.service";
-import { PuzzleServiceMock } from "../src/shared/mocks/puzzle.service.mock";
-import { SectionServiceMock } from "../src/shared/mocks/section.service.mock";
-import { TaskServiceMock } from "../src/shared/mocks/task.service.mock";
 import { TaskDto } from "../src/modules/task/dto/task.dto";
-import { PuzzleService } from "../src/shared/services/puzzle.service";
-import { SectionService } from "../src/shared/services/section.service";
 import { TemplateService } from "../src/shared/services/template.service";
 import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
 
@@ -16,8 +12,6 @@ describe("TaskController (e2e)", () => {
     let app: NestApplication;
     const taskService = new TaskServiceMock();
     const templateService = new TemplateServiceMock();
-    const puzzleService = new PuzzleServiceMock();
-    const sectionService = new SectionServiceMock();
     const payload: TaskDto = {
         id: 0,
         name: "task",
@@ -32,10 +26,6 @@ describe("TaskController (e2e)", () => {
             .useValue(taskService)
             .overrideProvider(TemplateService)
             .useValue(templateService)
-            .overrideProvider(PuzzleService)
-            .useValue(puzzleService)
-            .overrideProvider(SectionService)
-            .useValue(sectionService)
             .compile();
 
         app = moduleFixture.createNestApplication();

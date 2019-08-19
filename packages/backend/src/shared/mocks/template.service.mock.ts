@@ -10,7 +10,7 @@ export class TemplateServiceMock implements ITemplateService {
 
     async findByTaskId(id: string): Promise<any> {}
 
-    async save(template: Template): Promise<any> {
+    async insert(template: Template): Promise<any> {
         return template;
     }
 
@@ -24,4 +24,6 @@ export class TemplateServiceMock implements ITemplateService {
     }
 
     async deleteById(id: string) {}
+
+    async update(id: string, template: Template): Promise<any> {}
 }

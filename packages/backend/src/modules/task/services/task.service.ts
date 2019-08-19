@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Task, TTaskStatus } from "../entities/task.entity";
 import { FindManyOptions, In, Repository } from "typeorm";
-import { ITaskService } from "../../../shared/interfaces/task.service.interface";
+import { ITaskService } from "../interfaces/task.service.interface";
 
 @Injectable()
 export class TaskService implements ITaskService {

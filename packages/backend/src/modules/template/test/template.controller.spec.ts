@@ -1,20 +1,13 @@
 import { TemplateController } from "../template.controller";
 import { Test } from "@nestjs/testing";
 import { TemplateService } from "../../../shared/services/template.service";
-import { SectionService } from "../../../shared/services/section.service";
-import { PuzzleService } from "../../../shared/services/puzzle.service";
-import { SectionServiceMock } from "../../../shared/mocks/section.service.mock";
-import { PuzzleServiceMock } from "../../../shared/mocks/puzzle.service.mock";
 import { TemplateServiceMock } from "../../../shared/mocks/template.service.mock";
-import { PuzzleAssemblerService } from "../../../shared/services/puzzle-assembler.service";
 
 const payload = require("./template.json");
 
 describe("TemplateController", () => {
     let templateController: TemplateController;
     const templateService = new TemplateServiceMock();
-    const sectionService = new SectionServiceMock();
-    const puzzleService = new PuzzleServiceMock();
 
     beforeEach(async () => {
         const providers = [
@@ -22,15 +15,6 @@ describe("TemplateController", () => {
                 provide: TemplateService,
                 useValue: templateService,
             },
-            {
-                provide: SectionService,
-                useValue: sectionService,
-            },
-            {
-                provide: PuzzleService,
-                useValue: puzzleService,
-            },
-            PuzzleAssemblerService,
         ];
         const controllers = [TemplateController];
         const app = await Test.createTestingModule({ providers, controllers }).compile();

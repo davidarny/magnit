@@ -1,16 +1,19 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, Repository } from "typeorm";
+import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { FindManyOptions, Repository, Transaction, TransactionRepository } from "typeorm";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { Template } from "../entities/template.entity";
 import { ITemplateService } from "../interfaces/template.service.interface";
 
 @Injectable()
 export class TemplateService implements ITemplateService {
-    constructor(
-        @InjectRepository(Template) private readonly templateRepository: Repository<Template>,
-    ) {}
-
-    async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findAll(
+        offset?: number,
+        limit?: number,
+        sort?: "ASC" | "DESC",
+        title?: string,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
         const options: FindManyOptions<Template> = {};
         if (typeof offset !== "undefined") {
             options.skip = offset;
@@ -27,33 +30,96 @@ export class TemplateService implements ITemplateService {
             }
             Object.assign(options.where, { title });
         }
-        return this.templateRepository.find(options);
+        return templateRepository.find(options);
     }
 
-    async findOneOrFail(id: string) {
-        return this.templateRepository.findOneOrFail({ where: { id } });
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findOneOrFail(
+        id: string,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        return templateRepository.findOneOrFail({ where: { id } });
     }
 
-    async findByTaskId(id: string) {
-        return this.templateRepository
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findByTaskId(
+        id: string,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        return templateRepository
             .createQueryBuilder("template")
             .leftJoinAndSelect("template.tasks", "task")
             .where("task.id = :id", { id })
             .getMany();
     }
 
-    async save(template: Template, insert: boolean = true) {
-        if (insert) {
-            delete template.id;
+    @Transaction({ isolation: "READ COMMITTED" })
+    async insert(
+        template: Template,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        const response = await templateRepository.query(
+            `
+            INSERT INTO "template" ("title", "description", "json", "type", "created_at", "updated_at") 
+            VALUES ($1, $2, json_strip_nulls($3), $4, DEFAULT, DEFAULT)
+            RETURNING "id", "type", "created_at", "updated_at"
+        `,
+            [template.title, template.description, template.json, template.type],
+        );
+        if (Array.isArray(response) && response.length > 0) {
+            const inserted = response.pop();
+            if (inserted && inserted.id) {
+                return templateRepository.findOne({ id: inserted.id });
+            } else {
+                throw new InternalServerErrorException("Cannot save/update template");
+            }
+        } else {
+            throw new InternalServerErrorException("Cannot save/update template");
         }
-        return this.templateRepository.save(template);
     }
 
-    async findById(id: string) {
-        return this.templateRepository.findOne({ where: { id } });
+    @Transaction({ isolation: "READ COMMITTED" })
+    async update(
+        id: string,
+        template: Template,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        const builder = await templateRepository.createQueryBuilder("template").update();
+        const values: QueryDeepPartialEntity<Template> = {};
+        if (template.title || typeof template.title === "string") {
+            values.title = template.title;
+        }
+        if (template.description || typeof template.description === "string") {
+            values.description = template.description;
+        }
+        if (template.type) {
+            values.type = template.type;
+        }
+        if (template.json) {
+            values.json = template.json;
+        }
+        builder.set(values).where("id = :id", { id: Number(id) });
+        await builder.execute();
+        const result = await templateRepository.findOne({ id: Number(id) });
+        if (!result) {
+            throw new BadRequestException("Cannot update Template");
+        }
+        return result;
     }
 
-    async deleteById(id: string) {
-        await this.templateRepository.delete(id);
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findById(
+        id: string,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        return templateRepository.findOne({ where: { id } });
+    }
+
+    @Transaction({ isolation: "READ COMMITTED" })
+    async deleteById(
+        id: string,
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ) {
+        await templateRepository.delete(id);
     }
 }

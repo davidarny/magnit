@@ -3,29 +3,19 @@ import { Test } from "@nestjs/testing";
 import * as request from "supertest";
 import { TemplateService } from "../src/shared/services/template.service";
 import { NestApplication } from "@nestjs/core";
-import { PuzzleService } from "../src/shared/services/puzzle.service";
-import { SectionService } from "../src/shared/services/section.service";
 import { TemplateServiceMock } from "../src/shared/mocks/template.service.mock";
-import { PuzzleServiceMock } from "../src/shared/mocks/puzzle.service.mock";
-import { SectionServiceMock } from "../src/shared/mocks/section.service.mock";
 
 const payload = require("../src/modules/template/test/template.json");
 
 describe("TemplateController (e2e)", () => {
     let app: NestApplication;
     const templateService = new TemplateServiceMock();
-    const puzzleService = new PuzzleServiceMock();
-    const sectionService = new SectionServiceMock();
 
     beforeEach(async () => {
         const imports = [AppModule];
         const moduleFixture = await Test.createTestingModule({ imports })
             .overrideProvider(TemplateService)
             .useValue(templateService)
-            .overrideProvider(PuzzleService)
-            .useValue(puzzleService)
-            .overrideProvider(SectionService)
-            .useValue(sectionService)
             .compile();
 
         app = moduleFixture.createNestApplication();
