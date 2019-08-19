@@ -9,7 +9,7 @@ export function createMockFrom<T>(value: T): T {
 
     const filteredProps = props
         .sort()
-        .filter(prop => !excludedProps.includes(prop))
+        .filter(prop => prop !== "constructor" && !excludedProps.includes(prop))
         .filter(prop => typeof initialValue[prop] === "function");
 
     const result = {};
