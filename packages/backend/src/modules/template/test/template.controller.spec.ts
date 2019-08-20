@@ -34,13 +34,6 @@ describe("TemplateController", () => {
         expect(await templateController.create(payload)).toStrictEqual(result);
     });
 
-    it.skip("should return assembled template", async () => {
-        const result = { success: 1, template: payload };
-        const actual = await templateController.findById("0");
-        actual.template = JSON.parse(actual.template);
-        expect(actual).toStrictEqual(result);
-    });
-
     it("should delete template", async () => {
         const result = { success: 1 };
         expect(await templateController.deleteById("0")).toStrictEqual(result);

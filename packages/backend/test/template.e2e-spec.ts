@@ -41,17 +41,6 @@ describe("TemplateController (e2e)", () => {
             .expect({ success: 1, template_id: 0 });
     });
 
-    it.skip("should get created template", async () => {
-        return request(app.getHttpServer())
-            .get("/v1/templates/0")
-            .expect(200)
-            .then(res => {
-                const body = res.body;
-                body.template = JSON.parse(body.template);
-                expect(body).toStrictEqual({ success: 1, template: payload });
-            });
-    });
-
     it("should return 404 if template doesn't exist", async () => {
         jest.spyOn(templateService, "findById").mockResolvedValue(undefined);
         return request(app.getHttpServer())
