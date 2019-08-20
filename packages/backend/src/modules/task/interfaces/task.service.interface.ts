@@ -10,9 +10,11 @@ export interface ITaskService {
         name?: string,
     ): Promise<Task[]>;
 
-    save(task: Task, insert?: boolean): Promise<Task>;
+    insert(task: Task): Promise<Task>;
 
-    findById(id: string): Promise<Task>;
+    update(id: string, task: Task): Promise<Task>;
+
+    findById(id: string, relations?: string[]): Promise<Task>;
 
     deleteById(id: string): Promise<void>;
 }

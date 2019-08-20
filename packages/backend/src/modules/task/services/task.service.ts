@@ -47,18 +47,20 @@ export class TaskService implements ITaskService {
         return this.taskRepository.find(options);
     }
 
-    async save(task: Task, insert: boolean = true) {
-        if (insert) {
-            delete task.id;
-        }
+    async insert(task: Task) {
+        delete task.id;
         return this.taskRepository.save(task);
     }
 
-    async findById(id: string) {
-        return this.taskRepository.findOne({ where: { id } });
+    async findById(id: string, relations: string[] = []) {
+        return this.taskRepository.findOne({ where: { id }, relations });
     }
 
     async deleteById(id: string) {
         await this.taskRepository.delete(id);
+    }
+
+    update(id: string, task: Task): Promise<Task> {
+        return this.taskRepository.save({ ...task, id: Number(id) });
     }
 }
