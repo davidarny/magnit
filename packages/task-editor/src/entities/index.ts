@@ -13,7 +13,7 @@ export interface IBaseTask {
     id?: string;
     title: string;
     descriptions?: string;
-    status?: ETaskStatus;
+    status: ETaskStatus;
     updatedAt?: string;
     createdAt?: string;
 }

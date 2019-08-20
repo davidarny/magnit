@@ -3,6 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
+import { ETaskStatus } from "@magnit/services";
 import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
@@ -26,6 +27,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         title: "",
         id: uuid(),
         templates: [],
+        status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
