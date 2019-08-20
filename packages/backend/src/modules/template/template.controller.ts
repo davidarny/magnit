@@ -37,7 +37,6 @@ export class TemplateController {
     @ApiCreatedResponse({ type: CreateTemplateResponse, description: "ID of created Template" })
     async create(@Body("template") templateDto: TemplateDto) {
         const template = new Template(templateDto);
-        template.sections = templateDto.sections || [];
         const saved = await this.templateService.insert(template);
         return { success: 1, template_id: saved.id };
     }
@@ -51,7 +50,6 @@ export class TemplateController {
         @Body("template") templateDto: TemplateDto,
     ) {
         const template = new Template(templateDto);
-        template.sections = templateDto.sections ? templateDto.sections : undefined;
         const saved = await this.templateService.update(id, template);
         return { success: 1, template_id: saved.id };
     }
@@ -61,10 +59,7 @@ export class TemplateController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
-        return {
-            success: 1,
-            template: JSON.stringify({ ...template, ...template.sections }),
-        };
+        return { success: 1, template: JSON.stringify(template) };
     }
 
     @Delete("/:id")
