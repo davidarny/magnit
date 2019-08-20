@@ -18,7 +18,7 @@ interface IGetTemplate {
 }
 
 interface ITaskEditorProps {
-    task?: ITask;
+    initialState?: ITask;
     templates: Omit<IDocument, "__uuid">[];
     variant: "create" | "view";
 
@@ -29,7 +29,7 @@ interface ITaskEditorProps {
 
 export const TaskEditor: React.FC<ITaskEditorProps> = props => {
     const [task, setTask] = useState<ITask>(
-        props.task || {
+        props.initialState || {
             id: uuid(),
             stage: {
                 title: ETerminals.EMPTY,
@@ -79,7 +79,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
         }
     }, []);
 
-    const templates = _.get(props.task, "templates", []) as string[];
+    const templates = _.get(props.initialState, "templates", []) as string[];
     useEffect(() => {
         if (props.variant !== "view" || !props.getTemplate) {
             return;
@@ -139,6 +139,14 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
             props.onTaskChange(_.cloneDeep(task));
         }
     }, [task]);
+
+    const { initialState } = props;
+    useEffect(() => {
+        if (!_.isEqual(task, initialState) && initialState) {
+            setTask(initialState);
+            setFocusedPuzzleChain([initialState.id]);
+        }
+    }, [initialState]);
 
     function onTemplateChange(uuid: string, event: TChangeEvent): void {
         const { templates } = props;

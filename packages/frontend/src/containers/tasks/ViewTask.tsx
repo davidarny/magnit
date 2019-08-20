@@ -63,7 +63,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 })}
             >
                 <TaskEditor
-                    task={
+                    initialState={
                         ({
                             ...task,
                             templates: (task.templates || []).map(_.toString),
