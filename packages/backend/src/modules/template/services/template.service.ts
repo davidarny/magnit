@@ -57,8 +57,9 @@ export class TemplateService implements ITemplateService {
                 "template"."created_at",
                 "template"."updated_at",
                 "task_to_template"."editable"
-            FROM "template"
-            LEFT JOIN "task_to_template" ON "task_to_template"."id_task" = $1
+            FROM "task_to_template"
+            LEFT JOIN "template" ON "template"."id" = "task_to_template"."id_template"
+            WHERE "task_to_template"."id_task" = $1
         `,
             [id],
         );
@@ -74,7 +75,7 @@ export class TemplateService implements ITemplateService {
             INSERT INTO
             "template" ("title", "description", "sections", "type", "created_at", "updated_at")
             VALUES
-            ($1, $2, json_strip_nulls(json_array_elements($3)), $4, DEFAULT, DEFAULT)
+            ($1, $2, jsonb_strip_nulls($3), $4, DEFAULT, DEFAULT)
             RETURNING "id", "type", "created_at", "updated_at"
         `,
             [
