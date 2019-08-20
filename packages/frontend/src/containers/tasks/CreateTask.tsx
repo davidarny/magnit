@@ -3,6 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
+import { ETaskStatus } from "@magnit/services";
 import { ITask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -28,6 +29,7 @@ export const CreateTask: React.FC = () => {
         title: "",
         id: uuid(),
         templates: [],
+        status: ETaskStatus.DRAFT,
     });
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState(false); // success/error snackbar state
