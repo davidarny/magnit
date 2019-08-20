@@ -1,16 +1,10 @@
-import { IResponse, ICourier } from "services/api";
 import { ETaskStatus } from "@magnit/services";
+import { IBaseTask } from "@magnit/task-editor";
+import { ICourier, IResponse } from "services/api";
 
 export interface IGetTasksResponse extends IResponse {
     total: number;
-    tasks: Array<{
-        id: number;
-        name: string;
-        status: ETaskStatus;
-        descriptions: string;
-        updatedAt: string;
-        createdAt: string;
-    }>;
+    tasks: IBaseTask[];
 }
 
 export async function getTasks(courier: ICourier, status?: ETaskStatus) {

@@ -1,21 +1,8 @@
-import { ITemplate } from "@magnit/template-editor";
-import { IResponse, ICourier } from "services/api";
-import { ETaskStatus } from "@magnit/services";
-
-interface IEditableTemplate extends ITemplate {
-    editable: boolean;
-}
+import { IExtendedTask } from "@magnit/task-editor";
+import { ICourier, IResponse } from "services/api";
 
 export interface IGetTaskExtendedResponse extends IResponse {
-    task: {
-        id: number;
-        name: string;
-        status: ETaskStatus;
-        descriptions: string;
-        templates: IEditableTemplate[];
-        updatedAt: string;
-        createdAt: string;
-    };
+    task: IExtendedTask;
 }
 
 export async function getTaskExtended(courier: ICourier, id: number) {
