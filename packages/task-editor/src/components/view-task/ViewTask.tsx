@@ -1,33 +1,43 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import * as React from "react";
-import { useState } from "react";
-import { Dialog, Grid, MenuItem, Typography } from "@material-ui/core";
 import {
     Button,
     ButtonLikeText,
+    Checkbox,
     DateField,
     SelectableBlockWrapper,
     SelectField,
     StepperWrapper,
 } from "@magnit/components";
-import { ETaskStatus, IEditorService } from "@magnit/services";
-import { IDocument, IStep, ITask } from "entities";
-import _ from "lodash";
-import { TemplateRenderer } from "components/renderers";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
+import { ETaskStatus, IEditorService } from "@magnit/services";
+import {
+    Dialog,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    MenuItem,
+    Typography,
+} from "@material-ui/core";
+import { TemplateRenderer } from "components/renderers";
+import { IDocument, IExtendedTask, IStep, TChangeEvent } from "entities";
+import _ from "lodash";
+import * as React from "react";
+import { useState } from "react";
 import uuid from "uuid/v4";
+import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
 
 interface IViewTaskProps {
-    task: ITask;
+    task: Partial<IExtendedTask>;
     service: IEditorService;
     documents: IDocument[];
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
     onAssigneeChange?(userId: string): void;
+
+    onEditableChange(documentId: string, editable: boolean): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
@@ -96,6 +106,10 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }
 
+    function onEditableChange(documentId: string, editable: boolean) {
+        props.onEditableChange(documentId, editable);
+    }
+
     return (
         <React.Fragment>
             <Dialog
@@ -159,8 +173,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     padding: theme.spacing(3),
                     zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, task.id)}
-                onMouseDown={service.onPuzzleFocus.bind(service, task.id)}
+                onFocus={service.onPuzzleFocus.bind(service, task.id || "")}
+                onMouseDown={service.onPuzzleFocus.bind(service, task.id || "")}
                 focused={focusedPuzzleId === task.id}
                 id={task.id}
             >
@@ -255,36 +269,77 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
-            {documents.length > 0 &&
-                documents.map(document => {
-                    const snapshot = templateSnapshots.get(document.id.toString());
-                    const focused = focusedPuzzleId === document.__uuid;
-                    return (
-                        <SelectableBlockWrapper
-                            key={document.__uuid}
-                            onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
-                            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
-                            css={theme => ({
-                                padding: theme.spacing(3),
-                                zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
-                            })}
-                            focused={focused}
-                            id={document.__uuid}
-                        >
-                            <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                                <Grid item xs={12}>
-                                    <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                                        {_.get(snapshot, "title")}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    {focused && <TemplateRenderer template={snapshot} />}
-                                </Grid>
-                            </Grid>
-                        </SelectableBlockWrapper>
-                    );
-                })}
+            {documents.map(document => (
+                <TaskDocument
+                    key={document.__uuid}
+                    document={document}
+                    service={service}
+                    templateSnapshots={templateSnapshots}
+                    focusedPuzzleId={focusedPuzzleId}
+                    onEditableChange={onEditableChange}
+                />
+            ))}
         </React.Fragment>
+    );
+};
+
+interface ITaskDocumentProps {
+    document: IDocument;
+    service: IEditorService;
+    focusedPuzzleId?: string;
+    templateSnapshots: Map<string, object>;
+
+    onEditableChange(documentId: string, editable: boolean): void;
+}
+
+const TaskDocument: React.FC<ITaskDocumentProps> = props => {
+    const { templateSnapshots, focusedPuzzleId, service, document } = props;
+
+    const snapshot = templateSnapshots.get(document.id.toString());
+    const focused = focusedPuzzleId === document.__uuid;
+
+    function onEditableChange(event: TChangeEvent, checked: boolean) {
+        props.onEditableChange(document.id, checked);
+    }
+
+    return (
+        <SelectableBlockWrapper
+            onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
+            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
+            css={theme => ({
+                padding: theme.spacing(3),
+                zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
+            })}
+            focused={focused}
+            id={document.__uuid}
+        >
+            <Grid container css={theme => ({ padding: theme.spacing(4) })}>
+                <Grid item xs={9}>
+                    <Typography css={theme => ({ fontSize: theme.fontSize.xLarge })}>
+                        {_.get(snapshot, "title")}
+                    </Typography>
+                </Grid>
+                <Grid item xs={3}>
+                    <Grid container justify="center" alignItems="flex-end">
+                        <FormControl>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={document.editable}
+                                        css={theme => ({ marginRight: theme.spacing() })}
+                                        onChange={onEditableChange}
+                                    />
+                                }
+                                label="Разрешить редактирование"
+                            />
+                        </FormControl>
+                    </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                    {focused && <TemplateRenderer template={snapshot} />}
+                </Grid>
+            </Grid>
+        </SelectableBlockWrapper>
     );
 };
 

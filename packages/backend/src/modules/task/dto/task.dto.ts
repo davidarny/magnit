@@ -4,7 +4,7 @@ import { TTaskStatus } from "../entities/task.entity";
 
 export class TaskDto {
     @ApiModelProperty() readonly id: number;
-    @ApiModelProperty() readonly name: string;
+    @ApiModelProperty() readonly title: string;
     @ApiModelProperty() readonly description: string;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed"] })
     readonly status: TTaskStatus;

@@ -20,5 +20,5 @@ export class FindAllQuery {
             ' Not compatible with "status".',
     })
     readonly statuses?: TTaskStatus[];
-    @ApiModelPropertyOptional({ description: "Query by name" }) readonly name?: string;
+    @ApiModelPropertyOptional({ description: "Query by title" }) readonly title?: string;
 }

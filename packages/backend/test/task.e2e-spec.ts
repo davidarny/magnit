@@ -13,7 +13,7 @@ describe("TaskController (e2e)", () => {
     const templateService = createMockFrom(TemplateService.prototype);
     const task: Task = {
         id: 0,
-        name: "task",
+        title: "task",
         description: "task",
         status: "in_progress",
         task_to_template: [],

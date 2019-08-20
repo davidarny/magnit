@@ -1,9 +1,6 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IDocument, ITask, TChangeEvent } from "entities";
-import { getFriendlyDate, IEditorService } from "@magnit/services";
-import * as React from "react";
 import {
     ButtonLikeText,
     DateField,
@@ -11,14 +8,17 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
+import { IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
-import { TaskFieldContainer } from "components/task-field-container";
-import _ from "lodash";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
+import { TaskFieldContainer } from "components/task-field-container";
+import { IDocument, ITask, TChangeEvent } from "entities";
+import _ from "lodash";
+import * as React from "react";
 
 interface ICreateTaskProps {
-    task: ITask;
+    task: Partial<ITask>;
     service: IEditorService;
     templates: Omit<IDocument, "__uuid">[];
     documents: IDocument[];
@@ -30,6 +30,7 @@ interface ICreateTaskProps {
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
+
     return (
         <React.Fragment>
             <SelectableBlockWrapper
@@ -37,8 +38,8 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     padding: theme.spacing(3),
                     zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, task.id)}
-                onMouseDown={service.onPuzzleFocus.bind(service, task.id)}
+                onFocus={service.onPuzzleFocus.bind(service, task.id || "")}
+                onMouseDown={service.onPuzzleFocus.bind(service, task.id || "")}
                 focused={focusedPuzzleId === task.id}
                 id={task.id}
             >
@@ -58,19 +59,10 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     <TaskFieldContainer label="Этап задания">
                         <Grid container direction="row" alignItems="flex-end" spacing={2}>
                             <Grid item xs>
-                                <InputField
-                                    placeholder="Введите название этапа"
-                                    value={task.stage.title}
-                                    fullWidth
-                                />
+                                <InputField placeholder="Введите название этапа" fullWidth />
                             </Grid>
                             <Grid item>
-                                <DateField
-                                    value={
-                                        task.stage.until ? getFriendlyDate(task.stage.until) : ""
-                                    }
-                                    placeholder="Срок выполнения"
-                                />
+                                <DateField placeholder="Срок выполнения" />
                             </Grid>
                         </Grid>
                     </TaskFieldContainer>
@@ -120,7 +112,7 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                         focused={focusedPuzzleId === document.__uuid}
                         id={document.__uuid}
                     >
-                        <Grid item xs={3}>
+                        <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
                             <SelectField
                                 placeholder="Выбрать шаблон"
                                 value={document.id}

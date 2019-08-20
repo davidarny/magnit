@@ -1,29 +1,34 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { SectionLayout } from "components/section-layout";
-import { SectionTitle } from "components/section-title";
-import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
 import { ITask, TaskEditor } from "@magnit/task-editor";
-import { AppContext } from "context";
-import { addTemplatesToTask, createTask, getTemplate, getTemplates } from "services/api";
-import _ from "lodash";
+import { ITemplate } from "@magnit/template-editor";
+import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
+import { AppContext } from "context";
+import _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
+import { addTaskToTemplate, createTask, getTemplate, getTemplates } from "services/api";
+import uuid from "uuid/v4";
 
-interface IShortTemplate {
-    id: string;
-    title: string;
+interface IEditableTemplate extends ITemplate {
+    editable: boolean;
 }
 
 export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
-    const [templates, setTemplates] = useState<IShortTemplate[]>([]);
-    const [task, setTask] = useState<Partial<ITask>>({});
+    const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+    const [task, setTask] = useState<ITask>({
+        title: "",
+        id: uuid(),
+        templates: [],
+    });
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
@@ -36,7 +41,16 @@ export const CreateTask: React.FC = () => {
                     id: template.id.toString(),
                 }));
             })
-            .then(templates => setTemplates(templates))
+            .then(templates => {
+                return Promise.all(
+                    templates.map(template => getTemplate(context.courier, Number(template.id))),
+                );
+            })
+            .then(responses => {
+                const buffer: any[] = [];
+                responses.forEach(response => buffer.push(response.template));
+                setTemplates([...buffer]);
+            })
             .catch(console.error);
     }, [context.courier]);
 
@@ -52,20 +66,24 @@ export const CreateTask: React.FC = () => {
         setTimeout(() => setError(false), 100);
     }
 
-    function getTemplateHandler(id: string) {
-        return getTemplate(context.courier, _.toNumber(id));
-    }
+    function onTaskChange(task: Partial<ITask>): void {
+        const isValidTask = (value: object): value is ITask =>
+            _.has(value, "id") && _.has(value, "title") && _.has(value, "templates");
 
-    function onTaskChange(task: ITask): void {
-        setTask({ ...task });
+        if (isValidTask(task)) {
+            setTask({ ...task });
+        }
     }
 
     function onTaskSave(): void {
-        createTask(context.courier, task)
-            .then(response => {
-                return addTemplatesToTask(
+        createTask(context.courier, _.omit(task, ["id", "templates"]))
+            .then(async response => {
+                if (!response.taskId) {
+                    return;
+                }
+                await addTaskToTemplate(
                     context.courier,
-                    _.toNumber(response.taskId),
+                    Number(response.taskId),
                     (task.templates || []).map(_.toNumber),
                 );
             })
@@ -102,10 +120,10 @@ export const CreateTask: React.FC = () => {
                     pointerEvents: open ? "none" : "initial",
                 })}
             >
-                <TaskEditor
+                <TaskEditor<ITask>
                     variant="create"
+                    initialState={task}
                     templates={templates}
-                    getTemplate={getTemplateHandler}
                     onTaskChange={onTaskChange}
                 />
             </Grid>

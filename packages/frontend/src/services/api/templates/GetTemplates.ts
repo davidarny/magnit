@@ -9,6 +9,7 @@ interface IGetTemplatesResponse extends IResponse {
         assigned: boolean;
         createdAt: string;
         updatedAt: string;
+        editable: boolean;
     }>;
 }
 

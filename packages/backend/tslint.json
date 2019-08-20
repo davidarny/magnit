@@ -18,6 +18,7 @@
         "no-console": [true, "log"],
         "ban-types": false,
         "no-var-requires": false,
-        "no-empty": false
+        "no-empty": false,
+        "max-classes-per-file": false
     }
 }
