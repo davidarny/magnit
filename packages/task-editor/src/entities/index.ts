@@ -1,3 +1,4 @@
+import { ETaskStatus } from "@magnit/services";
 import * as React from "react";
 
 export interface IStep {
@@ -11,24 +12,25 @@ export interface IStep {
 export interface ITask {
     id: string;
     title: string;
-    stage: {
-        title: string;
-        until: Date | null;
-    };
-    location: {
-        region: string;
-        branch: string;
-        format: string;
-        address: string;
-    };
-    assignee: string;
+    descriptions: string;
+    status: ETaskStatus;
+    updatedAt: string;
+    createdAt: string;
+}
+
+export interface ITaskWithTemplates extends ITask {
     templates: string[];
 }
 
 export interface IDocument {
     id: string;
     title: string;
+    editable: boolean;
     __uuid: string; // need for correct rendering
+}
+
+export interface IExtendedTask extends ITask {
+    templates: Array<Omit<IDocument, "__uuid">>;
 }
 
 interface TChangeParam {

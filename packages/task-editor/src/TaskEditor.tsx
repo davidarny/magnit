@@ -1,61 +1,50 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import { EditorToolbar } from "@magnit/components";
 import { jsx } from "@emotion/core";
+import { EditorToolbar } from "@magnit/components";
 import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
-import _ from "lodash";
 import { EEditorType, ETerminals, getEditorService } from "@magnit/services";
+import _ from "lodash";
+import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
-import { IDocument, ITask, TChangeEvent } from "./entities";
-import { ViewTask } from "./components/view-task";
 import { CreateTask } from "./components/create-task";
+import { ViewTask } from "./components/view-task";
+import { IDocument, ITask, TChangeEvent } from "./entities";
 
-interface IGetTemplate {
-    template: object;
-}
-
-interface ITaskEditorProps {
-    initialState?: ITask;
+interface ITaskEditorProps<T extends ITask> {
+    initialState?: T;
     templates: Omit<IDocument, "__uuid">[];
     variant: "create" | "view";
 
-    getTemplate?(id: string): Promise<IGetTemplate>;
-
-    onTaskChange?(task: ITask): void;
+    onTaskChange?(task: Partial<T>): void;
 }
 
-export const TaskEditor: React.FC<ITaskEditorProps> = props => {
-    const [task, setTask] = useState<ITask>(
-        props.initialState || {
-            id: uuid(),
-            stage: {
-                title: ETerminals.EMPTY,
-                until: null,
-            },
-            title: ETerminals.EMPTY,
-            assignee: ETerminals.EMPTY,
-            location: {
-                region: ETerminals.EMPTY,
-                address: ETerminals.EMPTY,
-                branch: ETerminals.EMPTY,
-                format: ETerminals.EMPTY,
-            },
-            templates: [],
-        },
-    );
+export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
+    const { templates, initialState, variant, onTaskChange } = props;
+
+    const defaultState = ({
+        id: uuid(),
+        title: ETerminals.EMPTY,
+        descriptions: ETerminals.EMPTY,
+    } as unknown) as Partial<T>;
+
+    const [task, setTask] = useState<Partial<T>>(initialState || defaultState);
     const [documents, setDocuments] = useState<IDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([task.id]);
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([task.id || ""]);
+
     const service = useRef(
         getEditorService(EEditorType.TASK, [
             [focusedPuzzleChain, setFocusedPuzzleChain],
             [toolbarTopPosition, setToolbarTopPosition],
         ]),
     );
+
+    const hasTemplates = (value: object): value is { templates: IDocument[] } =>
+        _.has(value, "templates");
 
     // set toolbar offset top
     useEffect(() => {
@@ -65,46 +54,37 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
     // if no templates present (initially)
     // we add one stub document
     useEffect(() => {
-        if (props.variant !== "create") {
+        if (variant !== "create") {
             return;
         }
-        if (_.isEmpty(task.templates)) {
+        if (hasTemplates(task) && _.isEmpty(task.templates)) {
             setDocuments([
                 {
                     title: ETerminals.EMPTY,
                     id: ETerminals.EMPTY,
+                    editable: false,
                     __uuid: uuid(),
                 },
             ]);
         }
-    }, []);
+    }, [variant, task]);
 
-    const templates = _.get(props.initialState, "templates", []) as string[];
     useEffect(() => {
-        if (props.variant !== "view" || !props.getTemplate) {
+        if (variant !== "view") {
             return;
         }
-        Promise.all(
-            templates.map(async id =>
-                props.getTemplate!(id)
-                    .then(response => response.template)
-                    .then(template => {
-                        templateSnapshots.set(id, template);
-                        setTemplateSnapshots(new Map(templateSnapshots));
-                        return template;
-                    })
-                    .then(template => ({
-                        id: _.get(template, "id"),
-                        title: _.get(template, "title"),
-                        __uuid: uuid(),
-                    })),
-            ),
-        )
-            .then(documents => setDocuments(([...documents] as unknown) as IDocument[]))
-            .catch(console.error);
-    }, [templates]);
-
-    const focusedPuzzleId = _.head(focusedPuzzleChain);
+        const documents = templates.map(template => {
+            templateSnapshots.set(template.id.toString(), template);
+            return {
+                id: _.get(template, "id"),
+                title: _.get(template, "title"),
+                editable: _.get(template, "editable", false),
+                __uuid: uuid(),
+            };
+        });
+        setTemplateSnapshots(new Map(templateSnapshots));
+        setDocuments([...documents]);
+    }, [templates, variant]);
 
     // on every documents change we have to
     // update current task with their id's
@@ -119,32 +99,39 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
         });
         if (documents.some(document => document.__uuid === focusedPuzzleId)) {
             const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
-            if (props.getTemplate && documentId) {
-                props
-                    .getTemplate(documentId)
-                    .then(response => response.template)
-                    .then(template => {
-                        templateSnapshots.set(documentId, template);
-                        setTemplateSnapshots(new Map(templateSnapshots));
-                    });
+            if (documentId) {
+                const template = templates.find(template => template.id === documentId);
+                if (template) {
+                    templateSnapshots.set(documentId, template);
+                    setTemplateSnapshots(new Map(templateSnapshots));
+                }
             }
         }
     }, [documents]);
 
+    const prevTask = useRef(_.cloneDeep(task));
     useEffect(() => {
-        if (props.variant !== "create") {
-            return;
+        if (onTaskChange) {
+            if (hasTemplates(task)) {
+                task.templates = task.templates.map(template => {
+                    const document = documents.find(document => document.id === template.id);
+                    if (!document) {
+                        return template;
+                    }
+                    return { ...template, ..._.omit(document, "__uuid") };
+                });
+            }
+            if (!_.isEqual(prevTask.current, task)) {
+                prevTask.current = task;
+                onTaskChange({ ...task });
+            }
         }
-        if (props.onTaskChange) {
-            props.onTaskChange(_.cloneDeep(task));
-        }
-    }, [task]);
+    }, [task, documents, variant, onTaskChange]);
 
-    const { initialState } = props;
     useEffect(() => {
         if (!_.isEqual(task, initialState) && initialState) {
             setTask(initialState);
-            setFocusedPuzzleChain([initialState.id]);
+            setFocusedPuzzleChain([initialState.id || ""]);
         }
     }, [initialState]);
 
@@ -160,14 +147,29 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
         }
     }
 
+    function onEditableChange(documentId: string, editable: boolean) {
+        if (documents.some(document => document.id === documentId)) {
+            const documentIndex = documents.findIndex(document => document.id === documentId);
+            documents[documentIndex].editable = editable;
+            setDocuments([...documents]);
+        }
+    }
+
     function onAddDocument(): void {
         setDocuments([
             ...documents,
-            { id: ETerminals.EMPTY, __uuid: uuid(), title: ETerminals.EMPTY },
+            {
+                id: ETerminals.EMPTY,
+                __uuid: uuid(),
+                title: ETerminals.EMPTY,
+                editable: false,
+            },
         ]);
     }
 
-    function onDeleteDocument(): void {
+    const focusedPuzzleId = _.head(focusedPuzzleChain);
+
+    const onDeleteDocument = useCallback(() => {
         // do not to delete document if only one exists
         if (documents.length === 1) {
             return;
@@ -182,7 +184,9 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
             documents.splice(documentIndex, 1);
             setDocuments([...documents]);
         }
-    }
+    }, [focusedPuzzleChain]);
+
+    console.log(task);
 
     return (
         <React.Fragment>
@@ -224,6 +228,7 @@ export const TaskEditor: React.FC<ITaskEditorProps> = props => {
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
+                    onEditableChange={onEditableChange}
                 />
             )}
         </React.Fragment>
