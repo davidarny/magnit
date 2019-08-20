@@ -45,7 +45,7 @@ export class TemplateController {
     @Put("/:id")
     @ApiImplicitBody({ name: "template", type: TemplateDto, description: "Template JSON" })
     @ApiOkResponse({ type: UpdateTemplateResponse, description: "ID of updated Template" })
-    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async update(
         @Param("id", TemplateByIdPipe) id: string,
         @Body("template") templateDto: TemplateDto,
@@ -58,7 +58,7 @@ export class TemplateController {
 
     @Get("/:id")
     @ApiOkResponse({ type: GetTemplateResponse, description: "Stringified Template JSON" })
-    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async findById(@Param("id", TemplateByIdPipe) id: string) {
         const template = await this.templateService.findById(id);
         return {
@@ -69,7 +69,7 @@ export class TemplateController {
 
     @Delete("/:id")
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
-    @ApiNotFoundResponse({ type: ErrorResponse, description: "No Template with this ID found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async deleteById(@Param("id", TemplateByIdPipe) id: string) {
         await this.templateService.deleteById(id);
         return { success: 1 };

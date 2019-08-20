@@ -46,11 +46,22 @@ export class TemplateService implements ITemplateService {
         id: string,
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
     ) {
-        return templateRepository
-            .createQueryBuilder("template")
-            .leftJoinAndSelect("template.tasks", "task")
-            .where("task.id = :id", { id })
-            .getMany();
+        return templateRepository.query(
+            `
+            SELECT 
+                "template"."id",
+                "template"."title",
+                "template"."description",
+                "template"."sections",
+                "template"."type",
+                "template"."created_at",
+                "template"."updated_at",
+                "task_to_template"."editable"
+            FROM "template"
+            LEFT JOIN "task_to_template" ON "task_to_template"."id_task" = $1
+        `,
+            [id],
+        );
     }
 
     @Transaction({ isolation: "READ COMMITTED" })

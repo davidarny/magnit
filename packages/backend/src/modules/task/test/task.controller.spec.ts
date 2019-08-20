@@ -15,14 +15,14 @@ describe("TaskController", () => {
         name: "task",
         description: "task",
         status: "in_progress",
-        templates: [],
+        task_to_template: [],
         updated_at: Date.now(),
         created_at: Date.now(),
     };
     const template: Template = {
         id: 0,
         sections: [],
-        tasks: [],
+        task_to_template: [],
         title: "template",
         type: "complex",
         description: "template",
@@ -55,7 +55,7 @@ describe("TaskController", () => {
 
     it("should create task", async () => {
         const expected = { success: 1, task_id: 0 };
-        jest.spyOn(taskService, "save").mockResolvedValue(task);
+        jest.spyOn(taskService, "insert").mockResolvedValue(task);
         expect(await taskController.create(task)).toStrictEqual(expected);
     });
 
@@ -75,7 +75,7 @@ describe("TaskController", () => {
     it("should add template to task", async () => {
         const expected = { success: 1 };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        expect(await taskController.addTemplates("0", [0])).toStrictEqual(expected);
+        expect(await taskController.addTaskTemplates("0", [0])).toStrictEqual(expected);
     });
 
     it("should ensure task was added to tasks", async () => {
@@ -88,7 +88,7 @@ describe("TaskController", () => {
     it("should update task", async () => {
         const expected = { success: 1, task_id: 0 };
         const updated = { ...task, name: "updated task" };
-        jest.spyOn(taskService, "save").mockResolvedValue(updated);
+        jest.spyOn(taskService, "update").mockResolvedValue(updated);
         expect(await taskController.update("0", updated)).toStrictEqual(expected);
     });
 

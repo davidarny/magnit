@@ -4,24 +4,19 @@ import {
     DeepPartial,
     Entity,
     Index,
-    JoinTable,
-    ManyToMany,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Template } from "../../template/entities/template.entity";
+import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { TaskToTemplate } from "./task-to-template.entity";
 
 export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
 
-type TConstructableTask = Omit<Task, "templates">;
-
 @Entity()
+@EntityConstructor
 export class Task {
-    constructor(task?: DeepPartial<TConstructableTask>) {
-        if (task) {
-            Object.assign(this, task);
-        }
-    }
+    constructor(dto?: DeepPartial<Task>) {}
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -37,13 +32,8 @@ export class Task {
     @Column("varchar")
     status: TTaskStatus;
 
-    @ManyToMany(() => Template, template => template.tasks)
-    @JoinTable({
-        name: "task_x_template",
-        joinColumn: { name: "id_task", referencedColumnName: "id" },
-        inverseJoinColumn: { name: "id_template", referencedColumnName: "id" },
-    })
-    templates: Template[];
+    @OneToMany(() => TaskToTemplate, task_to_template => task_to_template.task, { cascade: true })
+    task_to_template: TaskToTemplate[];
 
     @CreateDateColumn({ type: "timestamptz" })
     created_at: number;

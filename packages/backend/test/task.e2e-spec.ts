@@ -16,7 +16,7 @@ describe("TaskController (e2e)", () => {
         name: "task",
         description: "task",
         status: "in_progress",
-        templates: [],
+        task_to_template: [],
         updated_at: Date.now(),
         created_at: Date.now(),
     };
@@ -47,7 +47,7 @@ describe("TaskController (e2e)", () => {
     });
 
     it("should create task", async () => {
-        jest.spyOn(taskService, "save").mockResolvedValue(task);
+        jest.spyOn(taskService, "insert").mockResolvedValue(task);
         return request(app.getHttpServer())
             .post("/v1/tasks")
             .send({ task })
@@ -93,7 +93,7 @@ describe("TaskController (e2e)", () => {
     it("should update task", async () => {
         const updated = { ...task, name: "updated task" };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "save").mockResolvedValue(updated);
+        jest.spyOn(taskService, "update").mockResolvedValue(updated);
         return request(app.getHttpServer())
             .put("/v1/tasks/0")
             .send({ task: updated })

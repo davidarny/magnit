@@ -3,23 +3,19 @@ import {
     CreateDateColumn,
     DeepPartial,
     Entity,
-    ManyToMany,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from "typeorm";
-import { Task } from "../../task/entities/task.entity";
+import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { TaskToTemplate } from "../../task/entities/task-to-template.entity";
 
 export type TTemplateType = "light" | "complex";
 
-type TConstructableTemplate = Omit<Template, "sections" | "tasks">;
-
 @Entity()
+@EntityConstructor
 export class Template {
-    constructor(template?: DeepPartial<TConstructableTemplate>) {
-        if (template) {
-            Object.assign(this, template);
-        }
-    }
+    constructor(dto?: DeepPartial<Template>) {}
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -30,11 +26,13 @@ export class Template {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @Column({ type: "json", nullable: true })
+    @Column({ type: "jsonb", nullable: true })
     sections: object;
 
-    @ManyToMany(() => Task, task => task.templates)
-    tasks: Task[];
+    @OneToMany(() => TaskToTemplate, task_to_template => task_to_template.template, {
+        cascade: true,
+    })
+    task_to_template: TaskToTemplate[];
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;
