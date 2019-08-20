@@ -7,7 +7,7 @@ export interface ITaskService {
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
         statuses?: TTaskStatus[],
-        name?: string,
+        title?: string,
     ): Promise<Task[]>;
 
     insert(task: Task): Promise<Task>;

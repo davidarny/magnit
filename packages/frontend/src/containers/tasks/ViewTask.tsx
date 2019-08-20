@@ -14,6 +14,7 @@ import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { getTaskExtended, updateTask } from "services/api";
+import uuid from "uuid/v4";
 
 interface IViewTaskProps {
     taskId: number;
@@ -21,14 +22,25 @@ interface IViewTaskProps {
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
-    const [task, setTask] = useState<Partial<IExtendedTask>>({});
+    const [task, setTask] = useState<IExtendedTask>({
+        title: "",
+        id: uuid(),
+        templates: [],
+    });
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
     const [redirect, setRedirect] = useState(false);
 
+    const isValidTask = (value: object): value is IExtendedTask =>
+        _.has(value, "id") && _.has(value, "title") && _.has(value, "templates");
+
     useEffect(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
-            .then(response => setTask({ ...response.task, id: response.task.id.toString() }))
+            .then(response => {
+                if (isValidTask(response.task)) {
+                    return setTask({ ...response.task, id: response.task.id.toString() });
+                }
+            })
             .catch(console.error);
     }, [context.courier, taskId]);
 
@@ -45,19 +57,19 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     }
 
     function onTaskChange(task: Partial<IExtendedTask>): void {
-        setTask({ ...task });
+        if (isValidTask(task)) {
+            setTask({ ...task });
+        }
     }
 
     function onTaskSave(): void {
-        updateTask(context.courier, taskId, task)
+        updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
             .then(() => setOpen(true))
             .catch(() => {
                 setOpen(true);
                 setError(true);
             });
     }
-
-    const isExtendedTask = (value: object): value is IExtendedTask => _.has(value, "templates");
 
     return (
         <SectionLayout>
@@ -82,14 +94,12 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     position: "relative",
                 })}
             >
-                {isExtendedTask(task) && (
-                    <TaskEditor<IExtendedTask>
-                        initialState={task}
-                        templates={task.templates || []}
-                        variant="view"
-                        onTaskChange={onTaskChange}
-                    />
-                )}
+                <TaskEditor<IExtendedTask>
+                    initialState={task}
+                    templates={task.templates || []}
+                    variant="view"
+                    onTaskChange={onTaskChange}
+                />
             </Grid>
             <Snackbar
                 open={open}

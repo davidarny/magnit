@@ -70,7 +70,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         <SectionLayout>
             {redirect.redirect && <Redirect to={`tasks/view/${redirect.to}`} noThrow />}
             <SectionTitle title="Список заданий">
-                {process.env.ALLOW_CREATE_TASK && (
+                {process.env.REACT_APP_ALLOW_CREATE_TASK && (
                     <Grid item hidden={empty}>
                         <Button component={Link} to="create" variant="contained" scheme="blue">
                             <AddIcon />
@@ -82,11 +82,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             {empty && (
                 <EmptyList
                     title="Заданий нет"
-                    actionName="Создать задание"
                     button={
                         <React.Fragment>
-                            {process.env.ALLOW_CREATE_TASK && (
-                                <Grid item hidden={empty}>
+                            {process.env.REACT_APP_ALLOW_CREATE_TASK && (
+                                <Grid item>
                                     <Button
                                         component={Link}
                                         to="create"
@@ -100,8 +99,14 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                             )}
                         </React.Fragment>
                     }
-                    description="Для создания задания нажмите кнопку"
-                />
+                >
+                    {process.env.REACT_APP_ALLOW_CREATE_TASK && (
+                        <React.Fragment>
+                            <div>Для создания задания нажмите кнопку</div>
+                            <div>Создать задание</div>
+                        </React.Fragment>
+                    )}
+                </EmptyList>
             )}
             {!empty && (
                 <Paper

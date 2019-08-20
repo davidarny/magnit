@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
-import { ITask, ITaskWithTemplates, TaskEditor } from "@magnit/task-editor";
+import { ITask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
@@ -24,7 +24,7 @@ interface IEditableTemplate extends ITemplate {
 export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
-    const [task, setTask] = useState<Partial<ITaskWithTemplates>>({
+    const [task, setTask] = useState<ITask>({
         title: "",
         id: uuid(),
         templates: [],
@@ -67,11 +67,16 @@ export const CreateTask: React.FC = () => {
     }
 
     function onTaskChange(task: Partial<ITask>): void {
-        setTask({ ...task });
+        const isValidTask = (value: object): value is ITask =>
+            _.has(value, "id") && _.has(value, "title") && _.has(value, "templates");
+
+        if (isValidTask(task)) {
+            setTask({ ...task });
+        }
     }
 
     function onTaskSave(): void {
-        createTask(context.courier, _.omit(task, "id"))
+        createTask(context.courier, _.omit(task, ["id", "templates"]))
             .then(async response => {
                 if (!response.taskId) {
                     return;
@@ -88,9 +93,6 @@ export const CreateTask: React.FC = () => {
                 setError(true);
             });
     }
-
-    const isTaskWithTemplates = (value: object): value is ITaskWithTemplates =>
-        _.has(value, "templates");
 
     return (
         <SectionLayout>
@@ -118,14 +120,12 @@ export const CreateTask: React.FC = () => {
                     pointerEvents: open ? "none" : "initial",
                 })}
             >
-                {isTaskWithTemplates(task) && (
-                    <TaskEditor<ITaskWithTemplates>
-                        variant="create"
-                        initialState={task}
-                        templates={templates}
-                        onTaskChange={onTaskChange}
-                    />
-                )}
+                <TaskEditor<ITask>
+                    variant="create"
+                    initialState={task}
+                    templates={templates}
+                    onTaskChange={onTaskChange}
+                />
             </Grid>
             <Snackbar
                 open={open}

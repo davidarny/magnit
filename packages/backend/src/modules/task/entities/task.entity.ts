@@ -23,7 +23,7 @@ export class Task {
 
     @Index()
     @Column("varchar")
-    name: string;
+    title: string;
 
     @Column({ type: "text", nullable: true })
     description: string;

@@ -6,14 +6,10 @@ export interface IGetTasksResponse extends IResponse {
     tasks: Array<{
         id: number;
         name: string;
-        objectId: string | null;
-        userId: string | null;
         status: ETaskStatus;
-        deadlineDate: string;
-        departureDate: string;
         descriptions: string;
-        templates: string[];
         updatedAt: string;
+        createdAt: string;
     }>;
 }
 

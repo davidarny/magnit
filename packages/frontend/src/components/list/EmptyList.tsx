@@ -8,11 +8,9 @@ import * as React from "react";
 interface IEmptyListProps {
     title: string;
     button: React.ReactNode;
-    actionName: string;
-    description?: string;
 }
 
-export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, description, ...props }) => {
+export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, children }) => {
     return (
         <CenteredSectionItem>
             <Grid container justify="center" alignContent="center" direction="column">
@@ -38,8 +36,7 @@ export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, descriptio
                             fontSize: theme.colors.larger,
                         })}
                     >
-                        <div>{description || "Для создания нажмите кнопку"}</div>
-                        <div>{props.actionName}</div>
+                        {children}
                     </Typography>
                 </Grid>
                 <Grid item>

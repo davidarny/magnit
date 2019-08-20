@@ -11,9 +11,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { CreateTask } from "./components/create-task";
 import { ViewTask } from "./components/view-task";
-import { IDocument, ITask, TChangeEvent } from "./entities";
+import { IDocument, IExtendedTask, ITask, TChangeEvent } from "./entities";
 
-interface ITaskEditorProps<T extends ITask> {
+type TTask = ITask | IExtendedTask;
+
+interface ITaskEditorProps<T extends TTask> {
     initialState?: T;
     templates: Omit<IDocument, "__uuid">[];
     variant: "create" | "view";
@@ -21,7 +23,7 @@ interface ITaskEditorProps<T extends ITask> {
     onTaskChange?(task: Partial<T>): void;
 }
 
-export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
+export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
     const { templates, initialState, variant, onTaskChange } = props;
 
     const defaultState = ({
@@ -34,7 +36,9 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
     const [documents, setDocuments] = useState<IDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([task.id || ""]);
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>(
+        task.id ? [task.id] : [],
+    );
 
     const service = useRef(
         getEditorService(EEditorType.TASK, [
@@ -43,8 +47,33 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
         ]),
     );
 
-    const hasTemplates = (value: object): value is { templates: IDocument[] } =>
-        _.has(value, "templates");
+    const isViewMode = useCallback(
+        (value: object): value is IExtendedTask => {
+            const templates = _.get(value, "templates");
+            if (_.isEmpty(templates)) {
+                return _.eq(variant, "view");
+            }
+            const first = _.first(templates);
+            return _.eq(variant, "view") && _.has(value, "templates") && _.isObject(first);
+        },
+        [variant],
+    );
+
+    const isCreateMode = useCallback(
+        (value: object): value is ITask => {
+            const templates = _.get(value, "templates");
+            if (_.isEmpty(templates)) {
+                return _.eq(variant, "create");
+            }
+            const first = _.first(templates);
+            return (
+                _.eq(variant, "create") &&
+                _.has(value, "templates") &&
+                (_.isString(first) || _.isNumber(first))
+            );
+        },
+        [variant],
+    );
 
     // set toolbar offset top
     useEffect(() => {
@@ -54,10 +83,7 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
     // if no templates present (initially)
     // we add one stub document
     useEffect(() => {
-        if (variant !== "create") {
-            return;
-        }
-        if (hasTemplates(task) && _.isEmpty(task.templates)) {
+        if (isCreateMode(task) && _.isEmpty(task.templates)) {
             setDocuments([
                 {
                     title: ETerminals.EMPTY,
@@ -70,7 +96,7 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
     }, [variant, task]);
 
     useEffect(() => {
-        if (variant !== "view") {
+        if (!isViewMode(task)) {
             return;
         }
         const documents = templates.map(template => {
@@ -90,20 +116,20 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
     // update current task with their id's
     // also caching template JSON for current active document
     useEffect(() => {
-        if (props.variant !== "create") {
-            return;
-        }
-        setTask({
-            ...task,
-            templates: documents.map(document => document.id),
-        });
-        if (documents.some(document => document.__uuid === focusedPuzzleId)) {
-            const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
-            if (documentId) {
-                const template = templates.find(template => template.id === documentId);
-                if (template) {
-                    templateSnapshots.set(documentId, template);
-                    setTemplateSnapshots(new Map(templateSnapshots));
+        if (isCreateMode(task)) {
+            setTask({
+                ...task,
+                templates: documents.map(document => document.id),
+            });
+            if (documents.some(document => document.__uuid === focusedPuzzleId)) {
+                const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!
+                    .id;
+                if (documentId) {
+                    const template = templates.find(template => template.id === documentId);
+                    if (template) {
+                        templateSnapshots.set(documentId, template);
+                        setTemplateSnapshots(new Map(templateSnapshots));
+                    }
                 }
             }
         }
@@ -112,7 +138,7 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
     const prevTask = useRef(_.cloneDeep(task));
     useEffect(() => {
         if (onTaskChange) {
-            if (hasTemplates(task)) {
+            if (isViewMode(task)) {
                 task.templates = task.templates.map(template => {
                     const document = documents.find(document => document.id === template.id);
                     if (!document) {
@@ -186,8 +212,6 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
         }
     }, [focusedPuzzleChain]);
 
-    console.log(task);
-
     return (
         <React.Fragment>
             <EditorToolbar
@@ -210,7 +234,7 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
                     },
                 ]}
             />
-            {_.eq(props.variant, "create") && (
+            {isCreateMode(task) && (
                 <CreateTask
                     task={task}
                     service={service.current}
@@ -221,7 +245,7 @@ export const TaskEditor = <T extends ITask>(props: ITaskEditorProps<T>) => {
                     onTemplateChange={onTemplateChange}
                 />
             )}
-            {_.eq(props.variant, "view") && (
+            {isViewMode(task) && (
                 <ViewTask
                     task={task}
                     service={service.current}

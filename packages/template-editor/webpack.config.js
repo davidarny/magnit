@@ -29,7 +29,7 @@ const config = {
     entry: {
         index: "./src/index.ts",
     },
-    ...(production ? {} : { devtool: "eval" }),
+    ...(production ? {} : { devtool: "eval-source-map" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",

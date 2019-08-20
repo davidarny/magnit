@@ -8,7 +8,9 @@ export async function updateTaskToTemplate(
     templateId: number,
     editable: boolean,
 ) {
-    return courier.put<IUpdateTemplatesToTaskResponse>(`tasks/${taskId}/templates/${templateId}`, {
-        editable,
-    });
+    const body = { editable };
+    return courier.put<IUpdateTemplatesToTaskResponse>(
+        `tasks/${taskId}/templates/${templateId}`,
+        body,
+    );
 }

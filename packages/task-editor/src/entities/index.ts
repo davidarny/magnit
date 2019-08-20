@@ -9,16 +9,17 @@ export interface IStep {
     editable?: boolean;
 }
 
-export interface ITask {
-    id: string;
+export interface IBaseTask {
+    id?: string;
     title: string;
-    descriptions: string;
-    status: ETaskStatus;
-    updatedAt: string;
-    createdAt: string;
+    descriptions?: string;
+    status?: ETaskStatus;
+    updatedAt?: string;
+    createdAt?: string;
 }
 
-export interface ITaskWithTemplates extends ITask {
+export interface ITask extends IBaseTask {
+    id: string;
     templates: string[];
 }
 
@@ -29,7 +30,8 @@ export interface IDocument {
     __uuid: string; // need for correct rendering
 }
 
-export interface IExtendedTask extends ITask {
+export interface IExtendedTask extends IBaseTask {
+    id: string;
     templates: Array<Omit<IDocument, "__uuid">>;
 }
 

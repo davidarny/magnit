@@ -13,12 +13,12 @@ import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
-import { IDocument, IExtendedTask, TChangeEvent } from "entities";
+import { IDocument, ITask, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 
 interface ICreateTaskProps {
-    task: Partial<IExtendedTask>;
+    task: Partial<ITask>;
     service: IEditorService;
     templates: Omit<IDocument, "__uuid">[];
     documents: IDocument[];

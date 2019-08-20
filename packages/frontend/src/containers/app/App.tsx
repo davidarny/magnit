@@ -110,7 +110,7 @@ const App: React.FC = () => {
                                ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
                             */}
                             <AsyncTasksList path="tasks/*" />
-                            {process.env.ALLOW_CREATE_TASK && (
+                            {process.env.REACT_APP_ALLOW_CREATE_TASK && (
                                 <AsyncCreateTask path="tasks/create" />
                             )}
                             <AsyncViewTask path="tasks/view/:taskId" />

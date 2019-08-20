@@ -14,7 +14,7 @@ export class TaskService implements ITaskService {
         sort?: "ASC" | "DESC",
         status?: TTaskStatus,
         statuses?: TTaskStatus[],
-        name?: string,
+        title?: string,
     ) {
         const options: FindManyOptions<Task> = {};
         if (typeof offset !== "undefined") {
@@ -24,7 +24,7 @@ export class TaskService implements ITaskService {
             options.take = limit;
         }
         if (sort) {
-            options.order = { name: sort };
+            options.order = { title: sort };
         }
         if (status) {
             if (!options.where) {
@@ -38,11 +38,11 @@ export class TaskService implements ITaskService {
             }
             Object.assign(options.where, { status: In(statuses) });
         }
-        if (name) {
+        if (title) {
             if (!options.where) {
                 options.where = {};
             }
-            Object.assign(options.where, { name });
+            Object.assign(options.where, { title });
         }
         return this.taskRepository.find(options);
     }

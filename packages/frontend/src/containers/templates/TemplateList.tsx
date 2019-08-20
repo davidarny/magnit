@@ -64,16 +64,17 @@ export const TemplateList: React.FC = () => {
             </SectionTitle>
             {empty && (
                 <EmptyList
-                    title={"Шаблонов нет"}
-                    actionName={"Создать шаблон"}
+                    title="Шаблонов нет"
                     button={
                         <Button component={Link} to="create" scheme="blue">
                             <AddIcon />
                             <Typography>Создать шаблон</Typography>
                         </Button>
                     }
-                    description={"Для создания шаблона нажмите кнопку"}
-                />
+                >
+                    <div>Для создания шаблона нажмите кнопку</div>
+                    <div>Создать шаблон</div>
+                </EmptyList>
             )}
             {!empty && (
                 <Paper
