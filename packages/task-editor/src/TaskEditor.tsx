@@ -99,17 +99,18 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         if (!isViewMode(task)) {
             return;
         }
-        const documents = templates.map(template => {
+        const nextDocuments = templates.map(template => {
+            const document = documents.find(document => template.id === document.id);
             templateSnapshots.set(template.id.toString(), template);
             return {
                 id: _.get(template, "id"),
                 title: _.get(template, "title"),
                 editable: _.get(template, "editable", false),
-                __uuid: uuid(),
+                __uuid: (document && document.__uuid) || uuid(),
             };
         });
         setTemplateSnapshots(new Map(templateSnapshots));
-        setDocuments([...documents]);
+        setDocuments([...nextDocuments]);
     }, [templates, variant]);
 
     // on every documents change we have to
@@ -148,7 +149,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                 });
             }
             if (!_.isEqual(prevTask.current, task)) {
-                prevTask.current = task;
+                prevTask.current = _.cloneDeep(task);
                 onTaskChange({ ...task });
             }
         }

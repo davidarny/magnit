@@ -15,7 +15,7 @@ import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
-import { addTaskToTemplate, createTask, getTemplate, getTemplates } from "services/api";
+import { addTemplateAssignment, createTask, getTemplate, getTemplates } from "services/api";
 import uuid from "uuid/v4";
 
 interface IEditableTemplate extends ITemplate {
@@ -83,7 +83,7 @@ export const CreateTask: React.FC = () => {
                 if (!response.taskId) {
                     return;
                 }
-                await addTaskToTemplate(
+                await addTemplateAssignment(
                     context.courier,
                     Number(response.taskId),
                     (task.templates || []).map(_.toNumber),

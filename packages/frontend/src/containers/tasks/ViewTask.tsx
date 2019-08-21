@@ -14,7 +14,7 @@ import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
-import { getTaskExtended, updateTask } from "services/api";
+import { getTaskExtended, updateTask, updateTemplateAssignment } from "services/api";
 import uuid from "uuid/v4";
 
 interface IViewTaskProps {
@@ -66,6 +66,16 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     function onTaskSave(): void {
         updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
+            .then(() =>
+                Promise.all(
+                    task.templates.map(({ id, editable }) => {
+                        const body = {
+                            editable,
+                        };
+                        return updateTemplateAssignment(context.courier, taskId, Number(id), body);
+                    }),
+                ),
+            )
             .then(() => setOpen(true))
             .catch(() => {
                 setOpen(true);
