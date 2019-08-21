@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
-import { ETaskStatus } from "@magnit/services";
+import { ETaskStatus, ETerminals } from "@magnit/services";
 import { ITask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -26,7 +26,7 @@ export const CreateTask: React.FC = () => {
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
     const [task, setTask] = useState<ITask>({
         id: 0,
-        title: "",
+        title: ETerminals.EMPTY,
         templates: [],
         stages: [],
         status: ETaskStatus.DRAFT,

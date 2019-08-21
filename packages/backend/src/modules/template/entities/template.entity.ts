@@ -32,7 +32,7 @@ export class Template {
     @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.template, {
         cascade: true,
     })
-    template_assignments: TemplateAssignment[];
+    assignments: TemplateAssignment[];
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;

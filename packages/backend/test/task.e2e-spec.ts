@@ -16,9 +16,10 @@ describe("TaskController (e2e)", () => {
         title: "task",
         description: "task",
         status: "in_progress",
-        template_assignments: [],
-        updated_at: Date.now(),
-        created_at: Date.now(),
+        assignments: [],
+        stages: [],
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
     };
 
     beforeEach(async () => {

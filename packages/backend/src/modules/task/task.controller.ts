@@ -32,7 +32,6 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
-import _ = require("lodash");
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -83,14 +82,14 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findById(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id, ["task_stages"]);
+        const task = await this.taskService.findById(id, ["stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
         return {
             success: 1,
             task: {
-                ..._.omit(task, "task_stages"),
+                ...task,
                 templates: (templates || []).map(template => template.id),
-                stages: (task.task_stages || []).map(stage => stage.id),
+                stages: (task.stages || []).map(stage => stage.id),
             },
         };
     }
@@ -113,9 +112,9 @@ export class TaskController {
             const template = await this.templateService.findById(templateId.toString());
             templates.push(template);
         }
-        const task = await this.taskService.findById(id, ["template_assignments"]);
-        task.template_assignments = [
-            ...task.template_assignments,
+        const task = await this.taskService.findById(id, ["assignments"]);
+        task.assignments = [
+            ...task.assignments,
             ...templates.map(template => new TemplateAssignment({ task, template })),
         ];
         await this.taskService.update(id, task);
@@ -131,11 +130,11 @@ export class TaskController {
         @Param("templateId", TemplateByIdPipe) templateId: string,
         @Body() taskTemplateDto: TemplateAssignmentDto,
     ) {
-        const task = await this.taskService.findById(taskId, ["template_assignments"]);
-        (task.template_assignments || [])
+        const task = await this.taskService.findById(taskId, ["assignments"]);
+        (task.assignments || [])
             .filter(taskToTemplate => taskToTemplate.id_template === Number(templateId))
             .forEach((taskToTemplate, index) => {
-                task.template_assignments[index] = { ...taskToTemplate, ...taskTemplateDto };
+                task.assignments[index] = { ...taskToTemplate, ...taskTemplateDto };
             });
         await this.taskService.update(taskId, task);
         return { success: 1 };
@@ -149,9 +148,9 @@ export class TaskController {
         @Param("id", TaskByIdPipe) id: string,
         @Body("stages") taskStageDtos: TaskStageDto[],
     ) {
-        const task = await this.taskService.findById(id, ["task_stages"]);
-        task.task_stages = [
-            ...task.task_stages,
+        const task = await this.taskService.findById(id, ["stages"]);
+        task.stages = [
+            ...task.stages,
             ...taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto })),
         ];
         await this.taskService.update(id, task);
@@ -170,11 +169,11 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id, ["task_stages"]);
+        const task = await this.taskService.findById(id, ["stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
         return {
             success: 1,
-            task: { ..._.omit(task, "task_stages"), templates, stages: task.task_stages || [] },
+            task: { ...task, templates },
         };
     }
 }

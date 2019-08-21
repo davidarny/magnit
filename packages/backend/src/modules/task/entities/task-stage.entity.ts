@@ -21,7 +21,7 @@ export class TaskStage {
     id: number;
 
     @Index()
-    @ManyToOne(() => Task, task => task.task_stages)
+    @ManyToOne(() => Task, task => task.stages)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
 

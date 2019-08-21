@@ -36,10 +36,10 @@ export class Task {
     @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
         cascade: true,
     })
-    template_assignments: TemplateAssignment[];
+    assignments: TemplateAssignment[];
 
     @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
-    task_stages: TaskStage[];
+    stages: TaskStage[];
 
     @CreateDateColumn({ type: "timestamptz" })
     created_at: string;

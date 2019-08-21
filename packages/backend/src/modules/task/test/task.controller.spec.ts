@@ -15,19 +15,20 @@ describe("TaskController", () => {
         title: "task",
         description: "task",
         status: "in_progress",
-        template_assignments: [],
-        updated_at: Date.now(),
-        created_at: Date.now(),
+        assignments: [],
+        stages: [],
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
     };
     const template: Template = {
         id: 0,
         sections: [],
-        template_assignments: [],
+        assignments: [],
         title: "template",
         type: "complex",
         description: "template",
-        created_at: Date.now(),
-        updated_at: Date.now(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
     };
 
     beforeEach(async () => {
