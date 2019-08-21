@@ -69,8 +69,6 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
         [id, onTitleChange],
     );
 
-    console.log(content, rest);
-
     return (
         <Step {...rest} active={true} completed={completed}>
             <StepLabel

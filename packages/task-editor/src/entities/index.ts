@@ -1,10 +1,10 @@
 import { ETaskStatus } from "@magnit/services";
 import * as React from "react";
 
-export interface IStep {
+export interface IStageStep {
     id: number;
     title: string;
-    date: string;
+    dueDate: string;
     completed: boolean;
     editable?: boolean;
 }

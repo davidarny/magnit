@@ -11,7 +11,7 @@ import {
     StepperWrapper,
 } from "@magnit/components";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { ETaskStatus, IEditorService } from "@magnit/services";
+import { ETaskStatus, getFriendlyDate, IEditorService } from "@magnit/services";
 import {
     Dialog,
     FormControl,
@@ -21,10 +21,10 @@ import {
     Typography,
 } from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
-import { IDocument, IExtendedTask, IStep, TChangeEvent } from "entities";
+import { IDocument, IExtendedTask, IStageStep, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
 
@@ -47,15 +47,20 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     let { documents } = props;
     documents = documents.filter(document => !!document.title);
 
-    const [steps, setSteps] = useState<IStep[]>([
-        {
-            id: 0,
-            title: "Подготовка технического плана",
-            date: "07.07.2019",
-            completed: false,
-            editable: false,
-        },
-    ]);
+    const { stages } = task;
+    const defaultStepsState = (stages || []).map(stage => ({
+        ...stage,
+        completed: Date.now() >= new Date(stage.dueDate).valueOf(),
+        editable: false,
+    }));
+    const [steps, setSteps] = useState<IStageStep[]>(defaultStepsState || []);
+
+    const prevStages = useRef(_.cloneDeep(stages));
+    useEffect(() => {
+        if (!_.isEqual(prevStages, stages) && !_.isEqual(steps, defaultStepsState)) {
+            setSteps(defaultStepsState);
+        }
+    }, [stages, defaultStepsState]);
 
     function onDialogClose(): void {
         setOpen(false);
@@ -79,7 +84,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             {
                 id: last.id + 1,
                 title: "",
-                date: "",
+                dueDate: "",
                 completed: false,
                 editable: true,
             },
@@ -97,7 +102,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     function onChangeStepDate(id: number, value: string): void {
         if (steps.some(step => step.id === id)) {
             const stepIndex = steps.findIndex(step => step.id === id);
-            steps[stepIndex].date = value;
+            steps[stepIndex].dueDate = value;
             setSteps([...steps]);
         }
     }
@@ -255,7 +260,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                         onChange={event =>
                                             onChangeStepDate(step.id, event.target.value)
                                         }
-                                        value={step.date}
+                                        value={getFriendlyDate(new Date(step.dueDate))}
                                     />
                                 ),
                             }))}
