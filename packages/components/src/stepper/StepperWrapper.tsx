@@ -39,6 +39,7 @@ export const StepperWrapper: React.FC<TStepperProps> = ({ steps, ...props }) => 
         <Stepper orientation="vertical">
             {steps.map(({ completed, title, content, editable, id }) => (
                 <StepWrapper
+                    key={id}
                     editable={editable}
                     completed={completed}
                     content={content}
@@ -59,7 +60,7 @@ interface IStepWrapperProps extends IStep {
 }
 
 export const StepWrapper: React.FC<IStepWrapperProps> = props => {
-    const { id, completed, content, title, editable, onStepDelete, onTitleChange } = props;
+    const { id, completed, content, title, editable, onStepDelete, onTitleChange, ...rest } = props;
 
     const onClick = useCallback(() => onStepDelete(id), [id, onStepDelete]);
 
@@ -69,7 +70,7 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
     );
 
     return (
-        <Step active={true} completed={completed}>
+        <Step active={true} {...rest} completed={completed}>
             <StepLabel
                 css={theme => ({
                     svg: { color: `${theme.colors.primary} !important` },
