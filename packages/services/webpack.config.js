@@ -6,15 +6,16 @@ const externals = require("webpack-node-externals");
 const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const PeerDepsExternalsPlugin = require("peer-deps-externals-webpack-plugin");
+const CircularDependencyPlugin = require("circular-dependency-plugin");
+
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+const smp = new SpeedMeasurePlugin();
 
 const env = {
-    raw: {
-        NODE_ENV: process.env.NODE_ENV || "development",
-    },
     get stringified() {
         return {
-            "process.env": Object.keys(this.raw).reduce((env, key) => {
-                env[key] = JSON.stringify(this.raw[key]);
+            "process.env": Object.keys(process.env).reduce((env, key) => {
+                env[key] = JSON.stringify(process.env[key]);
                 return env;
             }, {}),
         };
@@ -24,11 +25,11 @@ const env = {
 const development = process.env.NODE_ENV !== "production";
 const production = process.env.NODE_ENV === "production";
 
-module.exports = {
+const config = {
     entry: {
         index: "./src/index.ts",
     },
-    ...(production ? {} : { devtool: "eval" }),
+    ...(production ? {} : { devtool: "eval-source-map" }),
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
@@ -95,3 +96,9 @@ module.exports = {
         hints: false,
     },
 };
+
+if (production) {
+    module.exports = smp.wrap(config);
+} else {
+    module.exports = config;
+}
