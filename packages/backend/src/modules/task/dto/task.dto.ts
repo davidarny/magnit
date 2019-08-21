@@ -14,7 +14,7 @@ export class TaskWithTemplatesDto extends TaskDto {
     @ApiModelProperty({ type: [Number] }) readonly templates: number[];
 }
 
-export class TaskToTemplateDto {
+export class TemplateAssignmentDto {
     @ApiModelProperty() readonly editable: boolean;
 }
 

@@ -8,7 +8,7 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
-import { TaskToTemplate } from "../../task/entities/task-to-template.entity";
+import { TemplateAssignment } from "../../task/entities/tempalte-assignment.entity";
 
 export type TTemplateType = "light" | "complex";
 
@@ -26,13 +26,13 @@ export class Template {
     @Column({ type: "text", nullable: true })
     description: string;
 
-    @Column({ type: "jsonb", nullable: true })
+    @Column({ type: "jsonb", default: [] })
     sections: object;
 
-    @OneToMany(() => TaskToTemplate, task_to_template => task_to_template.template, {
+    @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.template, {
         cascade: true,
     })
-    task_to_template: TaskToTemplate[];
+    template_assignments: TemplateAssignment[];
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;

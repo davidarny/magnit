@@ -15,14 +15,14 @@ describe("TaskController", () => {
         title: "task",
         description: "task",
         status: "in_progress",
-        task_to_template: [],
+        template_assignments: [],
         updated_at: Date.now(),
         created_at: Date.now(),
     };
     const template: Template = {
         id: 0,
         sections: [],
-        task_to_template: [],
+        template_assignments: [],
         title: "template",
         type: "complex",
         description: "template",
@@ -75,7 +75,7 @@ describe("TaskController", () => {
     it("should add template to task", async () => {
         const expected = { success: 1 };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        expect(await taskController.addTaskTemplates("0", [0])).toStrictEqual(expected);
+        expect(await taskController.addTemplateAssignment("0", [0])).toStrictEqual(expected);
     });
 
     it("should ensure task was added to tasks", async () => {

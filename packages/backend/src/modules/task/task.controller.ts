@@ -7,18 +7,19 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { Template } from "../template/entities/template.entity";
-import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
-import { TaskToTemplate } from "./entities/task-to-template.entity";
-import { ITaskService } from "./interfaces/task.service.interface";
-import { ITemplateService } from "../template/interfaces/template.service.interface";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
+import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { TemplateService } from "../template/services/template.service";
 import { ErrorResponse } from "../../shared/responses/error.response";
+import { Template } from "../template/entities/template.entity";
+import { ITemplateService } from "../template/interfaces/template.service.interface";
+import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
+import { TemplateService } from "../template/services/template.service";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
-import { TaskDto, TaskToTemplateDto } from "./dto/task.dto";
+import { TaskDto, TemplateAssignmentDto } from "./dto/task.dto";
 import { Task } from "./entities/task.entity";
+import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
+import { ITaskService } from "./interfaces/task.service.interface";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
@@ -28,7 +29,6 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
-import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -93,7 +93,7 @@ export class TaskController {
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async addTaskTemplates(
+    async addTemplateAssignment(
         @Param("id", TaskByIdPipe) id: string,
         @Body("templates", TemplatesByIdsPipe) arrayOfIds: number[],
     ) {
@@ -102,8 +102,10 @@ export class TaskController {
             const template = await this.templateService.findById(templateId.toString());
             templates.push(template);
         }
-        const task = await this.taskService.findById(id, ["task_to_template"]);
-        task.task_to_template = templates.map(template => new TaskToTemplate({ task, template }));
+        const task = await this.taskService.findById(id, ["template_assignments"]);
+        task.template_assignments = templates.map(
+            template => new TemplateAssignment({ task, template }),
+        );
         await this.taskService.update(id, task);
         return { success: 1 };
     }
@@ -112,16 +114,16 @@ export class TaskController {
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async updateTaskTemplate(
+    async updateTemplateAssignment(
         @Param("taskId", TaskByIdPipe) taskId: string,
         @Param("templateId", TemplateByIdPipe) templateId: string,
-        @Body() taskTemplateDto: TaskToTemplateDto,
+        @Body() taskTemplateDto: TemplateAssignmentDto,
     ) {
-        const task = await this.taskService.findById(taskId, ["task_to_template"]);
-        (task.task_to_template || [])
+        const task = await this.taskService.findById(taskId, ["template_assignments"]);
+        (task.template_assignments || [])
             .filter(taskToTemplate => taskToTemplate.id_template === Number(templateId))
             .forEach((taskToTemplate, index) => {
-                task.task_to_template[index] = { ...taskToTemplate, ...taskTemplateDto };
+                task.template_assignments[index] = { ...taskToTemplate, ...taskTemplateDto };
             });
         await this.taskService.update(taskId, task);
         return { success: 1 };

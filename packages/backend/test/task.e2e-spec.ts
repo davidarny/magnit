@@ -16,7 +16,7 @@ describe("TaskController (e2e)", () => {
         title: "task",
         description: "task",
         status: "in_progress",
-        task_to_template: [],
+        template_assignments: [],
         updated_at: Date.now(),
         created_at: Date.now(),
     };
