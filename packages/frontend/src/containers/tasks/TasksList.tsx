@@ -31,9 +31,8 @@ const tabs: ITab[] = [
 ];
 
 const columns: IColumn[] = [
-    { key: "name", label: "Название задания" },
+    { key: "title", label: "Название задания" },
     { key: "description", label: "Описание задания" },
-    { key: "deadlineDate", label: "Срок выполнения" },
     { key: "createdAt", label: "Дата создания" },
     { key: "updatedAt", label: "Дата последнего обновления" },
 ];
