@@ -1,11 +1,6 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Grid, Paper, Typography } from "@material-ui/core";
-import * as React from "react";
-import { Link, Redirect, RouteComponentProps } from "@reach/router";
-import { SectionLayout } from "components/section-layout";
-import { SectionTitle } from "components/section-title";
 import {
     Button,
     IColumn,
@@ -16,12 +11,17 @@ import {
     TabsWrapper,
 } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
+import { ETaskStatus, getFriendlyDate } from "@magnit/services";
+import { Grid, Paper, Typography } from "@material-ui/core";
+import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
-import { useContext, useEffect, useState } from "react";
-import _ from "lodash";
-import { getTasks, IGetTasksResponse } from "services/api";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
-import { ETaskStatus } from "@magnit/services";
+import _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
+import { getTasks, IGetTasksResponse } from "services/api";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
@@ -31,9 +31,8 @@ const tabs: ITab[] = [
 ];
 
 const columns: IColumn[] = [
-    { key: "name", label: "Название задания" },
+    { key: "title", label: "Название задания" },
     { key: "description", label: "Описание задания" },
-    { key: "deadlineDate", label: "Срок выполнения" },
     { key: "createdAt", label: "Дата создания" },
     { key: "updatedAt", label: "Дата последнего обновления" },
 ];
@@ -48,7 +47,15 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     useEffect(() => {
         getTasks(context.courier, getTaskStatusByTab(tab))
-            .then(response => setTasks(response.tasks))
+            .then(response =>
+                setTasks(
+                    response.tasks.map(task => ({
+                        ...task,
+                        createdAt: getFriendlyDate(new Date(task.createdAt!), true),
+                        updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
+                    })),
+                ),
+            )
             .catch(console.error);
         getTasks(context.courier)
             .then(response => setTotal(response.tasks.length))

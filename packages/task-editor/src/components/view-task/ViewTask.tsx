@@ -11,7 +11,7 @@ import {
     StepperWrapper,
 } from "@magnit/components";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { ETaskStatus, IEditorService } from "@magnit/services";
+import { ETaskStatus, ETerminals, getFriendlyDate, IEditorService } from "@magnit/services";
 import {
     Dialog,
     FormControl,
@@ -21,10 +21,10 @@ import {
     Typography,
 } from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
-import { IDocument, IExtendedTask, IStep, TChangeEvent } from "entities";
+import { IDocument, IExtendedTask, IStageStep, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
 
@@ -35,27 +35,61 @@ interface IViewTaskProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
-    onAssigneeChange?(userId: string): void;
+    onAddStage?(step: IStageStep): void;
 
-    onEditableChange(documentId: string, editable: boolean): void;
+    onDeleteStage?(id: number): void;
+
+    onEditableChange(documentId: number, editable: boolean): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [open, setOpen] = useState(false);
     const { service, task, focusedPuzzleId, templateSnapshots } = props;
+    const { onAddStage, onDeleteStage, onEditableChange } = props;
 
     let { documents } = props;
     documents = documents.filter(document => !!document.title);
 
-    const [steps, setSteps] = useState<IStep[]>([
-        {
-            id: uuid(),
-            title: "Подготовка технического плана",
-            date: "07.07.2019",
-            completed: false,
+    const { stages } = task;
+    const initialStepsState =
+        stages &&
+        stages.length > 0 &&
+        stages.map(stage => ({
+            ...stage,
+            completed: Date.now() >= new Date(stage.dueDate).valueOf(),
             editable: false,
+        }));
+    const defaultStepsState = [
+        {
+            id: 0,
+            title: ETerminals.EMPTY,
+            dueDate: ETerminals.EMPTY,
+            completed: false,
+            editable: true,
         },
-    ]);
+    ];
+    const [steps, setSteps] = useState<IStageStep[]>(initialStepsState || defaultStepsState);
+
+    const prevStages = useRef(_.cloneDeep(stages));
+    useEffect(() => {
+        if (!initialStepsState) {
+            return;
+        }
+        if (!_.isEqual(prevStages, stages) && !_.isEqual(steps, initialStepsState)) {
+            setSteps(initialStepsState);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stages]);
+
+    useEffect(() => {
+        const diffSteps = steps
+            .filter(step => step.title && step.dueDate)
+            .filter(step => stages && !stages.find(stage => stage.id === step.id));
+        if (!diffSteps.length) {
+            return;
+        }
+        diffSteps.forEach(step => onAddStage && onAddStage(step));
+    }, [steps, stages, onAddStage]);
 
     function onDialogClose(): void {
         setOpen(false);
@@ -69,46 +103,71 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         setOpen(false);
     }
 
-    function onAddStep(): void {
+    const onAddStep = useCallback((): void => {
+        const last = _.last(steps);
+        if (!last) {
+            return;
+        }
         setSteps([
             ...steps,
             {
-                id: uuid(),
-                title: "",
-                date: "",
+                id: last.id + 1,
+                title: ETerminals.EMPTY,
+                dueDate: ETerminals.EMPTY,
                 completed: false,
                 editable: true,
             },
         ]);
-    }
+    }, [steps]);
 
-    function onChangeStepTitle(id: string, value: string): void {
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps[stepIndex].title = value;
-            setSteps([...steps]);
-        }
-    }
+    const onChangeStepTitle = useCallback(
+        (id: number, value: string): void => {
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps[stepIndex].title = value;
+                setSteps([...steps]);
+            }
+        },
+        [steps],
+    );
 
-    function onChangeStepDate(id: string, value: string): void {
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps[stepIndex].date = value;
-            setSteps([...steps]);
-        }
-    }
+    const onChangeStepDate = useCallback(
+        (id: number, value: string): void => {
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps[stepIndex].dueDate = value;
+                setSteps([...steps]);
+            }
+        },
+        [steps],
+    );
 
-    function onStepDelete(id: string): void {
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps.splice(stepIndex, 1);
-            setSteps([...steps]);
-        }
-    }
+    const onStepDelete = useCallback(
+        (id: number) => {
+            // disallow deleting if only 1 stage present
+            if (steps.length < 2) {
+                return;
+            }
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps.splice(stepIndex, 1);
+                setSteps([...steps]);
+                if (onDeleteStage) {
+                    onDeleteStage(id);
+                }
+            }
+        },
+        [onDeleteStage, steps],
+    );
 
-    function onEditableChange(documentId: string, editable: boolean) {
-        props.onEditableChange(documentId, editable);
-    }
+    const onEditableChangeHandler = useCallback(
+        (documentId: number, editable: boolean) => {
+            onEditableChange(documentId, editable);
+        },
+        [onEditableChange],
+    );
+
+    const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
     return (
         <React.Fragment>
@@ -171,12 +230,12 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
+                    zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, task.id || "")}
-                onMouseDown={service.onPuzzleFocus.bind(service, task.id || "")}
-                focused={focusedPuzzleId === task.id}
-                id={task.id}
+                onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
+                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
+                focused={focusedPuzzleId === getTaskId()}
+                id={getTaskId()}
             >
                 <Grid container spacing={2}>
                     <Grid
@@ -246,10 +305,15 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 title: step.title,
                                 content: (
                                     <DateField
+                                        disabled={!step.editable}
                                         onChange={event =>
                                             onChangeStepDate(step.id, event.target.value)
                                         }
-                                        value={step.date}
+                                        value={
+                                            !step.editable
+                                                ? getFriendlyDate(new Date(step.dueDate))
+                                                : step.dueDate
+                                        }
                                     />
                                 ),
                             }))}
@@ -264,7 +328,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             onClick={onAddStep}
                         >
                             <AddIcon />
-                            <Typography>Добавить новый этап</Typography>
+                            <Typography>Новый этап</Typography>
                         </Button>
                     </Grid>
                 </Grid>
@@ -276,7 +340,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     service={service}
                     templateSnapshots={templateSnapshots}
                     focusedPuzzleId={focusedPuzzleId}
-                    onEditableChange={onEditableChange}
+                    onEditableChange={onEditableChangeHandler}
                 />
             ))}
         </React.Fragment>
@@ -289,7 +353,7 @@ interface ITaskDocumentProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
-    onEditableChange(documentId: string, editable: boolean): void;
+    onEditableChange(documentId: number, editable: boolean): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {

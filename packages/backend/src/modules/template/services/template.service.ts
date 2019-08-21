@@ -56,10 +56,10 @@ export class TemplateService implements ITemplateService {
                 "template"."type",
                 "template"."created_at",
                 "template"."updated_at",
-                "task_to_template"."editable"
-            FROM "task_to_template"
-            LEFT JOIN "template" ON "template"."id" = "task_to_template"."id_template"
-            WHERE "task_to_template"."id_task" = $1
+                "template_assignment"."editable"
+            FROM "template_assignment"
+            LEFT JOIN "template" ON "template"."id" = "template_assignment"."id_template"
+            WHERE "template_assignment"."id_task" = $1
         `,
             [id],
         );

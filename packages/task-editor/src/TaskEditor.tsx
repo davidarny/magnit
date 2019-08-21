@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -11,7 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { CreateTask } from "./components/create-task";
 import { ViewTask } from "./components/view-task";
-import { IDocument, IExtendedTask, ITask, TChangeEvent } from "./entities";
+import { IDocument, IExtendedTask, IStageStep, ITask, TChangeEvent } from "./entities";
 
 type TTask = ITask | IExtendedTask;
 
@@ -37,7 +36,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>(
-        task.id ? [task.id] : [],
+        task.id ? [task.id.toString()] : [],
     );
 
     const service = useRef(
@@ -86,31 +85,34 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         if (isCreateMode(task) && _.isEmpty(task.templates)) {
             setDocuments([
                 {
+                    id: 0,
                     title: ETerminals.EMPTY,
-                    id: ETerminals.EMPTY,
                     editable: false,
                     __uuid: uuid(),
                 },
             ]);
         }
-    }, [variant, task]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [variant, task, isCreateMode]);
 
     useEffect(() => {
         if (!isViewMode(task)) {
             return;
         }
-        const documents = templates.map(template => {
+        const nextDocuments = templates.map(template => {
+            const document = documents.find(document => template.id === document.id);
             templateSnapshots.set(template.id.toString(), template);
             return {
                 id: _.get(template, "id"),
                 title: _.get(template, "title"),
                 editable: _.get(template, "editable", false),
-                __uuid: uuid(),
+                __uuid: (document && document.__uuid) || uuid(),
             };
         });
         setTemplateSnapshots(new Map(templateSnapshots));
-        setDocuments([...documents]);
-    }, [templates, variant]);
+        setDocuments([...nextDocuments]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [templates, variant, isViewMode]);
 
     // on every documents change we have to
     // update current task with their id's
@@ -127,13 +129,14 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                 if (documentId) {
                     const template = templates.find(template => template.id === documentId);
                     if (template) {
-                        templateSnapshots.set(documentId, template);
+                        templateSnapshots.set(documentId.toString(), template);
                         setTemplateSnapshots(new Map(templateSnapshots));
                     }
                 }
             }
         }
-    }, [documents]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [documents, isCreateMode]);
 
     const prevTask = useRef(_.cloneDeep(task));
     useEffect(() => {
@@ -148,50 +151,89 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                 });
             }
             if (!_.isEqual(prevTask.current, task)) {
-                prevTask.current = task;
+                prevTask.current = _.cloneDeep(task);
                 onTaskChange({ ...task });
             }
         }
-    }, [task, documents, variant, onTaskChange]);
+    }, [task, documents, variant, onTaskChange, isViewMode]);
 
     useEffect(() => {
         if (!_.isEqual(task, initialState) && initialState) {
             setTask(initialState);
-            setFocusedPuzzleChain([initialState.id || ""]);
+            setFocusedPuzzleChain([initialState.id.toString() || ""]);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialState]);
 
-    function onTemplateChange(uuid: string, event: TChangeEvent): void {
-        const { templates } = props;
-        const templateId = event.target.value as string;
-        if (documents.some(document => document.__uuid === uuid)) {
-            const templateIndex = templates.findIndex(template => template.id === templateId);
-            const documentIndex = documents.findIndex(document => document.__uuid === uuid);
-            documents[documentIndex].id = templates[templateIndex].id;
-            documents[documentIndex].title = templates[templateIndex].title;
-            setDocuments([...documents]);
-        }
-    }
+    const onTemplateChange = useCallback(
+        (uuid: string, event: TChangeEvent): void => {
+            const templateId = Number(event.target.value);
+            if (documents.some(document => document.__uuid === uuid)) {
+                const templateIndex = templates.findIndex(template => template.id === templateId);
+                const documentIndex = documents.findIndex(document => document.__uuid === uuid);
+                documents[documentIndex].id = templates[templateIndex].id;
+                documents[documentIndex].title = templates[templateIndex].title;
+                setDocuments([...documents]);
+            }
+        },
+        [documents, templates],
+    );
 
-    function onEditableChange(documentId: string, editable: boolean) {
-        if (documents.some(document => document.id === documentId)) {
-            const documentIndex = documents.findIndex(document => document.id === documentId);
-            documents[documentIndex].editable = editable;
-            setDocuments([...documents]);
-        }
-    }
+    const onEditableChange = useCallback(
+        (documentId: number, editable: boolean) => {
+            if (documents.some(document => document.id === documentId)) {
+                const documentIndex = documents.findIndex(document => document.id === documentId);
+                documents[documentIndex].editable = editable;
+                setDocuments([...documents]);
+            }
+        },
+        [documents],
+    );
 
-    function onAddDocument(): void {
+    const onAddDocument = useCallback((): void => {
         setDocuments([
             ...documents,
             {
-                id: ETerminals.EMPTY,
+                id: 0,
                 __uuid: uuid(),
                 title: ETerminals.EMPTY,
                 editable: false,
             },
         ]);
-    }
+    }, [documents]);
+
+    const onAddStage = useCallback(
+        (step: IStageStep) => {
+            if (!isViewMode(task)) {
+                return;
+            }
+            if (task.stages) {
+                task.stages.push(step);
+            }
+            if (onTaskChange) {
+                onTaskChange({ ...task });
+            }
+        },
+        [isViewMode, onTaskChange, task],
+    );
+
+    const onDeleteStage = useCallback(
+        (id: number) => {
+            if (!isViewMode(task)) {
+                return;
+            }
+            if (task.stages) {
+                const stageIndex = task.stages.findIndex(stage => stage.id === id);
+                if (stageIndex !== -1) {
+                    task.stages.splice(stageIndex, 1);
+                }
+            }
+            if (onTaskChange) {
+                onTaskChange({ ...task });
+            }
+        },
+        [isViewMode, onTaskChange, task],
+    );
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
@@ -210,7 +252,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
             documents.splice(documentIndex, 1);
             setDocuments([...documents]);
         }
-    }, [focusedPuzzleChain]);
+    }, [documents, focusedPuzzleId]);
 
     return (
         <React.Fragment>
@@ -253,6 +295,8 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
                     onEditableChange={onEditableChange}
+                    onAddStage={onAddStage}
+                    onDeleteStage={onDeleteStage}
                 />
             )}
         </React.Fragment>

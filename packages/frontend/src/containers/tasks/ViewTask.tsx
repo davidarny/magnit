@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
-import { ETaskStatus } from "@magnit/services";
+import { ETaskStatus, ETerminals } from "@magnit/services";
 import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
@@ -13,9 +13,8 @@ import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTaskExtended, updateTask } from "services/api";
-import uuid from "uuid/v4";
+import { useContext, useEffect, useRef, useState } from "react";
+import { addStages, getTaskExtended, updateTask, updateTemplateAssignment } from "services/api";
 
 interface IViewTaskProps {
     taskId: number;
@@ -24,9 +23,10 @@ interface IViewTaskProps {
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
     const [task, setTask] = useState<IExtendedTask>({
-        title: "",
-        id: uuid(),
+        id: 0,
+        title: ETerminals.EMPTY,
         templates: [],
+        stages: [],
         status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
@@ -34,13 +34,19 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const [redirect, setRedirect] = useState(false);
 
     const isValidTask = (value: object): value is IExtendedTask =>
-        _.has(value, "id") && _.has(value, "title") && _.has(value, "templates");
+        _.has(value, "id") &&
+        _.has(value, "title") &&
+        _.has(value, "templates") &&
+        _.has(value, "stages");
+
+    const initialStages = useRef<IExtendedTask["stages"]>([]);
 
     useEffect(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(response => {
                 if (isValidTask(response.task)) {
-                    return setTask({ ...response.task, id: response.task.id.toString() });
+                    initialStages.current = _.cloneDeep(response.task.stages);
+                    return setTask({ ...response.task });
                 }
             })
             .catch(console.error);
@@ -66,6 +72,38 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     function onTaskSave(): void {
         updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
+            .then(() =>
+                Promise.all(
+                    task.templates.map(({ id, editable }) => {
+                        const body = {
+                            editable,
+                        };
+                        return updateTemplateAssignment(context.courier, taskId, Number(id), body);
+                    }),
+                ),
+            )
+            .then(async () => {
+                const diffStages = task.stages
+                    .filter(
+                        stage =>
+                            !initialStages.current.find(
+                                initialStage => initialStage.id === stage.id,
+                            ),
+                    )
+                    .map(stage => {
+                        // TODO: mask input for date
+                        const splitted = stage.dueDate.split(".");
+                        const date = new Date();
+                        date.setDate(Number(_.first(splitted)));
+                        date.setMonth(Number(_.nth(splitted, 1)) - 1);
+                        date.setFullYear(Number(_.nth(splitted, 2)));
+                        return { ...stage, dueDate: new Date(date).toISOString() };
+                    });
+                if (!diffStages.length) {
+                    return;
+                }
+                return addStages(context.courier, taskId, diffStages);
+            })
             .then(() => setOpen(true))
             .catch(() => {
                 setOpen(true);

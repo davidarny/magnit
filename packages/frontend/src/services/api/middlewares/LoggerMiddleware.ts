@@ -2,7 +2,7 @@
 import { IMiddleware, IMiddlewareMeta } from "services/api";
 
 export class LoggerMiddleware implements IMiddleware {
-    async apply(meta: IMiddlewareMeta, response: any): Promise<void> {
+    async response(meta: IMiddlewareMeta, response: any): Promise<void> {
         console.log(
             "%c%s",
             "color:" + "#006DFF",
@@ -19,4 +19,6 @@ export class LoggerMiddleware implements IMiddleware {
             reason,
         );
     }
+
+    async request(meta: IMiddlewareMeta, data: any): Promise<any> {}
 }

@@ -35,7 +35,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }).current;
     const [template, setTemplate] = useState<ITemplate>(
         props.initialState || {
-            id: uuid(),
+            id: 0,
             sections: [],
             title: ETerminals.EMPTY,
             description: ETerminals.EMPTY,
@@ -43,7 +43,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         },
     );
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([template.id]);
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>(
+        template.id ? [template.id.toString()] : [],
+    );
     const service = useRef(
         getEditorService(EEditorType.TEMPLATE, [
             [focusedPuzzleChain, setFocusedPuzzleChain],
@@ -331,7 +333,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
                         service.onPuzzleFocus(puzzleToFocusOn.id);
                     } else {
-                        service.onPuzzleFocus(template.id);
+                        service.onPuzzleFocus(template.id.toString());
                     }
                     return true;
                 }
@@ -382,18 +384,18 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 ]}
             />
             <SelectableBlockWrapper
-                id={template.id}
+                id={template.id.toString()}
                 css={theme => ({
                     paddingTop: theme.spacing(3),
                     marginBottom: theme.spacing(2),
                 })}
-                focused={focusedPuzzleId === template.id}
-                onFocus={service.onPuzzleFocus.bind(service, template.id)}
-                onMouseDown={service.onPuzzleFocus.bind(service, template.id)}
+                focused={focusedPuzzleId === template.id.toString()}
+                onFocus={service.onPuzzleFocus.bind(service, template.id.toString())}
+                onMouseDown={service.onPuzzleFocus.bind(service, template.id.toString())}
             >
                 <SectionHead
                     template={template}
-                    focused={focusedPuzzleId === template.id}
+                    focused={focusedPuzzleId === template.id.toString()}
                     onTemplateChange={onTemplateChange}
                 />
             </SelectableBlockWrapper>

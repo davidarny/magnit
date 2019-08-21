@@ -29,15 +29,26 @@ export class FetchCourier implements ICourier {
         return this.send(path, "DELETE", body);
     }
 
-    private async send<T>(path: string, method: TMethod, body?: object) {
+    private async send<T>(path: string, method: TMethod, body?: any) {
         try {
+            if (this.middlewares) {
+                for (const middleware of this.middlewares) {
+                    const result = await middleware.request(
+                        { path, method, version: this.version },
+                        body,
+                    );
+                    if (result) {
+                        body = _.merge({}, result);
+                    }
+                }
+            }
             const response = await this.fetch(path, method, body);
             const json = await response.clone().json();
             if (this.middlewares) {
                 const responses = [];
                 for (const middleware of this.middlewares) {
                     _.merge(json, ...responses);
-                    const result = await middleware.apply(
+                    const result = await middleware.response(
                         { path, method, version: this.version },
                         json,
                     );

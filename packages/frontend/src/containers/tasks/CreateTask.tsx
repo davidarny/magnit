@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
-import { ETaskStatus } from "@magnit/services";
+import { ETaskStatus, ETerminals } from "@magnit/services";
 import { ITask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -15,8 +15,7 @@ import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
-import { addTaskToTemplate, createTask, getTemplate, getTemplates } from "services/api";
-import uuid from "uuid/v4";
+import { addTemplateAssignment, createTask, getTemplate, getTemplates } from "services/api";
 
 interface IEditableTemplate extends ITemplate {
     editable: boolean;
@@ -26,9 +25,10 @@ export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
     const [task, setTask] = useState<ITask>({
-        title: "",
-        id: uuid(),
+        id: 0,
+        title: ETerminals.EMPTY,
         templates: [],
+        stages: [],
         status: ETaskStatus.DRAFT,
     });
     const [redirect, setRedirect] = useState(false);
@@ -83,7 +83,7 @@ export const CreateTask: React.FC = () => {
                 if (!response.taskId) {
                     return;
                 }
-                await addTaskToTemplate(
+                await addTemplateAssignment(
                     context.courier,
                     Number(response.taskId),
                     (task.templates || []).map(_.toNumber),

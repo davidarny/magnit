@@ -1,21 +1,22 @@
 import {
     Column,
+    CreateDateColumn,
     DeepPartial,
     Entity,
     Index,
     JoinColumn,
     ManyToOne,
-    PrimaryColumn,
     PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
 import { Template } from "../../template/entities/template.entity";
 import { Task } from "./task.entity";
 
-@Entity({ name: "task_to_template" })
+@Entity({ name: "template_assignment" })
 @EntityConstructor
-export class TaskToTemplate {
-    constructor(dto?: DeepPartial<TaskToTemplate>) {}
+export class TemplateAssignment {
+    constructor(dto?: DeepPartial<TemplateAssignment>) {}
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -38,4 +39,10 @@ export class TaskToTemplate {
     @ManyToOne(() => Template)
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;
+
+    @CreateDateColumn({ type: "timestamptz" })
+    created_at: string;
+
+    @UpdateDateColumn({ type: "timestamptz" })
+    updated_at: string;
 }

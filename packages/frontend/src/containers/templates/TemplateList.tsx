@@ -33,8 +33,8 @@ export const TemplateList: React.FC = () => {
                 response.templates = response.templates.map(template => {
                     return {
                         ...template,
-                        createdAt: getFriendlyDate(new Date(template.createdAt)),
-                        updatedAt: getFriendlyDate(new Date(template.updatedAt)),
+                        createdAt: getFriendlyDate(new Date(template.createdAt!), true),
+                        updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
                     };
                 });
                 setRows(response.templates);

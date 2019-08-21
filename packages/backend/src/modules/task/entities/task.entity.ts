@@ -9,7 +9,8 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
-import { TaskToTemplate } from "./task-to-template.entity";
+import { TaskStage } from "./task-stage.entity";
+import { TemplateAssignment } from "./tempalte-assignment.entity";
 
 export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
 
@@ -32,12 +33,17 @@ export class Task {
     @Column("varchar")
     status: TTaskStatus;
 
-    @OneToMany(() => TaskToTemplate, task_to_template => task_to_template.task, { cascade: true })
-    task_to_template: TaskToTemplate[];
+    @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
+        cascade: true,
+    })
+    assignments: TemplateAssignment[];
+
+    @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
+    stages: TaskStage[];
 
     @CreateDateColumn({ type: "timestamptz" })
-    created_at: number;
+    created_at: string;
 
     @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: number;
+    updated_at: string;
 }
