@@ -40,11 +40,11 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
+                    zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
                 })}
                 onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
                 onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
-                focused={focusedPuzzleId === task.id}
+                focused={focusedPuzzleId === getTaskId()}
                 id={getTaskId()}
             >
                 <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>

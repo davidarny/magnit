@@ -177,11 +177,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
+                    zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
                 })}
                 onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
                 onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
-                focused={focusedPuzzleId === task.id}
+                focused={focusedPuzzleId === getTaskId()}
                 id={getTaskId()}
             >
                 <Grid container spacing={2}>
