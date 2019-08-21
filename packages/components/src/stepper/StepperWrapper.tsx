@@ -69,8 +69,10 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
         [id, onTitleChange],
     );
 
+    console.log(content, rest);
+
     return (
-        <Step active={true} {...rest} completed={completed}>
+        <Step {...rest} active={true} completed={completed}>
             <StepLabel
                 css={theme => ({
                     svg: { color: `${theme.colors.primary} !important` },
