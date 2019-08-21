@@ -15,7 +15,9 @@ import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
 import { IDocument, ITask, TChangeEvent } from "entities";
 import _ from "lodash";
+import { useCallback } from "react";
 import * as React from "react";
+import uuid from "uuid/v4";
 
 interface ICreateTaskProps {
     task: Partial<ITask>;
@@ -31,6 +33,8 @@ interface ICreateTaskProps {
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
 
+    const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
+
     return (
         <React.Fragment>
             <SelectableBlockWrapper
@@ -38,10 +42,10 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     padding: theme.spacing(3),
                     zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, task.id || "")}
-                onMouseDown={service.onPuzzleFocus.bind(service, task.id || "")}
+                onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
+                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
                 focused={focusedPuzzleId === task.id}
-                id={task.id}
+                id={getTaskId()}
             >
                 <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
                     <Grid item xs={12}>
@@ -99,7 +103,7 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                 </Grid>
             </SelectableBlockWrapper>
             {documents.map(document => {
-                const snapshot = templateSnapshots.get(document.id);
+                const snapshot = templateSnapshots.get(document.id.toString());
                 return (
                     <SelectableBlockWrapper
                         key={document.__uuid}

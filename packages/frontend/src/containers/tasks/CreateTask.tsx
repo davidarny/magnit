@@ -16,7 +16,6 @@ import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { addTemplateAssignment, createTask, getTemplate, getTemplates } from "services/api";
-import uuid from "uuid/v4";
 
 interface IEditableTemplate extends ITemplate {
     editable: boolean;
@@ -26,9 +25,10 @@ export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
     const [task, setTask] = useState<ITask>({
+        id: 0,
         title: "",
-        id: uuid(),
         templates: [],
+        stages: [],
         status: ETaskStatus.DRAFT,
     });
     const [redirect, setRedirect] = useState(false);

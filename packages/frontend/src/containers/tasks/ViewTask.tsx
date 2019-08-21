@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
-import { ETaskStatus } from "@magnit/services";
+import { ETaskStatus, ETerminals } from "@magnit/services";
 import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
@@ -15,7 +15,6 @@ import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { getTaskExtended, updateTask, updateTemplateAssignment } from "services/api";
-import uuid from "uuid/v4";
 
 interface IViewTaskProps {
     taskId: number;
@@ -24,9 +23,10 @@ interface IViewTaskProps {
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
     const [task, setTask] = useState<IExtendedTask>({
-        title: "",
-        id: uuid(),
+        id: 0,
+        title: ETerminals.EMPTY,
         templates: [],
+        stages: [],
         status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
@@ -40,7 +40,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(response => {
                 if (isValidTask(response.task)) {
-                    return setTask({ ...response.task, id: response.task.id.toString() });
+                    return setTask({ ...response.task });
                 }
             })
             .catch(console.error);

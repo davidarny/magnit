@@ -9,6 +9,7 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
 export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
@@ -37,9 +38,12 @@ export class Task {
     })
     template_assignments: TemplateAssignment[];
 
+    @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
+    task_stages: TaskStage[];
+
     @CreateDateColumn({ type: "timestamptz" })
-    created_at: number;
+    created_at: string;
 
     @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: number;
+    updated_at: string;
 }

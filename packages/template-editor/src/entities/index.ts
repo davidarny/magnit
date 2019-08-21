@@ -52,7 +52,8 @@ export interface IValidation extends IOrdered, IWithId {
     errorMessage: string;
 }
 
-export interface ITemplate extends ITitled, IWithId, IWithDescription {
+export interface ITemplate extends ITitled, IWithDescription {
+    id: number;
     sections: ISection[];
     type: ETemplateType;
 }

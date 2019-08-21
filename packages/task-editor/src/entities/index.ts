@@ -2,7 +2,7 @@ import { ETaskStatus } from "@magnit/services";
 import * as React from "react";
 
 export interface IStep {
-    id: string;
+    id: number;
     title: string;
     date: string;
     completed: boolean;
@@ -10,7 +10,7 @@ export interface IStep {
 }
 
 export interface IBaseTask {
-    id?: string;
+    id?: number;
     title: string;
     descriptions?: string;
     status: ETaskStatus;
@@ -19,20 +19,29 @@ export interface IBaseTask {
 }
 
 export interface ITask extends IBaseTask {
-    id: string;
+    id: number;
     templates: string[];
+    stages: string[];
 }
 
 export interface IDocument {
-    id: string;
+    id: number;
     title: string;
     editable: boolean;
     __uuid: string; // need for correct rendering
 }
 
+export interface IStage {
+    id: number;
+    title: string;
+    dueDate: string; // ISO time format
+    __uuid: string; // need for correct rendering
+}
+
 export interface IExtendedTask extends IBaseTask {
-    id: string;
+    id: number;
     templates: Array<Omit<IDocument, "__uuid">>;
+    stages: Array<Omit<IStage, "__uuid">>;
 }
 
 interface TChangeParam {

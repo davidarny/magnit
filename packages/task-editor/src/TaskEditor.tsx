@@ -37,7 +37,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>(
-        task.id ? [task.id] : [],
+        task.id ? [task.id.toString()] : [],
     );
 
     const service = useRef(
@@ -86,8 +86,8 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         if (isCreateMode(task) && _.isEmpty(task.templates)) {
             setDocuments([
                 {
+                    id: 0,
                     title: ETerminals.EMPTY,
-                    id: ETerminals.EMPTY,
                     editable: false,
                     __uuid: uuid(),
                 },
@@ -128,7 +128,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                 if (documentId) {
                     const template = templates.find(template => template.id === documentId);
                     if (template) {
-                        templateSnapshots.set(documentId, template);
+                        templateSnapshots.set(documentId.toString(), template);
                         setTemplateSnapshots(new Map(templateSnapshots));
                     }
                 }
@@ -158,13 +158,13 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
     useEffect(() => {
         if (!_.isEqual(task, initialState) && initialState) {
             setTask(initialState);
-            setFocusedPuzzleChain([initialState.id || ""]);
+            setFocusedPuzzleChain([initialState.id.toString() || ""]);
         }
     }, [initialState]);
 
     function onTemplateChange(uuid: string, event: TChangeEvent): void {
         const { templates } = props;
-        const templateId = event.target.value as string;
+        const templateId = Number(event.target.value);
         if (documents.some(document => document.__uuid === uuid)) {
             const templateIndex = templates.findIndex(template => template.id === templateId);
             const documentIndex = documents.findIndex(document => document.__uuid === uuid);
@@ -174,7 +174,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         }
     }
 
-    function onEditableChange(documentId: string, editable: boolean) {
+    function onEditableChange(documentId: number, editable: boolean) {
         if (documents.some(document => document.id === documentId)) {
             const documentIndex = documents.findIndex(document => document.id === documentId);
             documents[documentIndex].editable = editable;
@@ -186,7 +186,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         setDocuments([
             ...documents,
             {
-                id: ETerminals.EMPTY,
+                id: 0,
                 __uuid: uuid(),
                 title: ETerminals.EMPTY,
                 editable: false,

@@ -38,8 +38,8 @@ export class Template {
     type: TTemplateType;
 
     @CreateDateColumn({ type: "timestamptz" })
-    created_at: number;
+    created_at: string;
 
     @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: number;
+    updated_at: string;
 }

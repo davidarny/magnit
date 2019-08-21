@@ -10,35 +10,27 @@ import {
     UpdateDateColumn,
 } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
-import { Template } from "../../template/entities/template.entity";
 import { Task } from "./task.entity";
 
-@Entity({ name: "template_assignment" })
+@Entity("task_stage")
 @EntityConstructor
-export class TemplateAssignment {
-    constructor(dto?: DeepPartial<TemplateAssignment>) {}
+export class TaskStage {
+    constructor(dto?: DeepPartial<TaskStage>) {}
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: "boolean", default: false })
-    editable: boolean;
-
-    @Column()
-    id_task: number;
-
     @Index()
-    @ManyToOne(() => Task)
+    @ManyToOne(() => Task, task => task.task_stages)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
 
-    @Column()
-    id_template: number;
+    @Column("varchar")
+    title: string;
 
     @Index()
-    @ManyToOne(() => Template)
-    @JoinColumn({ name: "id_template", referencedColumnName: "id" })
-    template: Template;
+    @Column("timestamptz")
+    due_date: string;
 
     @CreateDateColumn({ type: "timestamptz" })
     created_at: string;

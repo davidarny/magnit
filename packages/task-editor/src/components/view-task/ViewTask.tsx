@@ -24,7 +24,7 @@ import { TemplateRenderer } from "components/renderers";
 import { IDocument, IExtendedTask, IStep, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
 
@@ -37,7 +37,7 @@ interface IViewTaskProps {
 
     onAssigneeChange?(userId: string): void;
 
-    onEditableChange(documentId: string, editable: boolean): void;
+    onEditableChange(documentId: number, editable: boolean): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
@@ -49,7 +49,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const [steps, setSteps] = useState<IStep[]>([
         {
-            id: uuid(),
+            id: 0,
             title: "Подготовка технического плана",
             date: "07.07.2019",
             completed: false,
@@ -70,10 +70,14 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     }
 
     function onAddStep(): void {
+        const last = _.last(steps);
+        if (!last) {
+            return;
+        }
         setSteps([
             ...steps,
             {
-                id: uuid(),
+                id: last.id + 1,
                 title: "",
                 date: "",
                 completed: false,
@@ -82,7 +86,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         ]);
     }
 
-    function onChangeStepTitle(id: string, value: string): void {
+    function onChangeStepTitle(id: number, value: string): void {
         if (steps.some(step => step.id === id)) {
             const stepIndex = steps.findIndex(step => step.id === id);
             steps[stepIndex].title = value;
@@ -90,7 +94,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }
 
-    function onChangeStepDate(id: string, value: string): void {
+    function onChangeStepDate(id: number, value: string): void {
         if (steps.some(step => step.id === id)) {
             const stepIndex = steps.findIndex(step => step.id === id);
             steps[stepIndex].date = value;
@@ -98,7 +102,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }
 
-    function onStepDelete(id: string): void {
+    function onStepDelete(id: number): void {
         if (steps.some(step => step.id === id)) {
             const stepIndex = steps.findIndex(step => step.id === id);
             steps.splice(stepIndex, 1);
@@ -106,9 +110,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }
 
-    function onEditableChange(documentId: string, editable: boolean) {
+    function onEditableChange(documentId: number, editable: boolean) {
         props.onEditableChange(documentId, editable);
     }
+
+    const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
     return (
         <React.Fragment>
@@ -173,10 +179,10 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     padding: theme.spacing(3),
                     zIndex: focusedPuzzleId === task.id ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, task.id || "")}
-                onMouseDown={service.onPuzzleFocus.bind(service, task.id || "")}
+                onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
+                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
                 focused={focusedPuzzleId === task.id}
-                id={task.id}
+                id={getTaskId()}
             >
                 <Grid container spacing={2}>
                     <Grid
@@ -289,7 +295,7 @@ interface ITaskDocumentProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
-    onEditableChange(documentId: string, editable: boolean): void;
+    onEditableChange(documentId: number, editable: boolean): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {

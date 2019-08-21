@@ -16,7 +16,10 @@ import { ITemplateService } from "../template/interfaces/template.service.interf
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
 import { TemplateService } from "../template/services/template.service";
 import { AddTemplatesBody } from "./bodies/add-templates.body";
-import { TaskDto, TemplateAssignmentDto } from "./dto/task.dto";
+import { TaskStageDto } from "./dto/task-stage.dto";
+import { TaskDto } from "./dto/task.dto";
+import { TemplateAssignmentDto } from "./dto/template-assignment.dto";
+import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
 import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
 import { ITaskService } from "./interfaces/task.service.interface";
@@ -29,6 +32,7 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
+import _ = require("lodash");
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -79,12 +83,19 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findById(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id);
+        const task = await this.taskService.findById(id, ["task_stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
-        return { success: 1, task: { ...task, templates: templates.map(template => template.id) } };
+        return {
+            success: 1,
+            task: {
+                ..._.omit(task, "task_stages"),
+                templates: (templates || []).map(template => template.id),
+                stages: (task.task_stages || []).map(stage => stage.id),
+            },
+        };
     }
 
-    @Put("/:id/templates")
+    @Post("/:id/templates")
     @ApiImplicitBody({
         name: "templates",
         type: AddTemplatesBody,
@@ -95,10 +106,10 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async addTemplateAssignment(
         @Param("id", TaskByIdPipe) id: string,
-        @Body("templates", TemplatesByIdsPipe) arrayOfIds: number[],
+        @Body("templates", TemplatesByIdsPipe) templateIds: number[],
     ) {
         const templates: Template[] = [];
-        for (const templateId of arrayOfIds) {
+        for (const templateId of templateIds) {
             const template = await this.templateService.findById(templateId.toString());
             templates.push(template);
         }
@@ -129,6 +140,20 @@ export class TaskController {
         return { success: 1 };
     }
 
+    @Post("/:id/stages")
+    @ApiImplicitBody({ type: [TaskStageDto], name: "stages" })
+    @ApiOkResponse({ type: BaseResponse })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    async addTaskStage(
+        @Param("id", TaskByIdPipe) id: string,
+        @Body("stages") taskStageDtos: TaskStageDto[],
+    ) {
+        const task = await this.taskService.findById(id, ["task_stages"]);
+        task.task_stages = taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto }));
+        await this.taskService.update(id, task);
+        return { success: 1 };
+    }
+
     @Delete("/:id")
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
@@ -141,8 +166,11 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id);
+        const task = await this.taskService.findById(id, ["task_stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
-        return { success: 1, task: { ...task, templates } };
+        return {
+            success: 1,
+            task: { ..._.omit(task, "task_stages"), templates, stages: task.task_stages || [] },
+        };
     }
 }
