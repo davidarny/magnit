@@ -3,7 +3,7 @@ import { traverse } from "@magnit/template-editor";
 import _ from "lodash";
 
 export class JsonParseMiddleware implements IMiddleware {
-    async apply(meta: IMiddlewareMeta, response: any): Promise<object> {
+    async response(meta: IMiddlewareMeta, response: any): Promise<object> {
         traverse(response, (object: any) => {
             if (_.isObject(object)) {
                 _.mapKeys(object, (value: any, key: string) => {
@@ -19,4 +19,6 @@ export class JsonParseMiddleware implements IMiddleware {
     }
 
     error<T>(meta: IMiddlewareMeta, reason: T): void {}
+
+    async request(meta: IMiddlewareMeta, data: any): Promise<any> {}
 }

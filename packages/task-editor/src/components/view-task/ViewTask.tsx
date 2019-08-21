@@ -35,7 +35,9 @@ interface IViewTaskProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
-    onAssigneeChange?(userId: string): void;
+    onAddStage?(step: IStageStep): void;
+
+    onDeleteStage?(id: number): void;
 
     onEditableChange(documentId: number, editable: boolean): void;
 }
@@ -43,6 +45,7 @@ interface IViewTaskProps {
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [open, setOpen] = useState(false);
     const { service, task, focusedPuzzleId, templateSnapshots } = props;
+    const { onAddStage, onDeleteStage, onEditableChange } = props;
 
     let { documents } = props;
     documents = documents.filter(document => !!document.title);
@@ -78,6 +81,16 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stages]);
 
+    useEffect(() => {
+        const diffSteps = steps
+            .filter(step => step.title && step.dueDate)
+            .filter(step => stages && !stages.find(stage => stage.id === step.id));
+        if (!diffSteps.length) {
+            return;
+        }
+        diffSteps.forEach(step => onAddStage && onAddStage(step));
+    }, [steps, stages, onAddStage]);
+
     function onDialogClose(): void {
         setOpen(false);
     }
@@ -90,7 +103,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         setOpen(false);
     }
 
-    function onAddStep(): void {
+    const onAddStep = useCallback((): void => {
         const last = _.last(steps);
         if (!last) {
             return;
@@ -105,57 +118,56 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 editable: true,
             },
         ]);
-    }
+    }, [steps]);
 
-    function onChangeStepTitle(id: number, value: string): void {
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps[stepIndex].title = value;
-            setSteps([...steps]);
-        }
-    }
+    const onChangeStepTitle = useCallback(
+        (id: number, value: string): void => {
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps[stepIndex].title = value;
+                setSteps([...steps]);
+            }
+        },
+        [steps],
+    );
 
-    function onChangeStepDate(id: number, value: string): void {
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps[stepIndex].dueDate = value;
-            setSteps([...steps]);
-        }
-    }
+    const onChangeStepDate = useCallback(
+        (id: number, value: string): void => {
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps[stepIndex].dueDate = value;
+                setSteps([...steps]);
+            }
+        },
+        [steps],
+    );
 
-    function onStepDelete(id: number): void {
-        // disallow deleting if only 1 stage present
-        if (steps.length < 2) {
-            return;
-        }
-        if (steps.some(step => step.id === id)) {
-            const stepIndex = steps.findIndex(step => step.id === id);
-            steps.splice(stepIndex, 1);
-            setSteps([...steps]);
-        }
-    }
+    const onStepDelete = useCallback(
+        (id: number) => {
+            // disallow deleting if only 1 stage present
+            if (steps.length < 2) {
+                return;
+            }
+            if (steps.some(step => step.id === id)) {
+                const stepIndex = steps.findIndex(step => step.id === id);
+                steps.splice(stepIndex, 1);
+                setSteps([...steps]);
+                if (onDeleteStage) {
+                    onDeleteStage(id);
+                }
+            }
+        },
+        [onDeleteStage, steps],
+    );
 
-    function onEditableChange(documentId: number, editable: boolean) {
-        props.onEditableChange(documentId, editable);
-    }
+    const onEditableChangeHandler = useCallback(
+        (documentId: number, editable: boolean) => {
+            onEditableChange(documentId, editable);
+        },
+        [onEditableChange],
+    );
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
-
-    console.log(
-        task,
-        steps.map(step => ({
-            id: step.id,
-            editable: step.editable,
-            completed: step.completed,
-            title: step.title,
-            content: (
-                <DateField
-                    onChange={event => onChangeStepDate(step.id, event.target.value)}
-                    value={step.dueDate}
-                />
-            ),
-        })),
-    );
 
     return (
         <React.Fragment>
@@ -293,6 +305,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 title: step.title,
                                 content: (
                                     <DateField
+                                        disabled={!step.editable}
                                         onChange={event =>
                                             onChangeStepDate(step.id, event.target.value)
                                         }
@@ -315,7 +328,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             onClick={onAddStep}
                         >
                             <AddIcon />
-                            <Typography>Добавить новый этап</Typography>
+                            <Typography>Новый этап</Typography>
                         </Button>
                     </Grid>
                 </Grid>
@@ -327,7 +340,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     service={service}
                     templateSnapshots={templateSnapshots}
                     focusedPuzzleId={focusedPuzzleId}
-                    onEditableChange={onEditableChange}
+                    onEditableChange={onEditableChangeHandler}
                 />
             ))}
         </React.Fragment>

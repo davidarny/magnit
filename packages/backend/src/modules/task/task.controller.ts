@@ -114,9 +114,10 @@ export class TaskController {
             templates.push(template);
         }
         const task = await this.taskService.findById(id, ["template_assignments"]);
-        task.template_assignments = templates.map(
-            template => new TemplateAssignment({ task, template }),
-        );
+        task.template_assignments = [
+            ...task.template_assignments,
+            ...templates.map(template => new TemplateAssignment({ task, template })),
+        ];
         await this.taskService.update(id, task);
         return { success: 1 };
     }
@@ -149,7 +150,10 @@ export class TaskController {
         @Body("stages") taskStageDtos: TaskStageDto[],
     ) {
         const task = await this.taskService.findById(id, ["task_stages"]);
-        task.task_stages = taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto }));
+        task.task_stages = [
+            ...task.task_stages,
+            ...taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto })),
+        ];
         await this.taskService.update(id, task);
         return { success: 1 };
     }

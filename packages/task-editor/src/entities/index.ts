@@ -5,7 +5,7 @@ export interface IStageStep {
     id: number;
     title: string;
     dueDate: string;
-    completed: boolean;
+    completed?: boolean;
     editable?: boolean;
 }
 
