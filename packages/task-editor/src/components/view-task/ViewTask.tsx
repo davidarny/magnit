@@ -11,7 +11,7 @@ import {
     StepperWrapper,
 } from "@magnit/components";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { ETaskStatus, getFriendlyDate, IEditorService } from "@magnit/services";
+import { ETaskStatus, ETerminals, getFriendlyDate, IEditorService } from "@magnit/services";
 import {
     Dialog,
     FormControl,
@@ -48,19 +48,35 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     documents = documents.filter(document => !!document.title);
 
     const { stages } = task;
-    const defaultStepsState = (stages || []).map(stage => ({
-        ...stage,
-        completed: Date.now() >= new Date(stage.dueDate).valueOf(),
-        editable: false,
-    }));
-    const [steps, setSteps] = useState<IStageStep[]>(defaultStepsState || []);
+    const initialStepsState =
+        stages &&
+        stages.length > 0 &&
+        stages.map(stage => ({
+            ...stage,
+            completed: Date.now() >= new Date(stage.dueDate).valueOf(),
+            editable: false,
+        }));
+    const defaultStepsState = [
+        {
+            id: 0,
+            title: ETerminals.EMPTY,
+            dueDate: ETerminals.EMPTY,
+            completed: false,
+            editable: true,
+        },
+    ];
+    const [steps, setSteps] = useState<IStageStep[]>(initialStepsState || defaultStepsState);
 
     const prevStages = useRef(_.cloneDeep(stages));
     useEffect(() => {
-        if (!_.isEqual(prevStages, stages) && !_.isEqual(steps, defaultStepsState)) {
-            setSteps(defaultStepsState);
+        if (!initialStepsState) {
+            return;
         }
-    }, [stages, defaultStepsState]);
+        if (!_.isEqual(prevStages, stages) && !_.isEqual(steps, initialStepsState)) {
+            setSteps(initialStepsState);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stages]);
 
     function onDialogClose(): void {
         setOpen(false);
@@ -83,8 +99,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             ...steps,
             {
                 id: last.id + 1,
-                title: "",
-                dueDate: "",
+                title: ETerminals.EMPTY,
+                dueDate: ETerminals.EMPTY,
                 completed: false,
                 editable: true,
             },
@@ -108,6 +124,10 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     }
 
     function onStepDelete(id: number): void {
+        // disallow deleting if only 1 stage present
+        if (steps.length < 2) {
+            return;
+        }
         if (steps.some(step => step.id === id)) {
             const stepIndex = steps.findIndex(step => step.id === id);
             steps.splice(stepIndex, 1);
@@ -120,6 +140,22 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     }
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
+
+    console.log(
+        task,
+        steps.map(step => ({
+            id: step.id,
+            editable: step.editable,
+            completed: step.completed,
+            title: step.title,
+            content: (
+                <DateField
+                    onChange={event => onChangeStepDate(step.id, event.target.value)}
+                    value={step.dueDate}
+                />
+            ),
+        })),
+    );
 
     return (
         <React.Fragment>
@@ -260,7 +296,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                         onChange={event =>
                                             onChangeStepDate(step.id, event.target.value)
                                         }
-                                        value={getFriendlyDate(new Date(step.dueDate))}
+                                        value={
+                                            !step.editable
+                                                ? getFriendlyDate(new Date(step.dueDate))
+                                                : step.dueDate
+                                        }
                                     />
                                 ),
                             }))}
