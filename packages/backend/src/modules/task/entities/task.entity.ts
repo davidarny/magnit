@@ -1,16 +1,20 @@
 import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
-import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
-export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
+export enum ETaskStatus {
+    IN_PROGRESS = "in_progress",
+    ON_CHECK = "on_check",
+    DRAFT = "draft",
+    COMPLETED = "completed",
+}
 
 @Entity()
-@EntityConstructor
-export class Task extends BaseEntity {
+export class Task extends BaseEntity<Task, DeepPartial<Task>> {
     constructor(dto?: DeepPartial<Task>) {
         super();
+        this.construct(this, dto);
     }
 
     @Index()
@@ -22,7 +26,7 @@ export class Task extends BaseEntity {
 
     @Index()
     @Column("varchar")
-    status: TTaskStatus;
+    status: ETaskStatus;
 
     @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
         cascade: true,

@@ -1,12 +1,12 @@
-import { Task, TTaskStatus } from "../entities/task.entity";
+import { ETaskStatus, Task } from "../entities/task.entity";
 
 export interface ITaskService {
     findAll(
         offset?: number,
         limit?: number,
         sort?: "ASC" | "DESC",
-        status?: TTaskStatus,
-        statuses?: TTaskStatus[],
+        status?: ETaskStatus,
+        statuses?: ETaskStatus[],
         title?: string,
     ): Promise<Task[]>;
 
@@ -17,4 +17,6 @@ export interface ITaskService {
     findById(id: string, relations?: string[]): Promise<Task>;
 
     deleteById(id: string): Promise<void>;
+
+    getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
 }

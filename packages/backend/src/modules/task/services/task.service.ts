@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Task, TTaskStatus } from "../entities/task.entity";
+import { Task, ETaskStatus } from "../entities/task.entity";
 import { FindManyOptions, In, Repository } from "typeorm";
 import { ITaskService } from "../interfaces/task.service.interface";
 
@@ -12,8 +12,8 @@ export class TaskService implements ITaskService {
         offset?: number,
         limit?: number,
         sort?: "ASC" | "DESC",
-        status?: TTaskStatus,
-        statuses?: TTaskStatus[],
+        status?: ETaskStatus,
+        statuses?: ETaskStatus[],
         title?: string,
     ) {
         const options: FindManyOptions<Task> = {};
@@ -60,7 +60,26 @@ export class TaskService implements ITaskService {
         await this.taskRepository.delete(id);
     }
 
-    update(id: string, task: Task): Promise<Task> {
+    async update(id: string, task: Task): Promise<Task> {
         return this.taskRepository.save({ ...task, id: Number(id) });
+    }
+
+    getDescriptionByTransition(
+        prevStatus: ETaskStatus,
+        nextStatus: ETaskStatus,
+    ): string | undefined {
+        return {
+            [ETaskStatus.DRAFT]: {
+                [ETaskStatus.ON_CHECK]: "Отправка задания",
+            },
+            [ETaskStatus.ON_CHECK]: {
+                [ETaskStatus.IN_PROGRESS]: "Начало работы над заданием",
+                [ETaskStatus.DRAFT]: "Задание отозвано",
+            },
+            [ETaskStatus.IN_PROGRESS]: {
+                [ETaskStatus.COMPLETED]: "Задание завершено",
+                [ETaskStatus.DRAFT]: "Задание отозвано",
+            },
+        }[prevStatus][nextStatus];
     }
 }

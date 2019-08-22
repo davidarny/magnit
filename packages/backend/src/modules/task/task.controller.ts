@@ -118,20 +118,20 @@ export class TaskController {
         return { success: 1 };
     }
 
-    @Put("/:taskId/templates/:templateId")
+    @Put("/:task_id/templates/:template_id")
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async updateTemplateAssignment(
-        @Param("taskId", TaskByIdPipe) taskId: string,
-        @Param("templateId", TemplateByIdPipe) templateId: string,
-        @Body() taskTemplateDto: TemplateAssignmentDto,
+        @Param("task_id", TaskByIdPipe) taskId: string,
+        @Param("template_id", TemplateByIdPipe) templateId: string,
+        @Body() templateAssignmentDto: TemplateAssignmentDto,
     ) {
         const task = await this.taskService.findById(taskId, ["assignments"]);
         (task.assignments || [])
-            .filter(taskToTemplate => taskToTemplate.id_template === Number(templateId))
-            .forEach((taskToTemplate, index) => {
-                task.assignments[index] = { ...taskToTemplate, ...taskTemplateDto };
+            .filter(assignment => assignment.id_template === Number(templateId))
+            .forEach((assignment, index) => {
+                task.assignments[index] = { ...assignment, ...templateAssignmentDto };
             });
         await this.taskService.update(taskId, task);
         return { success: 1 };

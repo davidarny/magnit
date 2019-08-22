@@ -1,15 +1,14 @@
 import { Column, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { TemplateAssignment } from "../../task/entities/tempalte-assignment.entity";
 
 export type TTemplateType = "light" | "complex";
 
 @Entity()
-@EntityConstructor
-export class Template extends BaseEntity {
+export class Template extends BaseEntity<Template, DeepPartial<Template>> {
     constructor(dto?: DeepPartial<Template>) {
         super();
+        this.construct(this, dto);
     }
 
     @PrimaryGeneratedColumn()

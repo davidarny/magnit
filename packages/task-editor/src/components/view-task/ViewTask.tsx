@@ -476,8 +476,8 @@ const InfoField: React.FC<IMainInfoProps> = ({ title, value, editable, label, ..
 
 function getTitleByStatus(status: ETaskStatus): string {
     return {
-        [ETaskStatus.IN_PROGRESS.replace("-", "_")]: "В работе",
-        [ETaskStatus.ON_CHECK.replace("-", "_")]: "На проверке",
+        [ETaskStatus.IN_PROGRESS]: "В работе",
+        [ETaskStatus.ON_CHECK]: "На проверке",
         [ETaskStatus.COMPLETED]: "Завершено",
         [ETaskStatus.DRAFT]: "Черновик",
     }[status];
@@ -485,8 +485,8 @@ function getTitleByStatus(status: ETaskStatus): string {
 
 function getColorByStatus(theme: any, status: ETaskStatus): string {
     return {
-        [ETaskStatus.IN_PROGRESS.replace("-", "_")]: theme.colors.violet,
-        [ETaskStatus.ON_CHECK.replace("-", "_")]: theme.colors.darkYellow,
+        [ETaskStatus.IN_PROGRESS]: theme.colors.violet,
+        [ETaskStatus.ON_CHECK]: theme.colors.darkYellow,
         [ETaskStatus.COMPLETED]: theme.colors.green,
         [ETaskStatus.DRAFT]: theme.colors.secondary,
     }[status];

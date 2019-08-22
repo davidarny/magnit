@@ -1,6 +1,12 @@
 import { BeforeUpdate, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-export class BaseEntity {
+export abstract class BaseEntity<E, T> {
+    protected construct?(entity?: E, dto?: T) {
+        if (entity && dto) {
+            Object.assign(entity, dto);
+        }
+    }
+
     @PrimaryGeneratedColumn()
     id: number;
 
