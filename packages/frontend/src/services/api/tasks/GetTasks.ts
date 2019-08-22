@@ -10,7 +10,7 @@ export interface IGetTasksResponse extends IResponse {
 export async function getTasks(courier: ICourier, status?: ETaskStatus) {
     const query = {
         limit: `?limit=${Number.MAX_SAFE_INTEGER}`,
-        status: `${status ? `&status=${status.replace(/-/g, "_")}` : ""}`,
+        status: `${status ? `&status=${status}` : ""}`,
     };
     return courier.get<IGetTasksResponse>(`tasks${query.limit}${query.status}`);
 }

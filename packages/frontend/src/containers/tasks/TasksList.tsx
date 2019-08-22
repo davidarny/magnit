@@ -24,8 +24,8 @@ import { useContext, useEffect, useState } from "react";
 import { getTasks, IGetTasksResponse } from "services/api";
 
 const tabs: ITab[] = [
-    { value: ETaskStatus.IN_PROGRESS, label: "В работе" },
-    { value: ETaskStatus.ON_CHECK, label: "На проверке" },
+    { value: ETaskStatus.IN_PROGRESS.replace("_", "-"), label: "В работе" },
+    { value: ETaskStatus.ON_CHECK.replace("_", "-"), label: "На проверке" },
     { value: ETaskStatus.DRAFT, label: "Черновики" },
     { value: ETaskStatus.COMPLETED, label: "Завершенные" },
 ];

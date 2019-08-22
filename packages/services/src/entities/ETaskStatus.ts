@@ -1,6 +1,6 @@
 export enum ETaskStatus {
-    IN_PROGRESS = "in-progress",
-    ON_CHECK = "on-check",
+    IN_PROGRESS = "in_progress",
+    ON_CHECK = "on_check",
     DRAFT = "draft",
     COMPLETED = "completed",
 }
