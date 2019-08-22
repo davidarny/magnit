@@ -21,6 +21,9 @@ export class TaskStage extends BaseEntity<TaskStage, DeepPartial<TaskStage>> {
     @Column("varchar")
     title: string;
 
+    @Column({ type: "boolean", default: false })
+    finished: boolean;
+
     @Index()
     @Column("timestamptz")
     due_date: string;
