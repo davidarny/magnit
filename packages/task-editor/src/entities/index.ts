@@ -31,6 +31,10 @@ export interface IDocument {
     __uuid: string; // need for correct rendering
 }
 
+export interface IVirtualDocument extends IDocument {
+    virtual?: boolean;
+}
+
 export interface IStage {
     id: number;
     title: string;

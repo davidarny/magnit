@@ -103,7 +103,7 @@ export class TaskController {
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async addTemplateAssignment(
+    async setTemplateAssignments(
         @Param("id", TaskByIdPipe) id: string,
         @Body("templates", TemplatesByIdsPipe) templateIds: number[],
     ) {
@@ -113,10 +113,7 @@ export class TaskController {
             templates.push(template);
         }
         const task = await this.taskService.findById(id, ["assignments"]);
-        task.assignments = [
-            ...task.assignments,
-            ...templates.map(template => new TemplateAssignment({ task, template })),
-        ];
+        task.assignments = templates.map(template => new TemplateAssignment({ task, template }));
         await this.taskService.update(id, task);
         return { success: 1 };
     }
@@ -144,7 +141,7 @@ export class TaskController {
     @ApiImplicitBody({ type: [TaskStageDto], name: "stages" })
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async addTaskStage(
+    async addTaskStages(
         @Param("id", TaskByIdPipe) id: string,
         @Body("stages") taskStageDtos: TaskStageDto[],
     ) {

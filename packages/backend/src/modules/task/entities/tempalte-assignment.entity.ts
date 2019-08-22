@@ -24,7 +24,7 @@ export class TemplateAssignment {
     @Column({ type: "boolean", default: false })
     editable: boolean;
 
-    @Column()
+    @Column({ nullable: true })
     id_task: number;
 
     @Index()
@@ -32,7 +32,7 @@ export class TemplateAssignment {
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
 
-    @Column()
+    @Column({ nullable: true })
     id_template: number;
 
     @Index()

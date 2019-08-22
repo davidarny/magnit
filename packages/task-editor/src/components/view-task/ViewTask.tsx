@@ -21,7 +21,7 @@ import {
     Typography,
 } from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
-import { IDocument, IExtendedTask, IStageStep, TChangeEvent } from "entities";
+import { IDocument, IExtendedTask, IStageStep, IVirtualDocument, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -31,7 +31,8 @@ import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
 interface IViewTaskProps {
     task: Partial<IExtendedTask>;
     service: IEditorService;
-    documents: IDocument[];
+    documents: IVirtualDocument[];
+    templates: Omit<IDocument, "__uuid">[];
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
@@ -40,15 +41,14 @@ interface IViewTaskProps {
     onDeleteStage?(id: number): void;
 
     onEditableChange(documentId: number, editable: boolean): void;
+
+    onTemplatesChange(uuid: string, event: TChangeEvent): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [open, setOpen] = useState(false);
-    const { service, task, focusedPuzzleId, templateSnapshots } = props;
-    const { onAddStage, onDeleteStage, onEditableChange } = props;
-
-    let { documents } = props;
-    documents = documents.filter(document => !!document.title);
+    const { service, task, focusedPuzzleId, templateSnapshots, documents, templates } = props;
+    const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange } = props;
 
     const { stages } = task;
     const initialStepsState =
@@ -339,12 +339,15 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             </SelectableBlockWrapper>
             {documents.map(document => (
                 <TaskDocument
+                    documents={documents}
                     key={document.__uuid}
                     document={document}
+                    templates={templates}
                     service={service}
                     templateSnapshots={templateSnapshots}
                     focusedPuzzleId={focusedPuzzleId}
                     onEditableChange={onEditableChangeHandler}
+                    onTemplateChange={onTemplatesChange}
                 />
             ))}
         </React.Fragment>
@@ -352,16 +355,20 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 };
 
 interface ITaskDocumentProps {
-    document: IDocument;
+    documents: IVirtualDocument[];
+    document: IVirtualDocument;
     service: IEditorService;
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
+    templates: Omit<IDocument, "__uuid">[];
 
     onEditableChange(documentId: number, editable: boolean): void;
+
+    onTemplateChange(uuid: string, event: TChangeEvent): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
-    const { templateSnapshots, focusedPuzzleId, service, document } = props;
+    const { templateSnapshots, focusedPuzzleId, service, document, templates, documents } = props;
 
     const snapshot = templateSnapshots.get(document.id.toString());
     const focused = focusedPuzzleId === document.__uuid;
@@ -381,6 +388,28 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
             focused={focused}
             id={document.__uuid}
         >
+            {document.virtual && (
+                <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
+                    <SelectField
+                        placeholder="Выбрать шаблон"
+                        value={document.id === -1 ? "" : document.id}
+                        fullWidth
+                        onChange={event => props.onTemplateChange(document.__uuid, event)}
+                    >
+                        {templates
+                            .filter(template =>
+                                document.id !== template.id
+                                    ? !documents.find(document => document.id === template.id)
+                                    : true,
+                            )
+                            .map(template => (
+                                <MenuItem key={template.id} value={template.id}>
+                                    {template.title}
+                                </MenuItem>
+                            ))}
+                    </SelectField>
+                </Grid>
+            )}
             <Grid container css={theme => ({ padding: theme.spacing(4) })}>
                 <Grid item xs={9}>
                     <Typography css={theme => ({ fontSize: theme.fontSize.xLarge })}>
