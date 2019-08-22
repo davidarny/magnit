@@ -70,15 +70,14 @@ export class TaskService implements ITaskService {
     ): string | undefined {
         return {
             [ETaskStatus.DRAFT]: {
-                [ETaskStatus.ON_CHECK]: "Отправка задания",
-            },
-            [ETaskStatus.ON_CHECK]: {
-                [ETaskStatus.IN_PROGRESS]: "Начало работы над заданием",
-                [ETaskStatus.DRAFT]: "Задание отозвано",
+                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
             },
             [ETaskStatus.IN_PROGRESS]: {
-                [ETaskStatus.COMPLETED]: "Задание завершено",
-                [ETaskStatus.DRAFT]: "Задание отозвано",
+                [ETaskStatus.ON_CHECK]: "Задание прислано на проверку",
+                [ETaskStatus.COMPLETED]: "Задание отозвано",
+            },
+            [ETaskStatus.ON_CHECK]: {
+                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
             },
         }[prevStatus][nextStatus];
     }

@@ -25,13 +25,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         const prevStatus = before.status;
         const nextStatus = task.status;
         const description = this.taskService.getDescriptionByTransition(prevStatus, nextStatus);
-        const now = Date.now();
-        const stage = before.stages.find(stage => {
-            const dueDateTimestamp = new Date(stage.due_date).valueOf();
-            if (dueDateTimestamp > now) {
-                return stage;
-            }
-        });
+        const stage = before.stages.find(stage => stage.finished);
         if (stage && description) {
             const history = new StageHistory({
                 stage,
