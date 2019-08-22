@@ -1,21 +1,16 @@
-import {
-    Column,
-    CreateDateColumn,
-    DeepPartial,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { Column, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { BaseEntity } from "../../../shared/entities/base.entity";
 import { TemplateAssignment } from "../../task/entities/tempalte-assignment.entity";
 
 export type TTemplateType = "light" | "complex";
 
 @Entity()
 @EntityConstructor
-export class Template {
-    constructor(dto?: DeepPartial<Template>) {}
+export class Template extends BaseEntity {
+    constructor(dto?: DeepPartial<Template>) {
+        super();
+    }
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -36,10 +31,4 @@ export class Template {
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;
-
-    @CreateDateColumn({ type: "timestamptz" })
-    created_at: string;
-
-    @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: string;
 }

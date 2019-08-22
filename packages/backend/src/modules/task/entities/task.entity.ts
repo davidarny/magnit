@@ -1,14 +1,6 @@
-import {
-    Column,
-    CreateDateColumn,
-    DeepPartial,
-    Entity,
-    Index,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { BaseEntity } from "../../../shared/entities/base.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
@@ -16,11 +8,10 @@ export type TTaskStatus = "in_progress" | "on_check" | "draft" | "completed";
 
 @Entity()
 @EntityConstructor
-export class Task {
-    constructor(dto?: DeepPartial<Task>) {}
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class Task extends BaseEntity {
+    constructor(dto?: DeepPartial<Task>) {
+        super();
+    }
 
     @Index()
     @Column("varchar")
@@ -40,10 +31,4 @@ export class Task {
 
     @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
     stages: TaskStage[];
-
-    @CreateDateColumn({ type: "timestamptz" })
-    created_at: string;
-
-    @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: string;
 }
