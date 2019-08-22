@@ -1,5 +1,6 @@
 /** @jsx jsx */
 
+import { useState } from "react";
 import * as React from "react";
 import { Grid, IconButton, Table, TablePagination } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
@@ -20,27 +21,44 @@ export interface IColumn {
 interface ITableWrapperProps {
     columns: IColumn[];
     data: object[];
+    initialPage?: number;
+    rowsPerPage?: number;
 
     onRowClick?(row?: object): void;
 }
 
 export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...props }) => {
+    const { initialPage = 0, rowsPerPage = 10 } = props;
+
+    const [page, setPage] = useState(initialPage);
+
+    function onChangePage(
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
+        newPage: number,
+    ) {
+        setPage(newPage);
+    }
+
     return (
         <React.Fragment>
             <Table>
                 <TableHeader headers={columns} />
-                <TableBodyWrapper data={data} columns={columns} onRowClick={props.onRowClick} />
+                <TableBodyWrapper
+                    data={data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                    columns={columns}
+                    onRowClick={props.onRowClick}
+                />
             </Table>
             <TablePagination
                 component="div"
                 count={data.length}
-                page={0}
-                rowsPerPage={15}
+                page={page}
+                rowsPerPage={rowsPerPage}
                 labelDisplayedRows={PaginationLabel}
                 ActionsComponent={ActionComponent}
-                labelRowsPerPage={""}
+                labelRowsPerPage=""
                 SelectProps={{ style: { display: "none" } }}
-                onChangePage={_.noop}
+                onChangePage={onChangePage}
                 css={theme => ({
                     width: "100%",
                     marginTop: theme.spacing(2),
@@ -51,9 +69,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
                         paddingLeft: 0,
                         width: "100%",
                         div: {
-                            ":nth-of-type(1)": {
-                                display: "none",
-                            },
+                            ":nth-of-type(1)": { display: "none" },
                             ":nth-of-type(3)": {
                                 display: "flex",
                                 justifyContent: "flex-end",
@@ -67,8 +83,6 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
                                         margin: "0 0 0 auto",
                                         padding: 0,
                                         width: "100%",
-                                        color: theme.colors.secondary,
-                                        background: theme.colors.white,
                                         transition: "0.25s",
                                         span: {
                                             display: "flex",
@@ -85,16 +99,12 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
                             },
                         },
                         span: {
-                            ":nth-of-type(1)": {
-                                display: "none",
-                            },
+                            ":nth-of-type(1)": { display: "none" },
                             ":nth-of-type(2)": {
                                 display: "block",
                                 marginRight: "auto",
                                 width: "calc(100% / 2)",
-                                span: {
-                                    display: "block",
-                                },
+                                span: { display: "block" },
                             },
                         },
                     },
@@ -106,11 +116,50 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
 
 interface IActionComponentProps {
     count: number;
+    page: number;
     rowsPerPage: number;
+
+    onChangePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number): void;
 }
 
-const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }) => {
-    const range = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
+const ActionComponent: React.FC<IActionComponentProps> = props => {
+    const { count, page, rowsPerPage, onChangePage } = props;
+
+    const range = {
+        offsets: {
+            start: 1,
+            end: 2,
+        },
+
+        get start() {
+            if (page === Math.ceil(count / rowsPerPage) - 1) {
+                this.offsets.start++;
+            }
+            return Math.max(0, page - this.offsets.start);
+        },
+
+        get end() {
+            if (page === 0) {
+                this.offsets.end++;
+            }
+            return Math.max(0, Math.min(page + this.offsets.end, Math.ceil(count / rowsPerPage)));
+        },
+    };
+
+    function onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        onChangePage(event, page - 1);
+    }
+
+    function onNextButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        onChangePage(event, page + 1);
+    }
+
+    function onActionButtonClick(
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        page: number,
+    ) {
+        onChangePage(event, page);
+    }
 
     return (
         <Grid
@@ -126,6 +175,8 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
         >
             <Grid item>
                 <IconButton
+                    onClick={onBackButtonClick}
+                    disabled={page === 0}
                     css={theme => ({
                         width: theme.spacing(4),
                         height: theme.spacing(4),
@@ -139,23 +190,31 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
                     <LeftArrowIcon />
                 </IconButton>
             </Grid>
-            {_.range(1, range).map((page, index) => (
+            {_.range(range.start, range.end).map((action, index) => (
                 <Grid item key={index}>
                     <IconButton
+                        onClick={event => onActionButtonClick(event, action)}
+                        disabled={action === page}
                         css={theme => ({
                             width: theme.spacing(4),
                             height: theme.spacing(4),
                             fontSize: theme.fontSize.normal,
-                            color: theme.colors.secondary,
-                            background: theme.colors.white,
+                            color:
+                                (action === page ? theme.colors.white : theme.colors.secondary) +
+                                " !important",
+                            background:
+                                (action === page ? theme.colors.primary : theme.colors.white) +
+                                " !important",
                         })}
                     >
-                        {page}
+                        {action + 1}
                     </IconButton>
                 </Grid>
             ))}
             <Grid item>
                 <IconButton
+                    onClick={onNextButtonClick}
+                    disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                     css={theme => ({
                         width: theme.spacing(4),
                         height: theme.spacing(4),
@@ -175,9 +234,11 @@ const ActionComponent: React.FC<IActionComponentProps> = ({ count, rowsPerPage }
 
 interface IPaginationLabelProps {
     from: number;
+    to: number;
     count: number;
+    page: number;
 }
 
-const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count }) => {
-    return <span>{`${from} из ${count}`}</span>;
+const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count, to }) => {
+    return <span>{`${from} - ${to} из ${count}`}</span>;
 };
