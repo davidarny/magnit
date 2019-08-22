@@ -76,7 +76,7 @@ describe("TaskController", () => {
     it("should add template to task", async () => {
         const expected = { success: 1 };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        expect(await taskController.addTemplateAssignment("0", [0])).toStrictEqual(expected);
+        expect(await taskController.setTemplateAssignments("0", [0])).toStrictEqual(expected);
     });
 
     it("should ensure task was added to tasks", async () => {

@@ -28,24 +28,26 @@ interface ITemplateEditorProps {
 }
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
+    const { initialState } = props;
+
     const context = useContext(EditorContext);
     const cache = useRef<ICache>({
         sections: new Map<string, ISection>(),
         puzzles: new Map<string, IPuzzle>(),
     }).current;
-    const [template, setTemplate] = useState<ITemplate>(
-        props.initialState || {
-            id: 0,
-            sections: [],
-            title: ETerminals.EMPTY,
-            description: ETerminals.EMPTY,
-            type: ETemplateType.LIGHT,
-        },
-    );
+
+    const defaultState = {
+        id: 0,
+        sections: [],
+        title: ETerminals.EMPTY,
+        description: ETerminals.EMPTY,
+        type: ETemplateType.LIGHT,
+    };
+    const [template, setTemplate] = useState<ITemplate>(initialState || defaultState);
+
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>(
-        template.id ? [template.id.toString()] : [],
-    );
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
+
     const service = useRef(
         getEditorService(EEditorType.TEMPLATE, [
             [focusedPuzzleChain, setFocusedPuzzleChain],
@@ -53,12 +55,18 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         ]),
     ).current;
 
-    (window as typeof window & { template: ITemplate }).template = template;
-
     // set toolbar offset top
     useEffect(() => {
         service.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
+
+    // handle initial focus
+    useEffect(() => {
+        const idToFocusOn = initialState ? initialState.id : defaultState.id;
+        if (!focusedPuzzleChain.length) {
+            service.onPuzzleFocus(idToFocusOn.toString());
+        }
+    }, [initialState, focusedPuzzleChain]);
 
     // handle passed onChange callback
     // update cache
@@ -66,6 +74,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         if (props.onChange) {
             props.onChange(template);
         }
+
         const isSection = (object: unknown): object is ISection =>
             !_.has(object, "puzzleType") && _.has(object, "puzzles");
         const isPuzzle = (object: unknown): object is IPuzzle =>
@@ -73,6 +82,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
         cache.puzzles.clear();
         cache.sections.clear();
+
         traverse(template, (element: IPuzzle | ISection) => {
             if (isPuzzle(element)) {
                 cache.puzzles.set(element.id, element);
@@ -399,18 +409,17 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     onTemplateChange={onTemplateChange}
                 />
             </SelectableBlockWrapper>
-            {template.sections &&
-                template.sections.map((section, index) => (
-                    <SectionWrapper
-                        key={section.id}
-                        section={section}
-                        index={index}
-                        template={template}
-                        focusedPuzzleId={focusedPuzzleId}
-                        onTemplateChange={onTemplateChange}
-                        onPuzzleFocus={service.onPuzzleFocus.bind(service)}
-                    />
-                ))}
+            {(template.sections || []).map((section, index) => (
+                <SectionWrapper
+                    key={section.id}
+                    section={section}
+                    index={index}
+                    template={template}
+                    focusedPuzzleId={focusedPuzzleId}
+                    onTemplateChange={onTemplateChange}
+                    onPuzzleFocus={service.onPuzzleFocus.bind(service)}
+                />
+            ))}
             {process.env.NODE_ENV !== "production" && (
                 <ExpansionPanel css={theme => ({ marginTop: theme.spacing(3) })}>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>

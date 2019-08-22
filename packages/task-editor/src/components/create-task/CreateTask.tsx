@@ -27,7 +27,7 @@ interface ICreateTaskProps {
     templateSnapshots: Map<string, object>;
     focusedPuzzleId?: string;
 
-    onTemplateChange(uuid: string, event: TChangeEvent): void;
+    onTemplatesChange(uuid: string, event: TChangeEvent): void;
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
@@ -119,9 +119,9 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                         <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
                             <SelectField
                                 placeholder="Выбрать шаблон"
-                                value={document.id}
+                                value={document.id === -1 ? "" : document.id}
                                 fullWidth
-                                onChange={event => props.onTemplateChange(document.__uuid, event)}
+                                onChange={event => props.onTemplatesChange(document.__uuid, event)}
                             >
                                 {templates.map(template => (
                                     <MenuItem key={template.id} value={template.id}>

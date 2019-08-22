@@ -5,6 +5,7 @@ import { Button } from "@magnit/components";
 import { SendIcon } from "@magnit/icons";
 import { ETaskStatus, ETerminals } from "@magnit/services";
 import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
+import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
@@ -14,14 +15,27 @@ import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useRef, useState } from "react";
-import { addStages, getTaskExtended, updateTask, updateTemplateAssignment } from "services/api";
+import {
+    addStages,
+    addTemplateAssignment,
+    getTaskExtended,
+    getTemplate,
+    getTemplates,
+    updateTask,
+    updateTemplateAssignment,
+} from "services/api";
 
 interface IViewTaskProps {
     taskId: number;
 }
 
+interface IEditableTemplate extends ITemplate {
+    editable: boolean;
+}
+
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
+    const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
     const [task, setTask] = useState<IExtendedTask>({
         id: 0,
         title: ETerminals.EMPTY,
@@ -42,12 +56,39 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const initialStages = useRef<IExtendedTask["stages"]>([]);
 
     useEffect(() => {
+        let task: IExtendedTask;
+
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(response => {
                 if (isValidTask(response.task)) {
                     initialStages.current = _.cloneDeep(response.task.stages);
+                    task = response.task;
                     return setTask({ ...response.task });
                 }
+            })
+            // TODO: allow only in DRAFT mode
+            .then(() => getTemplates(context.courier))
+            .then(response =>
+                response.templates.map(template => ({
+                    ...template,
+                    id: template.id.toString(),
+                })),
+            )
+            .then(templates =>
+                Promise.all(
+                    templates.map(template => getTemplate(context.courier, Number(template.id))),
+                ),
+            )
+            .then(responses => {
+                const buffer: any[] = [];
+                responses.forEach(response => buffer.push(response.template));
+                buffer.forEach((data, index, array) => {
+                    const template = task.templates.find(template => template.id === data.id);
+                    if (template) {
+                        array[index] = _.merge(data, template);
+                    }
+                });
+                setTemplates([...buffer]);
             })
             .catch(console.error);
     }, [context.courier, taskId]);
@@ -72,6 +113,19 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     function onTaskSave(): void {
         updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
+            .then(async () => {
+                // TODO: allow only in DRAFT mode
+                return addTemplateAssignment(
+                    context.courier,
+                    Number(taskId),
+                    (task.templates || [])
+                        // filter to only existing templates
+                        .filter(assignment =>
+                            templates.find(template => template.id === assignment.id),
+                        )
+                        .map(template => Number(template.id)),
+                );
+            })
             .then(() =>
                 Promise.all(
                     task.templates.map(({ id, editable }) => {
@@ -84,6 +138,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             )
             .then(async () => {
                 const diffStages = task.stages
+                    // filter so that add only stages that doens't exist
                     .filter(
                         stage =>
                             !initialStages.current.find(
@@ -136,7 +191,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             >
                 <TaskEditor<IExtendedTask>
                     initialState={task}
-                    templates={task.templates || []}
+                    templates={(templates.length && templates) || task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}
                 />
