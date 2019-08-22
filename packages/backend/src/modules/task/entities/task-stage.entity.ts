@@ -1,24 +1,14 @@
-import {
-    Column,
-    CreateDateColumn,
-    DeepPartial,
-    Entity,
-    Index,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { EntityConstructor } from "../../../shared/decorators/entity-constructor.decorator";
+import { BaseEntity } from "../../../shared/entities/base.entity";
 import { Task } from "./task.entity";
 
 @Entity("task_stage")
 @EntityConstructor
-export class TaskStage {
-    constructor(dto?: DeepPartial<TaskStage>) {}
-
-    @PrimaryGeneratedColumn()
-    id: number;
+export class TaskStage extends BaseEntity {
+    constructor(dto?: DeepPartial<TaskStage>) {
+        super();
+    }
 
     @Index()
     @ManyToOne(() => Task, task => task.stages)
@@ -31,10 +21,4 @@ export class TaskStage {
     @Index()
     @Column("timestamptz")
     due_date: string;
-
-    @CreateDateColumn({ type: "timestamptz" })
-    created_at: string;
-
-    @UpdateDateColumn({ type: "timestamptz" })
-    updated_at: string;
 }
