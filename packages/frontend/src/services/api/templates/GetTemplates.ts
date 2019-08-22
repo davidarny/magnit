@@ -14,5 +14,8 @@ interface IGetTemplatesResponse extends IResponse {
 }
 
 export async function getTemplates(courier: ICourier) {
-    return courier.get<IGetTemplatesResponse>("templates");
+    const query = {
+        limit: `?limit=${Number.MAX_SAFE_INTEGER}`,
+    };
+    return courier.get<IGetTemplatesResponse>(`templates${query.limit}`);
 }
