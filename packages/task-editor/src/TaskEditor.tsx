@@ -95,39 +95,38 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
     }, [variant, task, isCreateMode]);
 
     // set documents if task has any
+    const prevDocuments = useRef(_.cloneDeep(documents));
     useEffect(() => {
-        if (!task.templates || !task.templates.length) {
-            return;
+        if (isViewMode(task)) {
+            const nextDocuments = (task.templates || []).map(template => {
+                const document = documents.find(document => template.id === document.id);
+                templateSnapshots.set(template.id.toString(), template);
+                return {
+                    id: _.get(template, "id"),
+                    title: _.get(template, "title"),
+                    editable: _.get(template, "editable", false),
+                    __uuid: (document && document.__uuid) || uuid(),
+                };
+            });
+            if (!_.isEqual(prevDocuments.current, nextDocuments)) {
+                prevDocuments.current = _.cloneDeep(nextDocuments);
+                setTemplateSnapshots(new Map(templateSnapshots));
+                setDocuments([...nextDocuments]);
+            }
         }
-        const nextDocuments = templates.map(template => {
-            const document = documents.find(document => template.id === document.id);
-            templateSnapshots.set(template.id.toString(), template);
-            return {
-                id: _.get(template, "id"),
-                title: _.get(template, "title"),
-                editable: _.get(template, "editable", false),
-                __uuid: (document && document.__uuid) || uuid(),
-            };
-        });
-        setTemplateSnapshots(new Map(templateSnapshots));
-        setDocuments([...nextDocuments]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [templates]);
+    }, [templates, task.templates, isViewMode, isCreateMode]);
 
     // on every documents change we have to
     // update current task with their id's
     // also caching template JSON for current active document
     useEffect(() => {
-        let nextTemplates;
-        if (isCreateMode(task)) {
-            nextTemplates = documents
-                .filter(document => !!document.title)
-                .filter(document => document.id >= 0)
-                .map(document => document.id);
-        }
-        if (isViewMode(task)) {
-            nextTemplates = documents;
-        }
+        const nextTemplates = isCreateMode(task)
+            ? documents
+                  .filter(document => !!document.title)
+                  .filter(document => document.id >= 0)
+                  .map(document => document.id)
+            : task.templates;
         setTask({ ...task, templates: nextTemplates });
         if (documents.some(document => document.__uuid === focusedPuzzleId)) {
             const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
