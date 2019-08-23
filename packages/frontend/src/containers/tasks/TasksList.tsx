@@ -189,5 +189,5 @@ function getTaskStatusByTab(tab?: string): ETaskStatus {
     if (!tab) {
         return ETaskStatus.IN_PROGRESS;
     }
-    return (tab as unknown) as ETaskStatus;
+    return ((tab as unknown) as string).replace("-", "_") as ETaskStatus;
 }
