@@ -57,40 +57,49 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     const initialStages = useRef<IExtendedTask["stages"]>([]);
 
-    useEffect(() => {
-        let task: IExtendedTask;
+    const isTaskEditable = (task: IExtendedTask) =>
+        task.status === ETaskStatus.ON_CHECK || task.status === ETaskStatus.DRAFT;
 
+    useEffect(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(response => {
                 if (isValidTask(response.task)) {
                     initialStages.current = _.cloneDeep(response.task.stages);
-                    task = response.task;
-                    return setTask({ ...response.task });
+                    setTask({ ...response.task });
+                    return response.task;
                 }
             })
-            // TODO: allow only in DRAFT mode
-            .then(() => getTemplates(context.courier))
-            .then(response =>
-                response.templates.map(template => ({
-                    ...template,
-                    id: template.id.toString(),
-                })),
-            )
-            .then(templates =>
-                Promise.all(
-                    templates.map(template => getTemplate(context.courier, Number(template.id))),
-                ),
-            )
-            .then(responses => {
-                const buffer: any[] = [];
-                responses.forEach(response => buffer.push(response.template));
-                buffer.forEach((data, index, array) => {
-                    const template = task.templates.find(template => template.id === data.id);
-                    if (template) {
-                        array[index] = _.merge(data, template);
-                    }
-                });
-                setTemplates([...buffer]);
+            .then(async nextTask => {
+                if (!nextTask || !isTaskEditable(nextTask)) {
+                    return;
+                }
+                return getTemplates(context.courier)
+                    .then(response =>
+                        response.templates.map(template => ({
+                            ...template,
+                            id: template.id.toString(),
+                        })),
+                    )
+                    .then(templates =>
+                        Promise.all(
+                            templates.map(template =>
+                                getTemplate(context.courier, Number(template.id)),
+                            ),
+                        ),
+                    )
+                    .then(responses => {
+                        const buffer: any[] = [];
+                        responses.forEach(response => buffer.push(response.template));
+                        buffer.forEach((data, index, array) => {
+                            const template = nextTask.templates.find(
+                                template => template.id === data.id,
+                            );
+                            if (template) {
+                                array[index] = _.merge(data, template);
+                            }
+                        });
+                        setTemplates([...buffer]);
+                    });
             })
             .catch(console.error);
     }, [context.courier, taskId]);
@@ -127,15 +136,18 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     }
 
     function onTaskSave(): void {
+        // disallow update if task is not editable
+        if (!isTaskEditable(task)) {
+            return;
+        }
         // sending from DRAFT to IN_PROGRESS
         // only this transition is allowed
         if (task.status === ETaskStatus.DRAFT) {
             task.status = ETaskStatus.IN_PROGRESS;
         }
         updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
-            .then(async () => {
-                // TODO: allow only in DRAFT mode
-                return addTemplateAssignment(
+            .then(async () =>
+                addTemplateAssignment(
                     context.courier,
                     Number(taskId),
                     (task.templates || [])
@@ -144,8 +156,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                             templates.find(template => template.id === assignment.id),
                         )
                         .map(template => Number(template.id)),
-                );
-            })
+                ),
+            )
             .then(() =>
                 Promise.all(
                     task.templates.map(({ id, editable }) => {
@@ -158,7 +170,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             )
             .then(async () => {
                 const diffStages = task.stages
-                    // filter so that add only stages that doens't exist
+                    // filter so that add only stages that doesn't exist
                     .filter(
                         stage =>
                             !initialStages.current.find(
@@ -193,8 +205,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 <Grid item>
                     <Grid container>
                         <Grid item>
-                            {(task.status === ETaskStatus.ON_CHECK ||
-                                task.status === ETaskStatus.DRAFT) && (
+                            {isTaskEditable(task) && (
                                 <Button
                                     variant="contained"
                                     scheme="blue"
@@ -232,7 +243,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             >
                 <TaskEditor<IExtendedTask>
                     initialState={task}
-                    templates={(templates.length && templates) || task.templates}
+                    templates={isTaskEditable(task) ? templates : task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}
                 />
