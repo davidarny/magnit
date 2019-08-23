@@ -6,7 +6,8 @@ import { SendIcon } from "@magnit/icons";
 import { ETaskStatus, ETerminals } from "@magnit/services";
 import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
-import { Grid, Typography } from "@material-ui/core";
+import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
+import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { Redirect } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
@@ -35,6 +36,7 @@ interface IEditableTemplate extends ITemplate {
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
+    const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
     const [task, setTask] = useState<IExtendedTask>({
         id: 0,
@@ -45,7 +47,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     });
     const [error, setError] = useState(false); // success/error snackbar state
     const [open, setOpen] = useState(false); // open/close snackbar
-    const [redirect, setRedirect] = useState(false);
+    const [redirect, setRedirect] = useState({ trigger: false, to: "" });
 
     const isValidTask = (value: object): value is IExtendedTask =>
         _.has(value, "id") &&
@@ -98,7 +100,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             return;
         }
         if (!error) {
-            setRedirect(true);
+            setRedirect({ to: "/tasks", trigger: true });
         }
         setOpen(false);
         // wait till animation ends
@@ -109,6 +111,19 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         if (isValidTask(task)) {
             setTask({ ...task });
         }
+    }
+
+    function onMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
+        setMenuAnchorElement(event.currentTarget);
+    }
+
+    function onMenuClose() {
+        setMenuAnchorElement(null);
+    }
+
+    function onTaskHistoryClick() {
+        setRedirect({ to: `/tasks/${taskId}/history`, trigger: true });
+        onMenuClose();
     }
 
     function onTaskSave(): void {
@@ -168,18 +183,36 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to={"/tasks"} noThrow />}
+            {redirect.trigger && <Redirect to={redirect.to} noThrow />}
             <SectionTitle title="Информация о задании">
                 <Grid item>
-                    <Button
-                        variant="contained"
-                        scheme="blue"
-                        css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                        onClick={onTaskSave}
-                    >
-                        <SendIcon />
-                        <Typography>Отправить</Typography>
-                    </Button>
+                    <Grid container>
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                scheme="blue"
+                                css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
+                                onClick={onTaskSave}
+                            >
+                                <SendIcon />
+                                <Typography>Отправить</Typography>
+                            </Button>
+                        </Grid>
+                        <Grid item>
+                            <IconButton onClick={onMenuClick}>
+                                <MoreVertIcon />
+                            </IconButton>
+                        </Grid>
+                        <Menu
+                            keepMounted
+                            open={Boolean(menuAnchorElement)}
+                            anchorEl={menuAnchorElement}
+                            onClose={onMenuClose}
+                        >
+                            <MenuItem onClick={onMenuClose}>Посмотреть отчет</MenuItem>
+                            <MenuItem onClick={onTaskHistoryClick}>Посмотреть истоию</MenuItem>
+                        </Menu>
+                    </Grid>
                 </Grid>
             </SectionTitle>
             <Grid
