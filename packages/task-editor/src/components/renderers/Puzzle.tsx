@@ -31,7 +31,7 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = ({ puzzle, last = 
                                     background: theme.colors.lightGray,
                                     position: "absolute",
                                     top: theme.spacing(4),
-                                    left: "20px", // TODO: dynamic calculation
+                                    left: "20.5px", // TODO: dynamic calculation
                                     zIndex: 1,
                                 })}
                             />

@@ -3,7 +3,6 @@ import { BaseDto } from "../../../shared/dto/base.dto";
 import { TaskStageDto } from "./task-stage.dto";
 
 export class StageHistoryDto extends BaseDto {
-    @ApiModelProperty({ description: "ISO date format" }) readonly date: string;
     @ApiModelProperty() readonly description: string;
 }
 

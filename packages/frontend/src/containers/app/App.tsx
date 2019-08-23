@@ -30,6 +30,10 @@ const AsyncCreateTask = Loadable(({
     loader: () => import("containers/tasks").then(module => module.CreateTask),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
+const AsyncTaskHistory = Loadable(({
+    loader: () => import("containers/tasks").then(module => module.TaskHistory),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
 // ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
 // ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
@@ -114,6 +118,7 @@ const App: React.FC = () => {
                                 <AsyncCreateTask path="tasks/create" />
                             )}
                             <AsyncViewTask path="tasks/view/:taskId" />
+                            <AsyncTaskHistory path="tasks/:taskId/history" />
                             {/*
                             ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
                             ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝

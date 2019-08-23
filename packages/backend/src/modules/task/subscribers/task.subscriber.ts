@@ -30,11 +30,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         // usually there should be only one non-finished stage
         const stage = before.stages.find(stage => !stage.finished);
         if (stage && description) {
-            const history = new StageHistory({
-                stage,
-                date: new Date().toISOString(),
-                description,
-            });
+            const history = new StageHistory({ stage, description });
             await event.manager.save(history);
         }
     }

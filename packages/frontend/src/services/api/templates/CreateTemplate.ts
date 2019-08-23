@@ -1,6 +1,6 @@
 import { ICourier, IResponse } from "services/api";
 
-interface ICreateTemplateResponse extends IResponse {
+export interface ICreateTemplateResponse extends IResponse {
     templateId: number;
 }
 
