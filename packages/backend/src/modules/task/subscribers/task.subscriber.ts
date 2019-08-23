@@ -25,7 +25,10 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         const prevStatus = before.status;
         const nextStatus = task.status;
         const description = this.taskService.getDescriptionByTransition(prevStatus, nextStatus);
-        const stage = before.stages.find(stage => stage.finished);
+        // find non-finished stage
+        // it means it's active
+        // usually there should be only one non-finished stage
+        const stage = before.stages.find(stage => !stage.finished);
         if (stage && description) {
             const history = new StageHistory({
                 stage,
