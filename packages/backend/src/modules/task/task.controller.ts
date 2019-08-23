@@ -27,6 +27,7 @@ import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTaskResponse } from "./responses/create-task.response";
+import { GetStagesWithFullHistoryResponse } from "./responses/get-stages-with-full-history.response";
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
@@ -172,5 +173,16 @@ export class TaskController {
             success: 1,
             task: { ...task, templates },
         };
+    }
+
+    @Get("/:id/stages/history/full")
+    @ApiOkResponse({
+        type: GetStagesWithFullHistoryResponse,
+        description: "Task Stages with history",
+    })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    async getStagesWithFullHistory(@Param("id", TaskByIdPipe) id: string) {
+        const task = await this.taskService.findById(id, ["stages", "stages.history"]);
+        return { success: 1, stages: task.stages };
     }
 }

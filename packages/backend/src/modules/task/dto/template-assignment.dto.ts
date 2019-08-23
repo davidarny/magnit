@@ -1,7 +1,6 @@
 import { ApiModelProperty } from "@nestjs/swagger";
+import { BaseDto } from "../../../shared/dto/base.dto";
 
-export class TemplateAssignmentDto {
+export class TemplateAssignmentDto extends BaseDto {
     @ApiModelProperty() readonly editable: boolean;
-    @ApiModelProperty({ description: "ISO date format" }) readonly created_at: string;
-    @ApiModelProperty({ description: "ISO date format" }) readonly updated_at: string;
 }
