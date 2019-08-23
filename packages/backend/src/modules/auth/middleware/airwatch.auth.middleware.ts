@@ -1,12 +1,12 @@
-import { ForbiddenException, Inject, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { Inject, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
 import { User } from "../entities/user.entity";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { ITokenManager } from "../interfaces/token.manager.interface";
-import { AirwatchAuthService } from "../services/airwatch-auth.service";
 import { JwtTokenManager } from "../providers/jwt.token.manager";
+import { AirwatchAuthService } from "../services/airwatch-auth.service";
 import _ = require("lodash");
 
 export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
@@ -28,7 +28,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
                 if (error instanceof TokenExpiredError) {
                     message = "Token has expired";
                 }
-                throw new ForbiddenException(message);
+                throw new UnauthorizedException(message);
             }
         }
         if (authorization) {
