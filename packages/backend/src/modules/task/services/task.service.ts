@@ -74,7 +74,7 @@ export class TaskService implements ITaskService {
             },
             [ETaskStatus.IN_PROGRESS]: {
                 [ETaskStatus.ON_CHECK]: "Задание прислано на проверку",
-                [ETaskStatus.COMPLETED]: "Задание отозвано",
+                [ETaskStatus.COMPLETED]: "Этап завершён",
             },
             [ETaskStatus.ON_CHECK]: {
                 [ETaskStatus.IN_PROGRESS]: "Отправка задания",
