@@ -5,3 +5,4 @@ export * from "./UpdateTemplateAssignment";
 export * from "./UpdateTask";
 export * from "./GetTaskExtended";
 export * from "./AddStages";
+export * from "./GetStagesWithFullHistory";

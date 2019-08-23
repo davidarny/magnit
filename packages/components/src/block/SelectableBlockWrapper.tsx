@@ -30,7 +30,7 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
                     borderRadius: `${theme.radius(0.5)} 0 0 ${theme.radius(0.5)}`,
                     top: 0,
                     bottom: 0,
-                    backgroundColor: theme.colors.primary,
+                    background: theme.colors.primary,
                     zIndex: 1000,
                     display: focused ? "block" : "none",
                 })}
@@ -44,7 +44,7 @@ export const SelectableBlockWrapper: React.FC<TSelectableBlockWrapperProps> = pr
                     borderRadius: `0 ${theme.radius(0.5)} ${theme.radius(0.5)} 0`,
                     top: 0,
                     bottom: 0,
-                    backgroundColor: theme.colors.white,
+                    background: theme.colors.white,
                     zIndex: 1000,
                     display: focused ? "block" : "none",
                 })}

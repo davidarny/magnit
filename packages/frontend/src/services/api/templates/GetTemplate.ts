@@ -1,6 +1,6 @@
 import { ICourier, IResponse } from "services/api";
 
-interface IGetTemplate extends IResponse {
+export interface IGetTemplate extends IResponse {
     template: object;
 }
 

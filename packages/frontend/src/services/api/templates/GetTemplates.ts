@@ -1,16 +1,18 @@
 import { ICourier, IResponse } from "services/api";
 
-interface IGetTemplatesResponse extends IResponse {
+export interface ITemplateResponse {
+    id: number;
+    title: string;
+    description: string;
+    assigned: boolean;
+    createdAt: string;
+    updatedAt: string;
+    editable: boolean;
+}
+
+export interface IGetTemplatesResponse extends IResponse {
     total: number;
-    templates: Array<{
-        id: number;
-        title: string;
-        description: string;
-        assigned: boolean;
-        createdAt: string;
-        updatedAt: string;
-        editable: boolean;
-    }>;
+    templates: ITemplateResponse[];
 }
 
 export async function getTemplates(courier: ICourier) {
