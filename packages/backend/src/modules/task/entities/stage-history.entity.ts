@@ -1,11 +1,11 @@
 import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
-import { StageHistoryDto } from "../dto/stage-history.dto";
+import { FullStageHistoryDto } from "../dto/stage-history.dto";
 import { TaskStage } from "./task-stage.entity";
 
 @Entity({ name: "stage_history" })
-export class StageHistory extends BaseEntity<StageHistory, DeepPartial<StageHistoryDto>> {
-    constructor(dto?: DeepPartial<StageHistoryDto>) {
+export class StageHistory extends BaseEntity<StageHistory, DeepPartial<FullStageHistoryDto>> {
+    constructor(dto?: DeepPartial<FullStageHistoryDto>) {
         super();
         this.construct(this, dto);
     }

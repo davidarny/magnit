@@ -1,16 +1,14 @@
 import { ApiModelProperty } from "@nestjs/swagger";
+import { BaseDto } from "../../../shared/dto/base.dto";
 import { TemplateDto } from "../../template/dto/template.dto";
 import { ETaskStatus } from "../entities/task.entity";
 import { TaskStageDto } from "./task-stage.dto";
 
-export class TaskDto {
-    @ApiModelProperty() readonly id: number;
+export class TaskDto extends BaseDto {
     @ApiModelProperty() readonly title: string;
     @ApiModelProperty() readonly description: string;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed"] })
     readonly status: ETaskStatus;
-    @ApiModelProperty({ description: "ISO date format" }) readonly created_at: string;
-    @ApiModelProperty({ description: "ISO date format" }) readonly updated_at: string;
 }
 
 export class FullTaskDto extends TaskDto {

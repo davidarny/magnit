@@ -1,8 +1,12 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { TaskStage } from "../entities/task-stage.entity";
+import { BaseDto } from "../../../shared/dto/base.dto";
+import { TaskStageDto } from "./task-stage.dto";
 
-export class StageHistoryDto {
+export class StageHistoryDto extends BaseDto {
     @ApiModelProperty({ description: "ISO date format" }) readonly date: string;
     @ApiModelProperty() readonly description: string;
-    @ApiModelProperty({ type: TaskStage }) readonly stage: TaskStage;
+}
+
+export class FullStageHistoryDto extends StageHistoryDto {
+    @ApiModelProperty({ type: TaskStageDto }) readonly stage: TaskStageDto;
 }
