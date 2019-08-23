@@ -5,12 +5,14 @@ import { toCamelCase, toSnakeCase } from "services/string";
 
 export class CamelCaseMiddleware implements IMiddleware {
     async response(meta: IMiddlewareMeta, response: any): Promise<object> {
-        traverse(response, (object: any) => {
-            if (_.isObject(object)) {
-                _.mapKeys(object, (value: any, key: string) => {
-                    delete (object as { [key: string]: any })[key];
-                    (object as { [key: string]: any })[toCamelCase(key)] = value;
-                });
+        traverse(response, object => {
+            if (!(typeof object === "object" && object !== null)) {
+                return;
+            }
+            for (const key of Object.keys(object)) {
+                const value = object[key];
+                delete object[key];
+                object[toCamelCase(key)] = value;
             }
         });
         return response;
@@ -21,12 +23,14 @@ export class CamelCaseMiddleware implements IMiddleware {
     async request(meta: IMiddlewareMeta, data: any): Promise<any> {
         const buffer = _.cloneDeep(data);
         // convert all props to snake_case before saving
-        traverse(buffer, (object: any) => {
-            if (_.isObject(object)) {
-                _.mapKeys(object, (value: any, key: string) => {
-                    delete (object as { [key: string]: any })[key];
-                    (object as { [key: string]: any })[toSnakeCase(key)] = value;
-                });
+        traverse(buffer, object => {
+            if (!(typeof object === "object" && object !== null)) {
+                return;
+            }
+            for (const key of Object.keys(object)) {
+                const value = object[key];
+                delete object[key];
+                object[toSnakeCase(key)] = value;
             }
         });
         return buffer;
