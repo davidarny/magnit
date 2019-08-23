@@ -247,7 +247,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         })}
                     >
                         <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                            Хардкорное задание для суровых прорабов
+                            {task.title}
                         </Typography>
                     </Grid>
                     <Grid item>
@@ -277,7 +277,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 <Grid container spacing={2}>
                     <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
                         <Grid container direction={"row"}>
-                            <InfoField title="Администратор" value="SuperMegaAdmin" />
+                            <InfoField title="Администратор" value="Барановский Прохор Артёмович" />
                             <InfoField
                                 title="Исполнитель"
                                 value="Рукастый Иннокентий Петрович"
@@ -293,7 +293,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         >
                             <InfoField
                                 title="Местоположение"
-                                value="Челябинская область, Челябинск, улица Железная, 5"
+                                value="Челябинская область, г. Челябинск, ул. Железная, д. 5"
                             />
                             <InfoField title="Формат объекта" value="МК" />
                         </Grid>

@@ -127,6 +127,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     }
 
     function onTaskSave(): void {
+        // sending from DRAFT to IN_PROGRESS
+        // only this transition is allowed
+        if (task.status === ETaskStatus.DRAFT) {
+            task.status = ETaskStatus.IN_PROGRESS;
+        }
         updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
             .then(async () => {
                 // TODO: allow only in DRAFT mode
@@ -188,15 +193,18 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 <Grid item>
                     <Grid container>
                         <Grid item>
-                            <Button
-                                variant="contained"
-                                scheme="blue"
-                                css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                                onClick={onTaskSave}
-                            >
-                                <SendIcon />
-                                <Typography>Отправить</Typography>
-                            </Button>
+                            {(task.status === ETaskStatus.ON_CHECK ||
+                                task.status === ETaskStatus.DRAFT) && (
+                                <Button
+                                    variant="contained"
+                                    scheme="blue"
+                                    css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
+                                    onClick={onTaskSave}
+                                >
+                                    <SendIcon />
+                                    <Typography>Отправить</Typography>
+                                </Button>
+                            )}
                         </Grid>
                         <Grid item>
                             <IconButton onClick={onMenuClick}>
