@@ -18,7 +18,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, ..
         <TableBody>
             {data.map((value, index) => (
                 <TableRow
-                    hover
+                    hover={!!props.onRowClick}
                     key={index}
                     onClick={() => props.onRowClick && props.onRowClick(value)}
                 >
@@ -33,7 +33,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, ..
                                     fontSize: theme.fontSize.sNormal,
                                     fontWeight: 400,
                                     lineHeight: 1.5,
-                                    cursor: "pointer",
+                                    cursor: props.onRowClick ? "pointer" : "inherit",
                                 })}
                                 title={label}
                             >

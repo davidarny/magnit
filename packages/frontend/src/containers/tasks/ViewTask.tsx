@@ -135,6 +135,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         onMenuClose();
     }
 
+    function onTaskReportClick() {
+        setRedirect({ to: `/tasks/${taskId}/report`, trigger: true });
+        onMenuClose();
+    }
+
     function onTaskSave(): void {
         // disallow update if task is not editable
         if (!isTaskEditable(task)) {
@@ -228,7 +233,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                             anchorEl={menuAnchorElement}
                             onClose={onMenuClose}
                         >
-                            <MenuItem onClick={onMenuClose}>Посмотреть отчет</MenuItem>
+                            <MenuItem onClick={onTaskReportClick}>Посмотреть отчет</MenuItem>
                             <MenuItem onClick={onTaskHistoryClick}>Посмотреть истоию</MenuItem>
                         </Menu>
                     </Grid>
