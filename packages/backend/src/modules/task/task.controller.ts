@@ -1,6 +1,22 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Inject,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query,
+    UploadedFiles,
+    UseInterceptors,
+} from "@nestjs/common";
+import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import {
     ApiBadRequestResponse,
+    ApiConsumes,
     ApiCreatedResponse,
     ApiImplicitBody,
     ApiNotFoundResponse,
@@ -11,6 +27,7 @@ import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.
 import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
+import { TemplateAnswer } from "../template/entities/template-answer.entity";
 import { Template } from "../template/entities/template.entity";
 import { ITemplateService } from "../template/interfaces/template.service.interface";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
@@ -33,6 +50,7 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
+import _ = require("lodash");
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -53,6 +71,8 @@ export class TaskController {
         query?: FindAllQuery,
     ) {
         const { offset, limit, sort, statuses, status, title } = {
+            // need this to correctly handle default values
+            // not sure if nest creates them on given query
             ...new FindAllQuery(),
             ...query,
         };
@@ -129,7 +149,9 @@ export class TaskController {
         @Body() templateAssignmentDto: TemplateAssignmentDto,
     ) {
         const task = await this.taskService.findById(taskId, ["assignments"]);
-        (task.assignments || [])
+        task.assignments
+            // filter to assignments that relate to
+            // current template
             .filter(assignment => assignment.id_template === Number(templateId))
             .forEach((assignment, index) => {
                 task.assignments[index] = { ...assignment, ...templateAssignmentDto };
@@ -149,6 +171,7 @@ export class TaskController {
         const task = await this.taskService.findById(id, ["stages"]);
         task.stages = [
             ...task.stages,
+            // create stages from dtos
             ...taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto })),
         ];
         await this.taskService.update(id, task);
@@ -184,5 +207,70 @@ export class TaskController {
     async getStagesWithFullHistory(@Param("id", TaskByIdPipe) id: string) {
         const task = await this.taskService.findById(id, ["stages", "stages.history"]);
         return { success: 1, stages: task.stages };
+    }
+
+    @Post("/:task_id/templates/:template_id/answers")
+    @ApiConsumes("multipart/form-data")
+    @ApiOkResponse({ type: BaseResponse })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Puzzle not found" })
+    @UseInterceptors(AnyFilesInterceptor())
+    async setTemplateAnswers(
+        @Param("task_id", TaskByIdPipe) taskId: string,
+        @Param("template_id", TemplateByIdPipe) templateId: string,
+        @UploadedFiles() files: Express.Multer.File[],
+        @Body() body: { [key: string]: string },
+    ) {
+        // remove id of comment suffix
+        // cause we don't store that separately
+        const ids = [...files.map(file => file.fieldname), ...Object.keys(body)].filter(
+            id => !id.includes("comment"),
+        );
+        // validating here cause pipe cannot get access
+        // to file array and it's keys
+        const promises = ids.map(async id => ({
+            id,
+            result: await this.templateService.findByPuzzleId(id),
+        }));
+        let results: { id: string; result?: TemplateAnswer }[];
+        try {
+            results = await Promise.all(promises);
+        } catch (error) {
+            throw new NotFoundException(`Cannot save answers`);
+        }
+        for (const result of results) {
+            if (result.result) {
+                throw new BadRequestException(
+                    `Cannot save duplicate answer with id "${result.id}"`,
+                );
+            }
+        }
+        // end of validation
+        const template = await this.templateService.findById(templateId);
+        const puzzles = await this.templateService.findPuzzlesByIds(templateId, ids);
+        // collect answers
+        const answers = [...puzzles.values()].map(puzzle => {
+            // if no file with such id present
+            // try to get answer from body
+            const file = files.find(file => file.fieldname === puzzle.id);
+            let answer = body[puzzle.id];
+            if (file) {
+                // TODO: store relative filename
+                answer = `${process.env.BACKEND_HOST}/${file.filename}`;
+            }
+            // trying to get puzzle_type
+            const type = (_.first(puzzle.puzzles) || { puzzle_type: null }).puzzle_type;
+            return new TemplateAnswer({
+                id_puzzle: puzzle.id,
+                answer,
+                template,
+                answer_type: type,
+                // save comment if exists
+                comment: body[`${puzzle.id}_comment`] || null,
+            });
+        });
+        await this.templateService.insertAnswerBulk(answers);
+        return { success: 1 };
     }
 }

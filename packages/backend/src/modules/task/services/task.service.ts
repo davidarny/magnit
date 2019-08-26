@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Task, ETaskStatus } from "../entities/task.entity";
 import { FindManyOptions, In, Repository } from "typeorm";
+import { ETaskStatus, Task } from "../entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 
 @Injectable()
 export class TaskService implements ITaskService {
+    // TODO: need to use @TransactionalRepository on a method
     constructor(@InjectRepository(Task) private readonly taskRepository: Repository<Task>) {}
 
     async findAll(
@@ -16,6 +17,7 @@ export class TaskService implements ITaskService {
         statuses?: ETaskStatus[],
         title?: string,
     ) {
+        // TODO: probably need to introduce FindOptionsBuilder
         const options: FindManyOptions<Task> = {};
         if (typeof offset !== "undefined") {
             options.skip = offset;
@@ -48,6 +50,8 @@ export class TaskService implements ITaskService {
     }
 
     async insert(task: Task) {
+        // in case if insert() is called with existing task
+        // semantics of this methods is about creating new onde
         delete task.id;
         return this.taskRepository.save(task);
     }
@@ -68,6 +72,8 @@ export class TaskService implements ITaskService {
         prevStatus: ETaskStatus,
         nextStatus: ETaskStatus,
     ): string | undefined {
+        // little state machine with possible transitions
+        // between statuses
         return {
             [ETaskStatus.DRAFT]: {
                 [ETaskStatus.IN_PROGRESS]: "Отправка задания",

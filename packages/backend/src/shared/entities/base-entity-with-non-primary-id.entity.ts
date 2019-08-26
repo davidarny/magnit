@@ -1,19 +1,21 @@
 import {
     BeforeUpdate,
+    Column,
     CreateDateColumn,
     DeepPartial,
-    PrimaryGeneratedColumn,
+    Generated,
     UpdateDateColumn,
 } from "typeorm";
 
-export abstract class BaseEntity<E, T = DeepPartial<E>> {
+export abstract class BaseEntityWithNonPrimaryId<E, T = DeepPartial<E>> {
     protected construct?(entity?: E, dto?: T) {
         if (entity && dto) {
             Object.assign(entity, dto);
         }
     }
 
-    @PrimaryGeneratedColumn()
+    @Column()
+    @Generated("rowid")
     id: number;
 
     @CreateDateColumn({ type: "timestamptz" })
