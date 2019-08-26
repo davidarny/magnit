@@ -4,7 +4,7 @@ import { StageHistory } from "./stage-history.entity";
 import { Task } from "./task.entity";
 
 @Entity("task_stage")
-export class TaskStage extends BaseEntity<TaskStage, DeepPartial<TaskStage>> {
+export class TaskStage extends BaseEntity<TaskStage> {
     constructor(dto?: DeepPartial<TaskStage>) {
         super();
         this.construct(this, dto);

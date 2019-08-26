@@ -1,5 +1,6 @@
 import { ApiModelProperty } from "@nestjs/swagger";
 import { BaseDto } from "../../../shared/dto/base.dto";
+import { TemplateAnswerDto } from "../../template/dto/template-answer.dto";
 import { TemplateDto } from "../../template/dto/template.dto";
 import { ETaskStatus } from "../entities/task.entity";
 import { TaskStageDto } from "./task-stage.dto";
@@ -23,4 +24,5 @@ class EditableTemplateDto extends TemplateDto {
 export class ExtendedTaskDto extends TaskDto {
     @ApiModelProperty({ type: [EditableTemplateDto] }) readonly templates: EditableTemplateDto[];
     @ApiModelProperty({ type: [TaskStageDto] }) readonly stages: TaskStageDto[];
+    @ApiModelProperty({ type: [TemplateAnswerDto] }) readonly answers: TemplateAnswerDto[];
 }

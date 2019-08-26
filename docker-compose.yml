@@ -24,6 +24,7 @@ services:
         environment:
             - NODE_ENV=production
             - BACKEND_PORT=${BACKEND_PORT:-1337}
+            - BACKEND_HOST=${BACKEND_HOST:-http://localhost:${BACKEND_PORT:-1337}}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
             - GLOBAL_CONTROLLER_PREFIX=${GLOBAL_CONTROLLER_PREFIX:-v1}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}

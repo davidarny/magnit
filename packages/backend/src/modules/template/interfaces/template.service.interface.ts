@@ -1,4 +1,6 @@
-import { Template } from "../entities/template.entity";
+import { Repository, Transaction, TransactionRepository } from "typeorm";
+import { TemplateAnswer } from "../entities/template-answer.entity";
+import { IPuzzle, Template } from "../entities/template.entity";
 
 export interface ITemplateService {
     findAll(
@@ -7,6 +9,11 @@ export interface ITemplateService {
         sort?: "ASC" | "DESC",
         title?: string,
     ): Promise<Template[]>;
+
+    findByPuzzleId(
+        id: string,
+        templateAnswerRepository?: Repository<TemplateAnswer>,
+    ): Promise<TemplateAnswer>;
 
     findOneOrFail(id: string): Promise<Template>;
 
@@ -19,4 +26,10 @@ export interface ITemplateService {
     findById(id: string): Promise<Template>;
 
     deleteById(id: string): Promise<void>;
+
+    findPuzzlesByIds(id: string, ids: string[]): Promise<Map<string, IPuzzle>>;
+
+    findAnswersById(id: string): Promise<TemplateAnswer[]>;
+
+    insertAnswerBulk(assets: TemplateAnswer[]): Promise<TemplateAnswer[]>;
 }

@@ -11,7 +11,7 @@ export enum ETaskStatus {
 }
 
 @Entity()
-export class Task extends BaseEntity<Task, DeepPartial<Task>> {
+export class Task extends BaseEntity<Task> {
     constructor(dto?: DeepPartial<Task>) {
         super();
         this.construct(this, dto);

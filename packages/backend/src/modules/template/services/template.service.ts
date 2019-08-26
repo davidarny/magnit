@@ -1,11 +1,36 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from "@nestjs/common";
 import { FindManyOptions, Repository, Transaction, TransactionRepository } from "typeorm";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import { Template } from "../entities/template.entity";
+import { TemplateAnswer } from "../entities/template-answer.entity";
+import { IPuzzle, Template } from "../entities/template.entity";
 import { ITemplateService } from "../interfaces/template.service.interface";
+import _ = require("lodash");
 
 @Injectable()
 export class TemplateService implements ITemplateService {
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findAnswersById(
+        id: string,
+        @TransactionRepository(TemplateAnswer)
+        templateAnswerRepository?: Repository<TemplateAnswer>,
+    ): Promise<TemplateAnswer[]> {
+        return templateAnswerRepository.find({ where: { id_template: id } });
+    }
+
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findByPuzzleId(
+        id: string,
+        @TransactionRepository(TemplateAnswer)
+        templateAnswerRepository?: Repository<TemplateAnswer>,
+    ): Promise<TemplateAnswer> {
+        return templateAnswerRepository.findOne({ where: { id_puzzle: id } });
+    }
+
     @Transaction({ isolation: "READ COMMITTED" })
     async findAll(
         offset?: number,
@@ -14,6 +39,7 @@ export class TemplateService implements ITemplateService {
         title?: string,
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
     ) {
+        // TODO: probably need to introduce FindOptionsBuilder
         const options: FindManyOptions<Template> = {};
         if (typeof offset !== "undefined") {
             options.skip = offset;
@@ -33,7 +59,9 @@ export class TemplateService implements ITemplateService {
         return templateRepository.find(options);
     }
 
+    // TODO: remove this one and handle 404 more accurately
     @Transaction({ isolation: "READ COMMITTED" })
+    /** @deprecated */
     async findOneOrFail(
         id: string,
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
@@ -56,10 +84,13 @@ export class TemplateService implements ITemplateService {
                 "template"."type",
                 "template"."created_at",
                 "template"."updated_at",
-                "template_assignment"."editable"
+                "template_assignment"."editable",
+                to_jsonb(array_agg("template_answer")) as "answers"
             FROM "template_assignment"
             LEFT JOIN "template" ON "template"."id" = "template_assignment"."id_template"
+            LEFT JOIN "template_answer" on "template"."id" = "template_answer"."id_template"
             WHERE "template_assignment"."id_task" = $1
+            GROUP BY "template"."id", "template_assignment"."id"
         `,
             [id],
         );
@@ -70,6 +101,8 @@ export class TemplateService implements ITemplateService {
         template: Template,
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
     ) {
+        // tricky insert
+        // need this only for jsonb_strip_nulls()
         const response = await templateRepository.query(
             `
             INSERT INTO
@@ -103,6 +136,8 @@ export class TemplateService implements ITemplateService {
         template: Template,
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
     ) {
+        // tricky update
+        // need this only for jsonb_strip_nulls()
         const builder = await templateRepository.createQueryBuilder("template").update();
         const values: QueryDeepPartialEntity<Template> = {};
         if (template.title || typeof template.title === "string") {
@@ -141,5 +176,62 @@ export class TemplateService implements ITemplateService {
         @TransactionRepository(Template) templateRepository?: Repository<Template>,
     ) {
         await templateRepository.delete(id);
+    }
+
+    @Transaction({ isolation: "READ COMMITTED" })
+    async insertAnswerBulk(
+        assets: TemplateAnswer[],
+        @TransactionRepository(TemplateAnswer) templateAssetRepository?: Repository<TemplateAnswer>,
+    ) {
+        return templateAssetRepository.save(assets);
+    }
+
+    @Transaction({ isolation: "READ COMMITTED" })
+    async findPuzzlesByIds(
+        id: string,
+        ids: string[],
+        @TransactionRepository(Template) templateRepository?: Repository<Template>,
+    ): Promise<Map<string, IPuzzle>> {
+        const result = new Map<string, IPuzzle>();
+        const template = await templateRepository.findOne(id);
+        const rest = [...ids];
+        const isValuePuzzle = (value: object): value is IPuzzle =>
+            _.has(value, "id") && _.has(value, "puzzles");
+        // find all puzzles from set of ids
+        await this.traverse(template.sections as object[], value => {
+            if (isValuePuzzle(value) && rest.includes(value.id)) {
+                const indexToRemove = rest.findIndex(id => id === value.id);
+                if (indexToRemove !== -1) {
+                    rest.splice(indexToRemove, 1);
+                }
+                result.set(value.id, value);
+                return !ids.length;
+            }
+        });
+        // if we are not out of ids
+        // then some of puzzles are not found
+        if (rest.length) {
+            throw new NotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
+        }
+        return result;
+    }
+
+    private async traverse(array: object[], predicate: (value: object) => boolean) {
+        return new Promise(resolve => {
+            const query = [...array];
+            while (query.length) {
+                const first = _.first(query);
+                query.shift();
+                if (predicate(first)) {
+                    return resolve();
+                }
+                for (const key of Object.keys(first)) {
+                    if (first[key] instanceof Array) {
+                        query.push(...first[key]);
+                    }
+                }
+            }
+            resolve();
+        });
     }
 }
