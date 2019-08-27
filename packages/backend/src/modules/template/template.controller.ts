@@ -6,6 +6,7 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 import { Template } from "./entities/template.entity";
 import { ITemplateService } from "./interfaces/template.service.interface";
 import { BaseResponse } from "../../shared/responses/base.response";

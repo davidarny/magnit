@@ -1,6 +1,11 @@
+import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import * as helmet from "helmet";
 import * as compression from "compression";
+import {
+    initializeTransactionalContext,
+    patchTypeORMRepositoryWithBaseRepository,
+} from "typeorm-transactional-cls-hooked";
 import { AppModule } from "./app.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
@@ -64,6 +69,9 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("api", app, document);
+
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
 
     // listen port
     await app.listen(process.env.BACKEND_PORT || 1337);

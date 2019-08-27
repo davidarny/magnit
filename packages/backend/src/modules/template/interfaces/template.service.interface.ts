@@ -1,4 +1,3 @@
-import { Repository, Transaction, TransactionRepository } from "typeorm";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
 
@@ -10,10 +9,7 @@ export interface ITemplateService {
         title?: string,
     ): Promise<Template[]>;
 
-    findByPuzzleId(
-        id: string,
-        templateAnswerRepository?: Repository<TemplateAnswer>,
-    ): Promise<TemplateAnswer>;
+    findByPuzzleId(id: string): Promise<TemplateAnswer>;
 
     findOneOrFail(id: string): Promise<Template>;
 

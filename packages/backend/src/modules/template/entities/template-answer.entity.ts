@@ -24,7 +24,7 @@ export class TemplateAnswer extends BaseEntityWithNonPrimaryId<TemplateAnswer> {
     @Column("varchar")
     answer_type: string;
 
-    @Column({ type: "varchar" })
+    @Column({ type: "varchar", primary: true })
     answer: string;
 
     @Column({ type: "text", nullable: true })

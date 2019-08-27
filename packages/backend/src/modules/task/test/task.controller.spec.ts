@@ -1,6 +1,6 @@
 import { Template } from "../../template/entities/template.entity";
 import { createMockFrom } from "../../../utils/create-mock.util";
-import { Task } from "../entities/task.entity";
+import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskController } from "../task.controller";
 import { TaskService } from "../services/task.service";
 import { Test } from "@nestjs/testing";
@@ -14,7 +14,7 @@ describe("TaskController", () => {
         id: 0,
         title: "task",
         description: "task",
-        status: "in_progress",
+        status: "in_progress" as ETaskStatus,
         assignments: [],
         stages: [],
         updated_at: new Date().toISOString(),
@@ -24,6 +24,7 @@ describe("TaskController", () => {
         id: 0,
         sections: [],
         assignments: [],
+        answers: [],
         title: "template",
         type: "complex",
         description: "template",
@@ -43,7 +44,8 @@ describe("TaskController", () => {
             },
         ];
         const controllers = [TaskController];
-        const app = await Test.createTestingModule({ providers, controllers }).compile();
+        const metadata = { providers, controllers };
+        const app = await Test.createTestingModule(metadata).compile();
 
         taskController = app.get(TaskController);
     });
