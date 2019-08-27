@@ -20,3 +20,12 @@ export function createMockFrom<T>(value: T): T {
 
     return result as T;
 }
+
+export function getMockRepository() {
+    return jest.fn(() => ({
+        metadata: {
+            columns: [],
+            relations: [],
+        },
+    }));
+}

@@ -1,9 +1,12 @@
+import { getRepositoryToken } from "@nestjs/typeorm";
 import { AppModule } from "../src/app.module";
 import { Test } from "@nestjs/testing";
 import * as request from "supertest";
+import { Template } from "../src/modules/template/entities/template.entity";
 import { TemplateService } from "../src/modules/template/services/template.service";
 import { NestApplication } from "@nestjs/core";
-import { createMockFrom } from "../src/utils/create-mock.util";
+import { TemplateModule } from "../src/modules/template/template.module";
+import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
 
 const payload = require("../src/modules/template/test/template.json");
 
@@ -12,8 +15,11 @@ describe("TemplateController (e2e)", () => {
     const templateService = createMockFrom(TemplateService.prototype);
 
     beforeEach(async () => {
-        const imports = [AppModule];
-        const moduleFixture = await Test.createTestingModule({ imports })
+        const imports = [TemplateModule];
+        const metadata = { imports };
+        const moduleFixture = await Test.createTestingModule(metadata)
+            .overrideProvider(getRepositoryToken(Template))
+            .useValue(getMockRepository())
             .overrideProvider(TemplateService)
             .useValue(templateService)
             .compile();

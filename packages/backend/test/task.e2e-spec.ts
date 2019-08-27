@@ -1,21 +1,29 @@
-import { AppModule } from "../src/app.module";
-import { Test } from "@nestjs/testing";
-import * as request from "supertest";
 import { NestApplication } from "@nestjs/core";
-import { Task } from "../src/modules/task/entities/task.entity";
+import { Test } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
+import * as request from "supertest";
+import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
+import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
+import { ETaskStatus, Task } from "../src/modules/task/entities/task.entity";
 import { TaskService } from "../src/modules/task/services/task.service";
+import { TaskStageSubscriber } from "../src/modules/task/subscribers/task-stage.subscriber";
+import { TaskSubscriber } from "../src/modules/task/subscribers/task.subscriber";
+import { TaskModule } from "../src/modules/task/task.module";
+import { Template } from "../src/modules/template/entities/template.entity";
 import { TemplateService } from "../src/modules/template/services/template.service";
-import { createMockFrom } from "../src/utils/create-mock.util";
+import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
 
 describe("TaskController (e2e)", () => {
     let app: NestApplication;
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
+    const taskSubscriber = createMockFrom(TaskSubscriber.prototype);
+    const taskStageSubscriber = createMockFrom(TaskStageSubscriber.prototype);
     const task: Task = {
         id: 0,
         title: "task",
         description: "task",
-        status: "in_progress",
+        status: "in_progress" as ETaskStatus,
         assignments: [],
         stages: [],
         updated_at: new Date().toISOString(),
@@ -23,8 +31,20 @@ describe("TaskController (e2e)", () => {
     };
 
     beforeEach(async () => {
-        const imports = [AppModule];
-        const moduleFixture = await Test.createTestingModule({ imports })
+        const metadata = { imports: [TaskModule] };
+        const moduleFixture = await Test.createTestingModule(metadata)
+            .overrideProvider(getRepositoryToken(Task))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(Template))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(TaskStage))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(StageHistory))
+            .useValue(getMockRepository())
+            .overrideProvider(TaskSubscriber)
+            .useValue(taskSubscriber)
+            .overrideProvider(TaskStageSubscriber)
+            .useValue(taskStageSubscriber)
             .overrideProvider(TaskService)
             .useValue(taskService)
             .overrideProvider(TemplateService)
@@ -35,9 +55,7 @@ describe("TaskController (e2e)", () => {
         (await app.setGlobalPrefix("v1")).init();
     });
 
-    afterEach(async () => {
-        await app.close();
-    });
+    afterEach(async () => await app.close());
 
     it("should return empty list of tasks", async () => {
         jest.spyOn(taskService, "findAll").mockResolvedValue([]);
