@@ -9,4 +9,5 @@ export class TemplateDto<T = TemplateDto<object>> extends BaseDto<TemplateDto> {
     @ApiModelProperty({ enum: ["light", "complex"] })
     readonly type: TTemplateType;
     @ApiModelProperty({ type: [SectionDto] }) readonly sections: SectionDto[];
+    @ApiModelProperty() readonly version: number;
 }

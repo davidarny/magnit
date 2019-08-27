@@ -6,6 +6,7 @@ import { TaskDto } from "./task.dto";
 export class ReportTemplateDto extends BaseDto<ReportTemplateDto> {
     @ApiModelProperty() readonly id: number;
     @ApiModelProperty() readonly version: number;
+    @ApiModelProperty() readonly title: string;
 }
 
 export class ReportStageDto extends TaskStageDto<ReportStageDto> {

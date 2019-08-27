@@ -208,15 +208,28 @@ export class TaskService implements ITaskService {
     @Transactional()
     async getReport(id: string): Promise<TaskReportDto> {
         const task = await this.findById(id, ["assignments", "stages"]);
-        const taskWithoutAssignments = _.omit(task, "assignments");
+        const templates = await this.templateService.findByTaskId(task.id.toString());
         return new TaskReportDto({
-            ...taskWithoutAssignments,
+            ..._.omit(task, "assignments"),
             stages: task.stages.map(stage => {
                 return new ReportStageDto({
                     ...stage,
-                    templates: task.assignments.map(assignment => {
-                        return new ReportTemplateDto(assignment);
-                    }),
+                    templates: task.assignments
+                        .map(assignment => {
+                            const template = _.find(templates, { id: assignment.id_template });
+                            if (!template) {
+                                return;
+                            }
+                            console.log(template);
+                            return new ReportTemplateDto({
+                                id: template.id,
+                                title: template.title,
+                                version: template.version,
+                                updated_at: template.updated_at,
+                                created_at: template.created_at,
+                            });
+                        })
+                        .filter(Boolean),
                 });
             }),
         });

@@ -73,6 +73,7 @@ export class TemplateService implements ITemplateService {
                 "template"."type",
                 "template"."created_at",
                 "template"."updated_at",
+                "template"."version",
                 "template_assignment"."editable",
                 to_jsonb(array_remove(array_agg("template_answer"), NULL)) as "answers"
             FROM "template_assignment"
