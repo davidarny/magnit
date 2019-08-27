@@ -1,4 +1,11 @@
-import { Column, DeepPartial, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    VersionColumn,
+} from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { TemplateAssignment } from "../../task/entities/tempalte-assignment.entity";
 import { TemplateAnswer } from "./template-answer.entity";

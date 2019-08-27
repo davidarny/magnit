@@ -74,7 +74,7 @@ export class TemplateService implements ITemplateService {
                 "template"."created_at",
                 "template"."updated_at",
                 "template_assignment"."editable",
-                to_jsonb(array_agg("template_answer")) as "answers"
+                to_jsonb(array_remove(array_agg("template_answer"), NULL)) as "answers"
             FROM "template_assignment"
             LEFT JOIN "template" ON "template"."id" = "template_assignment"."id_template"
             LEFT JOIN "template_answer" on "template"."id" = "template_answer"."id_template"
