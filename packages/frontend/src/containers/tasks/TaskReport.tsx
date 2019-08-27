@@ -1,23 +1,22 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IColumn, SelectableBlockWrapper, TableWrapper } from "@magnit/components";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { HistoryLineItem } from "components/history-line";
+import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
+import {
+    IReport,
+    SendReportForm,
+    TaskReportHeader,
+    TaskReportItem,
+} from "containers/tasks/task-report";
 import { useContext, useEffect, useState } from "react";
 import * as React from "react";
 import { AppContext } from "context";
-
-const columns: IColumn[] = [
-    { key: "number", label: "№" },
-    { key: "name", label: "Название шаблона" },
-    { key: "createdAt", label: "Дата добавления" },
-    { key: "correctionCount", label: "Количество правок" },
-];
 
 const reportHeaderFields = [
     {
@@ -42,13 +41,6 @@ const reportHeaderFields = [
     },
 ];
 
-interface IReport {
-    number: number;
-    name: string;
-    createdAt: string;
-    correctionCount: number;
-}
-
 interface ITaskReportProps {
     taskId: number;
 }
@@ -57,15 +49,8 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     const [reports, setReports] = useState<IReport[]>([]);
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
+    const [sendReportModal, setSendReportModal] = useState(false);
     const context = useContext(AppContext);
-
-    function onMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
-        setMenuAnchorElement(event.currentTarget);
-    }
-
-    function onMenuClose() {
-        setMenuAnchorElement(null);
-    }
 
     useEffect(() => {
         // mock report data
@@ -91,8 +76,32 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         ]);
     }, [context.courier, taskId]);
 
+    function onMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
+        setMenuAnchorElement(event.currentTarget);
+    }
+    function onMenuClose() {
+        setMenuAnchorElement(null);
+    }
+    function onOpenSendReportMenuItem() {
+        onMenuClose();
+        setSendReportModal(true);
+    }
+    function onSubmitSendReport(email: string) {
+        // send report on email
+    }
+
     return (
         <SectionLayout>
+            {/* Send report popup */}
+            <SimpleModal
+                width={370}
+                open={sendReportModal}
+                onClose={() => setSendReportModal(false)}
+            >
+                <SendReportForm onSubmit={onSubmitSendReport} />
+            </SimpleModal>
+
+            {/* Top bar */}
             <SectionTitle title="Отчет по заданию">
                 <Grid item>
                     <IconButton onClick={onMenuClick}>
@@ -106,7 +115,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     onClose={onMenuClose}
                 >
                     <MenuItem onClick={onMenuClose}>Скачать отчет (.xls)</MenuItem>
-                    <MenuItem onClick={onMenuClose}>Отправить на email</MenuItem>
+                    <MenuItem onClick={onOpenSendReportMenuItem}>Отправить на email</MenuItem>
                 </Menu>
             </SectionTitle>
 
@@ -117,38 +126,10 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     position: "relative",
                 })}
             >
-                <SelectableBlockWrapper>
-                    <Grid css={theme => ({ padding: theme.spacing(4) })}>
-                        <Typography css={theme => ({ fontSize: theme.fontSize.xLarge })}>
-                            Хардкорное задание для суровых прорабов
-                        </Typography>
+                {/* Report headers */}
+                <TaskReportHeader fields={reportHeaderFields} />
 
-                        <Grid
-                            container
-                            spacing={2}
-                            justify={"space-between"}
-                            css={theme => ({ marginTop: theme.spacing(2) })}
-                        >
-                            {reportHeaderFields.map((reportHeaderField, reportHeaderKey) => (
-                                <Grid item xs={12} md={2} key={reportHeaderKey}>
-                                    <Grid
-                                        css={theme => ({
-                                            color: theme.colors.gray,
-                                            fontSize: theme.fontSize.small,
-                                            marginBottom: theme.spacing(1),
-                                        })}
-                                    >
-                                        {reportHeaderField.title}
-                                    </Grid>
-                                    <Grid css={theme => ({ fontSize: theme.fontSize.smaller })}>
-                                        {reportHeaderField.text}
-                                    </Grid>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Grid>
-                </SelectableBlockWrapper>
-
+                {/* Report line */}
                 <Typography
                     css={theme => ({
                         fontSize: theme.fontSize.large,
@@ -161,6 +142,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                 >
                     Этапы работы
                 </Typography>
+
                 {/* mock report items */}
                 {[1, 2, 3, 4, 5].map(item => {
                     return (
@@ -174,32 +156,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                             isFirst={item === 1}
                             isLast={item === 5}
                         >
-                            <Typography
-                                component="div"
-                                css={theme => ({
-                                    fontSize: theme.fontSize.larger,
-                                    marginBottom: theme.spacing(2),
-                                })}
-                            >
-                                Подготовка технического плана (18.05.2019 - 25.05.2019)
-                            </Typography>
-                            <div
-                                css={theme => ({
-                                    color: theme.colors.gray,
-                                    fontSize: theme.fontSize.sNormal,
-                                })}
-                            >
-                                <b
-                                    css={() => ({
-                                        fontWeight: 500,
-                                    })}
-                                >
-                                    Исполнитель:
-                                </b>{" "}
-                                Рукастый Иннокентий Петрович
-                            </div>
-
-                            <TableWrapper columns={columns} data={reports} />
+                            <TaskReportItem reportTableData={reports} />
                         </HistoryLineItem>
                     );
                 })}
