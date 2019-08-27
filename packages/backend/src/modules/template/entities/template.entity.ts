@@ -47,4 +47,7 @@ export class Template extends BaseEntity<Template> {
 
     @Column({ type: "varchar", default: "light" })
     type: TTemplateType;
+
+    @VersionColumn({ default: 0 })
+    version: number;
 }

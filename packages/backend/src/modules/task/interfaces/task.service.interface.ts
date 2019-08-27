@@ -1,3 +1,4 @@
+import { TaskReportDto } from "../dto/task-report.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 
 export interface ITaskService {
@@ -25,4 +26,6 @@ export interface ITaskService {
     ): Promise<void>;
 
     getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
+
+    getReport(id: string): Promise<TaskReportDto>;
 }

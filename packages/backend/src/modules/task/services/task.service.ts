@@ -6,13 +6,13 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
 import { TemplateService } from "../../template/services/template.service";
+import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 import _ = require("lodash");
 
 @Injectable()
 export class TaskService implements ITaskService {
-    // TODO: need to use @TransactionalRepository on a method
     constructor(
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
@@ -203,5 +203,22 @@ export class TaskService implements ITaskService {
                 [ETaskStatus.IN_PROGRESS]: "Отправка задания",
             },
         }[prevStatus][nextStatus];
+    }
+
+    @Transactional()
+    async getReport(id: string): Promise<TaskReportDto> {
+        const task = await this.findById(id, ["assignments", "stages"]);
+        const taskWithoutAssignments = _.omit(task, "assignments");
+        return new TaskReportDto({
+            ...taskWithoutAssignments,
+            stages: task.stages.map(stage => {
+                return new ReportStageDto({
+                    ...stage,
+                    templates: task.assignments.map(assignment => {
+                        return new ReportTemplateDto(assignment);
+                    }),
+                });
+            }),
+        });
     }
 }

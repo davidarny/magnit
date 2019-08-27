@@ -1,6 +1,10 @@
+import { DeepPartial } from "typeorm";
 import { Template } from "../../template/entities/template.entity";
 import { createMockFrom } from "../../../utils/create-mock.util";
+import { TaskReportDto } from "../dto/task-report.dto";
+import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
+import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
 import { TaskController } from "../task.controller";
 import { TaskService } from "../services/task.service";
 import { Test } from "@nestjs/testing";
@@ -30,6 +34,7 @@ describe("TaskController", () => {
         description: "template",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        version: 0,
     };
 
     beforeEach(async () => {
@@ -105,5 +110,14 @@ describe("TaskController", () => {
     it("should delete task", async () => {
         const expected = { success: 1 };
         expect(await taskController.deleteById("0")).toStrictEqual(expected);
+    });
+
+    it("should get task report", async () => {
+        const report = new TaskReportDto();
+        jest.spyOn(taskService, "getReport").mockResolvedValue(report);
+        const actual = await taskController.getReport("0");
+        expect(taskService.getReport).toHaveBeenCalledWith("0");
+        const expected = { success: 1, report };
+        expect(actual).toEqual(expected);
     });
 });

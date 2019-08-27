@@ -41,6 +41,7 @@ import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTaskResponse } from "./responses/create-task.response";
+import { GetReportResponse } from "./responses/get-report.response";
 import { GetStagesWithFullHistoryResponse } from "./responses/get-stages-with-full-history.response";
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { GetTaskResponse } from "./responses/get-task.response";
@@ -203,6 +204,14 @@ export class TaskController {
     async getStagesWithFullHistory(@Param("id", TaskByIdPipe) id: string) {
         const task = await this.taskService.findById(id, ["stages", "stages.history"]);
         return { success: 1, stages: task.stages };
+    }
+
+    @Get("/:id/report")
+    @ApiOkResponse({ type: GetReportResponse, description: "Task report" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    async getReport(@Param("id", TaskByIdPipe) id: string) {
+        const report = await this.taskService.getReport(id);
+        return { success: 1, report };
     }
 
     @Post("/:task_id/answers")
