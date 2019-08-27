@@ -9,7 +9,7 @@ interface IProps {
     children: React.ReactNodeArray | React.ReactNode;
     isFocused?: boolean;
     isChecked?: boolean;
-    number?: number;
+    index?: number;
     isFirst?: boolean;
     isLast?: boolean;
     onMouseDown?: () => void;
@@ -46,14 +46,14 @@ export const HistoryLineItem: React.FC<IProps> = props => {
                         })}
                     >
                         {props.isChecked && <CheckIcon />}
-                        {!props.isChecked && props.number && (
+                        {!props.isChecked && props.index && (
                             <div
                                 css={theme => ({
                                     fontSize: theme.fontSize.small,
                                     color: theme.colors.primary,
                                 })}
                             >
-                                {props.number}
+                                {props.index}
                             </div>
                         )}
                     </div>

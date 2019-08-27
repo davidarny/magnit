@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { getFriendlyDate } from "@magnit/services";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { HistoryLineItem } from "components/history-line";
@@ -9,71 +8,28 @@ import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import {
-    IReport,
     SendReportForm,
     TaskReportHeader,
-    TaskReportItem,
+    TaskReportStageItem,
 } from "containers/tasks/task-report";
 import { useContext, useEffect, useState } from "react";
 import * as React from "react";
 import { AppContext } from "context";
-
-const reportHeaderFields = [
-    {
-        title: "АДМИНИСТРАТОР",
-        text: "Andrey_555",
-    },
-    {
-        title: "МЕСТОПОЛОЖЕНИЕ",
-        text: "Челябинская область, Челябинск, улица Железная, 5",
-    },
-    {
-        title: "ФОРМАТ ОБЪЕКТА",
-        text: "МК",
-    },
-    {
-        title: "ДАТА СОЗДАНИЯ",
-        text: getFriendlyDate(new Date()),
-    },
-    {
-        title: "СТАТУС",
-        text: "В работе",
-    },
-];
+import { getTaskReport, IReportResponse } from "services/api/tasks";
 
 interface ITaskReportProps {
     taskId: number;
 }
 
 export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
-    const [reports, setReports] = useState<IReport[]>([]);
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [sendReportModal, setSendReportModal] = useState(false);
+    const [report, setReport] = useState<IReportResponse>();
     const context = useContext(AppContext);
 
     useEffect(() => {
-        // mock report data
-        setReports([
-            {
-                number: 1,
-                name: "Ведомость работ",
-                createdAt: getFriendlyDate(new Date()),
-                correctionCount: 8,
-            },
-            {
-                number: 2,
-                name: "Бриф",
-                createdAt: getFriendlyDate(new Date()),
-                correctionCount: 8,
-            },
-            {
-                number: 3,
-                name: "Инженерное заключение",
-                createdAt: getFriendlyDate(new Date()),
-                correctionCount: 0,
-            },
-        ]);
+        getTaskReport(context.courier, taskId).then(response => setReport(response.report));
     }, [context.courier, taskId]);
 
     function onMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -87,7 +43,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         setSendReportModal(true);
     }
     function onSubmitSendReport(email: string) {
-        // send report on email
+        // send report to email
     }
 
     return (
@@ -127,39 +83,45 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                 })}
             >
                 {/* Report headers */}
-                <TaskReportHeader fields={reportHeaderFields} />
+                {report && <TaskReportHeader title={report.title} report={report} />}
 
-                {/* Report line */}
                 <Typography
                     css={theme => ({
                         fontSize: theme.fontSize.large,
-                        paddingLeft: theme.spacing(4),
-                        paddingRight: theme.spacing(4),
-                        paddingBottom: theme.spacing(),
-                        paddingTop: theme.spacing(5),
+                        padding: `
+                            ${theme.spacing(5)}
+                            ${theme.spacing(4)}
+                            ${theme.spacing()}
+                        `,
                         backgroundColor: theme.colors.white,
                     })}
                 >
                     Этапы работы
                 </Typography>
 
-                {/* mock report items */}
-                {[1, 2, 3, 4, 5].map(item => {
-                    return (
-                        <HistoryLineItem
-                            key={item}
-                            number={item}
-                            isChecked={item % 2 === 0}
-                            isFocused={focusedBlockId === item}
-                            onMouseDown={() => setFocusedBlockId(item)}
-                            onFocus={() => setFocusedBlockId(item)}
-                            isFirst={item === 1}
-                            isLast={item === 5}
-                        >
-                            <TaskReportItem reportTableData={reports} />
-                        </HistoryLineItem>
-                    );
-                })}
+                {/* Report stages */}
+                {report &&
+                    report.stages.map((stage, stageIndex) => {
+                        const friendlyIndex = stageIndex + 1;
+                        return (
+                            <HistoryLineItem
+                                key={stage.id}
+                                index={friendlyIndex}
+                                isChecked={stage.finished}
+                                isFocused={focusedBlockId === stage.id}
+                                onMouseDown={() => setFocusedBlockId(stage.id)}
+                                onFocus={() => setFocusedBlockId(stage.id)}
+                                isFirst={!stageIndex}
+                                isLast={friendlyIndex === report.stages.length}
+                            >
+                                <TaskReportStageItem
+                                    title={stage.title}
+                                    dueDate={stage.dueDate}
+                                    templates={stage.templates}
+                                />
+                            </HistoryLineItem>
+                        );
+                    })}
             </Grid>
         </SectionLayout>
     );

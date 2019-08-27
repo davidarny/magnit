@@ -1,23 +1,51 @@
 /** @jsx jsx */
 import { SelectableBlockWrapper } from "@magnit/components";
+import { getFriendlyDate } from "@magnit/services";
 import { Grid, Typography } from "@material-ui/core";
 import * as React from "react";
 import { jsx } from "@emotion/core";
+import { EReportStatuses, IReportResponse } from "services/api/tasks";
 
 interface IProps {
-    fields: Array<{
-        title: string;
-        text: string;
-        colWidth?: number;
-    }>;
+    report: IReportResponse;
+    title: string;
 }
 
+const mapReportStatuses = {
+    [EReportStatuses.IN_PROGRESS]: "В работе",
+    [EReportStatuses.ON_CHECK]: "На проверке",
+    [EReportStatuses.DRAFT]: "Draft",
+    [EReportStatuses.COMPLETED]: "Завершен",
+};
+
 export const TaskReportHeader: React.FC<IProps> = props => {
+    const headerColumns = [
+        {
+            title: "АДМИНИСТРАТОР",
+            text: "Andrey_555",
+        },
+        {
+            title: "МЕСТОПОЛОЖЕНИЕ",
+            text: "Челябинская область, Челябинск, улица Железная, 5",
+        },
+        {
+            title: "ФОРМАТ ОБЪЕКТА",
+            text: "МК",
+        },
+        {
+            title: "ДАТА СОЗДАНИЯ",
+            text: getFriendlyDate(new Date(props.report.createdAt)),
+        },
+        {
+            title: "СТАТУС",
+            text: mapReportStatuses[props.report.status],
+        },
+    ];
     return (
         <SelectableBlockWrapper>
             <Grid css={theme => ({ padding: theme.spacing(4) })}>
                 <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
-                    Хардкорное задание для суровых прорабов
+                    {props.title}
                 </Typography>
 
                 <Grid
@@ -26,7 +54,7 @@ export const TaskReportHeader: React.FC<IProps> = props => {
                     justify={"space-between"}
                     css={theme => ({ marginTop: theme.spacing(2) })}
                 >
-                    {props.fields.map((field, fieldKey) => (
+                    {headerColumns.map((field, fieldKey) => (
                         <Grid item xs={12} md={"auto"} key={fieldKey}>
                             <Grid
                                 css={theme => ({
