@@ -19,10 +19,10 @@ export class FullTaskDto extends TaskDto {
 
 class EditableTemplateDto extends TemplateDto {
     @ApiModelProperty() readonly editable: boolean;
+    @ApiModelProperty({ type: [TemplateAnswerDto] }) readonly answers: TemplateAnswerDto[];
 }
 
 export class ExtendedTaskDto extends TaskDto {
     @ApiModelProperty({ type: [EditableTemplateDto] }) readonly templates: EditableTemplateDto[];
     @ApiModelProperty({ type: [TaskStageDto] }) readonly stages: TaskStageDto[];
-    @ApiModelProperty({ type: [TemplateAnswerDto] }) readonly answers: TemplateAnswerDto[];
 }
