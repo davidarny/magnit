@@ -29,7 +29,7 @@ export const HistoryLineItem: React.FC<IProps> = props => {
             onFocus={props.onFocus}
         >
             <Grid container spacing={2} css={() => ({ position: "relative" })}>
-                <Grid item css={theme => ({ position: "relative" })}>
+                <Grid item css={() => ({ position: "relative" })}>
                     <div
                         css={theme => ({
                             width: theme.spacing(3),

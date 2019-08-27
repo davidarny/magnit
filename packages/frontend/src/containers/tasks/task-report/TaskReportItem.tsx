@@ -37,7 +37,8 @@ export const TaskReportItem: React.FC<IProps> = props => {
             <div
                 css={theme => ({
                     color: theme.colors.gray,
-                    fontSize: theme.fontSize.sNormal,
+                    fontSize: theme.fontSize.normal,
+                    marginBottom: theme.spacing(),
                 })}
             >
                 <b

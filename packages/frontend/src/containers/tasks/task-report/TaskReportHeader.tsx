@@ -8,6 +8,7 @@ interface IProps {
     fields: Array<{
         title: string;
         text: string;
+        colWidth?: number;
     }>;
 }
 
@@ -15,7 +16,7 @@ export const TaskReportHeader: React.FC<IProps> = props => {
     return (
         <SelectableBlockWrapper>
             <Grid css={theme => ({ padding: theme.spacing(4) })}>
-                <Typography css={theme => ({ fontSize: theme.fontSize.xLarge })}>
+                <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>
                     Хардкорное задание для суровых прорабов
                 </Typography>
 
@@ -26,17 +27,17 @@ export const TaskReportHeader: React.FC<IProps> = props => {
                     css={theme => ({ marginTop: theme.spacing(2) })}
                 >
                     {props.fields.map((field, fieldKey) => (
-                        <Grid item xs={12} md={2} key={fieldKey}>
+                        <Grid item xs={12} md={"auto"} key={fieldKey}>
                             <Grid
                                 css={theme => ({
                                     color: theme.colors.gray,
-                                    fontSize: theme.fontSize.small,
+                                    fontSize: theme.fontSize.sNormal,
                                     marginBottom: theme.spacing(1),
                                 })}
                             >
                                 {field.title}
                             </Grid>
-                            <Grid css={theme => ({ fontSize: theme.fontSize.smaller })}>
+                            <Grid css={theme => ({ fontSize: theme.fontSize.normal })}>
                                 {field.text}
                             </Grid>
                         </Grid>
