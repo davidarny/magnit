@@ -55,7 +55,8 @@
         "rxjs": "^6.5.2",
         "swagger-ui-express": "^4.0.7",
         "typeorm": "^0.2.18",
-        "typeorm-transactional-cls-hooked": "^0.1.8"
+        "typeorm-transactional-cls-hooked": "^0.1.8",
+        "xlsx": "^0.15.1"
     },
     "devDependencies": {
         "@compodoc/compodoc": "^1.1.10",

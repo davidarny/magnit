@@ -8,6 +8,7 @@ import {
     Post,
     Put,
     Query,
+    Res,
     UploadedFiles,
     UseInterceptors,
 } from "@nestjs/common";
@@ -19,8 +20,11 @@ import {
     ApiImplicitBody,
     ApiNotFoundResponse,
     ApiOkResponse,
+    ApiProduces,
     ApiUseTags,
 } from "@nestjs/swagger";
+import { Response } from "express";
+import * as XLSX from "xlsx";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
@@ -48,6 +52,7 @@ import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
+import _ = require("lodash");
 
 @ApiUseTags("tasks")
 @Controller("tasks")
@@ -229,5 +234,33 @@ export class TaskController {
         const ids = [...files.map(file => file.fieldname), ...Object.keys(body)];
         await this.taskService.setTaskAnswers(ids, files, body);
         return { success: 1 };
+    }
+
+    @Get("/:id/report/file")
+    @ApiOkResponse({ description: "XLSX file reposnse" })
+    @ApiProduces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    async getReportFile(@Param("id", TaskByIdPipe) id: string, @Res() res: Response) {
+        const report = await this.taskService.getReport(id);
+        const ws = XLSX.utils.aoa_to_sheet([
+            ["Дата создания", "Статус"],
+            [report.created_at, report.status],
+            ["Этапы работы"],
+            ..._.flatMap(report.stages, stage => [
+                [stage.title, stage.due_date],
+                ["№", "Название шаблона", "Дата добавления", "Количество правок"],
+                ..._.map(stage.templates, (template, index) => [
+                    index,
+                    template.title,
+                    template.created_at,
+                    template.version,
+                ]),
+            ]),
+        ]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, report.title);
+        const buf = XLSX.write(wb, { type: "buffer" });
+        res.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.attachment("report.xlsx");
+        res.status(200).send(buf);
     }
 }
