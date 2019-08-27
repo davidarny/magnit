@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { IColumn, SelectableBlockWrapper, TableWrapper } from "@magnit/components";
-import { CheckIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
+import { HistoryLineItem } from "components/history-line";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { useContext, useEffect, useState } from "react";
@@ -68,6 +68,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     }
 
     useEffect(() => {
+        // mock report data
         setReports([
             {
                 number: 1,
@@ -160,110 +161,46 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                 >
                     Этапы работы
                 </Typography>
+                {/* mock report items */}
                 {[1, 2, 3, 4, 5].map(item => {
-                    const isChecked = item % 2 === 0;
-                    const isFocused = focusedBlockId === item;
-                    const isLast = item === 5;
                     return (
-                        <SelectableBlockWrapper
+                        <HistoryLineItem
                             key={item}
-                            css={theme => ({
-                                padding: `${theme.spacing(3)} ${theme.spacing(4)}`,
-                                "&:hover": {
-                                    background: theme.colors.light,
-                                    "> div:last-child": { background: theme.colors.light },
-                                },
-                                zIndex: isFocused ? 1300 : "initial",
-                            })}
-                            focused={isFocused}
+                            number={item}
+                            isChecked={item % 2 === 0}
+                            isFocused={focusedBlockId === item}
                             onMouseDown={() => setFocusedBlockId(item)}
                             onFocus={() => setFocusedBlockId(item)}
+                            isFirst={item === 1}
+                            isLast={item === 5}
                         >
-                            <Grid
-                                container
-                                spacing={2}
-                                css={css`
-                                    position: relative;
-                                `}
+                            <Typography
+                                component="div"
+                                css={theme => ({
+                                    fontSize: theme.fontSize.larger,
+                                    marginBottom: theme.spacing(2),
+                                })}
                             >
-                                <Grid item>
-                                    <Grid container justify="flex-end">
-                                        <div
-                                            css={theme => ({
-                                                width: theme.spacing(3),
-                                                height: theme.spacing(3),
-                                                borderRadius: "50%",
-                                                border: `2px solid ${theme.colors.primary}`,
-                                                zIndex: 2,
-                                                color: isChecked ? theme.colors.white : "initial",
-                                                position: "relative",
-                                                background: isChecked
-                                                    ? theme.colors.primary
-                                                    : theme.colors.white,
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            })}
-                                        >
-                                            {isChecked && <CheckIcon />}
-                                            {!isChecked && (
-                                                <div
-                                                    css={theme => ({
-                                                        fontSize: theme.fontSize.small,
-                                                        color: theme.colors.primary,
-                                                    })}
-                                                >
-                                                    {item}
-                                                </div>
-                                            )}
-                                        </div>
-                                        {!isLast && (
-                                            <div
-                                                css={theme => ({
-                                                    width: theme.spacing(0.25),
-                                                    height: isFocused
-                                                        ? `calc(100% - ${theme.spacing(2)})`
-                                                        : `calc(100% + ${theme.spacing()})`,
-                                                    background: theme.colors.lightGray,
-                                                    position: "absolute",
-                                                    top: theme.spacing(4),
-                                                    left: "20.5px", // TODO: dynamic calculation
-                                                    zIndex: 1,
-                                                })}
-                                            />
-                                        )}
-                                    </Grid>
-                                </Grid>
-                                <Grid item xs={7}>
-                                    <Typography
-                                        component="div"
-                                        css={theme => ({
-                                            fontSize: theme.fontSize.larger,
-                                            marginBottom: theme.spacing(2),
-                                        })}
-                                    >
-                                        Подготовка технического плана (18.05.2019 - 25.05.2019)
-                                    </Typography>
-                                    <div
-                                        css={theme => ({
-                                            color: theme.colors.gray,
-                                            fontSize: theme.fontSize.sNormal,
-                                        })}
-                                    >
-                                        <b
-                                            css={() => ({
-                                                fontWeight: 500,
-                                            })}
-                                        >
-                                            Исполнитель:
-                                        </b>{" "}
-                                        Рукастый Иннокентий Петрович
-                                    </div>
+                                Подготовка технического плана (18.05.2019 - 25.05.2019)
+                            </Typography>
+                            <div
+                                css={theme => ({
+                                    color: theme.colors.gray,
+                                    fontSize: theme.fontSize.sNormal,
+                                })}
+                            >
+                                <b
+                                    css={() => ({
+                                        fontWeight: 500,
+                                    })}
+                                >
+                                    Исполнитель:
+                                </b>{" "}
+                                Рукастый Иннокентий Петрович
+                            </div>
 
-                                    <TableWrapper columns={columns} data={reports} />
-                                </Grid>
-                            </Grid>
-                        </SelectableBlockWrapper>
+                            <TableWrapper columns={columns} data={reports} />
+                        </HistoryLineItem>
                     );
                 })}
             </Grid>
