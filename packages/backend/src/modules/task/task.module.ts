@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { createHash } from "crypto";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import { TemplateAnswer } from "../template/entities/template-answer.entity";
 import { Template } from "../template/entities/template.entity";
 import { TemplateService } from "../template/services/template.service";
 import { StageHistory } from "./entities/stage-history.entity";
@@ -18,7 +19,7 @@ const MAX_HASH_LENGTH = 28;
 
 const controllers = [TaskController];
 const providers = [TaskService, TemplateService, TaskSubscriber, TaskStageSubscriber];
-const entities = [Task, Template, TaskStage, StageHistory];
+const entities = [Task, Template, TaskStage, StageHistory, TemplateAnswer];
 const imports = [
     TypeOrmModule.forFeature(entities),
     MulterModule.register({

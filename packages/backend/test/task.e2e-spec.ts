@@ -2,6 +2,10 @@ import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import * as request from "supertest";
+import {
+    initializeTransactionalContext,
+    patchTypeORMRepositoryWithBaseRepository,
+} from "typeorm-transactional-cls-hooked";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
 import { ETaskStatus, Task } from "../src/modules/task/entities/task.entity";
@@ -9,6 +13,7 @@ import { TaskService } from "../src/modules/task/services/task.service";
 import { TaskStageSubscriber } from "../src/modules/task/subscribers/task-stage.subscriber";
 import { TaskSubscriber } from "../src/modules/task/subscribers/task.subscriber";
 import { TaskModule } from "../src/modules/task/task.module";
+import { TemplateAnswer } from "../src/modules/template/entities/template-answer.entity";
 import { Template } from "../src/modules/template/entities/template.entity";
 import { TemplateService } from "../src/modules/template/services/template.service";
 import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
@@ -30,6 +35,9 @@ describe("TaskController (e2e)", () => {
         created_at: new Date().toISOString(),
     };
 
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
+
     beforeEach(async () => {
         const metadata = { imports: [TaskModule] };
         const moduleFixture = await Test.createTestingModule(metadata)
@@ -40,6 +48,8 @@ describe("TaskController (e2e)", () => {
             .overrideProvider(getRepositoryToken(TaskStage))
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(StageHistory))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(TemplateAnswer))
             .useValue(getMockRepository())
             .overrideProvider(TaskSubscriber)
             .useValue(taskSubscriber)

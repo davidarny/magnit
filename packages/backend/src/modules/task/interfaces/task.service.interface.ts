@@ -18,5 +18,11 @@ export interface ITaskService {
 
     deleteById(id: string): Promise<void>;
 
+    setTaskAnswers(
+        ids: string[],
+        files: Express.Multer.File[],
+        body: { [key: string]: string },
+    ): Promise<void>;
+
     getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
 }

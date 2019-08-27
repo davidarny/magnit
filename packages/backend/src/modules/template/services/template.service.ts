@@ -4,7 +4,9 @@ import {
     InternalServerErrorException,
     NotFoundException,
 } from "@nestjs/common";
-import { FindManyOptions, Repository, Transaction, TransactionRepository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { FindManyOptions, Repository } from "typeorm";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
@@ -13,32 +15,25 @@ import _ = require("lodash");
 
 @Injectable()
 export class TemplateService implements ITemplateService {
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findAnswersById(
-        id: string,
-        @TransactionRepository(TemplateAnswer)
-        templateAnswerRepository?: Repository<TemplateAnswer>,
-    ): Promise<TemplateAnswer[]> {
-        return templateAnswerRepository.find({ where: { id_template: id } });
+    constructor(
+        @InjectRepository(Template)
+        private readonly templateRepository: Repository<Template>,
+        @InjectRepository(TemplateAnswer)
+        private readonly templateAnswerRepository: Repository<TemplateAnswer>,
+    ) {}
+
+    @Transactional()
+    async findAnswersById(id: string): Promise<TemplateAnswer[]> {
+        return this.templateAnswerRepository.find({ where: { id_template: id } });
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findByPuzzleId(
-        id: string,
-        @TransactionRepository(TemplateAnswer)
-        templateAnswerRepository?: Repository<TemplateAnswer>,
-    ): Promise<TemplateAnswer> {
-        return templateAnswerRepository.findOne({ where: { id_puzzle: id } });
+    @Transactional()
+    async findByPuzzleId(id: string): Promise<TemplateAnswer> {
+        return this.templateAnswerRepository.findOne({ where: { id_puzzle: id } });
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findAll(
-        offset?: number,
-        limit?: number,
-        sort?: "ASC" | "DESC",
-        title?: string,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
+    @Transactional()
+    async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
         // TODO: probably need to introduce FindOptionsBuilder
         const options: FindManyOptions<Template> = {};
         if (typeof offset !== "undefined") {
@@ -56,25 +51,19 @@ export class TemplateService implements ITemplateService {
             }
             Object.assign(options.where, { title });
         }
-        return templateRepository.find(options);
+        return this.templateRepository.find(options);
     }
 
     // TODO: remove this one and handle 404 more accurately
-    @Transaction({ isolation: "READ COMMITTED" })
+    @Transactional()
     /** @deprecated */
-    async findOneOrFail(
-        id: string,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
-        return templateRepository.findOneOrFail({ where: { id } });
+    async findOneOrFail(id: string) {
+        return this.templateRepository.findOneOrFail({ where: { id } });
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findByTaskId(
-        id: string,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
-        return templateRepository.query(
+    @Transactional()
+    async findByTaskId(id: string) {
+        return this.templateRepository.query(
             `
             SELECT
                 "template"."id",
@@ -96,14 +85,11 @@ export class TemplateService implements ITemplateService {
         );
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async insert(
-        template: Template,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
+    @Transactional()
+    async insert(template: Template) {
         // tricky insert
         // need this only for jsonb_strip_nulls()
-        const response = await templateRepository.query(
+        const response = await this.templateRepository.query(
             `
             INSERT INTO
             "template" ("title", "description", "sections", "type", "created_at", "updated_at")
@@ -121,7 +107,7 @@ export class TemplateService implements ITemplateService {
         if (Array.isArray(response) && response.length > 0) {
             const inserted = response.pop();
             if (inserted && inserted.id) {
-                return templateRepository.findOne({ id: inserted.id });
+                return this.templateRepository.findOne({ id: inserted.id });
             } else {
                 throw new InternalServerErrorException("Cannot save/update template");
             }
@@ -130,15 +116,11 @@ export class TemplateService implements ITemplateService {
         }
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async update(
-        id: string,
-        template: Template,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
+    @Transactional()
+    async update(id: string, template: Template) {
         // tricky update
         // need this only for jsonb_strip_nulls()
-        const builder = await templateRepository.createQueryBuilder("template").update();
+        const builder = await this.templateRepository.createQueryBuilder("template").update();
         const values: QueryDeepPartialEntity<Template> = {};
         if (template.title || typeof template.title === "string") {
             values.title = template.title;
@@ -155,45 +137,32 @@ export class TemplateService implements ITemplateService {
         }
         builder.set(values).where("id = :id", { id: Number(id) });
         await builder.execute();
-        const result = await templateRepository.findOne({ id: Number(id) });
+        const result = await this.templateRepository.findOne({ id: Number(id) });
         if (!result) {
             throw new BadRequestException("Cannot update Template");
         }
         return result;
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findById(
-        id: string,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
-        return templateRepository.findOne({ where: { id } });
+    @Transactional()
+    async findById(id: string) {
+        return this.templateRepository.findOne({ where: { id } });
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async deleteById(
-        id: string,
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ) {
-        await templateRepository.delete(id);
+    @Transactional()
+    async deleteById(id: string) {
+        await this.templateRepository.delete(id);
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async insertAnswerBulk(
-        assets: TemplateAnswer[],
-        @TransactionRepository(TemplateAnswer) templateAssetRepository?: Repository<TemplateAnswer>,
-    ) {
-        return templateAssetRepository.save(assets);
+    @Transactional()
+    async insertAnswerBulk(assets: TemplateAnswer[]) {
+        return this.templateAnswerRepository.save(assets);
     }
 
-    @Transaction({ isolation: "READ COMMITTED" })
-    async findPuzzlesByIds(
-        id: string,
-        ids: string[],
-        @TransactionRepository(Template) templateRepository?: Repository<Template>,
-    ): Promise<Map<string, IPuzzle>> {
+    @Transactional()
+    async findPuzzlesByIds(id: string, ids: string[]): Promise<Map<string, IPuzzle>> {
         const result = new Map<string, IPuzzle>();
-        const template = await templateRepository.findOne(id);
+        const template = await this.templateRepository.findOne(id);
         const rest = [...ids];
         const isValuePuzzle = (value: object): value is IPuzzle =>
             _.has(value, "id") && _.has(value, "puzzles");
