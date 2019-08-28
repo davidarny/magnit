@@ -6,7 +6,7 @@ import { Grid } from "@material-ui/core";
 import * as React from "react";
 import { jsx } from "@emotion/core";
 
-interface IHistoryLineItemProps {
+interface IVerticalStepperProps {
     focused?: boolean;
     checked?: boolean;
     index?: number;
@@ -18,7 +18,7 @@ interface IHistoryLineItemProps {
     onFocus?(): void;
 }
 
-export const HistoryLineItem: React.FC<IHistoryLineItemProps> = props => {
+export const VerticalStepper: React.FC<IVerticalStepperProps> = props => {
     return (
         <SelectableBlockWrapper
             css={theme => ({
@@ -30,7 +30,7 @@ export const HistoryLineItem: React.FC<IHistoryLineItemProps> = props => {
             onMouseDown={props.onMouseDown}
             onFocus={props.onFocus}
         >
-            <Grid container spacing={2} css={{ position: "relative" }}>
+            <Grid container spacing={2}>
                 <Grid item css={{ position: "relative" }}>
                     <div
                         css={theme => ({

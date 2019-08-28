@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
-import { FC } from "react";
 import { TableBody, TableCell, TableRow } from "@material-ui/core";
 import { jsx } from "@emotion/core";
+import React from "react";
 import { IColumn } from "./TableWrapper";
 import * as _ from "lodash";
 
@@ -14,7 +14,7 @@ interface ITableBodyWrapperProps {
     onRowClick?(row?: object): void;
 }
 
-export const TableBodyWrapper: FC<ITableBodyWrapperProps> = props => {
+export const TableBodyWrapper: React.FC<ITableBodyWrapperProps> = props => {
     const { data, columns, hover = true, onRowClick } = props;
 
     return (
@@ -29,7 +29,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = props => {
                 return (
                     <TableRow hover={hover} key={index} onClick={onClick}>
                         {columns.map((column: IColumn, index) => {
-                            const label = _.get(value, column.key, "");
+                            const label = _.get(value, column.key);
 
                             return (
                                 <TableCell
@@ -44,7 +44,7 @@ export const TableBodyWrapper: FC<ITableBodyWrapperProps> = props => {
                                     })}
                                     title={label}
                                 >
-                                    {label || "(не задано)"}
+                                    {typeof label !== "undefined" ? label : "(не задано)"}
                                 </TableCell>
                             );
                         })}

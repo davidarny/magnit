@@ -14,13 +14,13 @@ const columns: IColumn[] = [
     { key: "version", label: "Количество правок" },
 ];
 
-interface ITaskReportStageItemProps {
+interface ITaskStageProps {
     title: string;
     dueDate: string;
     templates: IReportStageTemplate[];
 }
 
-export const TaskReportStageItem: React.FC<ITaskReportStageItemProps> = props => {
+export const ReportStage: React.FC<ITaskStageProps> = props => {
     const transformedTemplateData = props.templates.map((template, templateIndex) => ({
         index: templateIndex + 1,
         title: template.title,
@@ -48,7 +48,6 @@ export const TaskReportStageItem: React.FC<ITaskReportStageItemProps> = props =>
             >
                 <span css={{ fontWeight: 500 }}>Исполнитель:</span> Рукастый Иннокентий Петрович
             </div>
-
             <TableWrapper
                 rowHover={false}
                 showPagination={false}

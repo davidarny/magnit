@@ -7,7 +7,7 @@ import * as React from "react";
 import { jsx } from "@emotion/core";
 import { EReportStatuses, IReportResponse } from "services/api/tasks";
 
-interface ITaskReportHeaderProps {
+interface IReportHeaderProps {
     report: IReportResponse;
     title: string;
 }
@@ -19,11 +19,11 @@ const reportStatusTranslations = {
     [EReportStatuses.COMPLETED]: "Завершен",
 };
 
-export const TaskReportHeader: React.FC<ITaskReportHeaderProps> = props => {
+export const ReportHeader: React.FC<IReportHeaderProps> = props => {
     const headers = [
         {
             title: "АДМИНИСТРАТОР",
-            text: "Andrey_555",
+            text: "Терещенко Геннадий Владимирович",
         },
         {
             title: "МЕСТОПОЛОЖЕНИЕ",

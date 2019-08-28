@@ -1,24 +1,20 @@
 /** @jsx jsx */
-import { Close } from "@material-ui/icons";
-import * as React from "react";
+
 import { jsx } from "@emotion/core";
-import Modal from "@material-ui/core/Modal";
+import { Modal } from "@material-ui/core";
+import { Close as CloseIcon } from "@material-ui/icons";
+import * as React from "react";
 
 interface IProps {
     open?: boolean;
-    children: React.ReactElement;
     width?: number | string;
+
     onClose(): void;
 }
 
-export const SimpleModal: React.FC<IProps> = props => {
+export const SimpleModal: React.FC<IProps> = ({ onClose, open, width, children }) => {
     return (
-        <Modal
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            open={!!props.open}
-            onClose={props.onClose}
-        >
+        <Modal open={!!open} onClose={onClose}>
             <div
                 css={theme => ({
                     position: "absolute",
@@ -28,7 +24,7 @@ export const SimpleModal: React.FC<IProps> = props => {
                     padding: theme.spacing(6),
                     maxWidth: "100%",
                     backgroundColor: theme.colors.white,
-                    width: props.width || theme.spacing(6),
+                    width: width || theme.spacing(6),
                     borderRadius: 6,
                 })}
             >
@@ -48,11 +44,11 @@ export const SimpleModal: React.FC<IProps> = props => {
                         height: "1em",
                         cursor: "pointer",
                     })}
-                    onClick={props.onClose}
+                    onClick={onClose}
                 >
-                    <Close css={theme => ({ fontSize: theme.fontSize.small })} />
+                    <CloseIcon css={theme => ({ fontSize: theme.fontSize.small })} />
                 </div>
-                {props.children}
+                {children}
             </div>
         </Modal>
     );

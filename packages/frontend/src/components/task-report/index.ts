@@ -1,3 +1,3 @@
 export * from "./SendReportForm";
-export * from "./TaskReportHeader";
-export * from "./TaskReportStageItem";
+export * from "./ReportHeader";
+export * from "./ReportStage";

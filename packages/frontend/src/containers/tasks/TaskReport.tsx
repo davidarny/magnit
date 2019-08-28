@@ -3,15 +3,15 @@
 import { jsx } from "@emotion/core";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
-import { HistoryLineItem } from "components/history-line";
 import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { SendReportForm, TaskReportHeader, TaskReportStageItem } from "components/task-report";
+import { SendReportForm, ReportHeader, ReportStage } from "components/task-report";
 import { useContext, useEffect, useState } from "react";
 import * as React from "react";
 import { AppContext } from "context";
 import { getTaskReport, IReportResponse } from "services/api/tasks";
+import { VerticalStepper } from "../../components/vertical-stepper";
 
 interface ITaskReportProps {
     taskId: number;
@@ -81,7 +81,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                 })}
             >
                 {/* report headers */}
-                {report && <TaskReportHeader title={report.title} report={report} />}
+                {report && <ReportHeader title={report.title} report={report} />}
 
                 {report && report.stages.length > 0 && (
                     <Typography
@@ -109,7 +109,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                         const friendlyIndex = index + 1;
 
                         return (
-                            <HistoryLineItem
+                            <VerticalStepper
                                 key={stage.id}
                                 index={friendlyIndex}
                                 checked={stage.finished}
@@ -119,12 +119,12 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                                 first={!index}
                                 last={friendlyIndex === report.stages.length}
                             >
-                                <TaskReportStageItem
+                                <ReportStage
                                     title={stage.title}
                                     dueDate={stage.dueDate}
                                     templates={stage.templates}
                                 />
-                            </HistoryLineItem>
+                            </VerticalStepper>
                         );
                     })}
             </Grid>

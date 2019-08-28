@@ -2,7 +2,7 @@
 
 import { Button, InputField } from "@magnit/components";
 import { Send } from "@material-ui/icons";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import * as React from "react";
 import { jsx } from "@emotion/core";
 
@@ -11,14 +11,20 @@ interface IProps {
 }
 
 export const SendReportForm: React.FC<IProps> = props => {
+    const { onSubmit } = props;
+
     const [email, setEmail] = useState("");
-    function onSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        props.onSubmit(email);
-    }
+
+    const onSubmitCallback = useCallback(
+        (event: React.FormEvent) => {
+            event.preventDefault();
+            onSubmit(email);
+        },
+        [email, onSubmit],
+    );
 
     return (
-        <form action="" onSubmit={onSubmit}>
+        <form action="" onSubmit={onSubmitCallback}>
             <div
                 css={theme => ({
                     fontSize: theme.fontSize.larger,
@@ -30,14 +36,14 @@ export const SendReportForm: React.FC<IProps> = props => {
             <InputField
                 onChange={e => setEmail(e.target.value)}
                 value={email}
-                placeholder={"Email"}
+                placeholder="Email"
                 autoFocus
-                type={"email"}
+                type="email"
                 required
                 fullWidth
             />
             <Button
-                type={"submit"}
+                type="submit"
                 css={theme => ({
                     display: "flex",
                     margin: `${theme.spacing(6)} auto 0`,
@@ -48,7 +54,7 @@ export const SendReportForm: React.FC<IProps> = props => {
                         fontSize: theme.fontSize.normal,
                         marginRight: theme.spacing(),
                     })}
-                />{" "}
+                />
                 Отправить
             </Button>
         </form>
