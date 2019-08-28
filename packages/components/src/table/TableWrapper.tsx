@@ -23,12 +23,14 @@ interface ITableWrapperProps {
     data: object[];
     initialPage?: number;
     rowsPerPage?: number;
+    showPagination?: boolean;
+    rowHover?: boolean;
 
     onRowClick?(row?: object): void;
 }
 
 export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...props }) => {
-    const { initialPage = 0, rowsPerPage = 10 } = props;
+    const { initialPage = 0, rowsPerPage = 10, showPagination = true, rowHover = true } = props;
 
     const [page, setPage] = useState(initialPage);
 
@@ -38,19 +40,22 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
     ) {
         setPage(newPage);
     }
-    const isShowPagination = data.length > rowsPerPage;
-
     return (
         <React.Fragment>
             <Table>
                 <TableHeader headers={columns} />
                 <TableBodyWrapper
-                    data={data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                    data={
+                        showPagination
+                            ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : data
+                    }
                     columns={columns}
+                    hover={rowHover}
                     onRowClick={props.onRowClick}
                 />
             </Table>
-            {isShowPagination && (
+            {showPagination && (
                 <TablePagination
                     component="div"
                     count={data.length}

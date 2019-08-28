@@ -7,11 +7,7 @@ import { HistoryLineItem } from "components/history-line";
 import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import {
-    SendReportForm,
-    TaskReportHeader,
-    TaskReportStageItem,
-} from "containers/tasks/task-report";
+import { SendReportForm, TaskReportHeader, TaskReportStageItem } from "components/task-report";
 import { useContext, useEffect, useState } from "react";
 import * as React from "react";
 import { AppContext } from "context";
@@ -25,11 +21,13 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [sendReportModal, setSendReportModal] = useState(false);
-    const [report, setReport] = useState<IReportResponse>();
+    const [report, setReport] = useState<IReportResponse | null>(null);
     const context = useContext(AppContext);
 
     useEffect(() => {
-        getTaskReport(context.courier, taskId).then(response => setReport(response.report));
+        getTaskReport(context.courier, taskId)
+            .then(response => setReport(response.report))
+            .catch(console.error);
     }, [context.courier, taskId]);
 
     function onMenuClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -43,21 +41,21 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         setSendReportModal(true);
     }
     function onSubmitSendReport(email: string) {
-        // send report to email
+        // TODO: send report to email
+    }
+
+    function onPopupClose() {
+        setSendReportModal(false);
     }
 
     return (
         <SectionLayout>
-            {/* Send report popup */}
-            <SimpleModal
-                width={370}
-                open={sendReportModal}
-                onClose={() => setSendReportModal(false)}
-            >
+            {/* send report popup */}
+            <SimpleModal width={370} open={sendReportModal} onClose={onPopupClose}>
                 <SendReportForm onSubmit={onSubmitSendReport} />
             </SimpleModal>
 
-            {/* Top bar */}
+            {/* top bar */}
             <SectionTitle title="Отчет по заданию">
                 <Grid item>
                     <IconButton onClick={onMenuClick}>
@@ -82,37 +80,44 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     position: "relative",
                 })}
             >
-                {/* Report headers */}
+                {/* report headers */}
                 {report && <TaskReportHeader title={report.title} report={report} />}
 
-                <Typography
-                    css={theme => ({
-                        fontSize: theme.fontSize.large,
-                        padding: `
-                            ${theme.spacing(5)}
-                            ${theme.spacing(4)}
-                            ${theme.spacing()}
-                        `,
-                        backgroundColor: theme.colors.white,
-                    })}
-                >
-                    Этапы работы
-                </Typography>
+                {report && report.stages.length > 0 && (
+                    <Typography
+                        css={({ spacing, fontSize, colors }) => ({
+                            fontSize: fontSize.large,
+                            padding: ` ${spacing(5)} ${spacing(4)} ${spacing()} `,
+                            backgroundColor: colors.white,
+                        })}
+                    >
+                        Этапы работы
+                    </Typography>
+                )}
 
-                {/* Report stages */}
+                {/* report stages */}
                 {report &&
-                    report.stages.map((stage, stageIndex) => {
-                        const friendlyIndex = stageIndex + 1;
+                    report.stages.map((stage, index) => {
+                        function onMouseDown() {
+                            setFocusedBlockId(stage.id);
+                        }
+
+                        function onFocus() {
+                            setFocusedBlockId(stage.id);
+                        }
+
+                        const friendlyIndex = index + 1;
+
                         return (
                             <HistoryLineItem
                                 key={stage.id}
                                 index={friendlyIndex}
-                                isChecked={stage.finished}
-                                isFocused={focusedBlockId === stage.id}
-                                onMouseDown={() => setFocusedBlockId(stage.id)}
-                                onFocus={() => setFocusedBlockId(stage.id)}
-                                isFirst={!stageIndex}
-                                isLast={friendlyIndex === report.stages.length}
+                                checked={stage.finished}
+                                focused={focusedBlockId === stage.id}
+                                onMouseDown={onMouseDown}
+                                onFocus={onFocus}
+                                first={!index}
+                                last={friendlyIndex === report.stages.length}
                             >
                                 <TaskReportStageItem
                                     title={stage.title}

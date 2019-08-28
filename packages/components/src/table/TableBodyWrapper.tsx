@@ -9,40 +9,48 @@ import * as _ from "lodash";
 interface ITableBodyWrapperProps {
     data: object[];
     columns: IColumn[];
+    hover?: boolean;
 
     onRowClick?(row?: object): void;
 }
 
-export const TableBodyWrapper: FC<ITableBodyWrapperProps> = ({ data, columns, ...props }) => {
+export const TableBodyWrapper: FC<ITableBodyWrapperProps> = props => {
+    const { data, columns, hover = true, onRowClick } = props;
+
     return (
         <TableBody>
-            {data.map((value, index) => (
-                <TableRow
-                    hover={!!props.onRowClick}
-                    key={index}
-                    onClick={() => props.onRowClick && props.onRowClick(value)}
-                >
-                    {columns.map((column: IColumn, index) => {
-                        const label = _.get(value, column.key, null);
-                        return (
-                            <TableCell
-                                key={index}
-                                css={theme => ({
-                                    borderBottomColor: theme.colors.light,
-                                    color: theme.colors.black,
-                                    fontSize: theme.fontSize.sNormal,
-                                    fontWeight: 400,
-                                    lineHeight: 1.5,
-                                    cursor: props.onRowClick ? "pointer" : "inherit",
-                                })}
-                                title={label}
-                            >
-                                {!_.isNull(label) ? label : "(не задано)"}
-                            </TableCell>
-                        );
-                    })}
-                </TableRow>
-            ))}
+            {data.map((value, index) => {
+                function onClick() {
+                    if (onRowClick) {
+                        onRowClick(value);
+                    }
+                }
+
+                return (
+                    <TableRow hover={hover} key={index} onClick={onClick}>
+                        {columns.map((column: IColumn, index) => {
+                            const label = _.get(value, column.key, "");
+
+                            return (
+                                <TableCell
+                                    key={index}
+                                    css={theme => ({
+                                        borderBottomColor: theme.colors.light,
+                                        color: theme.colors.black,
+                                        fontSize: theme.fontSize.sNormal,
+                                        fontWeight: 400,
+                                        lineHeight: 1.5,
+                                        cursor: hover ? "pointer" : "inherit",
+                                    })}
+                                    title={label}
+                                >
+                                    {label || "(не задано)"}
+                                </TableCell>
+                            );
+                        })}
+                    </TableRow>
+                );
+            })}
         </TableBody>
     );
 };

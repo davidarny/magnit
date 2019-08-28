@@ -1,4 +1,5 @@
 /** @jsx jsx */
+
 import { SelectableBlockWrapper } from "@magnit/components";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, Typography } from "@material-ui/core";
@@ -6,20 +7,20 @@ import * as React from "react";
 import { jsx } from "@emotion/core";
 import { EReportStatuses, IReportResponse } from "services/api/tasks";
 
-interface IProps {
+interface ITaskReportHeaderProps {
     report: IReportResponse;
     title: string;
 }
 
-const mapReportStatuses = {
+const reportStatusTranslations = {
     [EReportStatuses.IN_PROGRESS]: "В работе",
     [EReportStatuses.ON_CHECK]: "На проверке",
     [EReportStatuses.DRAFT]: "Draft",
     [EReportStatuses.COMPLETED]: "Завершен",
 };
 
-export const TaskReportHeader: React.FC<IProps> = props => {
-    const headerColumns = [
+export const TaskReportHeader: React.FC<ITaskReportHeaderProps> = props => {
+    const headers = [
         {
             title: "АДМИНИСТРАТОР",
             text: "Andrey_555",
@@ -38,9 +39,10 @@ export const TaskReportHeader: React.FC<IProps> = props => {
         },
         {
             title: "СТАТУС",
-            text: mapReportStatuses[props.report.status],
+            text: reportStatusTranslations[props.report.status],
         },
     ];
+
     return (
         <SelectableBlockWrapper>
             <Grid css={theme => ({ padding: theme.spacing(4) })}>
@@ -51,11 +53,11 @@ export const TaskReportHeader: React.FC<IProps> = props => {
                 <Grid
                     container
                     spacing={2}
-                    justify={"space-between"}
+                    justify="space-between"
                     css={theme => ({ marginTop: theme.spacing(2) })}
                 >
-                    {headerColumns.map((field, fieldKey) => (
-                        <Grid item xs={12} md={"auto"} key={fieldKey}>
+                    {headers.map((field, fieldKey) => (
+                        <Grid item xs={12} md="auto" key={fieldKey}>
                             <Grid
                                 css={theme => ({
                                     color: theme.colors.gray,

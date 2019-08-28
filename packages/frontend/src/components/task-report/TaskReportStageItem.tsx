@@ -1,4 +1,5 @@
 /** @jsx jsx */
+
 import { TableWrapper, IColumn } from "@magnit/components";
 import { getFriendlyDate } from "@magnit/services";
 import { Typography } from "@material-ui/core";
@@ -13,19 +14,20 @@ const columns: IColumn[] = [
     { key: "version", label: "Количество правок" },
 ];
 
-interface IProps {
+interface ITaskReportStageItemProps {
     title: string;
     dueDate: string;
     templates: IReportStageTemplate[];
 }
 
-export const TaskReportStageItem: React.FC<IProps> = props => {
-    const mapTemplatesData = props.templates.map((template, templateIndex) => ({
+export const TaskReportStageItem: React.FC<ITaskReportStageItemProps> = props => {
+    const transformedTemplateData = props.templates.map((template, templateIndex) => ({
         index: templateIndex + 1,
         title: template.title,
         createdAt: getFriendlyDate(new Date(template.createdAt)),
         version: template.version,
     }));
+
     return (
         <React.Fragment>
             <Typography
@@ -44,11 +46,15 @@ export const TaskReportStageItem: React.FC<IProps> = props => {
                     marginBottom: theme.spacing(),
                 })}
             >
-                <span css={() => ({ fontWeight: 500 })}>Исполнитель:</span> Рукастый Иннокентий
-                Петрович
+                <span css={{ fontWeight: 500 }}>Исполнитель:</span> Рукастый Иннокентий Петрович
             </div>
 
-            <TableWrapper columns={columns} data={mapTemplatesData} />
+            <TableWrapper
+                rowHover={false}
+                showPagination={false}
+                columns={columns}
+                data={transformedTemplateData}
+            />
         </React.Fragment>
     );
 };

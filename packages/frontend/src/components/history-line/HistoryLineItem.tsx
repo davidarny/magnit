@@ -1,35 +1,37 @@
 /** @jsx jsx */
+
 import { SelectableBlockWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { Grid } from "@material-ui/core";
 import * as React from "react";
 import { jsx } from "@emotion/core";
 
-interface IProps {
-    children: React.ReactNodeArray | React.ReactNode;
-    isFocused?: boolean;
-    isChecked?: boolean;
+interface IHistoryLineItemProps {
+    focused?: boolean;
+    checked?: boolean;
     index?: number;
-    isFirst?: boolean;
-    isLast?: boolean;
-    onMouseDown?: () => void;
-    onFocus?: () => void;
+    first?: boolean;
+    last?: boolean;
+
+    onMouseDown?(): void;
+
+    onFocus?(): void;
 }
 
-export const HistoryLineItem: React.FC<IProps> = props => {
+export const HistoryLineItem: React.FC<IHistoryLineItemProps> = props => {
     return (
         <SelectableBlockWrapper
             css={theme => ({
                 padding: `${theme.spacing(3)} ${theme.spacing(4)}`,
                 "&:hover": { background: theme.colors.light },
-                zIndex: props.isFocused ? 1300 : "initial",
+                zIndex: props.focused ? 1300 : "initial",
             })}
-            focused={props.isFocused}
+            focused={props.focused}
             onMouseDown={props.onMouseDown}
             onFocus={props.onFocus}
         >
-            <Grid container spacing={2} css={() => ({ position: "relative" })}>
-                <Grid item css={() => ({ position: "relative" })}>
+            <Grid container spacing={2} css={{ position: "relative" }}>
+                <Grid item css={{ position: "relative" }}>
                     <div
                         css={theme => ({
                             width: theme.spacing(3),
@@ -37,16 +39,16 @@ export const HistoryLineItem: React.FC<IProps> = props => {
                             borderRadius: "50%",
                             border: `2px solid ${theme.colors.primary}`,
                             zIndex: 2,
-                            color: props.isChecked ? theme.colors.white : "initial",
-                            background: props.isChecked ? theme.colors.primary : theme.colors.white,
+                            color: props.checked ? theme.colors.white : "initial",
+                            background: props.checked ? theme.colors.primary : theme.colors.white,
                             position: "relative",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                         })}
                     >
-                        {props.isChecked && <CheckIcon />}
-                        {!props.isChecked && props.index && (
+                        {props.checked && <CheckIcon />}
+                        {!props.checked && props.index && (
                             <div
                                 css={theme => ({
                                     fontSize: theme.fontSize.small,
@@ -57,7 +59,7 @@ export const HistoryLineItem: React.FC<IProps> = props => {
                             </div>
                         )}
                     </div>
-                    {!props.isFirst && (
+                    {!props.first && (
                         <div
                             css={theme => ({
                                 width: theme.spacing(0.25),
@@ -72,7 +74,7 @@ export const HistoryLineItem: React.FC<IProps> = props => {
                             })}
                         />
                     )}
-                    {!props.isLast && (
+                    {!props.last && (
                         <div
                             css={theme => ({
                                 width: theme.spacing(0.25),
