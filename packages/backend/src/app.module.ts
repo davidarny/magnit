@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { resolve } from "path";
 import { ConnectionOptionsReader } from "typeorm";
+import { AmqpModule } from "./modules/amqp/amqp.module";
 import { AssetModule } from "./modules/asset/asset.module";
 import { TaskModule } from "./modules/task/task.module";
 import { TemplateModule } from "./modules/template/template.module";
@@ -22,6 +23,7 @@ const imports = [
     TemplateModule,
     TaskModule,
     AssetModule,
+    AmqpModule,
 ];
 
 @Module({ imports })
