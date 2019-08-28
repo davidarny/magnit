@@ -84,7 +84,7 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
                                                 height: theme.spacing(3),
                                                 borderRadius: "50%",
                                                 border: `2px solid ${theme.colors.primary}`,
-                                                zIndex: 2,
+                                                zIndex: 1500,
                                                 color: stage.finished
                                                     ? theme.colors.white
                                                     : "initial",
@@ -100,15 +100,12 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
                                             <div
                                                 css={theme => ({
                                                     width: theme.spacing(0.25),
-                                                    height:
-                                                        focusedBlockId === stage.id
-                                                            ? `calc(100% - ${theme.spacing(2)})`
-                                                            : `calc(100% + ${theme.spacing()})`,
+                                                    height: `calc(100% + ${theme.spacing()})`,
                                                     background: theme.colors.lightGray,
                                                     position: "absolute",
                                                     top: theme.spacing(4),
                                                     left: "20.5px", // TODO: dynamic calculation
-                                                    zIndex: 1,
+                                                    zIndex: 1400,
                                                 })}
                                             />
                                         )}
