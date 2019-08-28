@@ -41,6 +41,7 @@ services:
         ports:
             - ${BACKEND_PORT:-1337}:${BACKEND_PORT:-1337}
         depends_on:
+            - rabbitmq
             - db
         volumes:
             - ${BACKEND_LOGS_DIR}:/var/www/magnit/logs
