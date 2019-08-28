@@ -1,13 +1,17 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { BaseEntityWithNonPrimaryId } from "../../../shared/entities/base-entity-with-non-primary-id.entity";
+import { Column, DeepPartial, Entity, Generated, Index, JoinColumn, ManyToOne } from "typeorm";
+import { BaseEntity } from "../../../shared/entities/base.entity";
 import { Template } from "./template.entity";
 
 @Entity("template_answer")
-export class TemplateAnswer extends BaseEntityWithNonPrimaryId<TemplateAnswer> {
+export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
     constructor(dto?: DeepPartial<TemplateAnswer>) {
         super();
         this.construct(this, dto);
     }
+
+    @Column()
+    @Generated("rowid")
+    id: number;
 
     @Column({ primary: true })
     id_template: string;

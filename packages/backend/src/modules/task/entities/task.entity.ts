@@ -1,5 +1,5 @@
 import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
-import { BaseEntity } from "../../../shared/entities/base.entity";
+import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
@@ -11,7 +11,7 @@ export enum ETaskStatus {
 }
 
 @Entity()
-export class Task extends BaseEntity<Task> {
+export class Task extends PrimaryBaseEntity<Task> {
     constructor(dto?: DeepPartial<Task>) {
         super();
         this.construct(this, dto);

@@ -1,10 +1,10 @@
 import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
-import { BaseEntity } from "../../../shared/entities/base.entity";
+import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { StageHistory } from "./stage-history.entity";
 import { Task } from "./task.entity";
 
 @Entity("task_stage")
-export class TaskStage extends BaseEntity<TaskStage> {
+export class TaskStage extends PrimaryBaseEntity<TaskStage> {
     constructor(dto?: DeepPartial<TaskStage>) {
         super();
         this.construct(this, dto);

@@ -1,10 +1,10 @@
 import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { BaseEntity } from "../../../shared/entities/base.entity";
+import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { Template } from "../../template/entities/template.entity";
 import { Task } from "./task.entity";
 
 @Entity({ name: "template_assignment" })
-export class TemplateAssignment extends BaseEntity<TemplateAssignment> {
+export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
     constructor(dto?: DeepPartial<TemplateAssignment>) {
         super();
         this.construct(this, dto);

@@ -1,10 +1,4 @@
-import {
-    BeforeUpdate,
-    CreateDateColumn,
-    DeepPartial,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
+import { BeforeUpdate, CreateDateColumn, DeepPartial, UpdateDateColumn } from "typeorm";
 
 export abstract class BaseEntity<E, T = DeepPartial<E>> {
     protected construct?(entity?: E, dto?: T) {
@@ -12,9 +6,6 @@ export abstract class BaseEntity<E, T = DeepPartial<E>> {
             Object.assign(entity, dto);
         }
     }
-
-    @PrimaryGeneratedColumn()
-    id: number;
 
     @CreateDateColumn({ type: "timestamptz" })
     created_at: string;
