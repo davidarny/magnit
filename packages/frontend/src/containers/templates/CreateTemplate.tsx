@@ -3,6 +3,7 @@
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
+import { ETerminals } from "@magnit/services";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
@@ -20,7 +21,10 @@ export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<object>({});
     const [error, setError] = useState(false); // success/error snackbar state
-    const [open, setOpen] = useState(false); // open/close snackbar
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: ETerminals.EMPTY as string,
+    }); // open/close snackbar
     const [redirect, setRedirect] = useState(false);
 
     function onTemplateChange(template: object) {
@@ -34,16 +38,16 @@ export const CreateTemplate: React.FC = () => {
         if (!error) {
             setRedirect(true);
         }
-        setOpen(false);
+        setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }
 
     function onTemplateSave() {
         createTemplate(context.courier, template)
-            .then(() => setOpen(true))
+            .then(() => setSnackbar({ open: true, message: "Шаблон успешно сохранён!" }))
             .catch(() => {
-                setOpen(true);
+                setSnackbar({ open: true, message: "Ошибка сохранения шаблона!" });
                 setError(true);
             });
     }
@@ -64,7 +68,12 @@ export const CreateTemplate: React.FC = () => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
-                    <Button variant="contained" scheme="green" onClick={onTemplateSave}>
+                    <Button
+                        variant="contained"
+                        scheme="green"
+                        onClick={onTemplateSave}
+                        disabled={snackbar.open}
+                    >
                         <CheckIcon />
                         <Typography>Сохранить</Typography>
                     </Button>
@@ -75,9 +84,9 @@ export const CreateTemplate: React.FC = () => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
-                    opacity: open ? 0.5 : 1,
+                    opacity: snackbar.open ? 0.5 : 1,
                     transition: "opacity 0.3s ease-in-out",
-                    pointerEvents: open ? "none" : "initial",
+                    pointerEvents: snackbar.open ? "none" : "initial",
                 })}
             >
                 <TemplateEditor
@@ -88,13 +97,10 @@ export const CreateTemplate: React.FC = () => {
                 />
             </Grid>
             <Snackbar
-                open={open}
+                open={snackbar.open}
                 error={error}
                 onClose={onSnackbarClose}
-                messages={{
-                    success: "Шаблон успешно сохранён!",
-                    error: "Ошибка сохранения шаблона!",
-                }}
+                message={snackbar.message}
             />
         </SectionLayout>
     );

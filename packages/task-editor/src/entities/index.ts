@@ -39,6 +39,7 @@ export interface IStage {
     id: number;
     title: string;
     dueDate: string; // ISO time format
+    finished: boolean;
     __uuid: string; // need for correct rendering
 }
 

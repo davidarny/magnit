@@ -56,7 +56,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         stages.length > 0 &&
         stages.map(stage => ({
             ...stage,
-            completed: Date.now() >= new Date(stage.dueDate).valueOf(),
+            completed: stage.finished,
             editable: false,
         }));
     const defaultStepsState = [

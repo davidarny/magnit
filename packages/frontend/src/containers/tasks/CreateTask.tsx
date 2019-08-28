@@ -33,7 +33,10 @@ export const CreateTask: React.FC = () => {
     });
     const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState(false); // success/error snackbar state
-    const [open, setOpen] = useState(false); // open/close snackbar
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: ETerminals.EMPTY as string,
+    }); // open/close snackbar
 
     useEffect(() => {
         getTemplates(context.courier)
@@ -63,7 +66,7 @@ export const CreateTask: React.FC = () => {
         if (!error) {
             setRedirect(true);
         }
-        setOpen(false);
+        setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }
@@ -89,9 +92,9 @@ export const CreateTask: React.FC = () => {
                     (task.templates || []).map(_.toNumber),
                 );
             })
-            .then(() => setOpen(true))
+            .then(() => setSnackbar({ open: true, message: "Задание успешно сохранено!" }))
             .catch(() => {
-                setOpen(true);
+                setSnackbar({ open: true, message: "Ошибка сохранения задания!" });
                 setError(true);
             });
     }
@@ -106,6 +109,7 @@ export const CreateTask: React.FC = () => {
                         scheme="blue"
                         css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                         onClick={onTaskSave}
+                        disabled={snackbar.open}
                     >
                         <SendIcon />
                         <Typography>Отправить</Typography>
@@ -117,9 +121,9 @@ export const CreateTask: React.FC = () => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
-                    opacity: open ? 0.5 : 1,
+                    opacity: snackbar.open ? 0.5 : 1,
                     transition: "opacity 0.3s ease-in-out",
-                    pointerEvents: open ? "none" : "initial",
+                    pointerEvents: snackbar.open ? "none" : "initial",
                 })}
             >
                 <TaskEditor<ITask>
@@ -130,13 +134,10 @@ export const CreateTask: React.FC = () => {
                 />
             </Grid>
             <Snackbar
-                open={open}
+                open={snackbar.open}
                 error={error}
                 onClose={onSnackbarClose}
-                messages={{
-                    success: "Задание успешно сохранено!",
-                    error: "Ошибка сохранения задания!",
-                }}
+                message={snackbar.message}
             />
         </SectionLayout>
     );

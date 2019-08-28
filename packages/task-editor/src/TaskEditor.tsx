@@ -216,7 +216,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                 return;
             }
             if (task.stages) {
-                task.stages.push(step);
+                task.stages.push({ ...step, finished: false });
             }
             if (onTaskChange) {
                 onTaskChange({ ...task });

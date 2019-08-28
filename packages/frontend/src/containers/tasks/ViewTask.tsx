@@ -46,8 +46,14 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
-    const [open, setOpen] = useState(false); // open/close snackbar
-    const [redirect, setRedirect] = useState({ trigger: false, to: "" });
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: ETerminals.EMPTY as string,
+    }); // open/close snackbar
+    const [redirect, setRedirect] = useState({
+        trigger: false,
+        to: ETerminals.EMPTY as string,
+    });
 
     const isValidTask = (value: object): value is IExtendedTask =>
         _.has(value, "id") &&
@@ -111,7 +117,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         if (!error) {
             setRedirect({ to: "/tasks", trigger: true });
         }
-        setOpen(false);
+        setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }
@@ -147,10 +153,10 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         // sending from DRAFT to IN_PROGRESS
         // only this transition is allowed
-        if (task.status === ETaskStatus.DRAFT) {
+        if (task.status === ETaskStatus.DRAFT || task.status === ETaskStatus.ON_CHECK) {
             task.status = ETaskStatus.IN_PROGRESS;
         }
-        updateTask(context.courier, taskId, _.omit(task, ["id", "templates"]))
+        updateTask(context.courier, taskId, getTaskPayload(task))
             .then(async () =>
                 addTemplateAssignment(
                     context.courier,
@@ -196,11 +202,37 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 }
                 return addStages(context.courier, taskId, diffStages);
             })
-            .then(() => setOpen(true))
+            .then(() => setSnackbar({ open: true, message: "Задание успешно обновлено!" }))
             .catch(() => {
-                setOpen(true);
+                setSnackbar({ open: true, message: "Ошибка обновления задания!" });
                 setError(true);
             });
+    }
+
+    function onTaskWithdrawClick() {
+        if (task.status === ETaskStatus.IN_PROGRESS) {
+            task.status = ETaskStatus.ON_CHECK;
+        }
+        updateTask(context.courier, taskId, getTaskPayload(task))
+            .then(() => setSnackbar({ open: true, message: "Задание успешно отозвано!" }))
+            .catch(() => {
+                setSnackbar({ open: true, message: "Ошибка отзыва задания!" });
+                setError(true);
+            });
+        onMenuClose();
+    }
+
+    function onTaskCompleteClick() {
+        if (task.status === ETaskStatus.IN_PROGRESS || task.status === ETaskStatus.ON_CHECK) {
+            task.status = ETaskStatus.COMPLETED;
+        }
+        updateTask(context.courier, taskId, getTaskPayload(task))
+            .then(() => setSnackbar({ open: true, message: "Задание успешно звершено!" }))
+            .catch(() => {
+                setSnackbar({ open: true, message: "Ошибка завершения задания!" });
+                setError(true);
+            });
+        onMenuClose();
     }
 
     return (
@@ -216,6 +248,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                                     scheme="blue"
                                     css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                                     onClick={onTaskSave}
+                                    disabled={snackbar.open}
                                 >
                                     <SendIcon />
                                     <Typography>Отправить</Typography>
@@ -235,6 +268,12 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                         >
                             <MenuItem onClick={onTaskReportClick}>Посмотреть отчет</MenuItem>
                             <MenuItem onClick={onTaskHistoryClick}>Посмотреть истоию</MenuItem>
+                            {task.status === ETaskStatus.IN_PROGRESS && (
+                                <MenuItem onClick={onTaskWithdrawClick}>Отозвать задание</MenuItem>
+                            )}
+                            {task.status !== ETaskStatus.COMPLETED && (
+                                <MenuItem onClick={onTaskCompleteClick}>Завершить задание</MenuItem>
+                            )}
                         </Menu>
                     </Grid>
                 </Grid>
@@ -254,14 +293,15 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 />
             </Grid>
             <Snackbar
-                open={open}
+                open={snackbar.open}
                 error={error}
                 onClose={onSnackbarClose}
-                messages={{
-                    success: "Задание успешно обновлено!",
-                    error: "Ошибка обновления задания!",
-                }}
+                message={snackbar.message}
             />
         </SectionLayout>
     );
 };
+
+function getTaskPayload(task: IExtendedTask) {
+    return _.omit(task, ["id", "templates", "stages"]);
+}
