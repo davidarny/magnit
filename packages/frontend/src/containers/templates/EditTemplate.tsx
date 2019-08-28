@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
+import { ETerminals } from "@magnit/services";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { SectionLayout } from "components/section-layout";
@@ -23,7 +24,10 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<object>({});
     const [error, setError] = useState(false); // success/error snackbar state
-    const [open, setOpen] = useState(false); // open/close snackbar
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: ETerminals.EMPTY as string,
+    }); // open/close snackbar
     const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
@@ -43,16 +47,16 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
         if (!error) {
             setRedirect(true);
         }
-        setOpen(false);
+        setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }
 
     function onTemplateSave() {
         updateTemplate(context.courier, templateId, template)
-            .then(() => setOpen(true))
+            .then(() => setSnackbar({ open: true, message: "Шаблон успешно обновлён!" }))
             .catch(() => {
-                setOpen(true);
+                setSnackbar({ open: true, message: "Ошибка обновления шаблона!" });
                 setError(true);
             });
     }
@@ -73,7 +77,12 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             {redirect && <Redirect to={"/templates"} noThrow />}
             <SectionTitle title="Редактирование шаблона">
                 <Grid item>
-                    <Button variant="contained" scheme="blue" onClick={onTemplateSave}>
+                    <Button
+                        variant="contained"
+                        scheme="blue"
+                        onClick={onTemplateSave}
+                        disabled={snackbar.open}
+                    >
                         <CheckIcon />
                         <Typography>Обновить</Typography>
                     </Button>
@@ -84,9 +93,9 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
-                    opacity: open ? 0.5 : 1,
+                    opacity: snackbar.open ? 0.5 : 1,
                     transition: "opacity 0.3s ease-in-out",
-                    pointerEvents: open ? "none" : "initial",
+                    pointerEvents: snackbar.open ? "none" : "initial",
                 })}
             >
                 {!_.isEmpty(template) && (
@@ -100,13 +109,10 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                 )}
             </Grid>
             <Snackbar
-                open={open}
+                open={snackbar.open}
                 error={error}
                 onClose={onSnackbarClose}
-                messages={{
-                    success: "Шаблон успешно обновлён!",
-                    error: "Ошибка обновления шаблона!",
-                }}
+                message={snackbar.message}
             />
         </SectionLayout>
     );

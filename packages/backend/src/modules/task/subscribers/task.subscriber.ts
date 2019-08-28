@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
 import { Connection, EntitySubscriberInterface, UpdateEvent } from "typeorm";
 import { StageHistory } from "../entities/stage-history.entity";
-import { Task } from "../entities/task.entity";
+import { ETaskStatus, Task } from "../entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 import { TaskService } from "../services/task.service";
 
@@ -29,6 +29,11 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         // it means it's active
         // usually there should be only one non-finished stage
         const stage = before.stages.find(stage => !stage.finished);
+        // handle task completion
+        if (nextStatus === ETaskStatus.COMPLETED) {
+            stage.finished = true;
+            await event.manager.save(stage);
+        }
         if (stage && description) {
             const history = new StageHistory({ stage, description });
             await event.manager.save(history);

@@ -1,15 +1,15 @@
 /** @jsx jsx */
 
-import { FC } from "react";
 import { TableHead, TableRow, TableCell, TableSortLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
+import React from "react";
 import { IColumn } from "./TableWrapper";
 
 interface ITableHeaderProps {
     headers: IColumn[];
 }
 
-export const TableHeader: FC<ITableHeaderProps> = ({ headers }) => {
+export const TableHeader: React.FC<ITableHeaderProps> = ({ headers }) => {
     return (
         <TableHead>
             <TableRow>

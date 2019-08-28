@@ -26,5 +26,5 @@ export class TaskStage extends BaseEntity<TaskStage> {
 
     @Index()
     @Column("timestamptz")
-    due_date: string;
+    deadline: string;
 }

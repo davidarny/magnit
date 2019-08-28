@@ -67,15 +67,17 @@ export const Button: React.FC<TButtonProps> = props => {
             css={theme => ({
                 textTransform: "none",
                 transitionDuration: "0.3s",
-                transitionProperty: "box-shadow, background, color",
+                transitionProperty: "box-shadow, background, color, opacity",
                 transitionTimingFunction: "ease-in-out",
                 boxShadow: "none",
                 padding: `${theme.spacing()} ${theme.spacing(2)}`,
                 borderRadius: theme.radius(5),
                 ":hover": { ..._.get(variant(theme), "hover", {}) },
                 ":active": { ..._.get(variant(theme), "active", {}) },
+                "&.disabled": { color: theme.colors.white, opacity: 0.5 },
                 ...variant(theme),
             })}
+            classes={{ disabled: "disabled" }}
             {...rest}
         >
             {children}

@@ -23,12 +23,14 @@ interface ITableWrapperProps {
     data: object[];
     initialPage?: number;
     rowsPerPage?: number;
+    showPagination?: boolean;
+    rowHover?: boolean;
 
     onRowClick?(row?: object): void;
 }
 
 export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...props }) => {
-    const { initialPage = 0, rowsPerPage = 10 } = props;
+    const { initialPage = 0, rowsPerPage = 10, showPagination = true, rowHover = true } = props;
 
     const [page, setPage] = useState(initialPage);
 
@@ -38,78 +40,84 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
     ) {
         setPage(newPage);
     }
-
     return (
         <React.Fragment>
             <Table>
                 <TableHeader headers={columns} />
                 <TableBodyWrapper
-                    data={data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                    data={
+                        showPagination
+                            ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : data
+                    }
                     columns={columns}
+                    hover={rowHover}
                     onRowClick={props.onRowClick}
                 />
             </Table>
-            <TablePagination
-                component="div"
-                count={data.length}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                labelDisplayedRows={PaginationLabel}
-                ActionsComponent={ActionComponent}
-                labelRowsPerPage=""
-                SelectProps={{ style: { display: "none" } }}
-                onChangePage={onChangePage}
-                css={theme => ({
-                    width: "100%",
-                    marginTop: theme.spacing(2),
-                    position: "relative",
-                    display: "flex",
-                    border: "none",
-                    div: {
-                        paddingLeft: 0,
+            {showPagination && (
+                <TablePagination
+                    component="div"
+                    count={data.length}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    labelDisplayedRows={PaginationLabel}
+                    ActionsComponent={ActionComponent}
+                    labelRowsPerPage=""
+                    SelectProps={{ style: { display: "none" } }}
+                    onChangePage={onChangePage}
+                    css={theme => ({
                         width: "100%",
+                        marginTop: theme.spacing(2),
+                        position: "relative",
+                        display: "flex",
+                        border: "none",
                         div: {
-                            ":nth-of-type(1)": { display: "none" },
-                            ":nth-of-type(3)": {
-                                display: "flex",
-                                justifyContent: "flex-end",
-                                div: {
+                            paddingLeft: 0,
+                            width: "100%",
+                            div: {
+                                ":nth-of-type(1)": { display: "none" },
+                                ":nth-of-type(3)": {
                                     display: "flex",
-                                    width: theme.spacing(4),
-                                    height: theme.spacing(4),
-                                    marginLeft: theme.spacing(),
-                                    button: {
+                                    justifyContent: "flex-end",
+                                    div: {
                                         display: "flex",
-                                        margin: "0 0 0 auto",
-                                        padding: 0,
-                                        width: "100%",
-                                        transition: "0.25s",
-                                        span: {
+                                        width: theme.spacing(4),
+                                        height: theme.spacing(4),
+                                        marginLeft: theme.spacing(),
+                                        button: {
                                             display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
+                                            margin: "0 0 0 auto",
+                                            padding: 0,
                                             width: "100%",
-                                        },
-                                        ":hover, :active": {
-                                            color: theme.colors.white,
-                                            background: theme.colors.primary,
+                                            transition: "0.25s",
+                                            span: {
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                width: "100%",
+                                            },
+                                            ":hover, :active": {
+                                                color: theme.colors.white,
+                                                background: theme.colors.primary,
+                                            },
                                         },
                                     },
                                 },
                             },
-                        },
-                        span: {
-                            ":nth-of-type(1)": { display: "none" },
-                            ":nth-of-type(2)": {
-                                display: "block",
-                                marginRight: "auto",
-                                width: "calc(100% / 2)",
-                                span: { display: "block" },
+                            span: {
+                                ":nth-of-type(1)": { display: "none" },
+                                ":nth-of-type(2)": {
+                                    display: "block",
+                                    marginRight: "auto",
+                                    width: "calc(100% / 2)",
+                                    span: { display: "block" },
+                                },
                             },
                         },
-                    },
-                })}
-            />
+                    })}
+                />
+            )}
         </React.Fragment>
     );
 };

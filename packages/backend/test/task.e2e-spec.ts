@@ -6,6 +6,7 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
+import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
 import { ETaskStatus, Task } from "../src/modules/task/entities/task.entity";
@@ -175,5 +176,16 @@ describe("TaskController (e2e)", () => {
             .delete("/v1/tasks/0")
             .expect(200)
             .expect({ success: 1 });
+    });
+
+    it("should return report", async () => {
+        const report = new TaskReportDto();
+        jest.spyOn(taskService, "getReport").mockResolvedValue(report);
+        const response = await request(app.getHttpServer())
+            .get("/v1/tasks/0/report")
+            .expect(200);
+        const expected = { success: 1, report };
+        expect(taskService.getReport).toHaveBeenCalledWith("0");
+        expect(response.body).toEqual(expected);
     });
 });

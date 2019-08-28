@@ -6,13 +6,13 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
 import { TemplateService } from "../../template/services/template.service";
+import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { ITaskService } from "../interfaces/task.service.interface";
 import _ = require("lodash");
 
 @Injectable()
 export class TaskService implements ITaskService {
-    // TODO: need to use @TransactionalRepository on a method
     constructor(
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
@@ -201,7 +201,38 @@ export class TaskService implements ITaskService {
             },
             [ETaskStatus.ON_CHECK]: {
                 [ETaskStatus.IN_PROGRESS]: "Отправка задания",
+                [ETaskStatus.COMPLETED]: "Этап завершён",
             },
         }[prevStatus][nextStatus];
+    }
+
+    @Transactional()
+    async getReport(id: string): Promise<TaskReportDto> {
+        const task = await this.findById(id, ["assignments", "stages"]);
+        const templates = await this.templateService.findByTaskId(task.id.toString());
+        return new TaskReportDto({
+            ..._.omit(task, "assignments"),
+            stages: task.stages.map(stage => {
+                return new ReportStageDto({
+                    ...stage,
+                    templates: task.assignments
+                        .map(assignment => {
+                            const template = _.find(templates, { id: assignment.id_template });
+                            if (!template) {
+                                return;
+                            }
+                            console.log(template);
+                            return new ReportTemplateDto({
+                                id: template.id,
+                                title: template.title,
+                                version: template.version,
+                                updated_at: template.updated_at,
+                                created_at: template.created_at,
+                            });
+                        })
+                        .filter(Boolean),
+                });
+            }),
+        });
     }
 }

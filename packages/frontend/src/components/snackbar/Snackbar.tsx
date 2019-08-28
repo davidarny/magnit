@@ -10,17 +10,14 @@ import {
 } from "@material-ui/icons";
 
 interface ISnackbarProps {
-    messages: {
-        success: string;
-        error: string;
-    };
+    message: string;
     open: boolean;
     error: boolean;
 
     onClose?(event?: React.SyntheticEvent, reason?: string): void;
 }
 
-export const Snackbar: React.FC<ISnackbarProps> = ({ messages, error, open, ...props }) => {
+export const Snackbar: React.FC<ISnackbarProps> = ({ message, error, open, ...props }) => {
     return (
         <MaterialSnackbar
             anchorOrigin={{
@@ -48,7 +45,7 @@ export const Snackbar: React.FC<ISnackbarProps> = ({ messages, error, open, ...p
                         ) : (
                             <CheckCircleIcon css={theme => ({ marginRight: theme.spacing(1) })} />
                         )}
-                        {error ? messages.error : messages.success}
+                        {message}
                     </span>
                 }
                 action={[
