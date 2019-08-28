@@ -126,7 +126,7 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
                                             color: theme.colors.secondary,
                                         })}
                                     >
-                                        {getFriendlyDate(new Date(stage.dueDate))}
+                                        {getFriendlyDate(new Date(stage.deadline))}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>

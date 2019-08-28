@@ -4,7 +4,7 @@ import * as React from "react";
 export interface IStageStep {
     id: number;
     title: string;
-    dueDate: string;
+    deadline: string;
     completed?: boolean;
     editable?: boolean;
 }
@@ -38,7 +38,7 @@ export interface IVirtualDocument extends IDocument {
 export interface IStage {
     id: number;
     title: string;
-    dueDate: string; // ISO time format
+    deadline: string; // ISO time format
     finished: boolean;
     __uuid: string; // need for correct rendering
 }

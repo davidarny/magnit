@@ -246,7 +246,7 @@ export class TaskController {
             [report.created_at, report.status],
             ["Этапы работы"],
             ..._.flatMap(report.stages, stage => [
-                [stage.title, stage.due_date],
+                [stage.title, stage.deadline],
                 ["№", "Название шаблона", "Дата добавления", "Количество правок"],
                 ..._.map(stage.templates, (template, index) => [
                     index,

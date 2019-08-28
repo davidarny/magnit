@@ -11,7 +11,7 @@ export interface IStageResponse {
     id: number;
     title: string;
     finished: boolean;
-    dueDate: string;
+    deadline: string;
     createdAt: string;
     updatedAt: string;
     history: IHistoryResponse[];

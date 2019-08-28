@@ -16,7 +16,7 @@ const columns: IColumn[] = [
 
 interface ITaskStageProps {
     title: string;
-    dueDate: string;
+    deadline: string;
     templates: IReportStageTemplate[];
 }
 
@@ -37,7 +37,7 @@ export const ReportStage: React.FC<ITaskStageProps> = props => {
                     marginBottom: theme.spacing(2),
                 })}
             >
-                {props.title} ({getFriendlyDate(new Date(props.dueDate))})
+                {props.title} ({getFriendlyDate(new Date(props.deadline))})
             </Typography>
             <div
                 css={theme => ({

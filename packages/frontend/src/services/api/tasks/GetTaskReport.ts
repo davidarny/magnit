@@ -21,7 +21,7 @@ export interface IReportStageResponse {
     updatedAt: string;
     title: string;
     finished: boolean;
-    dueDate: string;
+    deadline: string;
     templates: IReportStageTemplate[];
 }
 

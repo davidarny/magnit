@@ -121,7 +121,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                             >
                                 <ReportStage
                                     title={stage.title}
-                                    dueDate={stage.dueDate}
+                                    deadline={stage.deadline}
                                     templates={stage.templates}
                                 />
                             </VerticalStepper>

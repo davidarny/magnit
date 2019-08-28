@@ -190,12 +190,12 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     )
                     .map(stage => {
                         // TODO: mask input for date
-                        const splitted = stage.dueDate.split(".");
+                        const splitted = stage.deadline.split(".");
                         const date = new Date();
                         date.setDate(Number(_.first(splitted)));
                         date.setMonth(Number(_.nth(splitted, 1)) - 1);
                         date.setFullYear(Number(_.nth(splitted, 2)));
-                        return { ...stage, dueDate: new Date(date).toISOString() };
+                        return { ...stage, deadline: new Date(date).toISOString() };
                     });
                 if (!diffStages.length) {
                     return;

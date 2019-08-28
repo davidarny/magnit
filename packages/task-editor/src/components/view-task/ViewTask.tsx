@@ -63,7 +63,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         {
             id: 0,
             title: ETerminals.EMPTY,
-            dueDate: ETerminals.EMPTY,
+            deadline: ETerminals.EMPTY,
             completed: false,
             editable: true,
         },
@@ -83,7 +83,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     useEffect(() => {
         const diffSteps = steps
-            .filter(step => step.title && step.dueDate)
+            .filter(step => step.title && step.deadline)
             .filter(step => stages && !stages.find(stage => stage.id === step.id));
         if (!diffSteps.length) {
             return;
@@ -113,7 +113,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             {
                 id: last.id + 1,
                 title: ETerminals.EMPTY,
-                dueDate: ETerminals.EMPTY,
+                deadline: ETerminals.EMPTY,
                 completed: false,
                 editable: true,
             },
@@ -135,7 +135,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         (id: number, value: string): void => {
             if (steps.some(step => step.id === id)) {
                 const stepIndex = steps.findIndex(step => step.id === id);
-                steps[stepIndex].dueDate = value;
+                steps[stepIndex].deadline = value;
                 setSteps([...steps]);
             }
         },
@@ -315,8 +315,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                         }
                                         value={
                                             !step.editable
-                                                ? getFriendlyDate(new Date(step.dueDate))
-                                                : step.dueDate
+                                                ? getFriendlyDate(new Date(step.deadline))
+                                                : step.deadline
                                         }
                                     />
                                 ),
