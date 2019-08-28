@@ -13,7 +13,7 @@
         "start": "ts-node -r tsconfig-paths/register src/main.ts",
         "start:debug": "tsc-watch -p tsconfig.build.json --onSuccess \"node --inspect-brk dist/main.js\"",
         "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
-        "start:prod": "node dist/main.js > logs/server.log",
+        "start:prod": "node dist/main.js | tee logs/server.log",
         "test": "cross-env NODE_ENV=testing jest",
         "test:cov": "cross-env NODE_ENV=testing jest --coverage",
         "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",

@@ -41,8 +41,8 @@ services:
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
             - POSTGRES_HOST=${POSTGRES_HOST:-db}
             - POSTGRES_DB=${POSTGRES_DB:-magnit}
-            - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
-            - RABBITMQ_PORT=${RABBITMQ_PORT:-5762}
+            - RABBITMQ_HOST=${RABBITMQ_HOST:-amqp}
+            - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
             - RABBITMQ_USER=${RABBITMQ_USER:-magnit}
             - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-magnit}
         restart: unless-stopped
@@ -51,10 +51,10 @@ services:
         ports:
             - ${BACKEND_PORT:-1337}:${BACKEND_PORT:-1337}
         depends_on:
+            - amqp
             - db
-            - rabbitmq
 
-    rabbitmq:
+    amqp:
         image: rabbitmq:3.7-alpine
         restart: unless-stopped
         ports:
