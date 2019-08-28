@@ -29,7 +29,10 @@ export const TableBodyWrapper: React.FC<ITableBodyWrapperProps> = props => {
                 return (
                     <TableRow hover={hover} key={index} onClick={onClick}>
                         {columns.map((column: IColumn, index) => {
-                            const label = _.get(value, column.key);
+                            let label = _.get(value, column.key, null);
+                            if (typeof label !== "undefined" && label !== null) {
+                                label = label.toString();
+                            }
 
                             return (
                                 <TableCell
@@ -44,7 +47,7 @@ export const TableBodyWrapper: React.FC<ITableBodyWrapperProps> = props => {
                                     })}
                                     title={label}
                                 >
-                                    {typeof label !== "undefined" ? label : "(не задано)"}
+                                    {!!label ? label : "(не задано)"}
                                 </TableCell>
                             );
                         })}
