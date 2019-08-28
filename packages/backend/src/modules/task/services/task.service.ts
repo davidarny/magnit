@@ -94,7 +94,7 @@ export class TaskService implements ITaskService {
             templateIds.map(async templateId => {
                 // group all key with array index suffix
                 const puzzleIds = this.groupKeysBy(ids, id => this.getPuzzleIdFromMultipartKey(id));
-                this.ensurePuzzlesSettled(puzzleIds);
+                await this.ensurePuzzlesSettled(puzzleIds);
                 // remove id of comment suffix
                 // cause we don't store that separately
                 const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(ids, templateId);

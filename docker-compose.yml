@@ -36,6 +36,10 @@ services:
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
             - POSTGRES_HOST=${POSTGRES_HOST:-db}
             - POSTGRES_DB=${POSTGRES_DB:-magnit}
+            - RABBITMQ_HOST=${RABBITMQ_HOST:-rabbitmq}
+            - RABBITMQ_PORT=${RABBITMQ_PORT:-5762}
+            - RABBITMQ_USER=${RABBITMQ_USER:-magnit}
+            - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-magnit}
         restart: unless-stopped
         networks:
             - magnit
@@ -45,6 +49,15 @@ services:
             - db
         volumes:
             - ${BACKEND_LOGS_DIR}:/var/www/magnit/logs
+
+    rabbitmq:
+        image: rabbitmq:3.7-alpine
+        restart: unless-stopped
+        environment:
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-magnit}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-magnit}
+        networks:
+            - magnit
 
     db:
         image: postgres:11-alpine
