@@ -160,11 +160,11 @@ export class TaskService implements ITaskService {
             id,
             result: await this.templateService.findByPuzzleId(id),
         }));
-        let results: { id: string; result?: TemplateAnswer }[];
+        let results: Array<{ id: string; result?: TemplateAnswer }>;
         try {
             results = await Promise.all(promises);
         } catch (error) {
-            throw new NotFoundException(`Cannot save answers`);
+            throw new NotFoundException("Cannot save answers");
         }
         for (const result of results) {
             if (result.result) {
@@ -207,32 +207,34 @@ export class TaskService implements ITaskService {
     }
 
     @Transactional()
-    async getReport(id: string): Promise<TaskReportDto> {
+    async getReport(id: string): Promise<[Task, TaskReportDto]> {
         const task = await this.findById(id, ["assignments", "stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
-        return new TaskReportDto({
-            ..._.omit(task, "assignments"),
-            stages: task.stages.map(stage => {
-                return new ReportStageDto({
-                    ...stage,
-                    templates: task.assignments
-                        .map(assignment => {
-                            const template = _.find(templates, { id: assignment.id_template });
-                            if (!template) {
-                                return;
-                            }
-                            console.log(template);
-                            return new ReportTemplateDto({
-                                id: template.id,
-                                title: template.title,
-                                version: template.version,
-                                updated_at: template.updated_at,
-                                created_at: template.created_at,
-                            });
-                        })
-                        .filter(Boolean),
-                });
+        return [
+            task,
+            new TaskReportDto({
+                ..._.omit(task, "assignments"),
+                stages: task.stages.map(stage => {
+                    return new ReportStageDto({
+                        ...stage,
+                        templates: task.assignments
+                            .map(assignment => {
+                                const template = _.find(templates, { id: assignment.id_template });
+                                if (!template) {
+                                    return;
+                                }
+                                return new ReportTemplateDto({
+                                    id: template.id,
+                                    title: template.title,
+                                    version: template.version,
+                                    updated_at: template.updated_at,
+                                    created_at: template.created_at,
+                                });
+                            })
+                            .filter(Boolean),
+                    });
+                }),
             }),
-        });
+        ];
     }
 }

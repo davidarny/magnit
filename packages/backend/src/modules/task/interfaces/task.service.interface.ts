@@ -27,5 +27,5 @@ export interface ITaskService {
 
     getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
 
-    getReport(id: string): Promise<TaskReportDto>;
+    getReport(id: string): Promise<[Task, TaskReportDto]>;
 }

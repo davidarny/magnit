@@ -1,7 +1,7 @@
-import { createMockFrom } from "../../../utils/create-mock.util";
-import { TemplateController } from "../template.controller";
 import { Test } from "@nestjs/testing";
+import { createMockFrom } from "../../../utils/create-mock.util";
 import { TemplateService } from "../services/template.service";
+import { TemplateController } from "../template.controller";
 
 const payload = require("./template.json");
 

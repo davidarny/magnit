@@ -20,22 +20,24 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
     }
 
     async beforeUpdate(event: UpdateEvent<Task>): Promise<void> {
-        const task = event.entity;
-        const before = await event.manager.findOne(Task, task.id, { relations: ["stages"] });
-        const prevStatus = before.status;
-        const nextStatus = task.status;
+        const currentTask = event.entity;
+        const prevTask = await event.manager.findOne(Task, currentTask.id, {
+            relations: ["stages"],
+        });
+        const prevStatus = prevTask.status;
+        const nextStatus = currentTask.status;
         const description = this.taskService.getDescriptionByTransition(prevStatus, nextStatus);
         // find non-finished stage
         // it means it's active
         // usually there should be only one non-finished stage
-        const stage = before.stages.find(stage => !stage.finished);
+        const prevStage = prevTask.stages.find(stage => !stage.finished);
         // handle task completion
         if (nextStatus === ETaskStatus.COMPLETED) {
-            stage.finished = true;
-            await event.manager.save(stage);
+            prevStage.finished = true;
+            await event.manager.save(prevStage);
         }
-        if (stage && description) {
-            const history = new StageHistory({ stage, description });
+        if (prevStage && description) {
+            const history = new StageHistory({ stage: prevStage, description });
             await event.manager.save(history);
         }
     }

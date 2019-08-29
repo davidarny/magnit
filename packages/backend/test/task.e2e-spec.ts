@@ -6,6 +6,7 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
+import { AmqpService } from "../src/modules/amqp/services/amqp.service";
 import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
@@ -25,6 +26,7 @@ describe("TaskController (e2e)", () => {
     const templateService = createMockFrom(TemplateService.prototype);
     const taskSubscriber = createMockFrom(TaskSubscriber.prototype);
     const taskStageSubscriber = createMockFrom(TaskStageSubscriber.prototype);
+    const amqpService = createMockFrom(AmqpService.prototype);
     const task: Task = {
         id: 0,
         title: "task",
@@ -40,8 +42,7 @@ describe("TaskController (e2e)", () => {
     patchTypeORMRepositoryWithBaseRepository();
 
     beforeEach(async () => {
-        const metadata = { imports: [TaskModule] };
-        const moduleFixture = await Test.createTestingModule(metadata)
+        const moduleFixture = await Test.createTestingModule({ imports: [TaskModule] })
             .overrideProvider(getRepositoryToken(Task))
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(Template))
@@ -60,6 +61,8 @@ describe("TaskController (e2e)", () => {
             .useValue(taskService)
             .overrideProvider(TemplateService)
             .useValue(templateService)
+            .overrideProvider(AmqpService)
+            .useValue(amqpService)
             .compile();
 
         app = moduleFixture.createNestApplication();
@@ -180,7 +183,7 @@ describe("TaskController (e2e)", () => {
 
     it("should return report", async () => {
         const report = new TaskReportDto();
-        jest.spyOn(taskService, "getReport").mockResolvedValue(report);
+        jest.spyOn(taskService, "getReport").mockResolvedValue([task, report]);
         const response = await request(app.getHttpServer())
             .get("/v1/tasks/0/report")
             .expect(200);

@@ -170,7 +170,7 @@ export class TemplateService implements ITemplateService {
         // find all puzzles from set of ids
         await this.traverse(template.sections as object[], value => {
             if (isValuePuzzle(value) && rest.includes(value.id)) {
-                const indexToRemove = rest.findIndex(id => id === value.id);
+                const indexToRemove = rest.findIndex(restId => restId === value.id);
                 if (indexToRemove !== -1) {
                     rest.splice(indexToRemove, 1);
                 }

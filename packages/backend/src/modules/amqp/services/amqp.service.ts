@@ -5,9 +5,11 @@ import { IAmqpService } from "../interfaces/amqp.service.interface";
 
 @Injectable()
 export class AmqpService implements IAmqpService {
+    static EMAIL_QUEUE = "email";
+
     constructor(@InjectAmqpConnection() private readonly connection: Connection) {}
 
-    async close(): Promise<void> {
+    async closeConnection(): Promise<void> {
         return this.connection.close();
     }
 

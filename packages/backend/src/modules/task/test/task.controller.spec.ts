@@ -1,19 +1,18 @@
-import { DeepPartial } from "typeorm";
-import { Template } from "../../template/entities/template.entity";
-import { createMockFrom } from "../../../utils/create-mock.util";
-import { TaskReportDto } from "../dto/task-report.dto";
-import { TaskStage } from "../entities/task-stage.entity";
-import { ETaskStatus, Task } from "../entities/task.entity";
-import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
-import { TaskController } from "../task.controller";
-import { TaskService } from "../services/task.service";
 import { Test } from "@nestjs/testing";
+import { createMockFrom } from "../../../utils/create-mock.util";
+import { AmqpService } from "../../amqp/services/amqp.service";
+import { Template } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
+import { TaskReportDto } from "../dto/task-report.dto";
+import { ETaskStatus, Task } from "../entities/task.entity";
+import { TaskService } from "../services/task.service";
+import { TaskController } from "../task.controller";
 
 describe("TaskController", () => {
     let taskController: TaskController;
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
+    const amqpService = createMockFrom(AmqpService.prototype);
     const task: Task = {
         id: 0,
         title: "task",
@@ -38,19 +37,23 @@ describe("TaskController", () => {
     };
 
     beforeEach(async () => {
-        const providers = [
-            {
-                provide: TaskService,
-                useValue: taskService,
-            },
-            {
-                provide: TemplateService,
-                useValue: templateService,
-            },
-        ];
-        const controllers = [TaskController];
-        const metadata = { providers, controllers };
-        const app = await Test.createTestingModule(metadata).compile();
+        const app = await Test.createTestingModule({
+            providers: [
+                {
+                    provide: TaskService,
+                    useValue: taskService,
+                },
+                {
+                    provide: TemplateService,
+                    useValue: templateService,
+                },
+                {
+                    provide: AmqpService,
+                    useValue: amqpService,
+                },
+            ],
+            controllers: [TaskController],
+        }).compile();
 
         taskController = app.get(TaskController);
     });
@@ -114,7 +117,7 @@ describe("TaskController", () => {
 
     it("should get task report", async () => {
         const report = new TaskReportDto();
-        jest.spyOn(taskService, "getReport").mockResolvedValue(report);
+        jest.spyOn(taskService, "getReport").mockResolvedValue([task, report]);
         const actual = await taskController.getReport("0");
         expect(taskService.getReport).toHaveBeenCalledWith("0");
         const expected = { success: 1, report };

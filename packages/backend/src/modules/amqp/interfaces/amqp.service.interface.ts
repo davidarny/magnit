@@ -1,7 +1,7 @@
 import { Channel } from "amqplib";
 
 export interface IAmqpService {
-    close(): Promise<void>;
+    closeConnection(): Promise<void>;
 
     createChannel(): Promise<Channel>;
 }

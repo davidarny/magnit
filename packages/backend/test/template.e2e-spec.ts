@@ -22,9 +22,7 @@ describe("TemplateController (e2e)", () => {
     patchTypeORMRepositoryWithBaseRepository();
 
     beforeEach(async () => {
-        const imports = [TemplateModule];
-        const metadata = { imports };
-        const moduleFixture = await Test.createTestingModule(metadata)
+        const moduleFixture = await Test.createTestingModule({ imports: [TemplateModule] })
             .overrideProvider(getRepositoryToken(Template))
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(TemplateAnswer))

@@ -31,7 +31,10 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
                 })
                 .filter(Boolean),
         );
-        const history = new StageHistory({ description: "Создание этапа", stage: event.entity });
-        await event.manager.save(history);
+        const nextHistory = new StageHistory({
+            description: "Создание этапа",
+            stage: event.entity,
+        });
+        await event.manager.save(nextHistory);
     }
 }

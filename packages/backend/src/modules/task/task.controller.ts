@@ -29,6 +29,8 @@ import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.
 import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
+import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
+import { AmqpService } from "../amqp/services/amqp.service";
 import { Template } from "../template/entities/template.entity";
 import { ITemplateService } from "../template/interfaces/template.service.interface";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
@@ -60,6 +62,7 @@ export class TaskController {
     constructor(
         @Inject(TaskService) private readonly taskService: ITaskService,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
+        @Inject(AmqpService) private readonly amqpService: IAmqpService,
     ) {}
 
     @Get("/")
@@ -215,7 +218,7 @@ export class TaskController {
     @ApiOkResponse({ type: GetReportResponse, description: "Task report" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async getReport(@Param("id", TaskByIdPipe) id: string) {
-        const report = await this.taskService.getReport(id);
+        const [, report] = await this.taskService.getReport(id);
         return { success: 1, report };
     }
 
@@ -240,7 +243,7 @@ export class TaskController {
     @ApiOkResponse({ description: "XLSX file reposnse" })
     @ApiProduces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     async getReportFile(@Param("id", TaskByIdPipe) id: string, @Res() res: Response) {
-        const report = await this.taskService.getReport(id);
+        const [, report] = await this.taskService.getReport(id);
         const ws = XLSX.utils.aoa_to_sheet([
             ["Дата создания", "Статус"],
             [report.created_at, report.status],
@@ -258,9 +261,47 @@ export class TaskController {
         ]);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, report.title);
-        const buf = XLSX.write(wb, { type: "buffer" });
+        const buffer = XLSX.write(wb, { type: "buffer" });
         res.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         res.attachment("report.xlsx");
-        res.status(200).send(buf);
+        res.status(200).send(buffer);
+    }
+
+    @Get("/:id/report/email/:email")
+    @ApiOkResponse({ type: BaseResponse })
+    async getReportByEmail(@Param("id", TaskByIdPipe) id: string, @Param("email") email: string) {
+        const [task, report] = await this.taskService.getReport(id);
+        const ws = XLSX.utils.aoa_to_sheet([
+            ["Дата создания", "Статус"],
+            [report.created_at, report.status],
+            ["Этапы работы"],
+            ..._.flatMap(report.stages, stage => [
+                [stage.title, stage.deadline],
+                ["№", "Название шаблона", "Дата добавления", "Количество правок"],
+                ..._.map(stage.templates, (template, index) => [
+                    index,
+                    template.title,
+                    template.created_at,
+                    template.version,
+                ]),
+            ]),
+        ]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, report.title);
+        const buffer = XLSX.write(wb, { type: "buffer" });
+        const channel = await this.amqpService.createChannel();
+        await channel.assertQueue(AmqpService.EMAIL_QUEUE);
+        await channel.sendToQueue(
+            "email",
+            Buffer.from(
+                JSON.stringify({
+                    email,
+                    buffer,
+                    subject: `Отчёт по заданию "${task.title}"`,
+                    filename: "report.xlsx",
+                }),
+            ),
+        );
+        return { success: 1 };
     }
 }
