@@ -5,10 +5,10 @@ import { Template } from "./entities/template.entity";
 import { TemplateService } from "./services/template.service";
 import { TemplateController } from "./template.controller";
 
-const entities = [Template, TemplateAnswer];
-const providers = [TemplateService];
-const imports = [TypeOrmModule.forFeature(entities)];
-const controllers = [TemplateController];
-
-@Module({ imports, providers, controllers })
+@Module({
+    imports: [TypeOrmModule.forFeature([Template, TemplateAnswer])],
+    providers: [TemplateService],
+    controllers: [TemplateController],
+    exports: [TemplateService],
+})
 export class TemplateModule {}

@@ -29,6 +29,7 @@ COPY --from=build /devel/node_modules node_modules
 COPY --from=build /devel/packages/backend/node_modules node_modules
 COPY --from=build /devel/packages/backend/ormconfig.js ormconfig.js
 COPY --from=build /devel/packages/backend/amqpconfig.js amqpconfig.js
+COPY --from=build /devel/packages/backend/mailconfig.js mailconfig.js
 COPY --from=build /devel/packages/backend/package.json package.json
 
 RUN mkdir -p logs docs

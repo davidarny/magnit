@@ -1,11 +1,11 @@
-import { IEditorService } from "./IEditorService";
-import { TaskEditorService } from "./TaskEditorService";
-import { TemplateEditorService } from "./TemplateEditorService";
 import {
     EditorServiceImpl,
     TFocusedPuzzleState,
     TToolbarTopPositionState,
 } from "./EditorServiceImpl";
+import { IEditorService } from "./IEditorService";
+import { TaskEditorService } from "./TaskEditorService";
+import { TemplateEditorService } from "./TemplateEditorService";
 
 export enum EEditorType {
     TEMPLATE = 0,
@@ -22,11 +22,7 @@ export function getEditorService(
         case EEditorType.TEMPLATE:
             return new TemplateEditorService(...args);
         default:
-            console.log(
-                "%c%s",
-                "color:" + "#F07178",
-                `Current type (${type}) service does not exist!`,
-            );
+            console.log("%c%s", `color:#F07178`, `Current type (${type}) service does not exist!`);
             return new EditorServiceImpl(...args);
     }
 }

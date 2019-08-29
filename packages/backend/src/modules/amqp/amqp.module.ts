@@ -4,9 +4,9 @@ import { AmqpService } from "./services/amqp.service";
 
 const config = require("../../../amqpconfig");
 
-const imports = [NestAmqpModule.forRoot(config)];
-
-const providers = [AmqpService];
-
-@Module({ imports, providers })
+@Module({
+    imports: [...(process.env.NODE_ENV !== "testing" ? [NestAmqpModule.forRoot(config)] : [])],
+    providers: [AmqpService],
+    exports: [AmqpService],
+})
 export class AmqpModule {}

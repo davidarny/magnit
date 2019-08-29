@@ -1,16 +1,16 @@
-import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
-import * as helmet from "helmet";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as compression from "compression";
+import { closeSync, existsSync, mkdirSync, openSync } from "fs";
+import * as helmet from "helmet";
+import { join } from "path";
+import "reflect-metadata";
 import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AppModule } from "./app.module";
-import { NestExpressApplication } from "@nestjs/platform-express";
-import { join } from "path";
-import { closeSync, existsSync, mkdirSync, openSync } from "fs";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 const development = process.env.NODE_ENV === "development";
 
@@ -36,7 +36,7 @@ async function bootstrap() {
     }
 
     // controller prefix
-    app.setGlobalPrefix(process.env.GLOBAL_CONTROLLER_PREFIX || "v1");
+    app.setGlobalPrefix("v1");
 
     // security headers
     app.enableCors();

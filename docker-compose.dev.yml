@@ -36,7 +36,6 @@ services:
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - BACKEND_HOST=${BACKEND_HOST:-http://localhost:${BACKEND_PORT:-1337}}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
-            - GLOBAL_CONTROLLER_PREFIX=${GLOBAL_CONTROLLER_PREFIX:-v1}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
             - POSTGRES_HOST=${POSTGRES_HOST:-db}
@@ -45,6 +44,11 @@ services:
             - RABBITMQ_PORT=${RABBITMQ_PORT:-5672}
             - RABBITMQ_USER=${RABBITMQ_USER:-magnit}
             - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-magnit}
+            - SMTP_FROM=${MAIL_FROM:-'"Магнит" <magnit@mail.com>'}
+            - SMTP_HOST=${SMTP_HOST:-smtp.mailtrap.io}
+            - SMTP_PORT=${SMTP_PORT:-2525}
+            - SMTP_USER=${SMTP_USER}
+            - SMTP_PASS=${SMTP_PASS}
         restart: unless-stopped
         networks:
             - magnit
@@ -60,8 +64,8 @@ services:
         ports:
             - ${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}
         environment:
-            - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER:-magnit}
-            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS:-magnit}
+            - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-magnit}
+            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-magnit}
         networks:
             - magnit
 

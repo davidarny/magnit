@@ -17,6 +17,7 @@
         "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
         "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
         "start:frontend": "lerna run --scope @magnit/frontend start --stream",
+        "update:deps": "yarn upgrade-interactive --latest",
         "watch:lib": "lerna run watch:lib --stream --parallel --no-bail"
     },
     "config": {
@@ -41,7 +42,7 @@
         "cz-conventional-changelog": "^3.0.2",
         "gh-pages": "^2.1.1",
         "husky": "^3.0.4",
-        "lint-staged": "^9.2.3",
+        "lint-staged": "^9.2.5",
         "prettier": "^1.18.2",
         "pretty-quick": "^1.11.1"
     }
