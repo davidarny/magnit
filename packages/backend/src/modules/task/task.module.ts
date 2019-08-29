@@ -44,5 +44,6 @@ const MAX_HASH_LENGTH = 28;
         AmqpModule,
         TemplateModule,
     ],
+    exports: [TaskService],
 })
 export class TaskModule {}

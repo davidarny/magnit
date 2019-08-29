@@ -6,6 +6,8 @@ import { IAmqpService } from "../interfaces/amqp.service.interface";
 @Injectable()
 export class AmqpService implements IAmqpService {
     static EMAIL_QUEUE = "email";
+    static SCHEDULE_EMAIL_QUEUE = "schedule_email";
+    static CANCEL_EMAIL_SCHEDULE = "cancel_email_schedule";
 
     constructor(@InjectAmqpConnection() private readonly connection: Connection) {}
 

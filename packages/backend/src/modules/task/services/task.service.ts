@@ -2,6 +2,7 @@ import { BadRequestException, Inject, Injectable, NotFoundException } from "@nes
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, In, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
+import * as XLSX from "xlsx";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
@@ -210,31 +211,52 @@ export class TaskService implements ITaskService {
     async getReport(id: string): Promise<[Task, TaskReportDto]> {
         const task = await this.findById(id, ["assignments", "stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
-        return [
-            task,
-            new TaskReportDto({
-                ..._.omit(task, "assignments"),
-                stages: task.stages.map(stage => {
-                    return new ReportStageDto({
-                        ...stage,
-                        templates: task.assignments
-                            .map(assignment => {
-                                const template = _.find(templates, { id: assignment.id_template });
-                                if (!template) {
-                                    return;
-                                }
-                                return new ReportTemplateDto({
-                                    id: template.id,
-                                    title: template.title,
-                                    version: template.version,
-                                    updated_at: template.updated_at,
-                                    created_at: template.created_at,
-                                });
-                            })
-                            .filter(Boolean),
-                    });
-                }),
+        const report = new TaskReportDto({
+            ..._.omit(task, "assignments"),
+            stages: task.stages.map(stage => {
+                return new ReportStageDto({
+                    ...stage,
+                    templates: task.assignments
+                        .map(assignment => {
+                            const template = _.find(templates, { id: assignment.id_template });
+                            if (!template) {
+                                return;
+                            }
+                            return new ReportTemplateDto({
+                                id: template.id,
+                                title: template.title,
+                                version: template.version,
+                                updated_at: template.updated_at,
+                                created_at: template.created_at,
+                            });
+                        })
+                        .filter(Boolean),
+                });
             }),
-        ];
+        });
+        return [task, report];
+    }
+
+    async getReportByEmail(id: string): Promise<void> {}
+
+    getReportBuffer(report: TaskReportDto): Buffer {
+        const ws = XLSX.utils.aoa_to_sheet([
+            ["Дата создания", "Статус"],
+            [report.created_at, report.status],
+            ["Этапы работы"],
+            ..._.flatMap(report.stages, stage => [
+                [stage.title, stage.deadline],
+                ["№", "Название шаблона", "Дата добавления", "Количество правок"],
+                ..._.map(stage.templates, (template, index) => [
+                    index,
+                    template.title,
+                    template.created_at,
+                    template.version,
+                ]),
+            ]),
+        ]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, report.title);
+        return XLSX.write(wb, { type: "buffer" });
     }
 }
