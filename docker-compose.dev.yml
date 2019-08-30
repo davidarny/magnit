@@ -49,6 +49,7 @@ services:
             - SMTP_PORT=${SMTP_PORT:-2525}
             - SMTP_USER=${SMTP_USER}
             - SMTP_PASS=${SMTP_PASS}
+            - ALLOW_AUTH=${ALLOW_AUTH}
         restart: always
         networks:
             - magnit
