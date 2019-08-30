@@ -1,4 +1,4 @@
-import { HttpService, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpService, Injectable } from "@nestjs/common";
 import { TransformClassToPlain } from "class-transformer";
 import { Validate } from "../../../shared/decorators/validate.decorator";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
@@ -52,6 +52,6 @@ export class AirwatchUserService implements IUserService {
                 password: user.UserName,
             });
         }
-        throw new UnauthorizedException("Cannot authorize user");
+        throw new UserUnauthorizedException("Cannot authorize user");
     }
 }
