@@ -3,34 +3,31 @@ FROM node:10-alpine AS build
 
 WORKDIR /devel
 
-COPY package.json .
 COPY yarn.lock .
-COPY packages/backend/package.json packages/backend/package.json
+COPY packages/backend/package.json package.json
 
-RUN yarn install
+RUN yarn install --non-interactive --frozen-lockfile
 
-COPY . .
+COPY packages/backend/src src
+COPY packages/backend/assets assets
+COPY packages/backend/tsconfig.json tsconfig.json
+COPY packages/backend/tsconfig.build.json tsconfig.build.json
+COPY packages/backend/ormconfig.js ormconfig.js
+COPY packages/backend/amqpconfig.js amqpconfig.js
+COPY packages/backend/mailconfig.js mailconfig.js
 
-RUN yarn build:backend && yarn docs:build
+RUN yarn build && yarn docs:build
 
-# serve backend step
+# serve step
 FROM node:10-alpine AS serve
 
-RUN apk update && \
-    apk add logrotate
+RUN apk update && apk add logrotate
 
 COPY logrotate.txt /etc/logrotate.d/backend
 
 WORKDIR /var/www/magnit
 
-COPY --from=build /devel/packages/backend/dist dist
-COPY --from=build /devel/packages/backend/docs docs
-COPY --from=build /devel/node_modules node_modules
-COPY --from=build /devel/packages/backend/node_modules node_modules
-COPY --from=build /devel/packages/backend/ormconfig.js ormconfig.js
-COPY --from=build /devel/packages/backend/amqpconfig.js amqpconfig.js
-COPY --from=build /devel/packages/backend/mailconfig.js mailconfig.js
-COPY --from=build /devel/packages/backend/package.json package.json
+COPY --from=build /devel/ .
 
 RUN mkdir -p logs docs
 

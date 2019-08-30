@@ -9,3 +9,6 @@ dist/
 build/
 
 package-lock.json
+
+coverage/
+logs/
