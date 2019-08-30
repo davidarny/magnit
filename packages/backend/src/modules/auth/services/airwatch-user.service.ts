@@ -1,9 +1,18 @@
 import { HttpService, Injectable, UnauthorizedException } from "@nestjs/common";
 import { TransformClassToPlain } from "class-transformer";
 import { Validate } from "../../../shared/decorators/validate.decorator";
+import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { User } from "../entities/user.entity";
 import { IUserService } from "../interfaces/user.service.interface";
 import _ = require("lodash");
+
+interface IAirWatchUser {
+    UserName?: string;
+    Email?: string;
+    Status?: boolean;
+    Role?: string;
+    Uuid?: string;
+}
 
 @Injectable()
 export class AirwatchUserService implements IUserService {
@@ -25,7 +34,7 @@ export class AirwatchUserService implements IUserService {
     }
 
     @TransformClassToPlain()
-    @Validate(false, UnauthorizedException)
+    @Validate(UserUnauthorizedException)
     async findOne(username: string): Promise<User | undefined> {
         const query = `username=${encodeURI(username)}`;
         const url = `${this.url}/api/system/users/search?${query}`;
@@ -35,10 +44,12 @@ export class AirwatchUserService implements IUserService {
             Array.isArray(response.data.Users) &&
             response.data.Users.length > 0
         ) {
-            const foundUser = _.first<any>(response.data.Users);
+            const user = _.first<IAirWatchUser>(response.data.Users);
             return new User({
-                username: foundUser.UserName,
-                password: foundUser.UserName,
+                id: user.Uuid,
+                email: user.Email,
+                username: user.UserName,
+                password: user.UserName,
             });
         }
         throw new UnauthorizedException("Cannot authorize user");

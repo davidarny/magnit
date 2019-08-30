@@ -11,3 +11,5 @@
 | 5          | 400              | Cannot Save Answers           |                                                      |
 | 6          | 400              | Cannot Save Duplicate Answers |                                                      |
 | 7          | 404              | File Not Found                |                                                      |
+| 8          | 401              | User Unauthorized             |                                                      |
+| 9          | 401              | Invalid Token                 |                                                      |

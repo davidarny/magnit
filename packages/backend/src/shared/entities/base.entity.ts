@@ -1,12 +1,7 @@
 import { BeforeUpdate, CreateDateColumn, DeepPartial, UpdateDateColumn } from "typeorm";
+import { ConstructableEntity } from "./constructable.entity";
 
-export abstract class BaseEntity<E, T = DeepPartial<E>> {
-    protected construct?(entity?: E, dto?: T) {
-        if (entity && dto) {
-            Object.assign(entity, dto);
-        }
-    }
-
+export abstract class BaseEntity<E, T = DeepPartial<E>> extends ConstructableEntity<E, T> {
     @CreateDateColumn({ type: "timestamptz" })
     created_at: string;
 

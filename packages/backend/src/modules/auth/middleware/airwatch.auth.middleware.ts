@@ -1,6 +1,8 @@
-import { Inject, NestMiddleware, UnauthorizedException } from "@nestjs/common";
+import { Inject, NestMiddleware } from "@nestjs/common";
 import { Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
+import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
+import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
 import { User } from "../entities/user.entity";
 import { IAuthService } from "../interfaces/auth.service.interface";
@@ -28,7 +30,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
                 if (error instanceof TokenExpiredError) {
                     message = "Token has expired";
                 }
-                throw new UnauthorizedException(message);
+                throw new InvalidTokenException(message);
             }
         }
         if (authorization) {
@@ -38,12 +40,12 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
             const password = _.last(data.split(":"));
             req.user = await this.authService.validateUser(username, password);
             if (!req.user) {
-                throw new UnauthorizedException("Cannot authorize user");
+                throw new UserUnauthorizedException("Cannot authorize user");
             }
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
             return next();
         }
         res.set("WWW-Authenticate", "Basic");
-        throw new UnauthorizedException("User unauthorized");
+        throw new UserUnauthorizedException("User unauthorized");
     }
 }

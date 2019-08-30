@@ -1,8 +1,8 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { BaseDto } from "../../../shared/dto/base.dto";
+import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 import { TaskStageDto } from "./task-stage.dto";
 
-export class StageHistoryDto<T = StageHistoryDto<object>> extends BaseDto<StageHistoryDto> {
+export class StageHistoryDto<T = StageHistoryDto<object>> extends PrimaryBaseDto<StageHistoryDto> {
     @ApiModelProperty() readonly description: string;
 }
 

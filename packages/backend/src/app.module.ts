@@ -5,6 +5,7 @@ import { ConnectionOptionsReader } from "typeorm";
 import { AssetModule } from "./modules/asset/asset.module";
 import { AirwatchAuthModule } from "./modules/auth/airwatch.auth.module";
 import { MailModule } from "./modules/mail/mail.module";
+import { PushTokenModule } from "./modules/push-token/push-token.module";
 import { TaskModule } from "./modules/task/task.module";
 import { TemplateModule } from "./modules/template/template.module";
 import { CustomFileLogger } from "./shared/providers/custom.file.logger";
@@ -26,7 +27,8 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         TaskModule,
         AssetModule,
         MailModule,
-        AirwatchAuthModule,
+        ...(process.env.ALLOW_AUTH ? [AirwatchAuthModule] : []),
+        PushTokenModule,
     ],
 })
 export class AppModule {}

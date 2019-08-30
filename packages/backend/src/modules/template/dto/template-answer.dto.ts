@@ -1,7 +1,7 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { BaseDto } from "../../../shared/dto/base.dto";
+import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 
-export class TemplateAnswerDto extends BaseDto {
+export class TemplateAnswerDto extends PrimaryBaseDto {
     @ApiModelProperty({ description: "UUID" }) readonly id_puzzle: string;
     @ApiModelProperty() readonly id_template: number;
     @ApiModelProperty({ description: "Can be text, number-like text or filename" })

@@ -16,6 +16,7 @@
         "no-var-requires": false,
         "no-empty": false,
         "max-classes-per-file": false,
+        "object-literal-key-quotes": false,
         "no-conditional-assignment": [false]
     }
 }

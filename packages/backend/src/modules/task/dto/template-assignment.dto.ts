@@ -1,6 +1,6 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { BaseDto } from "../../../shared/dto/base.dto";
+import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 
-export class TemplateAssignmentDto extends BaseDto<TemplateAssignmentDto> {
+export class TemplateAssignmentDto extends PrimaryBaseDto<TemplateAssignmentDto> {
     @ApiModelProperty() readonly editable: boolean;
 }

@@ -1,16 +1,23 @@
 import { Exclude } from "class-transformer";
-import { IsString } from "class-validator";
+import { IsEmail, IsString } from "class-validator";
+import { DeepPartial } from "typeorm";
+import { ConstructableEntity } from "../../../shared/entities/constructable.entity";
 
-export class User {
-    constructor(user?: Partial<User>) {
-        if (user) {
-            Object.assign(this, user);
-        }
+export class User extends ConstructableEntity<User> {
+    constructor(dto?: DeepPartial<User>) {
+        super();
+        this.construct(this, dto);
     }
 
     @IsString()
-    readonly username: string;
+    username: string;
 
     @Exclude({ toPlainOnly: true })
-    readonly password: string;
+    password: string;
+
+    @IsString()
+    id: string;
+
+    @IsEmail()
+    email: string;
 }

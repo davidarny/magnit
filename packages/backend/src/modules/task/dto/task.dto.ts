@@ -1,11 +1,11 @@
 import { ApiModelProperty } from "@nestjs/swagger";
-import { BaseDto } from "../../../shared/dto/base.dto";
+import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 import { TemplateAnswerDto } from "../../template/dto/template-answer.dto";
 import { TemplateDto } from "../../template/dto/template.dto";
 import { ETaskStatus } from "../entities/task.entity";
 import { TaskStageDto } from "./task-stage.dto";
 
-export class TaskDto<T = TaskDto<object>> extends BaseDto<T> {
+export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
     @ApiModelProperty() readonly title: string;
     @ApiModelProperty() readonly description: string;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed"] })

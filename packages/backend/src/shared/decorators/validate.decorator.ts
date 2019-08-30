@@ -1,7 +1,7 @@
 import { validate } from "class-validator";
 
-export function Validate(target?: boolean, Exception?: { new (...args: any[]): any }) {
-    return function(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Validate(Exception?: new (...args: any[]) => any) {
+    return (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) => {
         const originalMethod = descriptor.value;
         descriptor.value = async function() {
             const args = [];
@@ -15,13 +15,13 @@ export function Validate(target?: boolean, Exception?: { new (...args: any[]): a
                 typeof result.then === "function";
             if (isPromise) {
                 const data = await result;
-                const errors = await validate(data, { validationError: { target } });
+                const errors = await validate(data, { validationError: { target: false } });
                 if (errors.length > 0) {
                     throw new Exception(errors);
                 }
                 return result;
             } else {
-                const errors = await validate(result, { validationError: { target } });
+                const errors = await validate(result, { validationError: { target: false } });
                 if (errors.length > 0) {
                     throw new Exception(errors);
                 }
