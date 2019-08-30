@@ -12,7 +12,7 @@ COPY packages/services/package.json packages/services/package.json
 COPY packages/task-editor/package.json packages/task-editor/package.json
 COPY packages/template-editor/package.json packages/template-editor/package.json
 
-RUN yarn install
+RUN yarn install --non-interactive --frozen-lockfile
 
 COPY . .
 

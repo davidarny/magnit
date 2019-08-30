@@ -8,7 +8,7 @@ services:
             - .:/devel
         working_dir: /devel/packages/frontend
         command: npm run start
-        restart: unless-stopped
+        restart: always
         environment:
             - NODE_ENV=development
             - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
@@ -29,7 +29,7 @@ services:
         environment:
             - NODE_ENV=development
             - BACKEND_PORT=${BACKEND_PORT:-1337}
-            - BACKEND_HOST=${BACKEND_HOST:-http://localhost:${BACKEND_PORT:-1337}}
+            - BACKEND_HOST=${BACKEND_HOST:-http://localhost:1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
@@ -44,7 +44,7 @@ services:
             - SMTP_PORT=${SMTP_PORT:-2525}
             - SMTP_USER=${SMTP_USER}
             - SMTP_PASS=${SMTP_PASS}
-        restart: unless-stopped
+        restart: always
         networks:
             - magnit
         ports:
@@ -55,7 +55,7 @@ services:
 
     amqp:
         image: rabbitmq:3.7-alpine
-        restart: unless-stopped
+        restart: always
         ports:
             - ${RABBITMQ_PORT:-5672}:${RABBITMQ_PORT:-5672}
         environment:
@@ -63,10 +63,12 @@ services:
             - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-magnit}
         networks:
             - magnit
+        volumes:
+            - amqp:/var/lib/rabbitmq/mnesia
 
     db:
         image: postgres:11-alpine
-        restart: unless-stopped
+        restart: always
         environment:
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
             - POSTGRES_DB=${POSTGRES_DB:-magnit}
@@ -75,6 +77,16 @@ services:
             - magnit
         ports:
             - ${POSTGRES_PORT:-5432}:5432
+        volumes:
+            - db:/var/lib/postgresql/data
+
+volumes:
+    amqp:
+        external:
+            name: magnit-amqp
+    db:
+        external:
+            name: magnit-db
 
 networks:
     magnit:

@@ -5,14 +5,12 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.frontend
-        restart: unless-stopped
+        restart: always
         networks:
             - magnit
         environment:
             - NODE_ENV=production
             - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
-        depends_on:
-            - backend
         ports:
             - ${FRONTEND_PORT:-80}:80
 
@@ -23,7 +21,7 @@ services:
         environment:
             - NODE_ENV=production
             - BACKEND_PORT=${BACKEND_PORT:-1337}
-            - BACKEND_HOST=${BACKEND_HOST:-http://localhost:${BACKEND_PORT:-1337}}
+            - BACKEND_HOST=${BACKEND_HOST:-http://localhost:1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
             - POSTGRES_USER=${POSTGRES_USER:-magnit}
@@ -38,37 +36,21 @@ services:
             - SMTP_PORT=${SMTP_PORT:-2525}
             - SMTP_USER=${SMTP_USER}
             - SMTP_PASS=${SMTP_PASS}
-        restart: unless-stopped
+        restart: always
         networks:
             - magnit
         ports:
             - ${BACKEND_PORT:-1337}:${BACKEND_PORT:-1337}
-        depends_on:
-            - amqp
-            - db
         volumes:
             - ${BACKEND_LOGS_DIR:-/var/logs/magnit}:/var/www/magnit/logs
-
-    amqp:
-        image: rabbitmq:3.7-alpine
-        restart: unless-stopped
-        environment:
-            - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-magnit}
-            - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-magnit}
-        networks:
-            - magnit
-
-    db:
-        image: postgres:11-alpine
-        restart: unless-stopped
-        environment:
-            - POSTGRES_USER=${POSTGRES_USER:-magnit}
-            - POSTGRES_DB=${POSTGRES_DB:-magnit}
-            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-magnit}
-        networks:
-            - magnit
-        volumes:
-            - ${POSTGRES_DATA:-/var/logs/magnit}:/var/lib/postgresql/data
+            - backend:/var/www/magnit/public
 
 networks:
     magnit:
+        external:
+            name: magnit
+
+volumes:
+    backend:
+        external:
+            name: magnit-backend
