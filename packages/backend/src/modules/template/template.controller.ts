@@ -6,19 +6,18 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { Transactional } from "typeorm-transactional-cls-hooked";
-import { Template } from "./entities/template.entity";
-import { ITemplateService } from "./interfaces/template.service.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
-import { TemplateService } from "./services/template.service";
 import { TemplateDto } from "./dto/template.dto";
+import { Template } from "./entities/template.entity";
+import { ITemplateService } from "./interfaces/template.service.interface";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTemplateResponse } from "./responses/create-template.response";
 import { GetTemplateResponse } from "./responses/get-template.response";
 import { GetTemplatesResponse } from "./responses/get-templates.response";
 import { UpdateTemplateResponse } from "./responses/update-template.response";
+import { TemplateService } from "./services/template.service";
 
 @ApiUseTags("templates")
 @Controller("templates")

@@ -118,6 +118,7 @@ describe("TaskController (e2e)", () => {
             .expect(404)
             .expect({
                 error: "Not Found",
+                errorCode: 1,
                 message: "Task with id 1 was not found",
                 statusCode: 404,
             });
@@ -143,6 +144,7 @@ describe("TaskController (e2e)", () => {
             .expect(404)
             .expect({
                 error: "Not Found",
+                errorCode: 1,
                 message: "Task with id 1 was not found",
                 statusCode: 404,
             });

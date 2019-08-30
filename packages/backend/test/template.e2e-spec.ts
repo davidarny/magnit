@@ -61,6 +61,7 @@ describe("TemplateController (e2e)", () => {
             .expect(404)
             .expect({
                 error: "Not Found",
+                errorCode: 0,
                 message: "Template with id 1 was not found",
                 statusCode: 404,
             });
@@ -81,6 +82,7 @@ describe("TemplateController (e2e)", () => {
             .expect(404)
             .expect({
                 error: "Not Found",
+                errorCode: 0,
                 message: "Template with id 1 was not found",
                 statusCode: 404,
             });
@@ -104,6 +106,7 @@ describe("TemplateController (e2e)", () => {
             .expect(404)
             .expect({
                 error: "Not Found",
+                errorCode: 0,
                 message: "Template with id 1 was not found",
                 statusCode: 404,
             });
