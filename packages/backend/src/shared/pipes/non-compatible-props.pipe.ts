@@ -1,4 +1,5 @@
-import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
+import { NonCompatiblePropsException } from "../exceptions/non-compatible-props.exception";
 
 interface IIndexedObject {
     [key: string]: any;
@@ -14,7 +15,7 @@ export class NonCompatiblePropsPipe<T extends IIndexedObject> implements PipeTra
             present.set(key, !!value[key]);
         }
         if ([...present.values()].every(bool => bool)) {
-            throw new BadRequestException(
+            throw new NonCompatiblePropsException(
                 `Found non compatible props in [${[...present.keys()].join(", ")}]`,
             );
         }

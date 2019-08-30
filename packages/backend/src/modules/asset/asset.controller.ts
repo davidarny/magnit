@@ -1,12 +1,5 @@
-import {
-    Controller,
-    Delete,
-    NotFoundException,
-    Param,
-    Post,
-    UploadedFile,
-    UseInterceptors,
-} from "@nestjs/common";
+import { Controller, Delete, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import {
     ApiConsumes,
     ApiImplicitFile,
@@ -14,11 +7,11 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { existsSync, unlinkSync } from "fs";
+import { AssetNotFoundException } from "../../shared/exceptions/asset-not-found.exception";
+import { BaseResponse } from "../../shared/responses/base.response";
 import { FileDto } from "./dto/file.dto";
 import { UploadFileResponse } from "./responses/upload-file.response";
-import { BaseResponse } from "../../shared/responses/base.response";
-import { existsSync, unlinkSync } from "fs";
 
 @ApiUseTags("assets")
 @Controller("assets")
@@ -38,7 +31,7 @@ export class AssetController {
     delete(@Param("filename") filename: string) {
         const pathToFile = process.cwd() + `/public/${filename}`;
         if (!existsSync(pathToFile)) {
-            throw new NotFoundException(`File "${filename}" not found`);
+            throw new AssetNotFoundException(`File "${filename}" Not Found`);
         }
         unlinkSync(pathToFile);
         return { success: 1 };

@@ -1,4 +1,5 @@
-import { ArgumentMetadata, Inject, NotFoundException, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, Inject, PipeTransform } from "@nestjs/common";
+import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
 import { TemplateService } from "../../template/services/template.service";
 
 export class TemplatesByIdsPipe implements PipeTransform<number[], Promise<number[]>> {
@@ -9,7 +10,9 @@ export class TemplatesByIdsPipe implements PipeTransform<number[], Promise<numbe
         try {
             await Promise.all(promises);
         } catch (error) {
-            throw new NotFoundException(`Template with ID ${ids.join(" or ")} was not found`);
+            throw new TemplateNotFoundException(
+                `Template with ID ${ids.join(" or ")} was not found`,
+            );
         }
         return ids;
     }

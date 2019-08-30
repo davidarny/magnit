@@ -1,13 +1,10 @@
-import {
-    BadRequestException,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
+import { CannotInsertTemplateException } from "../../../shared/exceptions/cannot-insert-template.exception";
+import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-found.exception";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
 import { ITemplateService } from "../interfaces/template.service.interface";
@@ -110,10 +107,10 @@ export class TemplateService implements ITemplateService {
             if (inserted && inserted.id) {
                 return this.templateRepository.findOne({ id: inserted.id });
             } else {
-                throw new InternalServerErrorException("Cannot save/update template");
+                throw new CannotInsertTemplateException("Cannot insert template");
             }
         } else {
-            throw new InternalServerErrorException("Cannot save/update template");
+            throw new CannotInsertTemplateException("Cannot insert template");
         }
     }
 
@@ -138,11 +135,7 @@ export class TemplateService implements ITemplateService {
         }
         builder.set(values).where("id = :id", { id: Number(id) });
         await builder.execute();
-        const result = await this.templateRepository.findOne({ id: Number(id) });
-        if (!result) {
-            throw new BadRequestException("Cannot update Template");
-        }
-        return result;
+        return await this.templateRepository.findOne({ id: Number(id) });
     }
 
     @Transactional()
@@ -181,7 +174,7 @@ export class TemplateService implements ITemplateService {
         // if we are not out of ids
         // then some of puzzles are not found
         if (rest.length) {
-            throw new NotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
+            throw new PuzzleNotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
         }
         return result;
     }

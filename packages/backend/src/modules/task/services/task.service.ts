@@ -1,8 +1,10 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, In, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
+import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
+import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
@@ -165,11 +167,11 @@ export class TaskService implements ITaskService {
         try {
             results = await Promise.all(promises);
         } catch (error) {
-            throw new NotFoundException("Cannot save answers");
+            throw new CannotSaveAnswersException("Cannot save answers");
         }
         for (const result of results) {
             if (result.result) {
-                throw new BadRequestException(
+                throw new CannotSaveDuplicateAnswerException(
                     `Cannot save duplicate answer with id "${result.id}"`,
                 );
             }
@@ -236,8 +238,6 @@ export class TaskService implements ITaskService {
         });
         return [task, report];
     }
-
-    async getReportByEmail(id: string): Promise<void> {}
 
     getReportBuffer(report: TaskReportDto): Buffer {
         const ws = XLSX.utils.aoa_to_sheet([
