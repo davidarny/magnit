@@ -1,23 +1,46 @@
 /** @jsx jsx */
 
-import { TableHead, TableRow, TableCell, TableSortLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import React from "react";
+import { TableCell, TableHead, TableRow, TableSortLabel } from "@material-ui/core";
+import { Checkbox } from "checkbox";
+import React, { useCallback } from "react";
 import { IColumn } from "./TableWrapper";
 
 interface ITableHeaderProps {
+    selectable?: boolean;
     headers: IColumn[];
+    allSelected?: boolean;
+
+    onSelectToggle?(selected: boolean): void;
 }
 
-export const TableHeader: React.FC<ITableHeaderProps> = ({ headers }) => {
+export const TableHeader: React.FC<ITableHeaderProps> = props => {
+    const { headers, selectable = false, onSelectToggle, allSelected = false } = props;
+
+    const onSelectToggleCallback = useCallback(
+        (event: unknown, checked: boolean) => {
+            if (onSelectToggle) {
+                onSelectToggle(checked);
+            }
+        },
+        [onSelectToggle],
+    );
+
     return (
         <TableHead>
             <TableRow>
-                {headers.map(header => (
+                {headers.map((header, index) => (
                     <TableCell
                         key={header.key}
                         css={theme => ({ borderBottomColor: theme.colors.light })}
                     >
+                        {selectable && index === 0 && (
+                            <Checkbox
+                                css={({ spacing }) => ({ marginRight: spacing() })}
+                                checked={allSelected}
+                                onChange={onSelectToggleCallback}
+                            />
+                        )}
                         <TableSortLabel
                             hideSortIcon={!header.sortable}
                             css={theme => ({
@@ -37,3 +60,5 @@ export const TableHeader: React.FC<ITableHeaderProps> = ({ headers }) => {
         </TableHead>
     );
 };
+
+TableHeader.displayName = "TableHeader";

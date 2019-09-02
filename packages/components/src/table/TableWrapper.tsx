@@ -1,16 +1,25 @@
 /** @jsx jsx */
 
-import { useState } from "react";
-import * as React from "react";
-import { Grid, IconButton, Table, TablePagination } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import { TableHeader } from "./TableHeader";
-import { TableBodyWrapper } from "./TableBodyWrapper";
-import * as _ from "lodash";
+import {
+    Grid,
+    IconButton,
+    Table,
+    TablePagination as MaterialTablePagination,
+} from "@material-ui/core";
 import {
     KeyboardArrowLeft as LeftArrowIcon,
     KeyboardArrowRight as RightArrowIcon,
 } from "@material-ui/icons";
+import * as _ from "lodash";
+import * as React from "react";
+import { useState } from "react";
+import { TableBodyWrapper } from "./TableBodyWrapper";
+import { TableHeader } from "./TableHeader";
+
+export interface ITableDataItem {
+    selected?: boolean;
+}
 
 export interface IColumn {
     key: string;
@@ -20,17 +29,33 @@ export interface IColumn {
 
 interface ITableWrapperProps {
     columns: IColumn[];
-    data: object[];
+    data: ITableDataItem[];
     initialPage?: number;
     rowsPerPage?: number;
     showPagination?: boolean;
     rowHover?: boolean;
+    selectable?: boolean;
+    allSelected?: boolean;
 
-    onRowClick?(row?: object): void;
+    onRowClick?(row: ITableDataItem): void;
+
+    onSelectToggle?(selected: boolean): void;
+
+    onRowSelectToggle?(row: ITableDataItem, selected: boolean): void;
 }
 
-export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...props }) => {
-    const { initialPage = 0, rowsPerPage = 10, showPagination = true, rowHover = true } = props;
+export const TableWrapper: React.FC<ITableWrapperProps> = props => {
+    const {
+        columns,
+        data,
+        initialPage = 0,
+        rowsPerPage = 10,
+        showPagination = true,
+        rowHover = true,
+        selectable = false,
+        allSelected = false,
+    } = props;
+    const { onRowClick, onRowSelectToggle, onSelectToggle } = props;
 
     const [page, setPage] = useState(initialPage);
 
@@ -43,29 +68,37 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
     return (
         <React.Fragment>
             <Table>
-                <TableHeader headers={columns} />
+                <TableHeader
+                    allSelected={allSelected}
+                    selectable={selectable}
+                    headers={columns}
+                    onSelectToggle={onSelectToggle}
+                />
                 <TableBodyWrapper
                     data={
                         showPagination
                             ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : data
                     }
+                    selectable={selectable}
                     columns={columns}
                     hover={rowHover}
-                    onRowClick={props.onRowClick}
+                    onRowClick={onRowClick}
+                    onRowSelectToggle={onRowSelectToggle}
                 />
             </Table>
             {showPagination && (
-                <TablePagination
+                <MaterialTablePagination
                     component="div"
                     count={data.length}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     labelDisplayedRows={PaginationLabel}
-                    ActionsComponent={ActionComponent}
+                    ActionsComponent={TablePagination}
                     labelRowsPerPage=""
                     SelectProps={{ style: { display: "none" } }}
                     onChangePage={onChangePage}
+                    // TODO: refactor
                     css={theme => ({
                         width: "100%",
                         marginTop: theme.spacing(2),
@@ -122,7 +155,9 @@ export const TableWrapper: React.FC<ITableWrapperProps> = ({ columns, data, ...p
     );
 };
 
-interface IActionComponentProps {
+TableWrapper.displayName = "TableWrapper";
+
+interface ITablePaginationProps {
     count: number;
     page: number;
     rowsPerPage: number;
@@ -130,7 +165,7 @@ interface IActionComponentProps {
     onChangePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number): void;
 }
 
-const ActionComponent: React.FC<IActionComponentProps> = props => {
+const TablePagination: React.FC<ITablePaginationProps> = props => {
     const { count, page, rowsPerPage, onChangePage } = props;
 
     const range = {
@@ -240,6 +275,8 @@ const ActionComponent: React.FC<IActionComponentProps> = props => {
     );
 };
 
+TablePagination.displayName = "TablePagination";
+
 interface IPaginationLabelProps {
     from: number;
     to: number;
@@ -250,3 +287,5 @@ interface IPaginationLabelProps {
 const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count, to }) => {
     return <span>{`${from} - ${to} из ${count}`}</span>;
 };
+
+PaginationLabel.displayName = "PaginationLabel";

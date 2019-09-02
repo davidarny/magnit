@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
-import * as React from "react";
-import { useEffect, useState } from "react";
 import { jsx } from "@emotion/core";
-import { ETemplateType, ITemplate, TChangeEvent } from "entities";
 import { Checkbox, InputField } from "@magnit/components";
 import { FormControl, FormControlLabel, Grid } from "@material-ui/core";
+import { ETemplateType, ITemplate, TChangeEvent } from "entities";
+import * as React from "react";
+import { useEffect, useState } from "react";
 
 interface IContentSectionProps {
     template: ITemplate;

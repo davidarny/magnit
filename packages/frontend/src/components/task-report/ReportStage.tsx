@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { TableWrapper, IColumn } from "@magnit/components";
+import { jsx } from "@emotion/core";
+import { IColumn, TableWrapper } from "@magnit/components";
 import { getFriendlyDate } from "@magnit/services";
 import { Typography } from "@material-ui/core";
 import * as React from "react";
-import { jsx } from "@emotion/core";
 import { IReportStageTemplate } from "services/api/tasks";
 
 const columns: IColumn[] = [
@@ -22,6 +22,7 @@ interface ITaskStageProps {
 
 export const ReportStage: React.FC<ITaskStageProps> = props => {
     const transformedTemplateData = props.templates.map((template, templateIndex) => ({
+        selected: false,
         index: templateIndex + 1,
         title: template.title,
         createdAt: getFriendlyDate(new Date(template.createdAt)),

@@ -10,7 +10,7 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
-import { AddIcon } from "@magnit/icons";
+import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
 import { ETaskStatus, getFriendlyDate } from "@magnit/services";
 import { Grid, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
@@ -20,8 +20,8 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTasks, IGetTasksResponse } from "services/api";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { getTasks, IGetTasksResponse, updateTask } from "services/api";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS.replace("_", "-"), label: "В работе" },
@@ -39,18 +39,32 @@ const columns: IColumn[] = [
 
 type TRouteProps = { "*": string };
 
+type TTask = IGetTasksResponse["tasks"][0] & { selected: boolean };
+
 export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     const tab = props["*"];
+
     const context = useContext(AppContext);
-    const [tasks, setTasks] = useState<IGetTasksResponse["tasks"]>([]);
+
+    const [tasks, setTasks] = useState<TTask[]>([]);
+    const [allSelected, setAllSelected] = useState(false);
+    const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
     const [total, setTotal] = useState(0);
 
-    useEffect(() => {
+    const clearSelectedTasks = useCallback(() => {
+        setAllSelected(false);
+        selectedTasks.clear();
+        setSelectedTasks(new Map(selectedTasks));
+    }, [selectedTasks]);
+
+    const updateTasksList = useCallback(() => {
+        clearSelectedTasks();
         getTasks(context.courier, getTaskStatusByTab(tab))
             .then(response =>
                 setTasks(
                     response.tasks.map(task => ({
                         ...task,
+                        selected: false,
                         createdAt: getFriendlyDate(new Date(task.createdAt!), true),
                         updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
                     })),
@@ -60,16 +74,96 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         getTasks(context.courier)
             .then(response => setTotal(response.tasks.length))
             .catch(console.error);
-    }, [context.courier, tab]);
+    }, [clearSelectedTasks, context.courier, tab]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => updateTasksList(), [context.courier, tab]);
 
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
-    function onRowClick(row?: object) {
+    function onRowClick(row: object) {
         if (!_.isObject(row) || !_.has(row, "id")) {
             return;
         }
         setRedirect({ redirect: true, to: _.get(row, "id") });
     }
+
+    const onRowSelectToggleCallback = useCallback(
+        (row: object, selected: boolean) => {
+            if (!_.isObject(row) || !_.has(row, "id")) {
+                return;
+            }
+            // select or un-select tasks for rejecting
+            const id = _.get(row, "id")!;
+            if (selected) {
+                selectedTasks.set(id, row as TTask);
+            } else {
+                selectedTasks.delete(id);
+            }
+            setSelectedTasks(new Map(selectedTasks));
+            // update actual task
+            const taskIndex = tasks.findIndex(task => task.id === id);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].selected = selected;
+                setTasks([...tasks]);
+            }
+        },
+        [selectedTasks, tasks],
+    );
+
+    const onBulkRejectClickCallback = useCallback(() => {
+        const tasksToUpdate = Array.from(selectedTasks.values());
+        // allow reject only tasks in IN_PROGRESS state
+        if (tasksToUpdate.some(task => task.status !== ETaskStatus.IN_PROGRESS)) {
+            return;
+        }
+        // TODO: perform one request
+        // https://github.com/DavidArutiunian/magnit/issues/88
+        Promise.all(
+            tasksToUpdate.map(async task =>
+                updateTask(context.courier, Number(task.id), { status: ETaskStatus.ON_CHECK }),
+            ),
+        )
+            .then(() => updateTasksList())
+            .catch(console.error);
+    }, [context.courier, selectedTasks, updateTasksList]);
+
+    const onBulkCompleteClickCallback = useCallback(() => {
+        const tasksToUpdate = Array.from(selectedTasks.values());
+        // allow complete only tasks in DRAFT & ON_CHECK states
+        if (
+            tasksToUpdate.some(
+                task => ![ETaskStatus.DRAFT, ETaskStatus.ON_CHECK].includes(task.status),
+            )
+        ) {
+            return;
+        }
+        // TODO: perform one request
+        // https://github.com/DavidArutiunian/magnit/issues/88
+        Promise.all(
+            tasksToUpdate.map(async task =>
+                updateTask(context.courier, Number(task.id), { status: ETaskStatus.IN_PROGRESS }),
+            ),
+        )
+            .then(() => updateTasksList())
+            .then(() => clearSelectedTasks())
+            .catch(console.error);
+    }, [clearSelectedTasks, context.courier, selectedTasks, updateTasksList]);
+
+    const onSelectToggleCallback = useCallback(
+        (selected: boolean) => {
+            setAllSelected(true);
+            const nextTasks = tasks.map(task => ({ ...task, selected }));
+            setTasks(nextTasks);
+            if (selected) {
+                nextTasks.forEach(task => task.id && selectedTasks.set(task.id, task));
+                setSelectedTasks(new Map(selectedTasks));
+            } else {
+                clearSelectedTasks();
+            }
+        },
+        [clearSelectedTasks, selectedTasks, tasks],
+    );
 
     const empty = !total;
 
@@ -171,10 +265,37 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                 </Grid>
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                     <TableWrapper
+                                        allSelected={allSelected}
+                                        selectable
                                         columns={columns}
                                         data={tasks}
                                         onRowClick={onRowClick}
+                                        onRowSelectToggle={onRowSelectToggleCallback}
+                                        onSelectToggle={onSelectToggleCallback}
                                     />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    {tab === ETaskStatus.IN_PROGRESS.replace("_", "-") && (
+                                        <Button
+                                            variant="contained"
+                                            scheme="blue"
+                                            onClick={onBulkRejectClickCallback}
+                                        >
+                                            <ReturnIcon />
+                                            <Typography>Отозвать</Typography>
+                                        </Button>
+                                    )}
+                                    {tab !== ETaskStatus.IN_PROGRESS.replace("_", "-") &&
+                                        tab !== ETaskStatus.COMPLETED && (
+                                            <Button
+                                                variant="contained"
+                                                scheme="blue"
+                                                onClick={onBulkCompleteClickCallback}
+                                            >
+                                                <SendIcon />
+                                                <Typography>Отправить</Typography>
+                                            </Button>
+                                        )}
                                 </Grid>
                             </Grid>
                         </TabsWrapper>
@@ -184,6 +305,8 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         </SectionLayout>
     );
 };
+
+TasksList.displayName = "TasksList";
 
 function getTaskStatusByTab(tab?: string): ETaskStatus {
     if (!tab) {
