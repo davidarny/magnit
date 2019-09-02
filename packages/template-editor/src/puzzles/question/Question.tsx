@@ -227,7 +227,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                     </Grid>
                     <Grid item xs={3}>
                         <SelectField
-                            id={"question-puzzle-type"}
+                            id="question-puzzle-type"
                             fullWidth={true}
                             value={answersType || ETerminals.EMPTY}
                             onChange={onAnswerTypeChange}

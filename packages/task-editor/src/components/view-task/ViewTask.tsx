@@ -276,7 +276,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 </Grid>
                 <Grid container spacing={2}>
                     <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
-                        <Grid container direction={"row"}>
+                        <Grid container direction="row">
                             <InfoField title="Администратор" value="Барановский Прохор Артёмович" />
                             <InfoField
                                 title="Исполнитель"
@@ -288,7 +288,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Grid>
                         <Grid
                             container
-                            direction={"row"}
+                            direction="row"
                             css={theme => ({ marginTop: theme.spacing(3) })}
                         >
                             <InfoField

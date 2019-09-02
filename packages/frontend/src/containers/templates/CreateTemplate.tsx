@@ -65,7 +65,7 @@ export const CreateTemplate: React.FC = () => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to={"/templates"} noThrow />}
+            {redirect && <Redirect to="/templates" noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
                     <Button

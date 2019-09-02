@@ -270,7 +270,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         variant="outlined"
                         color="primary"
                         onClick={onAddConditionCallback}
-                        scheme={"outline"}
+                        scheme="outline"
                     >
                         <AddIcon css={theme => ({ color: theme.colors.primary })} />
                         <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>

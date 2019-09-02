@@ -168,7 +168,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                     >
                         <InputField
                             fullWidth
-                            placeholder={"Добавить вариант"}
+                            placeholder="Добавить вариант"
                             onFocus={onAddDropdownButtonCallback}
                         />
                     </Grid>

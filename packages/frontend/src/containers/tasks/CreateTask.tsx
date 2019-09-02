@@ -101,7 +101,7 @@ export const CreateTask: React.FC = () => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to={"/tasks"} noThrow />}
+            {redirect && <Redirect to="/tasks" noThrow />}
             <SectionTitle title="Создание задания">
                 <Grid item>
                     <Button

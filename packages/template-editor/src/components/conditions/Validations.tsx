@@ -302,7 +302,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                         variant="outlined"
                         color="primary"
                         onClick={onAddValidationCallback}
-                        scheme={"outline"}
+                        scheme="outline"
                     >
                         <AddIcon css={theme => ({ color: theme.colors.primary })} />
                         <Typography css={theme => ({ fontSize: theme.fontSize.normal })}>

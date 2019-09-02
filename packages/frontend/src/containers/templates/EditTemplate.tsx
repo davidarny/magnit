@@ -1,20 +1,20 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { ETerminals } from "@magnit/services";
-import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { SectionLayout } from "components/section-layout";
-import { SectionTitle } from "components/section-title";
-import { Grid, Typography } from "@material-ui/core";
-import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { Button } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
-import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
-import { AppContext } from "context";
-import { Snackbar } from "components/snackbar";
+import { ETerminals } from "@magnit/services";
+import { ITemplate, TemplateEditor } from "@magnit/template-editor";
+import { Grid, Typography } from "@material-ui/core";
 import { Redirect } from "@reach/router";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
+import { Snackbar } from "components/snackbar";
+import { AppContext } from "context";
 import _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
+import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
 
 interface IEditTemplateProps {
     templateId: number;
@@ -74,7 +74,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to={"/templates"} noThrow />}
+            {redirect && <Redirect to="/templates" noThrow />}
             <SectionTitle title="Редактирование шаблона">
                 <Grid item>
                     <Button
