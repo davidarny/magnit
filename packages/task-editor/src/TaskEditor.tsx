@@ -243,6 +243,13 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         [isViewMode, onTaskChange, task],
     );
 
+    const onTaskTitleChange = useCallback(
+        (title: string) => {
+            setTask({ ...task, title });
+        },
+        [task],
+    );
+
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
     const onDeleteDocument = useCallback(() => {
@@ -293,6 +300,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
                     onTemplatesChange={onTemplatesChange}
+                    onTaskTitleChange={onTaskTitleChange}
                 />
             )}
             {isViewMode(task) && (
@@ -312,3 +320,5 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         </React.Fragment>
     );
 };
+
+TaskEditor.displayName = "TaskEditor";

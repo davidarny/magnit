@@ -8,15 +8,15 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
-import { IEditorService } from "@magnit/services";
+import { ETerminals, IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
 import { IDocument, ITask, TChangeEvent } from "entities";
 import _ from "lodash";
-import { useCallback } from "react";
 import * as React from "react";
+import { useCallback, useState } from "react";
 import uuid from "uuid/v4";
 
 interface ICreateTaskProps {
@@ -27,13 +27,29 @@ interface ICreateTaskProps {
     templateSnapshots: Map<string, object>;
     focusedPuzzleId?: string;
 
+    onTaskTitleChange(title: string): void;
+
     onTemplatesChange(uuid: string, event: TChangeEvent): void;
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
+    const { onTaskTitleChange, onTemplatesChange } = props;
+    const [title, setTitle] = useState<string>(ETerminals.EMPTY);
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
+
+    const onTaskTitleChangeCallback = useCallback(() => {
+        onTaskTitleChange(title);
+    }, [onTaskTitleChange, title]);
+
+    function onTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setTitle(event.target.value);
+    }
+
+    const onTitleBlur = useCallback(() => {
+        onTaskTitleChangeCallback();
+    }, [onTaskTitleChangeCallback]);
 
     return (
         <React.Fragment>
@@ -56,7 +72,9 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     <TaskFieldContainer label="Название задания">
                         <InputField
                             placeholder="Введите название задания"
-                            value={task.title}
+                            value={title}
+                            onChange={onTitleChange}
+                            onBlur={onTitleBlur}
                             fullWidth
                         />
                     </TaskFieldContainer>
@@ -102,54 +120,91 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
-            {documents.map(document => {
-                const snapshot = templateSnapshots.get(document.id.toString());
-                return (
-                    <SelectableBlockWrapper
-                        key={document.__uuid}
-                        onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
-                        onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
-                        css={theme => ({
-                            padding: theme.spacing(3),
-                            zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
-                        })}
-                        focused={focusedPuzzleId === document.__uuid}
-                        id={document.__uuid}
-                    >
-                        <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
-                            <SelectField
-                                placeholder="Выбрать шаблон"
-                                value={document.id === -1 ? "" : document.id}
-                                fullWidth
-                                onChange={event => props.onTemplatesChange(document.__uuid, event)}
-                            >
-                                {templates.map(template => (
-                                    <MenuItem key={template.id} value={template.id}>
-                                        {template.title}
-                                    </MenuItem>
-                                ))}
-                            </SelectField>
-                        </Grid>
-                        <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                            <Grid item xs={12}>
-                                {_.get(snapshot, "id") && (
-                                    <ButtonLikeText
-                                        component={Link}
-                                        to={`/templates/edit/${_.get(snapshot, "id")}`}
-                                        css={theme => ({
-                                            marginLeft: theme.spacing(),
-                                            marginTop: theme.spacing(2),
-                                        })}
-                                    >
-                                        Перейти к шаблону
-                                    </ButtonLikeText>
-                                )}
-                                <TemplateRenderer template={snapshot} />
-                            </Grid>
-                        </Grid>
-                    </SelectableBlockWrapper>
-                );
-            })}
+            {documents.map(document => (
+                <TaskDocument
+                    key={document.__uuid}
+                    document={document}
+                    templates={templates}
+                    service={service}
+                    templateSnapshots={templateSnapshots}
+                    focusedPuzzleId={focusedPuzzleId}
+                    onTemplatesChange={onTemplatesChange}
+                />
+            ))}
         </React.Fragment>
     );
 };
+
+CreateTask.displayName = "CreateTask";
+
+interface ITaskDocumentProps {
+    templates: Omit<IDocument, "__uuid">[];
+    service: IEditorService;
+    templateSnapshots: Map<string, object>;
+    document: IDocument;
+    focusedPuzzleId?: string;
+
+    onTemplatesChange(uuid: string, event: TChangeEvent): void;
+}
+
+const TaskDocument: React.FC<ITaskDocumentProps> = props => {
+    const { templates, templateSnapshots, document, service, focusedPuzzleId } = props;
+    const { onTemplatesChange } = props;
+
+    const snapshot = templateSnapshots.get(document.id.toString());
+
+    const onTemplateChangeCallback = useCallback(
+        (event: TChangeEvent) => {
+            onTemplatesChange(document.__uuid, event);
+        },
+        [onTemplatesChange, document],
+    );
+
+    return (
+        <SelectableBlockWrapper
+            key={document.__uuid}
+            onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
+            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
+            css={theme => ({
+                padding: theme.spacing(3),
+                zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
+            })}
+            focused={focusedPuzzleId === document.__uuid}
+            id={document.__uuid}
+        >
+            <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
+                <SelectField
+                    placeholder="Выбрать шаблон"
+                    value={document.id === -1 ? "" : document.id}
+                    fullWidth
+                    onChange={onTemplateChangeCallback}
+                >
+                    {templates.map(template => (
+                        <MenuItem key={template.id} value={template.id}>
+                            {template.title}
+                        </MenuItem>
+                    ))}
+                </SelectField>
+            </Grid>
+            <Grid container css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
+                <Grid item xs={12}>
+                    {_.get(snapshot, "id") && (
+                        <ButtonLikeText
+                            component={Link}
+                            to={`/templates/edit/${_.get(snapshot, "id")}`}
+                            css={theme => ({
+                                marginLeft: theme.spacing(),
+                                marginTop: theme.spacing(2),
+                            })}
+                        >
+                            Перейти к шаблону
+                        </ButtonLikeText>
+                    )}
+                    <TemplateRenderer template={snapshot} />
+                </Grid>
+            </Grid>
+        </SelectableBlockWrapper>
+    );
+};
+
+TaskDocument.displayName = "TaskDocument";

@@ -1,7 +1,6 @@
 const path = require("path");
 const os = require("os");
 const webpack = require("webpack");
-const externals = require("webpack-node-externals");
 
 const HardSourceWebpackPlugin = require("hard-source-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
@@ -35,7 +34,6 @@ module.exports = {
         library: "Icons",
         libraryTarget: "umd",
     },
-    externals: [externals()],
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
         modules: ["node_modules", "src"],
