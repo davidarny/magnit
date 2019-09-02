@@ -52,8 +52,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
         validationType: EValidationType.NONE,
         conditionType: EConditionType.OR,
     };
-    const [errorMessage, setErrorMessage] = useState<string>(ETerminals.EMPTY);
     const [validations, setValidations] = useState<IValidation[]>(initialState || [defaultState]);
+    const [errorMessage, setErrorMessage] = useState<string>(
+        _.get(_.first(validations), "errorMessage", ETerminals.EMPTY),
+    );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
 
@@ -328,6 +330,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     </Grid>
                     <Grid item xs={11} css={theme => ({ marginRight: theme.spacing(2) })}>
                         <InputField
+                            value={errorMessage}
                             onChange={onErrorMessageChange}
                             onBlur={onErrorMessageBlurCallback}
                             fullWidth
