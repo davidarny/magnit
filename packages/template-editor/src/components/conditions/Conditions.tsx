@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
@@ -25,7 +24,7 @@ import {
 } from "entities";
 import _ from "lodash";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getConditionService } from "services/condition";
 import { traverse } from "services/json";
 import uuid from "uuid/v4";
@@ -41,7 +40,7 @@ interface IConditionsProps {
 }
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const { puzzleId, template, disabled = false, focused = true } = props;
+    const { puzzleId, template, disabled = false, focused = true, onTemplateChange } = props;
     const defaultState = {
         id: uuid(),
         order: 0,
@@ -65,7 +64,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         if (disabled) {
             return;
         }
-        traverse(template, (value: any, parent: any) => {
+        traverse(template, (value: unknown, parent: unknown) => {
             if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
                 return;
             }
@@ -74,8 +73,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
         });
-    }, [template, disabled]);
+    }, [template, disabled, puzzleId]);
 
+    const prevQuestions = useRef(_.cloneDeep(questions));
+    const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
         if (disabled) {
             return;
@@ -89,7 +90,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     question => question.id === condition.questionPuzzle,
                 );
                 if (dependentQuestion) {
-                    traverse(template, (value: any) => {
+                    traverse(template, (value: unknown) => {
                         if (!_.has(value, "puzzles")) {
                             return;
                         }
@@ -165,36 +166,62 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 });
             });
             // set conditions of current puzzle
-            puzzle.puzzles[index].conditions = [...conditions];
+            puzzle.puzzles[index].conditions = [...conditions].filter(
+                condition =>
+                    !!(
+                        condition.actionType &&
+                        condition.conditionType &&
+                        condition.questionPuzzle &&
+                        (condition.value || condition.answerPuzzle)
+                    ),
+            );
         });
-        setQuestions(_.cloneDeep(questions));
-        setAnswers(_.cloneDeep(answers));
+        if (!_.isEqual(prevQuestions.current, questions)) {
+            const clonedQuestions = _.cloneDeep(questions);
+            prevQuestions.current = clonedQuestions;
+            setQuestions(clonedQuestions);
+        }
+        if (!_.isEqual(prevAnswers.current, answers)) {
+            const clonedAnswers = _.cloneDeep(answers);
+            prevAnswers.current = clonedAnswers;
+            setAnswers(clonedAnswers);
+        }
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
+        const clonedTemplate = _.cloneDeep(template);
         if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = _.cloneDeep(template);
+            templateSnapshot.current = clonedTemplate;
             return;
         }
-        templateSnapshot.current = _.cloneDeep(template);
-        props.onTemplateChange(templateSnapshot.current);
-    }, [conditions, template, disabled]);
+        templateSnapshot.current = clonedTemplate;
+        onTemplateChange(templateSnapshot.current);
+    }, [conditions, template, disabled, questions, answers, onTemplateChange, puzzleId]);
 
-    function onConditionDelete(id: string) {
-        // do not allow to delete if only one condition present
-        if (conditions.length === 1) {
-            setConditions([defaultState]);
-            return;
-        }
-        setConditions([...conditions.filter(condition => condition.id !== id)]);
-    }
+    const onConditionDeleteCallback = useCallback(
+        (id: string) => {
+            // do not allow to delete if only one condition present
+            if (conditions.length === 1) {
+                setConditions([defaultState]);
+                return;
+            }
+            setConditions([...conditions.filter(condition => condition.id !== id)]);
+        },
+        [conditions, defaultState],
+    );
 
-    function onConditionChange(id: string, nextCondition: Partial<ICondition>): void {
-        const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
-        conditions[changedConditionIdx] = { ...conditions[changedConditionIdx], ...nextCondition };
-        setConditions([...conditions]);
-    }
+    const onConditionChangeCallback = useCallback(
+        (id: string, nextCondition: Partial<ICondition>): void => {
+            const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
+            conditions[changedConditionIdx] = {
+                ...conditions[changedConditionIdx],
+                ...nextCondition,
+            };
+            setConditions([...conditions]);
+        },
+        [conditions],
+    );
 
-    function onAddCondition(): void {
+    const onAddConditionCallback = useCallback((): void => {
         if (
             questions.length === 0 ||
             (conditions.length !== 0 && !conditions.some(condition => !!condition.questionPuzzle))
@@ -212,7 +239,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
             conditionType: EConditionType.OR,
         });
         setConditions([...conditions]);
-    }
+    }, [conditions, questions.length]);
 
     return (
         <Grid
@@ -230,8 +257,8 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                     condition={condition}
                     conditions={conditions}
                     index={index}
-                    onConditionChange={onConditionChange}
-                    onConditionDelete={onConditionDelete}
+                    onConditionChange={onConditionChangeCallback}
+                    onConditionDelete={onConditionDeleteCallback}
                     questions={questions}
                     noDeleteButton={!focused}
                 />
@@ -242,7 +269,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         fullWidth
                         variant="outlined"
                         color="primary"
-                        onClick={onAddCondition}
+                        onClick={onAddConditionCallback}
                         scheme={"outline"}
                     >
                         <AddIcon css={theme => ({ color: theme.colors.primary })} />
@@ -271,50 +298,63 @@ interface IConditionProps {
 
 const Condition: React.FC<IConditionProps> = props => {
     const { condition, conditions, answers, questions, index, noDeleteButton = false } = props;
-    const [value, setValue] = useState<string>(ETerminals.EMPTY);
+    const { onConditionChange, onConditionDelete } = props;
+    const [value, setValue] = useState<string>(condition.value || ETerminals.EMPTY);
 
-    function onQuestionPuzzleChange(event: TChangeEvent): void {
-        // reset conditions length when question changed
-        conditions.length = 1;
-        // reset first condition fields when question changed
-        // and change questionPuzzle
-        props.onConditionChange(condition.id, {
-            answerPuzzle: ETerminals.EMPTY,
-            value: ETerminals.EMPTY,
-            actionType: EActionType.NONE,
-            questionPuzzle: event.target.value as string,
-        });
-    }
+    const onQuestionPuzzleChangeCallback = useCallback(
+        (event: TChangeEvent): void => {
+            // reset conditions length when question changed
+            conditions.length = 1;
+            // reset first condition fields when question changed
+            // and change questionPuzzle
+            onConditionChange(condition.id, {
+                answerPuzzle: ETerminals.EMPTY,
+                value: ETerminals.EMPTY,
+                actionType: EActionType.NONE,
+                questionPuzzle: event.target.value as string,
+            });
+        },
+        [condition.id, conditions.length, onConditionChange],
+    );
 
-    function onActionTypeChange(event: TChangeEvent): void {
-        props.onConditionChange(condition.id, {
-            actionType: event.target.value as EActionType,
-        });
-    }
+    const onActionTypeChangeCallback = useCallback(
+        (event: TChangeEvent): void => {
+            onConditionChange(condition.id, {
+                actionType: event.target.value as EActionType,
+            });
+        },
+        [condition.id, onConditionChange],
+    );
 
-    function onAnswerPuzzleChange(event: TChangeEvent): void {
-        props.onConditionChange(condition.id, {
-            answerPuzzle: event.target.value as string,
-        });
-    }
+    const onAnswerPuzzleChangeCallback = useCallback(
+        (event: TChangeEvent): void => {
+            onConditionChange(condition.id, {
+                answerPuzzle: event.target.value as string,
+            });
+        },
+        [condition.id, onConditionChange],
+    );
 
     function onValueChange(event: TChangeEvent): void {
         setValue(event.target.value as string);
     }
 
-    function onValueBlur() {
-        props.onConditionChange(condition.id, { value });
-    }
+    const onValueBlurCallback = useCallback(() => {
+        onConditionChange(condition.id, { value });
+    }, [condition.id, onConditionChange, value]);
 
-    function onConditionTypeChange(event: unknown, value: unknown): void {
-        props.onConditionChange(condition.id, {
-            conditionType: value as EConditionType,
-        });
-    }
+    const onConditionTypeChangeCallback = useCallback(
+        (event: unknown, value: unknown): void => {
+            onConditionChange(condition.id, {
+                conditionType: value as EConditionType,
+            });
+        },
+        [condition.id, onConditionChange],
+    );
 
-    function onConditionDeleteHandler() {
-        props.onConditionDelete(condition.id);
-    }
+    const onConditionDeleteCallback = useCallback(() => {
+        onConditionDelete(condition.id);
+    }, [condition.id, onConditionDelete]);
 
     const questionAnswers = answers.filter(answer => {
         const question = questions.find(question => question.id === condition.questionPuzzle);
@@ -350,7 +390,7 @@ const Condition: React.FC<IConditionProps> = props => {
                 <Grid xs={4} item css={theme => ({ marginLeft: theme.spacing(9) })}>
                     <RadioGroup
                         value={condition.conditionType}
-                        onChange={onConditionTypeChange}
+                        onChange={onConditionTypeChangeCallback}
                         row
                     >
                         <FormControlLabel
@@ -389,33 +429,28 @@ const Condition: React.FC<IConditionProps> = props => {
             {isFirstRow && (
                 <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id={"question-puzzle"}
+                        id="question-puzzle"
                         fullWidth={true}
                         value={condition.questionPuzzle || ETerminals.EMPTY}
-                        onChange={onQuestionPuzzleChange}
-                        placeholder={"Выберите вопрос"}
+                        onChange={onQuestionPuzzleChangeCallback}
+                        placeholder="Выберите вопрос"
                     >
-                        {questions.map(questionToChoseFrom => {
-                            return (
-                                <MenuItem
-                                    key={questionToChoseFrom.id}
-                                    value={questionToChoseFrom.id}
-                                >
-                                    {questionToChoseFrom.title}
-                                </MenuItem>
-                            );
-                        })}
+                        {questions.map(questionToChoseFrom => (
+                            <MenuItem key={questionToChoseFrom.id} value={questionToChoseFrom.id}>
+                                {questionToChoseFrom.title}
+                            </MenuItem>
+                        ))}
                     </SelectField>
                 </Grid>
             )}
             <Grid item xs={2}>
                 {!!condition.questionPuzzle && (
                     <SelectField
-                        id={"action-type"}
+                        id="action-type"
                         fullWidth={true}
                         value={condition.actionType || ETerminals.EMPTY}
-                        onChange={onActionTypeChange}
-                        placeholder={"Тип сравнения"}
+                        onChange={onActionTypeChangeCallback}
+                        placeholder="Тип сравнения"
                     >
                         {conditionService.getActionVariants()}
                     </SelectField>
@@ -425,16 +460,16 @@ const Condition: React.FC<IConditionProps> = props => {
                 {!!condition.actionType &&
                     conditionService
                         .getAnswerPuzzle(answers, questions)
-                        .setAnswerPuzzleChangeHandler(onAnswerPuzzleChange)
+                        .setAnswerPuzzleChangeHandler(onAnswerPuzzleChangeCallback)
                         .setValueChangeHandler(onValueChange)
-                        .setValueBlurHandler(onValueBlur)
+                        .setValueBlurHandler(onValueBlurCallback)
                         .build()}
             </Grid>
             {!noDeleteButton && condition.questionPuzzle && (
                 <Grid item xs>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <IconButton onClick={onConditionDeleteHandler}>
+                            <IconButton onClick={onConditionDeleteCallback}>
                                 <DeleteIcon />
                             </IconButton>
                         </Grid>

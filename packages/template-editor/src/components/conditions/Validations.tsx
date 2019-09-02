@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { Button, InputField, SelectField } from "@magnit/components";
+import { AddIcon } from "@magnit/icons";
+import { EPuzzleType, ETerminals } from "@magnit/services";
 import {
     FormControlLabel,
     Grid,
@@ -23,13 +23,12 @@ import {
     IValidation,
     TChangeEvent,
 } from "entities";
-import { traverse } from "services/json";
 import _ from "lodash";
-import uuid from "uuid/v4";
-import { Button, InputField, SelectField } from "@magnit/components";
-import { AddIcon } from "@magnit/icons";
+import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getValidationService } from "services/condition";
-import { EPuzzleType, ETerminals } from "@magnit/services";
+import { traverse } from "services/json";
+import uuid from "uuid/v4";
 
 interface IValidationsProps {
     initialState?: IValidation[];
@@ -42,7 +41,7 @@ interface IValidationsProps {
 }
 
 export const Validations: React.FC<IValidationsProps> = props => {
-    const { puzzleId, template, disabled = false, focused = true } = props;
+    const { puzzleId, template, disabled = false, focused = true, onTemplateChange } = props;
     const initialState = props.initialState && props.initialState.length && props.initialState;
     const defaultState = {
         id: uuid(),
@@ -76,9 +75,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
             const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
         });
-    }, [template, props.disabled]);
+    }, [template, disabled, puzzleId]);
 
     // get current question
+    const prevValidations = useRef(_.cloneDeep(validations));
     useEffect(() => {
         if (disabled) {
             return;
@@ -92,12 +92,18 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 return;
             }
             setCurrentQuestion(puzzle);
-            setValidations([
-                ...validations.map(validation => ({ ...validation, leftHandPuzzle: puzzle.id })),
-            ]);
+            const nextValidations = validations.map(validation => ({
+                ...validation,
+                leftHandPuzzle: puzzle.id,
+            }));
+            if (!_.isEqual(prevValidations.current, nextValidations)) {
+                prevValidations.current = _.cloneDeep(nextValidations);
+                setValidations([...nextValidations]);
+            }
         });
-    }, [template, props.disabled]);
+    }, [template, disabled, puzzleId, validations]);
 
+    const prevQuestions = useRef(_.cloneDeep(questions));
     useEffect(() => {
         if (disabled) {
             return;
@@ -183,38 +189,58 @@ export const Validations: React.FC<IValidationsProps> = props => {
                 });
             });
             // set validations of current puzzle
-            puzzle.puzzles[index].validations = [...validations];
+            puzzle.puzzles[index].validations = [...validations].filter(
+                validation =>
+                    !!(
+                        validation.validationType &&
+                        validation.conditionType &&
+                        validation.operatorType &&
+                        validation.errorMessage &&
+                        (validation.rightHandPuzzle || validation.value)
+                    ),
+            );
         });
-        setQuestions(_.cloneDeep(questions));
+        if (!_.isEqual(prevQuestions.current, questions)) {
+            const clonedQuestions = _.cloneDeep(questions);
+            prevQuestions.current = clonedQuestions;
+            setQuestions(clonedQuestions);
+        }
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
+        const clonedTemplate = _.cloneDeep(template);
         if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = _.cloneDeep(template);
+            templateSnapshot.current = clonedTemplate;
             return;
         }
-        templateSnapshot.current = _.cloneDeep(template);
-        props.onTemplateChange(templateSnapshot.current);
-    }, [validations, template, props.disabled]);
+        templateSnapshot.current = clonedTemplate;
+        onTemplateChange(templateSnapshot.current);
+    }, [validations, template, disabled, questions, puzzleId, onTemplateChange]);
 
-    function onDeleteValidation(id: string) {
-        // do not allow to delete if only one validation present
-        if (validations.length === 1) {
-            setValidations([defaultState]);
-            return;
-        }
-        setValidations([...validations.filter(validation => validation.id !== id)]);
-    }
+    const onDeleteValidationCallback = useCallback(
+        (id: string) => {
+            // do not allow to delete if only one validation present
+            if (validations.length === 1) {
+                setValidations([defaultState]);
+                return;
+            }
+            setValidations([...validations.filter(validation => validation.id !== id)]);
+        },
+        [defaultState, validations],
+    );
 
-    function onValidationChange(id: string, nextValidation: Partial<IValidation>): void {
-        const changedValidationIdx = validations.findIndex(validation => validation.id === id);
-        validations[changedValidationIdx] = {
-            ...validations[changedValidationIdx],
-            ...nextValidation,
-        };
-        setValidations([...validations]);
-    }
+    const onValidationChangeCallback = useCallback(
+        (id: string, nextValidation: Partial<IValidation>): void => {
+            const changedValidationIdx = validations.findIndex(validation => validation.id === id);
+            validations[changedValidationIdx] = {
+                ...validations[changedValidationIdx],
+                ...nextValidation,
+            };
+            setValidations([...validations]);
+        },
+        [validations],
+    );
 
-    function onAddValidation(): void {
+    const onAddValidationCallback = useCallback((): void => {
         if (
             questions.length === 0 ||
             (validations.length !== 0 &&
@@ -232,19 +258,19 @@ export const Validations: React.FC<IValidationsProps> = props => {
             conditionType: EConditionType.OR,
         });
         setValidations([...validations]);
-    }
+    }, [currentQuestion, questions.length, validations]);
 
     function onErrorMessageChange(event: TChangeEvent) {
         setErrorMessage(event.target.value as string);
     }
 
-    function onErrorMessageBlur() {
+    const onErrorMessageBlurCallback = useCallback(() => {
         const firstValidation = _.first(validations);
         if (firstValidation) {
             firstValidation.errorMessage = errorMessage;
         }
         setValidations([...validations.map(validation => ({ ...validation, errorMessage }))]);
-    }
+    }, [errorMessage, validations]);
 
     return (
         <Grid
@@ -261,8 +287,8 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     validation={validation}
                     index={index}
                     currentQuestion={currentQuestion}
-                    onDeleteValidation={onDeleteValidation}
-                    onValidationChange={onValidationChange}
+                    onDeleteValidation={onDeleteValidationCallback}
+                    onValidationChange={onValidationChangeCallback}
                     questions={questions}
                     noDeleteButton={!focused}
                 />
@@ -273,7 +299,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                         fullWidth
                         variant="outlined"
                         color="primary"
-                        onClick={onAddValidation}
+                        onClick={onAddValidationCallback}
                         scheme={"outline"}
                     >
                         <AddIcon css={theme => ({ color: theme.colors.primary })} />
@@ -303,7 +329,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     <Grid item xs={11} css={theme => ({ marginRight: theme.spacing(2) })}>
                         <InputField
                             onChange={onErrorMessageChange}
-                            onBlur={onErrorMessageBlur}
+                            onBlur={onErrorMessageBlurCallback}
                             fullWidth
                         />
                     </Grid>
@@ -326,44 +352,57 @@ interface IValidationProps {
 }
 
 const Validation: React.FC<IValidationProps> = props => {
-    const [value, setValue] = useState(0);
     const { validation, index, questions, currentQuestion, noDeleteButton = false } = props;
+    const { onValidationChange, onDeleteValidation } = props;
+    const [value, setValue] = useState(validation.value || 0);
 
-    function onOperatorTypeChange(event: TChangeEvent): void {
-        props.onValidationChange(validation.id, {
-            operatorType: event.target.value as EOperatorType,
-        });
-    }
+    const onOperatorTypeChangeCallback = useCallback(
+        (event: TChangeEvent): void => {
+            onValidationChange(validation.id, {
+                operatorType: event.target.value as EOperatorType,
+            });
+        },
+        [onValidationChange, validation.id],
+    );
 
-    function onRightHandPuzzleChange(event: TChangeEvent): void {
-        props.onValidationChange(validation.id, {
-            rightHandPuzzle: event.target.value as string,
-        });
-    }
+    const onRightHandPuzzleChange = useCallback(
+        (event: TChangeEvent): void => {
+            onValidationChange(validation.id, {
+                rightHandPuzzle: event.target.value as string,
+            });
+        },
+        [onValidationChange, validation.id],
+    );
 
     function onValueChange(event: TChangeEvent): void {
         setValue(event.target.value as number);
     }
 
-    function onValueBlur() {
-        props.onValidationChange(validation.id, { value });
-    }
+    const onValueBlurCallback = useCallback(() => {
+        onValidationChange(validation.id, { value });
+    }, [onValidationChange, validation.id, value]);
 
-    function onValidationTypeChange(event: TChangeEvent): void {
-        props.onValidationChange(validation.id, {
-            validationType: event.target.value as EValidationType,
-        });
-    }
+    const onValidationTypeChangeCallback = useCallback(
+        (event: TChangeEvent): void => {
+            onValidationChange(validation.id, {
+                validationType: event.target.value as EValidationType,
+            });
+        },
+        [onValidationChange, validation.id],
+    );
 
-    function onConditionTypeChange(event: unknown, value: unknown): void {
-        props.onValidationChange(validation.id, {
-            conditionType: value as EConditionType,
-        });
-    }
+    const onConditionTypeChangeCallback = useCallback(
+        (event: unknown, value: unknown): void => {
+            onValidationChange(validation.id, {
+                conditionType: value as EConditionType,
+            });
+        },
+        [onValidationChange, validation.id],
+    );
 
-    function onDeleteValidationHandler() {
-        props.onDeleteValidation(validation.id);
-    }
+    const onDeleteValidationHandlerCallback = useCallback(() => {
+        onDeleteValidation(validation.id);
+    }, [onDeleteValidation, validation.id]);
 
     const validationService = getValidationService({
         ...validation,
@@ -373,6 +412,14 @@ const Validation: React.FC<IValidationProps> = props => {
     });
 
     const isFirstRow = index === 0;
+
+    const currentQuestionId = currentQuestion ? currentQuestion.id : ETerminals.EMPTY;
+
+    const currentQuestionTitle = currentQuestion
+        ? currentQuestion.title
+            ? currentQuestion.title
+            : "(текущий вопрос)"
+        : "(текущий вопрос)";
 
     return (
         <React.Fragment key={validation.id}>
@@ -387,7 +434,7 @@ const Validation: React.FC<IValidationProps> = props => {
                 <Grid xs={3} item css={theme => ({ marginLeft: theme.spacing(9) })}>
                     <RadioGroup
                         value={validation.conditionType}
-                        onChange={onConditionTypeChange}
+                        onChange={onConditionTypeChangeCallback}
                         row
                     >
                         <FormControlLabel
@@ -423,18 +470,18 @@ const Validation: React.FC<IValidationProps> = props => {
                     </RadioGroup>
                 </Grid>
             )}
-            {isFirstRow && currentQuestion && (
+            {isFirstRow && (
                 <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id={"left-hand-puzzle"}
+                        id="left-hand-puzzle"
                         fullWidth
-                        value={currentQuestion.id || ETerminals.EMPTY}
-                        placeholder={"Выберите вопрос"}
+                        value={currentQuestionId}
+                        placeholder="Выберите вопрос"
                         disabled
                         displayEmpty={false}
                     >
-                        <MenuItem key={currentQuestion.id} value={currentQuestion.id}>
-                            {currentQuestion.title || "<Текущий вопрос>"}
+                        <MenuItem key={currentQuestionId} value={currentQuestionId}>
+                            {currentQuestionTitle}
                         </MenuItem>
                     </SelectField>
                 </Grid>
@@ -442,11 +489,11 @@ const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.leftHandPuzzle && (
                     <SelectField
-                        id={"operator-type"}
+                        id="operator-type"
                         fullWidth
                         value={validation.operatorType || ETerminals.EMPTY}
-                        onChange={onOperatorTypeChange}
-                        placeholder={"Выберите значение"}
+                        onChange={onOperatorTypeChangeCallback}
+                        placeholder="Выберите значение"
                     >
                         {validationService.getOperatorVariants()}
                     </SelectField>
@@ -455,11 +502,11 @@ const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.operatorType && (
                     <SelectField
-                        id={"validation-type"}
+                        id="validation-type"
                         fullWidth
                         value={validation.validationType || ETerminals.EMPTY}
-                        onChange={onValidationTypeChange}
-                        placeholder={"Тип сравнения"}
+                        onChange={onValidationTypeChangeCallback}
+                        placeholder="Тип сравнения"
                     >
                         {validationService.getValidationVariants()}
                     </SelectField>
@@ -471,14 +518,14 @@ const Validation: React.FC<IValidationProps> = props => {
                         .getRightHandPuzzle(questions)
                         .setRightHandPuzzleChangeHandler(onRightHandPuzzleChange)
                         .setValueChangeHandler(onValueChange)
-                        .setValueBlurHandler(onValueBlur)
+                        .setValueBlurHandler(onValueBlurCallback)
                         .build()}
             </Grid>
             {!noDeleteButton && validation.operatorType && (
                 <Grid item xs>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <IconButton onClick={onDeleteValidationHandler}>
+                            <IconButton onClick={onDeleteValidationHandlerCallback}>
                                 <DeleteIcon />
                             </IconButton>
                         </Grid>
