@@ -29,11 +29,11 @@ export class Task extends PrimaryBaseEntity<Task> {
     status: ETaskStatus;
 
     @Index()
-    @Column("varchar")
+    @Column({ type: "varchar", nullable: true })
     id_owner: string;
 
     @Index()
-    @Column("varchar")
+    @Column({ type: "varchar", nullable: true })
     id_assignee: string;
 
     @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
