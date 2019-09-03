@@ -37,7 +37,14 @@ export class PushTokenModule {
             const body = await this.amqpService.decodeMessageContent<IPushMessage>(message);
             if (body.token && body.message) {
                 try {
-                    await admin.messaging().sendToDevice(body.token, body.message, body.options);
+                    await admin
+                        .messaging()
+                        .sendToDevice(body.token, { notification: body.message }, body.options);
+                    const safeToLogToken =
+                        body.token.slice(0, 8) +
+                        "..." +
+                        body.token.slice(body.token.length - 8 - 1, body.token.length - 1);
+                    this.logger.log(`Push notification to "${safeToLogToken}" successfully sent`);
                 } catch (error) {
                     this.logger.error(`Cannot send push to "${body.token}": ${error.message}`);
                 }

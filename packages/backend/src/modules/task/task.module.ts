@@ -5,6 +5,7 @@ import { createHash } from "crypto";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import { AmqpModule } from "../amqp/amqp.module";
+import { PushTokenModule } from "../push-token/push-token.module";
 import { TemplateModule } from "../template/template.module";
 import { StageHistory } from "./entities/stage-history.entity";
 import { TaskStage } from "./entities/task-stage.entity";
@@ -41,6 +42,7 @@ const MAX_HASH_LENGTH = 28;
                 },
             }),
         }),
+        PushTokenModule,
         AmqpModule,
         TemplateModule,
     ],

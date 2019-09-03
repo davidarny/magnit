@@ -1,8 +1,14 @@
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiModelPropertyOptional } from "@nestjs/swagger";
 import * as admin from "firebase-admin";
-import MessagingPayload = admin.messaging.MessagingPayload;
+import NotificationMessagePayload = admin.messaging.NotificationMessagePayload;
 
-export class MessagePayloadDto implements MessagingPayload {
-    @ApiModelProperty() readonly data: admin.messaging.DataMessagePayload;
-    @ApiModelProperty() readonly notification: admin.messaging.NotificationMessagePayload;
+export class MessagePayloadDto implements NotificationMessagePayload {
+    [key: string]: string;
+    @ApiModelPropertyOptional() readonly tag?: string;
+    @ApiModelPropertyOptional() readonly body?: string;
+    @ApiModelPropertyOptional() readonly icon?: string;
+    @ApiModelPropertyOptional() readonly badge?: string;
+    @ApiModelPropertyOptional() readonly color?: string;
+    @ApiModelPropertyOptional() readonly sound?: string;
+    @ApiModelPropertyOptional() readonly title?: string;
 }

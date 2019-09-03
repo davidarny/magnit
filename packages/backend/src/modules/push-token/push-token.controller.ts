@@ -29,16 +29,15 @@ export class PushTokenController {
 
     @Post("/send")
     @ApiOkResponse({ type: BaseResponse })
-    async send(@Body() payload: MessagePayloadDto, @Req() req: IAuthRequest) {
+    async send(@Body() messagePayloadDto: MessagePayloadDto, @Req() req: IAuthRequest) {
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
+        const pushMessage: IPushMessage = {
+            token: req.user.token,
+            message: messagePayloadDto,
+        };
         await channel.sendToQueue(
             AmqpService.PUSH_NOTIFICATION,
-            Buffer.from(
-                JSON.stringify({
-                    token: req.user.token,
-                    message: payload,
-                } as IPushMessage),
-            ),
+            Buffer.from(JSON.stringify(pushMessage)),
         );
         return { success: 1 };
     }

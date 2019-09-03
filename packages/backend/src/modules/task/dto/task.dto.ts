@@ -7,7 +7,9 @@ import { TaskStageDto } from "./task-stage.dto";
 
 export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
     @ApiModelProperty() readonly title: string;
-    @ApiModelProperty() readonly description: string;
+    @ApiModelProperty({ nullable: true }) readonly description: string;
+    @ApiModelProperty({ nullable: true }) readonly id_owner: string;
+    @ApiModelProperty({ nullable: true }) readonly id_assignee: string;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed"] })
     readonly status: ETaskStatus;
 }

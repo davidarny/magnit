@@ -7,6 +7,8 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AmqpService } from "../src/modules/amqp/services/amqp.service";
+import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
+import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
@@ -22,11 +24,14 @@ import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util
 
 describe("TaskController (e2e)", () => {
     let app: NestApplication;
+
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
     const taskSubscriber = createMockFrom(TaskSubscriber.prototype);
     const taskStageSubscriber = createMockFrom(TaskStageSubscriber.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
+    const pushTokenService = createMockFrom(PushTokenService.prototype);
+
     const task: Task = {
         id: 0,
         title: "task",
@@ -34,6 +39,8 @@ describe("TaskController (e2e)", () => {
         status: "in_progress" as ETaskStatus,
         assignments: [],
         stages: [],
+        id_owner: null,
+        id_assignee: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
     };
@@ -63,6 +70,10 @@ describe("TaskController (e2e)", () => {
             .useValue(templateService)
             .overrideProvider(AmqpService)
             .useValue(amqpService)
+            .overrideProvider(PushTokenService)
+            .useValue(pushTokenService)
+            .overrideProvider(getRepositoryToken(PushToken))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();

@@ -28,6 +28,14 @@ export class Task extends PrimaryBaseEntity<Task> {
     @Column("varchar")
     status: ETaskStatus;
 
+    @Index()
+    @Column("varchar")
+    id_owner: string;
+
+    @Index()
+    @Column("varchar")
+    id_assignee: string;
+
     @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
         cascade: true,
     })

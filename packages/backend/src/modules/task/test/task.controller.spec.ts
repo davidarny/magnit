@@ -10,9 +10,11 @@ import { TaskController } from "../task.controller";
 
 describe("TaskController", () => {
     let taskController: TaskController;
+
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
+
     const task: Task = {
         id: 0,
         title: "task",
@@ -20,9 +22,12 @@ describe("TaskController", () => {
         status: "in_progress" as ETaskStatus,
         assignments: [],
         stages: [],
+        id_assignee: null,
+        id_owner: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
     };
+
     const template: Template = {
         id: 0,
         sections: [],

@@ -7,17 +7,19 @@ const payload = require("./template.json");
 
 describe("TemplateController", () => {
     let templateController: TemplateController;
+
     const templateService = createMockFrom(TemplateService.prototype);
 
     beforeEach(async () => {
-        const providers = [
-            {
-                provide: TemplateService,
-                useValue: templateService,
-            },
-        ];
-        const controllers = [TemplateController];
-        const app = await Test.createTestingModule({ providers, controllers }).compile();
+        const app = await Test.createTestingModule({
+            providers: [
+                {
+                    provide: TemplateService,
+                    useValue: templateService,
+                },
+            ],
+            controllers: [TemplateController],
+        }).compile();
 
         templateController = app.get(TemplateController);
     });

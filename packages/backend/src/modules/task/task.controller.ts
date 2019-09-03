@@ -258,16 +258,15 @@ export class TaskController {
         const [task, report] = await this.taskService.getReport(id);
         const buffer = this.taskService.getReportBuffer(report);
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.EMAIL_QUEUE);
+        const mailMessage: IMailMessage = {
+            email,
+            buffer,
+            subject: `Отчёт по заданию "${task.title}"`,
+            filename: "report.xlsx",
+        };
         await channel.sendToQueue(
             AmqpService.EMAIL_QUEUE,
-            Buffer.from(
-                JSON.stringify({
-                    email,
-                    buffer,
-                    subject: `Отчёт по заданию "${task.title}"`,
-                    filename: "report.xlsx",
-                } as IMailMessage),
-            ),
+            Buffer.from(JSON.stringify(mailMessage)),
         );
         return { success: 1 };
     }
@@ -283,15 +282,14 @@ export class TaskController {
         const channel = await this.amqpService.getAssertedChannelFor(
             AmqpService.SCHEDULE_EMAIL_QUEUE,
         );
+        const scheduleMessage: IScheduleMessage = {
+            email,
+            id,
+            schedule: `* 12 */${schedule} * *`,
+        };
         await channel.sendToQueue(
             AmqpService.SCHEDULE_EMAIL_QUEUE,
-            Buffer.from(
-                JSON.stringify({
-                    email,
-                    id,
-                    schedule: `* 12 */${schedule} * *`,
-                } as IScheduleMessage),
-            ),
+            Buffer.from(JSON.stringify(scheduleMessage)),
         );
         return { success: 1 };
     }

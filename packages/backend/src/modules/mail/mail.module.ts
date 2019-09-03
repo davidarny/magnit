@@ -41,7 +41,7 @@ export class MailModule {
         );
         await channel.consume(AmqpService.CANCEL_EMAIL_SCHEDULE, async message => {
             const id = message.content.toString();
-            this.scheduleService.cancelJob(this.getTaskJobName(id));
+            this.scheduleService.cancelJob(getTaskJobName(id));
             channel.ack(message);
         });
     }
@@ -57,22 +57,18 @@ export class MailModule {
             }
             if (body.email && body.id && body.schedule) {
                 try {
-                    const taskJobName = this.getTaskJobName(body.id);
+                    const taskJobName = getTaskJobName(body.id);
                     this.scheduleService.createJob(taskJobName, body.schedule, async () => {
                         const [task, report] = await this.taskService.getReport(body.id);
                         const buffer = this.taskService.getReportBuffer(report);
                         await channel.assertQueue(AmqpService.EMAIL_QUEUE);
-                        await channel.sendToQueue(
-                            "email",
-                            Buffer.from(
-                                JSON.stringify({
-                                    email: body.email,
-                                    buffer,
-                                    subject: `Отчёт по заданию "${task.title}"`,
-                                    filename: "report.xlsx",
-                                }),
-                            ),
-                        );
+                        const oayload: IMailMessage = {
+                            email: body.email,
+                            buffer,
+                            subject: `Отчёт по заданию "${task.title}"`,
+                            filename: "report.xlsx",
+                        };
+                        await channel.sendToQueue("email", Buffer.from(JSON.stringify(oayload)));
                         return false;
                     });
                     this.logger.log(
@@ -97,7 +93,13 @@ export class MailModule {
                 this.logger.error("No recipients defined");
             }
             const options: ISendMailOptions = { to: body.email };
-            if (body.buffer && body.buffer.data && body.filename) {
+            if (
+                body.buffer &&
+                // check if buffer is stringified before
+                !(body.buffer instanceof Buffer) &&
+                body.buffer.data &&
+                body.filename
+            ) {
                 options.attachments = [
                     {
                         filename: body.filename,
@@ -117,8 +119,8 @@ export class MailModule {
             channel.ack(message);
         });
     }
+}
 
-    private getTaskJobName(id: string): string {
-        return `task_${id}`;
-    }
+function getTaskJobName(id: string): string {
+    return `task_${id}`;
 }

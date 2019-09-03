@@ -24,6 +24,7 @@ class ControllerMock {
 
 describe("Airwatch Auth", () => {
     let app: NestApplication;
+
     const airwatchUserService = createMockFrom(AirwatchUserService.prototype);
     const airwatchAuthService = createMockFrom(AirwatchAuthService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);

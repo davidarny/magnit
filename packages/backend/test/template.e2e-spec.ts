@@ -16,6 +16,7 @@ const payload = require("../src/modules/template/test/template.json");
 
 describe("TemplateController (e2e)", () => {
     let app: NestApplication;
+
     const templateService = createMockFrom(TemplateService.prototype);
 
     initializeTransactionalContext();
