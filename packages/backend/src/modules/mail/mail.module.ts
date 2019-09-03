@@ -1,6 +1,5 @@
 import { ISendMailOptions, MailerModule } from "@nest-modules/mailer";
 import { Inject, Logger, Module } from "@nestjs/common";
-import { ConsumeMessage } from "amqplib";
 import { AmqpModule } from "../amqp/amqp.module";
 import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../amqp/services/amqp.service";
@@ -36,9 +35,10 @@ export class MailModule {
         this.consumeCancelScheduleQueue().catch(this.logger.error);
     }
 
-    async consumeCancelScheduleQueue() {
-        const channel = await this.amqpService.createChannel();
-        await channel.assertQueue(AmqpService.CANCEL_EMAIL_SCHEDULE);
+    private async consumeCancelScheduleQueue() {
+        const channel = await this.amqpService.getAssertedChannelFor(
+            AmqpService.CANCEL_EMAIL_SCHEDULE,
+        );
         await channel.consume(AmqpService.CANCEL_EMAIL_SCHEDULE, async message => {
             const id = message.content.toString();
             this.scheduleService.cancelJob(this.getTaskJobName(id));
@@ -46,11 +46,12 @@ export class MailModule {
         });
     }
 
-    async consumeScheduleQueue() {
-        const channel = await this.amqpService.createChannel();
-        await channel.assertQueue(AmqpService.SCHEDULE_EMAIL_QUEUE);
+    private async consumeScheduleQueue() {
+        const channel = await this.amqpService.getAssertedChannelFor(
+            AmqpService.SCHEDULE_EMAIL_QUEUE,
+        );
         await channel.consume(AmqpService.SCHEDULE_EMAIL_QUEUE, async message => {
-            const body = this.decodeMessageContent<IScheduleMessage>(message);
+            const body = this.amqpService.decodeMessageContent<IScheduleMessage>(message);
             if (!body) {
                 return channel.ack(message);
             }
@@ -79,18 +80,16 @@ export class MailModule {
                     );
                 } catch (error) {
                     this.logger.error(`Cannot schedule Email job: ${error.message}`);
-                    return channel.ack(message);
                 }
             }
             channel.ack(message);
         });
     }
 
-    async consumeEmailQueue() {
-        const channel = await this.amqpService.createChannel();
-        await channel.assertQueue(AmqpService.EMAIL_QUEUE);
+    private async consumeEmailQueue() {
+        const channel = await this.amqpService.getAssertedChannelFor(AmqpService.EMAIL_QUEUE);
         await channel.consume(AmqpService.EMAIL_QUEUE, async message => {
-            const body = this.decodeMessageContent<IMailMessage>(message);
+            const body = this.amqpService.decodeMessageContent<IMailMessage>(message);
             if (!body) {
                 return channel.ack(message);
             }
@@ -114,29 +113,9 @@ export class MailModule {
                 this.logger.log(`Successfully sent Email for "${options.to}"`);
             } catch (error) {
                 this.logger.error(`Cannot send Email: ${error.message}`);
-                return channel.ack(message);
             }
             channel.ack(message);
         });
-    }
-
-    private decodeMessageContent<T>(message: ConsumeMessage): T | undefined {
-        const content = message.content;
-        let string: string;
-        try {
-            string = content.toString();
-        } catch (error) {
-            this.logger.error(`Cannot decode AMQP content: ${error.message}`);
-            return;
-        }
-        let body: T;
-        try {
-            body = JSON.parse(string);
-        } catch (error) {
-            this.logger.error(`Cannot parse AMQP content: ${error.message}`);
-            return;
-        }
-        return body;
     }
 
     private getTaskJobName(id: string): string {

@@ -6,4 +6,6 @@ export interface IPushTokenService {
     save(token: PushToken): Promise<PushToken>;
 
     createUniqueToken(token: PushToken): Promise<PushToken>;
+
+    getTokenByUserId(id: string): Promise<PushToken>;
 }

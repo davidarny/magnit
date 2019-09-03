@@ -13,6 +13,7 @@ COPY packages/backend/assets assets
 COPY packages/backend/tsconfig.json tsconfig.json
 COPY packages/backend/tsconfig.build.json tsconfig.build.json
 COPY packages/backend/ormconfig.js ormconfig.js
+COPY packages/backend/firebaseconfig.js firebaseconfig.js
 COPY packages/backend/amqpconfig.js amqpconfig.js
 COPY packages/backend/mailconfig.js mailconfig.js
 

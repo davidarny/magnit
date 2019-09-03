@@ -1,7 +1,9 @@
-import { Channel } from "amqplib";
+import { Channel, ConsumeMessage } from "amqplib";
 
 export interface IAmqpService {
     closeConnection(): Promise<void>;
 
-    createChannel(): Promise<Channel>;
+    getAssertedChannelFor(queue: string): Promise<Channel>;
+
+    decodeMessageContent<T>(message: ConsumeMessage): Partial<T> | undefined;
 }

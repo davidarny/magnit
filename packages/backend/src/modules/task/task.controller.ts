@@ -256,9 +256,8 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async getReportByEmail(@Param("id", TaskByIdPipe) id: string, @Param("email") email: string) {
         const [task, report] = await this.taskService.getReport(id);
-        const channel = await this.amqpService.createChannel();
         const buffer = this.taskService.getReportBuffer(report);
-        await channel.assertQueue(AmqpService.EMAIL_QUEUE);
+        const channel = await this.amqpService.getAssertedChannelFor(AmqpService.EMAIL_QUEUE);
         await channel.sendToQueue(
             AmqpService.EMAIL_QUEUE,
             Buffer.from(
@@ -281,8 +280,9 @@ export class TaskController {
         @Param("schedule") schedule: string,
         @Param("email") email: string,
     ) {
-        const channel = await this.amqpService.createChannel();
-        await channel.assertQueue(AmqpService.SCHEDULE_EMAIL_QUEUE);
+        const channel = await this.amqpService.getAssertedChannelFor(
+            AmqpService.SCHEDULE_EMAIL_QUEUE,
+        );
         await channel.sendToQueue(
             AmqpService.SCHEDULE_EMAIL_QUEUE,
             Buffer.from(
@@ -300,8 +300,9 @@ export class TaskController {
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async cancelScheduledReport(@Param("id", TaskByIdPipe) id: string) {
-        const channel = await this.amqpService.createChannel();
-        await channel.assertQueue(AmqpService.CANCEL_EMAIL_SCHEDULE);
+        const channel = await this.amqpService.getAssertedChannelFor(
+            AmqpService.CANCEL_EMAIL_SCHEDULE,
+        );
         await channel.sendToQueue(AmqpService.CANCEL_EMAIL_SCHEDULE, Buffer.from(id));
         return { success: 1 };
     }

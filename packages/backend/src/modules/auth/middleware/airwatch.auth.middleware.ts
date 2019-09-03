@@ -4,6 +4,8 @@ import { TokenExpiredError } from "jsonwebtoken";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
+import { IPushTokenService } from "../../push-token/interfaces/push-token.service.interface";
+import { PushTokenService } from "../../push-token/services/push-token.service";
 import { User } from "../entities/user.entity";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { ITokenManager } from "../interfaces/token.manager.interface";
@@ -15,6 +17,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
     constructor(
         @Inject(AirwatchAuthService) private readonly authService: IAuthService,
         @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<User>,
+        @Inject(PushTokenService) private readonly pushTokenService: IPushTokenService,
     ) {}
 
     async use(req: IAuthRequest, res: Response, next: () => void): Promise<void> {
@@ -34,11 +37,10 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
             }
         }
         if (authorization) {
-            const credentials = authorization.split(" ")[1];
-            const data = Buffer.from(credentials, "base64").toString();
-            const username = _.first(data.split(":"));
-            const password = _.last(data.split(":"));
+            const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
             req.user = await this.authService.validateUser(username, password);
+            // try to get push token
+            await this.setPushTokenIfExists(req.user);
             if (!req.user) {
                 throw new UserUnauthorizedException("Cannot authorize user");
             }
@@ -47,5 +49,21 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
         }
         res.set("WWW-Authenticate", "Basic");
         throw new UserUnauthorizedException("User unauthorized");
+    }
+
+    // returns tuple with username & password
+    private getCredentialsFromAuthorizationString(authorization: string): [string, string] {
+        const credentials = authorization.split(" ")[1];
+        const data = Buffer.from(credentials, "base64").toString();
+        const username = _.first(data.split(":"));
+        const password = _.last(data.split(":"));
+        return [username, password];
+    }
+
+    private async setPushTokenIfExists(user: IAuthRequest["user"]): Promise<void> {
+        const pushToken = await this.pushTokenService.getTokenByUserId(user.id);
+        if (pushToken) {
+            user.token = pushToken.token;
+        }
     }
 }
