@@ -27,8 +27,8 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         TaskModule,
         AssetModule,
         MailModule,
-        ...(process.env.ALLOW_AUTH ? [AirwatchAuthModule] : []),
         PushTokenModule,
+        ...(process.env.ALLOW_AUTH ? [AirwatchAuthModule] : []),
     ],
 })
 export class AppModule {}

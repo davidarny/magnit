@@ -1,12 +1,20 @@
 import { Controller, Get } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
+import { getRepositoryToken } from "@nestjs/typeorm";
 import * as request from "supertest";
+import {
+    initializeTransactionalContext,
+    patchTypeORMRepositoryWithBaseRepository,
+} from "typeorm-transactional-cls-hooked";
+import { AmqpService } from "../src/modules/amqp/services/amqp.service";
 import { AirwatchAuthModule } from "../src/modules/auth/airwatch.auth.module";
 import { User } from "../src/modules/auth/entities/user.entity";
 import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
 import { AirwatchUserService } from "../src/modules/auth/services/airwatch-user.service";
-import { createMockFrom } from "../src/utils/create-mock.util";
+import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
+import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
+import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
 
 @Controller("mock")
 class ControllerMock {
@@ -18,6 +26,11 @@ describe("Airwatch Auth", () => {
     let app: NestApplication;
     const airwatchUserService = createMockFrom(AirwatchUserService.prototype);
     const airwatchAuthService = createMockFrom(AirwatchAuthService.prototype);
+    const amqpService = createMockFrom(AmqpService.prototype);
+    const pushTokenService = createMockFrom(PushTokenService.prototype);
+
+    initializeTransactionalContext();
+    patchTypeORMRepositoryWithBaseRepository();
 
     beforeAll(() => {
         // allow auth middleware
@@ -32,13 +45,20 @@ describe("Airwatch Auth", () => {
     });
 
     beforeEach(async () => {
-        const controllers = [ControllerMock];
-        const imports = [AirwatchAuthModule];
-        const moduleFixture = await Test.createTestingModule({ imports, controllers })
+        const moduleFixture = await Test.createTestingModule({
+            imports: [AirwatchAuthModule],
+            controllers: [ControllerMock],
+        })
             .overrideProvider(AirwatchAuthService)
             .useValue(airwatchAuthService)
             .overrideProvider(AirwatchUserService)
             .useValue(airwatchUserService)
+            .overrideProvider(AmqpService)
+            .useValue(amqpService)
+            .overrideProvider(PushTokenService)
+            .useValue(pushTokenService)
+            .overrideProvider(getRepositoryToken(PushToken))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();

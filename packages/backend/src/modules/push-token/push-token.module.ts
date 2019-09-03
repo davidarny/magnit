@@ -21,6 +21,9 @@ export class PushTokenModule {
     private readonly logger = new Logger(PushTokenModule.name);
 
     constructor(@Inject(AmqpService) private readonly amqpService: IAmqpService) {
+        if (process.env.NODE_ENV === "testing") {
+            return;
+        }
         if (!config || !config.account) {
             throw new Error("Cannot initialize Firebase without account config");
         }
