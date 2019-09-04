@@ -195,12 +195,8 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id, ["stages"]);
-        const templates = await this.templateService.findByTaskId(task.id.toString());
-        return {
-            success: 1,
-            task: { ...task, templates },
-        };
+        const task = await this.taskService.getTaskExtended(id);
+        return { success: 1, task };
     }
 
     @Get("/:id/stages/history/full")
@@ -210,7 +206,7 @@ export class TaskController {
     })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async getStagesWithFullHistory(@Param("id", TaskByIdPipe) id: string) {
-        const task = await this.taskService.findById(id, ["stages", "stages.history"]);
+        const task = await this.taskService.getTaskStagesWithHistory(id);
         return { success: 1, stages: task.stages };
     }
 

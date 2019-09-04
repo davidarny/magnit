@@ -20,6 +20,10 @@ export interface ITaskService {
 
     findById(id: string, relations?: string[]): Promise<Task>;
 
+    getTaskExtended(id: string): Promise<Task>;
+
+    getTaskStagesWithHistory(id: string): Promise<Task>;
+
     deleteById(id: string): Promise<void>;
 
     setTaskAnswers(

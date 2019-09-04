@@ -40,6 +40,7 @@ export interface IStage {
     title: string;
     deadline: string; // ISO time format
     finished: boolean;
+    editable?: boolean;
     __uuid: string; // need for correct rendering
 }
 

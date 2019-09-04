@@ -16,11 +16,11 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
 
     async afterInsert(event: InsertEvent<TaskStage>): Promise<void> {
         const stages = await event.manager.find(TaskStage, {
-            where: { task: event.entity.task },
+            where: { id_task: event.entity.id_task },
         });
         // set all non-finished stages as finished
         // usually it should be only one of the stages
-        await this.finishPreviousStages(stages, event);
+        await this.finishPreviousStages(event.entity, stages, event);
         const nextHistory = new StageHistory({
             description: "Создание этапа",
             stage: event.entity,
@@ -29,17 +29,19 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
     }
 
     private async finishPreviousStages(
+        current: TaskStage,
         stages: TaskStage[],
         event: InsertEvent<TaskStage>,
     ): Promise<void> {
         await Promise.all(
-            stages.map(stage => {
-                if (stage.finished) {
-                    return;
-                }
-                stage.finished = true;
-                return event.manager.save(stage);
-            }),
+            stages
+                .filter(stage => stage.id !== current.id)
+                .map(stage => {
+                    if (stage.finished) {
+                        return;
+                    }
+                    return event.manager.update(TaskStage, stage.id, { finished: true });
+                }),
         );
     }
 }

@@ -93,6 +93,30 @@ export class TaskService implements ITaskService {
     }
 
     @Transactional()
+    async getTaskExtended(id: string) {
+        const task = await this.taskRepository
+            .createQueryBuilder("task")
+            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
+            .where("task.id = :id", { id })
+            .orderBy("stage.created_at", "ASC")
+            .getOne();
+        const templates = await this.templateService.findByTaskId(task.id.toString());
+        return { ...task, templates };
+    }
+
+    @Transactional()
+    async getTaskStagesWithHistory(id: string): Promise<Task> {
+        return this.taskRepository
+            .createQueryBuilder("task")
+            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
+            .leftJoinAndSelect("stage.history", "history", "history.id_stage = stage.id")
+            .where("task.id = :id", { id })
+            .orderBy("stage.created_at", "ASC")
+            .addOrderBy("history.created_at", "ASC")
+            .getOne();
+    }
+
+    @Transactional()
     async deleteById(id: string) {
         await this.taskRepository.delete(id);
     }
@@ -172,7 +196,14 @@ export class TaskService implements ITaskService {
 
     @Transactional()
     async getReport(id: string): Promise<[Task, TaskReportDto]> {
-        const task = await this.findById(id, ["assignments", "stages"]);
+        const task = await this.taskRepository
+            .createQueryBuilder("task")
+            .leftJoinAndSelect("task.assignments", "assignment", "assignment.id_task = :id", { id })
+            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
+            .where("task.id = :id", { id })
+            .orderBy("assignment.created_at", "ASC")
+            .addOrderBy("stage.created_at", "ASC")
+            .getOne();
         const templates = await this.templateService.findByTaskId(task.id.toString());
         const report = new TaskReportDto({
             ..._.omit(task, "assignments"),

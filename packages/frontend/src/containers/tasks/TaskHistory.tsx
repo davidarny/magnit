@@ -7,10 +7,10 @@ import { getFriendlyDate } from "@magnit/services";
 import { Grid, Typography } from "@material-ui/core";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import * as _ from "lodash";
-import { useContext, useEffect, useState } from "react";
-import * as React from "react";
 import { AppContext } from "context";
+import * as _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
 import { getStagesWithFullHistory, IStageResponse } from "services/api/tasks";
 
 interface ITaskHistoryProps {
@@ -25,14 +25,8 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
     useEffect(() => {
         getStagesWithFullHistory(context.courier, taskId)
             .then(response => {
-                // sort stuff
-                // ideally should be done on a server side
-                const nextStages = _.sortBy(response.stages, ["createdAt"]).map(stage => ({
-                    ...stage,
-                    history: _.sortBy(stage.history, ["createdAt"]),
-                }));
-                setFocusedBlockId((_.last(nextStages) || { id: -1 }).id);
-                setStages(nextStages);
+                setFocusedBlockId((_.last(response.stages) || { id: -1 }).id);
+                setStages(response.stages);
             })
             .catch(console.error);
     }, [context.courier, taskId]);

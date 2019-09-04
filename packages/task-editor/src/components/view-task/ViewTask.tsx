@@ -59,7 +59,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         stages.map(stage => ({
             ...stage,
             completed: stage.finished,
-            editable: false,
+            editable: !!stage.editable,
         }));
     const defaultStepsState = [
         {
