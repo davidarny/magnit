@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -6,7 +5,7 @@ import { Checkbox, InputField } from "@magnit/components";
 import { FormControl, FormControlLabel, Grid } from "@material-ui/core";
 import { ETemplateType, ITemplate, TChangeEvent } from "entities";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface IContentSectionProps {
     template: ITemplate;
@@ -15,35 +14,38 @@ interface IContentSectionProps {
     onTemplateChange(template: ITemplate): void;
 }
 
-export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused, ...props }) => {
-    const [templateType, setTemplateType] = useState(ETemplateType.LIGHT);
+export const SectionHead: React.FC<IContentSectionProps> = props => {
+    const { template, focused, onTemplateChange } = props;
+
     const [templateTitle, setTemplateTitle] = useState(template.title);
     const [templateDescription, setTemplateDescription] = useState(template.description);
 
-    function onTemplateTypeChange(event: TChangeEvent, checked: boolean): void {
-        if (checked) {
-            setTemplateType(ETemplateType.COMPLEX);
-        } else {
-            setTemplateType(ETemplateType.LIGHT);
-        }
-    }
+    const onTemplateTypeChangeCallback = useCallback(
+        (event: TChangeEvent, checked: boolean) => {
+            if (checked) {
+                onTemplateChange({ ...template, type: ETemplateType.COMPLEX });
+            } else {
+                onTemplateChange({ ...template, type: ETemplateType.LIGHT });
+            }
+        },
+        [onTemplateChange, template],
+    );
 
-    function onTemplateTitleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    function onTemplateTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
         setTemplateTitle(event.target.value);
     }
 
-    function onTemplateDescriptionChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    const onTemplateTitleBlurCallback = useCallback(() => {
+        onTemplateChange({ ...template, title: templateTitle });
+    }, [onTemplateChange, template, templateTitle]);
+
+    function onTemplateDescriptionChange(event: React.ChangeEvent<HTMLInputElement>) {
         setTemplateDescription(event.target.value);
     }
 
-    useEffect(() => {
-        props.onTemplateChange({
-            ...template,
-            type: templateType,
-            title: templateTitle,
-            description: templateDescription,
-        });
-    }, [templateType, templateTitle, templateDescription]);
+    const onTemplateDescriptionBlurCallback = useCallback(() => {
+        onTemplateChange({ ...template, description: templateDescription });
+    }, [onTemplateChange, template, templateDescription]);
 
     return (
         <Grid container direction="column">
@@ -69,6 +71,7 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                                 },
                             })}
                             onChange={onTemplateTitleChange}
+                            onBlur={onTemplateTitleBlurCallback}
                         />
                     </Grid>
                     <Grid item xs={2}>
@@ -77,8 +80,9 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                                 <FormControlLabel
                                     control={
                                         <Checkbox
+                                            checked={template.type === ETemplateType.COMPLEX}
                                             css={theme => ({ marginRight: theme.spacing() })}
-                                            onChange={onTemplateTypeChange}
+                                            onChange={onTemplateTypeChangeCallback}
                                         />
                                     }
                                     label="Нужна смета"
@@ -110,6 +114,7 @@ export const SectionHead: React.FC<IContentSectionProps> = ({ template, focused,
                         },
                     })}
                     onChange={onTemplateDescriptionChange}
+                    onBlur={onTemplateDescriptionBlurCallback}
                 />
             </Grid>
             <Grid item xs={12}>
