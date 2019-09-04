@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import * as React from "react";
 import { SvgIcon } from "@material-ui/core";
+import * as React from "react";
 
-export const ChangeAssigneIllustration: React.FC = props => {
+export const ChangeAssigneeIllustration: React.FC = props => {
     return (
         <SvgIcon
             width={287}
@@ -269,3 +269,5 @@ export const ChangeAssigneIllustration: React.FC = props => {
         </SvgIcon>
     );
 };
+
+ChangeAssigneeIllustration.displayName = "ChangeAssigneeIllustration";

@@ -171,7 +171,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialState]);
 
-    const onTemplatesChange = useCallback(
+    const onTemplatesChangeCallback = useCallback(
         (uuid: string, event: TChangeEvent): void => {
             const templateId = Number(event.target.value);
             if (documents.some(document => document.__uuid === uuid)) {
@@ -185,7 +185,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         [documents, templates],
     );
 
-    const onEditableChange = useCallback(
+    const onEditableChangeCallback = useCallback(
         (documentId: number, editable: boolean) => {
             if (documents.some(document => document.id === documentId)) {
                 const documentIndex = documents.findIndex(document => document.id === documentId);
@@ -196,7 +196,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         [documents],
     );
 
-    const onAddDocument = useCallback((): void => {
+    const onAddDocumentCallback = useCallback((): void => {
         const nextDocument: IVirtualDocument = {
             id: -1,
             __uuid: uuid(),
@@ -210,7 +210,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         setDocuments([...documents, nextDocument]);
     }, [documents, isViewMode, task]);
 
-    const onAddStage = useCallback(
+    const onAddStageCallback = useCallback(
         (step: IStageStep) => {
             if (!isViewMode(task)) {
                 return;
@@ -225,7 +225,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         [isViewMode, onTaskChange, task],
     );
 
-    const onDeleteStage = useCallback(
+    const onDeleteStageCallback = useCallback(
         (id: number) => {
             if (!isViewMode(task)) {
                 return;
@@ -243,7 +243,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
         [isViewMode, onTaskChange, task],
     );
 
-    const onTaskTitleChange = useCallback(
+    const onTaskTitleChangeCallback = useCallback(
         (title: string) => {
             setTask({ ...task, title });
         },
@@ -252,7 +252,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
 
-    const onDeleteDocument = useCallback(() => {
+    const onDeleteDocumentCallback = useCallback(() => {
         // do not to delete document if only one exists
         if (isCreateMode(task) && documents.length === 1) {
             return;
@@ -277,7 +277,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     {
                         label: "Добавить шаблон",
                         icon: <QuestionIcon />,
-                        action: onAddDocument,
+                        action: onAddDocumentCallback,
                     },
                     {
                         label: "Оставить комментарий",
@@ -287,7 +287,7 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     {
                         label: "Удалить шаблон",
                         icon: <TrashIcon />,
-                        action: onDeleteDocument,
+                        action: onDeleteDocumentCallback,
                     },
                 ]}
             />
@@ -299,8 +299,8 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
-                    onTemplatesChange={onTemplatesChange}
-                    onTaskTitleChange={onTaskTitleChange}
+                    onTemplatesChange={onTemplatesChangeCallback}
+                    onTaskTitleChange={onTaskTitleChangeCallback}
                 />
             )}
             {isViewMode(task) && (
@@ -311,10 +311,11 @@ export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
-                    onEditableChange={onEditableChange}
-                    onAddStage={onAddStage}
-                    onDeleteStage={onDeleteStage}
-                    onTemplatesChange={onTemplatesChange}
+                    onEditableChange={onEditableChangeCallback}
+                    onAddStage={onAddStageCallback}
+                    onDeleteStage={onDeleteStageCallback}
+                    onTemplatesChange={onTemplatesChangeCallback}
+                    onTaskChange={onTaskChange as (task: Partial<IExtendedTask>) => void}
                 />
             )}
         </React.Fragment>

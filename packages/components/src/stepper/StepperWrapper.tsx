@@ -1,8 +1,6 @@
 /** @jsx jsx */
 
-import * as _ from "lodash";
-import { useCallback } from "react";
-import * as React from "react";
+import { jsx } from "@emotion/core";
 import {
     Grid,
     IconButton,
@@ -12,9 +10,10 @@ import {
     Stepper,
     Typography,
 } from "@material-ui/core";
-import { jsx } from "@emotion/core";
-import { InputField } from "fields";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { InputField } from "fields";
+import * as React from "react";
+import { useCallback } from "react";
 
 export interface IStep {
     id: number;
@@ -27,6 +26,8 @@ export interface IStep {
 interface IStepperWrapperProps {
     steps: IStep[];
 
+    onTitleBlur?(id: number): void;
+
     onTitleChange?(id: number, value: string): void;
 
     onStepDelete?(id: number): void;
@@ -34,7 +35,9 @@ interface IStepperWrapperProps {
 
 type TStepperProps = IStepperWrapperProps & Partial<React.ComponentProps<typeof Stepper>>;
 
-export const StepperWrapper: React.FC<TStepperProps> = ({ steps, ...props }) => {
+export const StepperWrapper: React.FC<TStepperProps> = props => {
+    const { steps, onTitleBlur, onTitleChange, onStepDelete } = props;
+
     return (
         <Stepper orientation="vertical">
             {steps.map(({ completed, title, content, editable, id }) => (
@@ -45,29 +48,58 @@ export const StepperWrapper: React.FC<TStepperProps> = ({ steps, ...props }) => 
                     content={content}
                     id={id}
                     title={title}
-                    onTitleChange={props.onTitleChange || _.noop}
-                    onStepDelete={props.onStepDelete || _.noop}
+                    onTitleChange={onTitleChange}
+                    onStepDelete={onStepDelete}
+                    onTitleBlur={onTitleBlur}
                 />
             ))}
         </Stepper>
     );
 };
 
-interface IStepWrapperProps extends IStep {
-    onTitleChange(id: number, value: string): void;
+StepperWrapper.displayName = "StepperWrapper";
 
-    onStepDelete(id: number): void;
+interface IStepWrapperProps extends IStep {
+    onTitleBlur?(id: number): void;
+
+    onTitleChange?(id: number, value: string): void;
+
+    onStepDelete?(id: number): void;
 }
 
 export const StepWrapper: React.FC<IStepWrapperProps> = props => {
-    const { id, completed, content, title, editable, onStepDelete, onTitleChange, ...rest } = props;
+    const {
+        id,
+        completed,
+        content,
+        title,
+        editable,
+        onStepDelete,
+        onTitleChange,
+        onTitleBlur,
+        ...rest
+    } = props;
 
-    const onClick = useCallback(() => onStepDelete(id), [id, onStepDelete]);
+    const onClickCallback = useCallback(() => {
+        if (onStepDelete) {
+            onStepDelete(id);
+        }
+    }, [id, onStepDelete]);
 
-    const onChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => onTitleChange(id, event.target.value),
+    const onChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            if (onTitleChange) {
+                onTitleChange(id, event.target.value);
+            }
+        },
         [id, onTitleChange],
     );
+
+    const onBlurCallback = useCallback(() => {
+        if (onTitleBlur) {
+            onTitleBlur(id);
+        }
+    }, [id, onTitleBlur]);
 
     return (
         <Step {...rest} active={true} completed={completed}>
@@ -90,7 +122,8 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
                                     input: { fontSize: theme.fontSize.larger },
                                 })}
                                 value={title}
-                                onChange={onChange}
+                                onChange={onChangeCallback}
+                                onBlur={onBlurCallback}
                             />
                         </Grid>
                         <Grid item xs>
@@ -98,7 +131,7 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
                                 css={theme => ({
                                     svg: { color: `${theme.colors.gray} !important` },
                                 })}
-                                onClick={onClick}
+                                onClick={onClickCallback}
                             >
                                 <DeleteIcon />
                             </IconButton>
@@ -110,3 +143,5 @@ export const StepWrapper: React.FC<IStepWrapperProps> = props => {
         </Step>
     );
 };
+
+StepWrapper.displayName = "StepWrapper";

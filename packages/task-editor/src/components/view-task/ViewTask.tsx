@@ -26,7 +26,7 @@ import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
-import { ChangeAssigneIllustration } from "./ChangeAssigneIllustration";
+import { ChangeAssigneeIllustration } from "./ChangeAssigneeIllustration";
 
 interface IViewTaskProps {
     task: Partial<IExtendedTask>;
@@ -40,15 +40,17 @@ interface IViewTaskProps {
 
     onDeleteStage?(id: number): void;
 
-    onEditableChange(documentId: number, editable: boolean): void;
+    onTaskChange?(task: Partial<IExtendedTask>): void;
 
-    onTemplatesChange(uuid: string, event: TChangeEvent): void;
+    onEditableChange?(documentId: number, editable: boolean): void;
+
+    onTemplatesChange?(uuid: string, event: TChangeEvent): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [open, setOpen] = useState(false);
     const { service, task, focusedPuzzleId, templateSnapshots, documents, templates } = props;
-    const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange } = props;
+    const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange, onTaskChange } = props;
 
     const { stages } = task;
     const initialStepsState =
@@ -70,26 +72,25 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     ];
     const [steps, setSteps] = useState<IStageStep[]>(initialStepsState || defaultStepsState);
 
-    const prevStages = useRef(_.cloneDeep(stages));
+    const initialStepsSet = useRef(false);
     useEffect(() => {
-        if (!initialStepsState) {
+        if (!initialStepsState || initialStepsSet.current) {
             return;
         }
-        if (!_.isEqual(prevStages, stages) && !_.isEqual(steps, initialStepsState)) {
+        if (!_.isEqual(steps, initialStepsState)) {
+            initialStepsSet.current = true;
             setSteps(initialStepsState);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [stages]);
+    }, [initialStepsState, steps]);
 
     useEffect(() => {
         const diffSteps = steps
             .filter(step => step.title && step.deadline)
             .filter(step => stages && !stages.find(stage => stage.id === step.id));
-        if (!diffSteps.length) {
-            return;
+        if (diffSteps.length) {
+            diffSteps.forEach(step => onAddStage && onAddStage(step));
         }
-        diffSteps.forEach(step => onAddStage && onAddStage(step));
-    }, [steps, stages, onAddStage]);
+    }, [steps, stages, onAddStage, onTaskChange, task]);
 
     function onDialogClose(): void {
         setOpen(false);
@@ -103,7 +104,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         setOpen(false);
     }
 
-    const onAddStep = useCallback((): void => {
+    const onAddStepCallback = useCallback((): void => {
         const last = _.last(steps);
         if (!last) {
             return;
@@ -120,7 +121,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         ]);
     }, [steps]);
 
-    const onChangeStepTitle = useCallback(
+    const onChangeStepTitleCallback = useCallback(
         (id: number, value: string): void => {
             if (steps.some(step => step.id === id)) {
                 const stepIndex = steps.findIndex(step => step.id === id);
@@ -131,7 +132,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         [steps],
     );
 
-    const onChangeStepDate = useCallback(
+    const onChangeStepDateCallback = useCallback(
         (id: number, value: string): void => {
             if (steps.some(step => step.id === id)) {
                 const stepIndex = steps.findIndex(step => step.id === id);
@@ -142,7 +143,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         [steps],
     );
 
-    const onStepDelete = useCallback(
+    const onStepDeleteCallback = useCallback(
         (id: number) => {
             // disallow deleting if only 1 stage present
             if (steps.length < 2) {
@@ -160,12 +161,22 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         [onDeleteStage, steps],
     );
 
-    const onEditableChangeHandler = useCallback(
+    const onEditableChangeCallback = useCallback(
         (documentId: number, editable: boolean) => {
-            onEditableChange(documentId, editable);
+            if (onEditableChange) {
+                onEditableChange(documentId, editable);
+            }
         },
         [onEditableChange],
     );
+
+    const onStepBlurCallback = useCallback(() => {
+        const validSteps = steps.filter(step => step.title && step.deadline);
+        if (validSteps.length && onTaskChange) {
+            const nextStages = _.cloneDeep(steps).map(stage => ({ ...stage, finished: false }));
+            onTaskChange({ ...task, stages: nextStages });
+        }
+    }, [onTaskChange, steps, task]);
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
@@ -193,7 +204,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     <Grid item>
                         <Grid container justify="center" alignItems="center">
                             <Grid item>
-                                <ChangeAssigneIllustration />
+                                <ChangeAssigneeIllustration />
                             </Grid>
                         </Grid>
                     </Grid>
@@ -300,8 +311,9 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                     <Grid item xs>
                         <StepperWrapper
-                            onTitleChange={onChangeStepTitle}
-                            onStepDelete={onStepDelete}
+                            onTitleChange={onChangeStepTitleCallback}
+                            onTitleBlur={onStepBlurCallback}
+                            onStepDelete={onStepDeleteCallback}
                             steps={steps.map(step => ({
                                 id: step.id,
                                 editable: step.editable,
@@ -311,8 +323,9 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                     <DateField
                                         disabled={!step.editable}
                                         onChange={event =>
-                                            onChangeStepDate(step.id, event.target.value)
+                                            onChangeStepDateCallback(step.id, event.target.value)
                                         }
+                                        onBlur={onStepBlurCallback}
                                         value={
                                             !step.editable
                                                 ? getFriendlyDate(new Date(step.deadline))
@@ -322,18 +335,21 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 ),
                             }))}
                         />
-                        <Button
-                            variant="outlined"
-                            scheme="outline"
-                            css={theme => ({
-                                color: theme.colors.primary,
-                                marginLeft: theme.spacing(6),
-                            })}
-                            onClick={onAddStep}
-                        >
-                            <AddIcon />
-                            <Typography>Новый этап</Typography>
-                        </Button>
+                        {![ETaskStatus.IN_PROGRESS, ETaskStatus.COMPLETED].includes(task.status!) &&
+                            !steps.some(step => step.editable) && (
+                                <Button
+                                    variant="outlined"
+                                    scheme="outline"
+                                    css={theme => ({
+                                        color: theme.colors.primary,
+                                        marginLeft: theme.spacing(6),
+                                    })}
+                                    onClick={onAddStepCallback}
+                                >
+                                    <AddIcon />
+                                    <Typography>Новый этап</Typography>
+                                </Button>
+                            )}
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
@@ -346,13 +362,15 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     service={service}
                     templateSnapshots={templateSnapshots}
                     focusedPuzzleId={focusedPuzzleId}
-                    onEditableChange={onEditableChangeHandler}
+                    onEditableChange={onEditableChangeCallback}
                     onTemplateChange={onTemplatesChange}
                 />
             ))}
         </React.Fragment>
     );
 };
+
+ViewTask.displayName = "ViewTask";
 
 interface ITaskDocumentProps {
     documents: IVirtualDocument[];
@@ -362,20 +380,43 @@ interface ITaskDocumentProps {
     templateSnapshots: Map<string, object>;
     templates: Omit<IDocument, "__uuid">[];
 
-    onEditableChange(documentId: number, editable: boolean): void;
+    onEditableChange?(documentId: number, editable: boolean): void;
 
-    onTemplateChange(uuid: string, event: TChangeEvent): void;
+    onTemplateChange?(uuid: string, event: TChangeEvent): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
-    const { templateSnapshots, focusedPuzzleId, service, document, templates, documents } = props;
+    const {
+        templateSnapshots,
+        focusedPuzzleId,
+        service,
+        document,
+        templates,
+        documents,
+        onEditableChange,
+        onTemplateChange,
+    } = props;
 
     const snapshot = templateSnapshots.get(document.id.toString());
     const focused = focusedPuzzleId === document.__uuid;
 
-    function onEditableChange(event: TChangeEvent, checked: boolean) {
-        props.onEditableChange(document.id, checked);
-    }
+    const onEditableChangeCallback = useCallback(
+        (event: TChangeEvent, checked: boolean) => {
+            if (onEditableChange) {
+                onEditableChange(document.id, checked);
+            }
+        },
+        [document.id, onEditableChange],
+    );
+
+    const onTemplateChangeCallback = useCallback(
+        (event: TChangeEvent) => {
+            if (onTemplateChange) {
+                onTemplateChange(document.__uuid, event);
+            }
+        },
+        [document.__uuid, onTemplateChange],
+    );
 
     return (
         <SelectableBlockWrapper
@@ -394,7 +435,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
                         placeholder="Выбрать шаблон"
                         value={document.id === -1 ? "" : document.id}
                         fullWidth
-                        onChange={event => props.onTemplateChange(document.__uuid, event)}
+                        onChange={onTemplateChangeCallback}
                     >
                         {templates
                             .filter(template =>
@@ -424,7 +465,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
                                     <Checkbox
                                         checked={document.editable}
                                         css={theme => ({ marginRight: theme.spacing() })}
-                                        onChange={onEditableChange}
+                                        onChange={onEditableChangeCallback}
                                     />
                                 }
                                 label="Разрешить редактирование"
@@ -440,6 +481,8 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
     );
 };
 
+TaskDocument.displayName = "TaskDocument";
+
 interface IMainInfoProps {
     title: string;
     value: string;
@@ -449,7 +492,8 @@ interface IMainInfoProps {
     onEditableClick?(): void;
 }
 
-const InfoField: React.FC<IMainInfoProps> = ({ title, value, editable, label, ...props }) => {
+const InfoField: React.FC<IMainInfoProps> = props => {
+    const { title, value, editable, label, onEditableClick } = props;
     return (
         <Grid item xs>
             <Typography
@@ -469,10 +513,12 @@ const InfoField: React.FC<IMainInfoProps> = ({ title, value, editable, label, ..
             >
                 {value}
             </Typography>
-            {editable && <ButtonLikeText onClick={props.onEditableClick}>{label}</ButtonLikeText>}
+            {editable && <ButtonLikeText onClick={onEditableClick}>{label}</ButtonLikeText>}
         </Grid>
     );
 };
+
+InfoField.displayName = "InfoField";
 
 function getTitleByStatus(status: ETaskStatus): string {
     return {

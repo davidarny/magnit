@@ -28,17 +28,18 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
         await event.manager.save(nextHistory);
     }
 
-    private async finishPreviousStages(stages, event: InsertEvent<TaskStage>): Promise<void> {
+    private async finishPreviousStages(
+        stages: TaskStage[],
+        event: InsertEvent<TaskStage>,
+    ): Promise<void> {
         await Promise.all(
-            stages
-                .map(history => {
-                    history.finished = true;
-                    if (history.finished) {
-                        return;
-                    }
-                    return event.manager.save(history);
-                })
-                .filter(Boolean),
+            stages.map(stage => {
+                if (stage.finished) {
+                    return;
+                }
+                stage.finished = true;
+                return event.manager.save(stage);
+            }),
         );
     }
 }
