@@ -1,6 +1,7 @@
 import { Test } from "@nestjs/testing";
 import { createMockFrom } from "../../../utils/create-mock.util";
 import { AmqpService } from "../../amqp/services/amqp.service";
+import { ScheduleService } from "../../schedule/services/schedule.service";
 import { Template } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
 import { TaskReportDto } from "../dto/task-report.dto";
@@ -14,6 +15,7 @@ describe("TaskController", () => {
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
+    const scheduleService = createMockFrom(ScheduleService.prototype);
 
     const task: Task = {
         id: 0,
@@ -24,6 +26,7 @@ describe("TaskController", () => {
         stages: [],
         id_assignee: null,
         id_owner: null,
+        notify_before: 3,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
     };
@@ -55,6 +58,10 @@ describe("TaskController", () => {
                 {
                     provide: AmqpService,
                     useValue: amqpService,
+                },
+                {
+                    provide: ScheduleService,
+                    useValue: scheduleService,
                 },
             ],
             controllers: [TaskController],

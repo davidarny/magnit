@@ -11,7 +11,7 @@ import { ITemplateService } from "../../template/interfaces/template.service.int
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
-import { ITaskService } from "../interfaces/task.service.interface";
+import { ITaskService, TTaskWithLastStageAndToken } from "../interfaces/task.service.interface";
 import _ = require("lodash");
 
 @Injectable()
@@ -20,6 +20,23 @@ export class TaskService implements ITaskService {
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
     ) {}
+
+    @Transactional()
+    async findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]> {
+        return await this.taskRepository.query(`
+            SELECT
+                t.*,
+                json_agg(ts.*) ->> json_array_length(json_agg(ts.*)) - 1  as stage,
+                json_agg(pt.token) ->> json_array_length(json_agg(pt.token)) - 1 as token
+            FROM task_stage ts
+            LEFT JOIN task t ON ts.id_task = t.id
+            LEFT JOIN push_token pt ON t.id_assignee = pt.id_user
+            WHERE EXTRACT(day FROM ts.deadline - date(now())) <= t.notify_before
+            AND NOT(ts.finished)
+            GROUP BY t.id, t.created_at, ts.created_at, pt.created_at
+            ORDER BY t.created_at, ts.created_at, pt.created_at
+        `);
+    }
 
     @Transactional()
     async findAll(
@@ -132,62 +149,6 @@ export class TaskService implements ITaskService {
         );
     }
 
-    private getFileName(files: Express.Multer.File[], templatePuzzleId) {
-        return (
-            files.find(file => file.fieldname === templatePuzzleId) || {
-                filename: undefined,
-            }
-        ).filename;
-    }
-
-    private getPuzzleType(puzzle: IPuzzle): string | null {
-        return (_.first(puzzle.puzzles) || { puzzle_type: null }).puzzle_type;
-    }
-
-    private getTemplateIdFromMultipartKey(id: string): string | undefined {
-        return _.first(id.split("_"));
-    }
-
-    private getPuzzleIdFromMultipartKey(id: string): string | undefined {
-        return _.nth(id.split("_"), 1);
-    }
-
-    private getTemplatePuzzleIdsWithoutComments(ids: string[], templateId: string): string[] {
-        return ids.filter(id => id.startsWith(templateId) && !id.includes("comment"));
-    }
-
-    private async ensurePuzzlesSettled(ids: string[]): Promise<void> {
-        // validating here cause pipe cannot get access
-        // to file array and it's keys
-        const promises = ids.map(async id => ({
-            id,
-            result: await this.templateService.findByPuzzleId(id),
-        }));
-        let results: Array<{ id: string; result?: TemplateAnswer }>;
-        try {
-            results = await Promise.all(promises);
-        } catch (error) {
-            throw new CannotSaveAnswersException("Cannot save answers");
-        }
-        for (const result of results) {
-            if (result.result) {
-                throw new CannotSaveDuplicateAnswerException(
-                    `Cannot save duplicate answer with id "${result.id}"`,
-                );
-            }
-        }
-    }
-
-    private groupKeysBy(ids: string[], predicate: (id: string) => string): string[] {
-        return ids.reduce((prev, curr) => {
-            const existing = prev.find(id => id === predicate(curr));
-            if (existing) {
-                return prev;
-            }
-            return [...prev, predicate(curr)];
-        }, []);
-    }
-
     getDescriptionByTransition(
         prevStatus: ETaskStatus,
         nextStatus: ETaskStatus,
@@ -258,5 +219,61 @@ export class TaskService implements ITaskService {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, report.title);
         return XLSX.write(wb, { type: "buffer" });
+    }
+
+    private getFileName(files: Express.Multer.File[], templatePuzzleId) {
+        return (
+            files.find(file => file.fieldname === templatePuzzleId) || {
+                filename: undefined,
+            }
+        ).filename;
+    }
+
+    private getPuzzleType(puzzle: IPuzzle): string | null {
+        return (_.first(puzzle.puzzles) || { puzzle_type: null }).puzzle_type;
+    }
+
+    private getTemplateIdFromMultipartKey(id: string): string | undefined {
+        return _.first(id.split("_"));
+    }
+
+    private getPuzzleIdFromMultipartKey(id: string): string | undefined {
+        return _.nth(id.split("_"), 1);
+    }
+
+    private getTemplatePuzzleIdsWithoutComments(ids: string[], templateId: string): string[] {
+        return ids.filter(id => id.startsWith(templateId) && !id.includes("comment"));
+    }
+
+    private async ensurePuzzlesSettled(ids: string[]): Promise<void> {
+        // validating here cause pipe cannot get access
+        // to file array and it's keys
+        const promises = ids.map(async id => ({
+            id,
+            result: await this.templateService.findByPuzzleId(id),
+        }));
+        let results: Array<{ id: string; result?: TemplateAnswer }>;
+        try {
+            results = await Promise.all(promises);
+        } catch (error) {
+            throw new CannotSaveAnswersException("Cannot save answers");
+        }
+        for (const result of results) {
+            if (result.result) {
+                throw new CannotSaveDuplicateAnswerException(
+                    `Cannot save duplicate answer with id "${result.id}"`,
+                );
+            }
+        }
+    }
+
+    private groupKeysBy(ids: string[], predicate: (id: string) => string): string[] {
+        return ids.reduce((prev, curr) => {
+            const existing = prev.find(id => id === predicate(curr));
+            if (existing) {
+                return prev;
+            }
+            return [...prev, predicate(curr)];
+        }, []);
     }
 }

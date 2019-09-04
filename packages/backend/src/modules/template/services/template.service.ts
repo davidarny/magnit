@@ -63,21 +63,21 @@ export class TemplateService implements ITemplateService {
         return this.templateRepository.query(
             `
             SELECT
-                "template"."id",
-                "template"."title",
-                "template"."description",
-                "template"."sections",
-                "template"."type",
-                "template"."created_at",
-                "template"."updated_at",
-                "template"."version",
-                "template_assignment"."editable",
-                to_jsonb(array_remove(array_agg("template_answer"), NULL)) as "answers"
-            FROM "template_assignment"
-            LEFT JOIN "template" ON "template"."id" = "template_assignment"."id_template"
-            LEFT JOIN "template_answer" on "template"."id" = "template_answer"."id_template"
-            WHERE "template_assignment"."id_task" = $1
-            GROUP BY "template"."id", "template_assignment"."id"
+                t.id,
+                t.title,
+                t.description,
+                t.sections,
+                t.type,
+                t.created_at,
+                t.updated_at,
+                t.version,
+                tas.editable,
+                to_jsonb(array_remove(array_agg(template_answer), NULL)) as answers
+            FROM template_assignment tas
+            LEFT JOIN template t ON t.id = tas.id_template
+            LEFT JOIN template_answer ta on t.id = ta.id_template
+            WHERE tas.id_task = $1
+            GROUP BY t.id, tas.id
         `,
             [id],
         );
@@ -90,10 +90,10 @@ export class TemplateService implements ITemplateService {
         const response = await this.templateRepository.query(
             `
             INSERT INTO
-            "template" ("title", "description", "sections", "type", "created_at", "updated_at")
+            template (title, description, sections, type, created_at, updated_at)
             VALUES
             ($1, $2, jsonb_strip_nulls($3), $4, DEFAULT, DEFAULT)
-            RETURNING "id", "type", "created_at", "updated_at"
+            RETURNING id, type, created_at, updated_at
         `,
             [
                 template.title,

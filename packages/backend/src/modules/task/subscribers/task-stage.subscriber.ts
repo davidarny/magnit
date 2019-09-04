@@ -20,6 +20,15 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
         });
         // set all non-finished stages as finished
         // usually it should be only one of the stages
+        await this.finishPreviousStages(stages, event);
+        const nextHistory = new StageHistory({
+            description: "Создание этапа",
+            stage: event.entity,
+        });
+        await event.manager.save(nextHistory);
+    }
+
+    private async finishPreviousStages(stages, event: InsertEvent<TaskStage>): Promise<void> {
         await Promise.all(
             stages
                 .map(history => {
@@ -31,10 +40,5 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
                 })
                 .filter(Boolean),
         );
-        const nextHistory = new StageHistory({
-            description: "Создание этапа",
-            stage: event.entity,
-        });
-        await event.manager.save(nextHistory);
     }
 }

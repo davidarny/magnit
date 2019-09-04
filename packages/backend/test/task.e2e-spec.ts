@@ -9,6 +9,7 @@ import {
 import { AmqpService } from "../src/modules/amqp/services/amqp.service";
 import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
+import { ScheduleService } from "../src/modules/schedule/services/schedule.service";
 import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
@@ -31,6 +32,7 @@ describe("TaskController (e2e)", () => {
     const taskStageSubscriber = createMockFrom(TaskStageSubscriber.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
+    const scheduleService = createMockFrom(ScheduleService.prototype);
 
     const task: Task = {
         id: 0,
@@ -41,6 +43,7 @@ describe("TaskController (e2e)", () => {
         stages: [],
         id_owner: null,
         id_assignee: null,
+        notify_before: 3,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
     };
@@ -74,6 +77,8 @@ describe("TaskController (e2e)", () => {
             .useValue(pushTokenService)
             .overrideProvider(getRepositoryToken(PushToken))
             .useValue(getMockRepository())
+            .overrideProvider(ScheduleService)
+            .useValue(scheduleService)
             .compile();
 
         app = moduleFixture.createNestApplication();

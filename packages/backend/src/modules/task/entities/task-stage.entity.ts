@@ -4,11 +4,15 @@ import { StageHistory } from "./stage-history.entity";
 import { Task } from "./task.entity";
 
 @Entity("task_stage")
+@Index((stage: TaskStage) => [stage.id_task, stage.created_at, stage.finished, stage.deadline])
 export class TaskStage extends PrimaryBaseEntity<TaskStage> {
     constructor(dto?: DeepPartial<TaskStage>) {
         super();
         this.construct(this, dto);
     }
+
+    @Column()
+    id_task: string;
 
     @Index()
     @ManyToOne(() => Task, task => task.stages)
@@ -21,6 +25,7 @@ export class TaskStage extends PrimaryBaseEntity<TaskStage> {
     @Column("varchar")
     title: string;
 
+    @Index()
     @Column({ type: "boolean", default: false })
     finished: boolean;
 

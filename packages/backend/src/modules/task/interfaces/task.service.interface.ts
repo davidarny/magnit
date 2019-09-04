@@ -1,5 +1,8 @@
 import { TaskReportDto } from "../dto/task-report.dto";
+import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
+
+export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStage };
 
 export interface ITaskService {
     findAll(
@@ -30,4 +33,6 @@ export interface ITaskService {
     getReport(id: string): Promise<[Task, TaskReportDto]>;
 
     getReportBuffer(report: TaskReportDto): Buffer;
+
+    findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]>;
 }
