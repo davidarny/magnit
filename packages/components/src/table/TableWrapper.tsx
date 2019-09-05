@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
+import { ETerminals } from "@magnit/services";
 import {
     Grid,
     IconButton,
@@ -13,11 +14,12 @@ import {
 } from "@material-ui/icons";
 import * as _ from "lodash";
 import * as React from "react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { TableBodyWrapper } from "./TableBodyWrapper";
 import { TableHeader } from "./TableHeader";
 
 export interface ITableDataItem {
+    [key: string]: any;
     selected?: boolean;
 }
 
@@ -32,14 +34,16 @@ interface ITableWrapperProps {
     data: ITableDataItem[];
     initialPage?: number;
     rowsPerPage?: number;
-    showPagination?: boolean;
-    rowHover?: boolean;
+    pagination?: boolean;
+    hover?: boolean;
     selectable?: boolean;
-    allSelected?: boolean;
+    sort?: boolean;
 
     onRowClick?(row: ITableDataItem): void;
 
     onSelectToggle?(selected: boolean): void;
+
+    onRequestSort?(sort: "asc" | "desc", sortBy: string): void;
 
     onRowSelectToggle?(row: ITableDataItem, selected: boolean): void;
 }
@@ -50,14 +54,28 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
         data,
         initialPage = 0,
         rowsPerPage = 10,
-        showPagination = true,
-        rowHover = true,
+        pagination = true,
+        hover = true,
         selectable = false,
-        allSelected = false,
+        sort = false,
     } = props;
-    const { onRowClick, onRowSelectToggle, onSelectToggle } = props;
+    const { onRowClick, onRowSelectToggle, onSelectToggle, onRequestSort } = props;
 
     const [page, setPage] = useState(initialPage);
+    const [order, setOrder] = useState<"asc" | "desc">("asc");
+    const [orderBy, setOrderBy] = useState<string>(ETerminals.EMPTY);
+
+    const onRequestSortCallback = useCallback(
+        (event: React.MouseEvent<unknown>, property: string) => {
+            const isDesc = orderBy === property && order === "desc";
+            setOrder(isDesc ? "asc" : "desc");
+            setOrderBy(property);
+            if (onRequestSort) {
+                onRequestSort(order, orderBy);
+            }
+        },
+        [onRequestSort, order, orderBy],
+    );
 
     function onChangePage(
         event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
@@ -69,25 +87,34 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
         <React.Fragment>
             <Table>
                 <TableHeader
-                    allSelected={allSelected}
+                    numSelected={data.filter(item => item.selected).length}
+                    rowCount={data.length}
                     selectable={selectable}
                     headers={columns}
+                    order={order}
+                    orderBy={orderBy}
                     onSelectToggle={onSelectToggle}
+                    onRequestSort={onRequestSortCallback}
                 />
                 <TableBodyWrapper
                     data={
-                        showPagination
-                            ? data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        pagination
+                            ? sort
+                                ? getSortedData(data, getSortingNumber(order, orderBy)).slice(
+                                      page * rowsPerPage,
+                                      page * rowsPerPage + rowsPerPage,
+                                  )
+                                : data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             : data
                     }
                     selectable={selectable}
                     columns={columns}
-                    hover={rowHover}
+                    hover={hover}
                     onRowClick={onRowClick}
                     onRowSelectToggle={onRowSelectToggle}
                 />
             </Table>
-            {showPagination && (
+            {pagination && (
                 <MaterialTablePagination
                     component="div"
                     count={data.length}
@@ -289,3 +316,30 @@ const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count, to }) =
 };
 
 PaginationLabel.displayName = "PaginationLabel";
+
+function desc<T>(a: T, b: T, orderBy: keyof T) {
+    if (b[orderBy] < a[orderBy]) {
+        return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+        return 1;
+    }
+    return 0;
+}
+
+function getSortedData<T>(array: T[], cmp: (a: T, b: T) => number) {
+    const stabilized = array.map((el, index) => [el, index] as [T, number]);
+    stabilized.sort((a, b) => {
+        const order = cmp(a[0], b[0]);
+        if (order !== 0) return order;
+        return a[1] - b[1];
+    });
+    return stabilized.map(el => el[0]);
+}
+
+function getSortingNumber<K extends string | number | symbol>(
+    order: "asc" | "desc",
+    orderBy: K,
+): (a: { [key in K]: number | string }, b: { [key in K]: number | string }) => number {
+    return order === "desc" ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
+}

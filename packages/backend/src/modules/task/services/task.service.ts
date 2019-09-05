@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, In, Repository } from "typeorm";
+import { FindManyOptions, In, Like, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
@@ -10,6 +10,7 @@ import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
+import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { ITaskService, TTaskWithLastStageAndToken } from "../interfaces/task.service.interface";
 import _ = require("lodash");
@@ -21,7 +22,6 @@ export class TaskService implements ITaskService {
         @Inject(TemplateService) private readonly templateService: ITemplateService,
     ) {}
 
-    @Transactional()
     async findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]> {
         return await this.taskRepository.query(`
             SELECT
@@ -38,10 +38,10 @@ export class TaskService implements ITaskService {
         `);
     }
 
-    @Transactional()
     async findAll(
         offset?: number,
         limit?: number,
+        sortBy?: keyof TaskDto,
         sort?: "ASC" | "DESC",
         status?: ETaskStatus,
         statuses?: ETaskStatus[],
@@ -56,7 +56,7 @@ export class TaskService implements ITaskService {
             options.take = limit;
         }
         if (sort) {
-            options.order = { title: sort };
+            options.order = { [sortBy || "title"]: sort };
         }
         if (status) {
             if (!options.where) {
@@ -74,12 +74,11 @@ export class TaskService implements ITaskService {
             if (!options.where) {
                 options.where = {};
             }
-            Object.assign(options.where, { title });
+            Object.assign(options.where, { title: Like(`%${title}%`) });
         }
         return this.taskRepository.find(options);
     }
 
-    @Transactional()
     async insert(task: Task) {
         // in case if insert() is called with existing task
         // semantics of this methods is about creating new onde
@@ -87,12 +86,10 @@ export class TaskService implements ITaskService {
         return this.taskRepository.save(task);
     }
 
-    @Transactional()
     async findById(id: string, relations: string[] = []) {
         return this.taskRepository.findOne({ where: { id }, relations });
     }
 
-    @Transactional()
     async getTaskExtended(id: string) {
         const task = await this.taskRepository
             .createQueryBuilder("task")
@@ -104,7 +101,6 @@ export class TaskService implements ITaskService {
         return { ...task, templates };
     }
 
-    @Transactional()
     async getTaskStagesWithHistory(id: string): Promise<Task> {
         return this.taskRepository
             .createQueryBuilder("task")
@@ -116,12 +112,10 @@ export class TaskService implements ITaskService {
             .getOne();
     }
 
-    @Transactional()
     async deleteById(id: string) {
         await this.taskRepository.delete(id);
     }
 
-    @Transactional()
     async update(id: string, task: Task): Promise<Task> {
         return this.taskRepository.save({ ...task, id: Number(id) });
     }

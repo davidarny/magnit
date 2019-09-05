@@ -50,8 +50,8 @@ export const ReportStage: React.FC<ITaskStageProps> = props => {
                 <span css={{ fontWeight: 500 }}>Исполнитель:</span> Рукастый Иннокентий Петрович
             </div>
             <TableWrapper
-                rowHover={false}
-                showPagination={false}
+                hover={false}
+                pagination={false}
                 columns={columns}
                 data={transformedTemplateData}
             />

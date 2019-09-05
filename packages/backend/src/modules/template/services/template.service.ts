@@ -19,17 +19,14 @@ export class TemplateService implements ITemplateService {
         private readonly templateAnswerRepository: Repository<TemplateAnswer>,
     ) {}
 
-    @Transactional()
     async findAnswersById(id: string): Promise<TemplateAnswer[]> {
         return this.templateAnswerRepository.find({ where: { id_template: id } });
     }
 
-    @Transactional()
     async findByPuzzleId(id: string): Promise<TemplateAnswer> {
         return this.templateAnswerRepository.findOne({ where: { id_puzzle: id } });
     }
 
-    @Transactional()
     async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
         // TODO: probably need to introduce FindOptionsBuilder
         const options: FindManyOptions<Template> = {};
@@ -52,13 +49,11 @@ export class TemplateService implements ITemplateService {
     }
 
     // TODO: remove this one and handle 404 more accurately
-    @Transactional()
     /** @deprecated */
     async findOneOrFail(id: string) {
         return this.templateRepository.findOneOrFail({ where: { id } });
     }
 
-    @Transactional()
     async findByTaskId(id: string) {
         return this.templateRepository.query(
             `
@@ -138,17 +133,14 @@ export class TemplateService implements ITemplateService {
         return await this.templateRepository.findOne({ id: Number(id) });
     }
 
-    @Transactional()
     async findById(id: string) {
         return this.templateRepository.findOne({ where: { id } });
     }
 
-    @Transactional()
     async deleteById(id: string) {
         await this.templateRepository.delete(id);
     }
 
-    @Transactional()
     async insertAnswerBulk(assets: TemplateAnswer[]) {
         return this.templateAnswerRepository.save(assets);
     }

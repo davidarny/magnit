@@ -9,13 +9,19 @@ import { IColumn } from "./TableWrapper";
 interface ITableHeaderProps {
     selectable?: boolean;
     headers: IColumn[];
-    allSelected?: boolean;
+    order?: "asc" | "desc";
+    orderBy?: string;
+    rowCount?: number;
+    numSelected?: number;
 
     onSelectToggle?(selected: boolean): void;
+
+    onRequestSort?(event: React.MouseEvent<unknown>, property: string): void;
 }
 
 export const TableHeader: React.FC<ITableHeaderProps> = props => {
-    const { headers, selectable = false, onSelectToggle, allSelected = false } = props;
+    const { headers, selectable = false, order, orderBy, rowCount = 0, numSelected = 0 } = props;
+    const { onSelectToggle, onRequestSort } = props;
 
     const onSelectToggleCallback = useCallback(
         (event: unknown, checked: boolean) => {
@@ -29,33 +35,51 @@ export const TableHeader: React.FC<ITableHeaderProps> = props => {
     return (
         <TableHead>
             <TableRow>
-                {headers.map((header, index) => (
-                    <TableCell
-                        key={header.key}
-                        css={theme => ({ borderBottomColor: theme.colors.light })}
-                    >
-                        {selectable && index === 0 && (
-                            <Checkbox
-                                css={({ spacing }) => ({ marginRight: spacing() })}
-                                checked={allSelected}
-                                onChange={onSelectToggleCallback}
-                            />
-                        )}
-                        <TableSortLabel
-                            hideSortIcon={!header.sortable}
-                            css={theme => ({
-                                fontSize: theme.fontSize.sNormal,
-                                lineHeight: 1.5,
-                                fontWeight: 500,
-                                color: theme.colors.secondary,
-                                transition: "0.25s",
-                                ":hover": { color: theme.colors.black },
-                            })}
+                {headers.map((header, index) => {
+                    function onSortClick(event: React.MouseEvent<unknown>) {
+                        if (onRequestSort) {
+                            onRequestSort(event, header.key);
+                        }
+                    }
+
+                    return (
+                        <TableCell
+                            key={header.key}
+                            css={theme => ({ borderBottomColor: theme.colors.light })}
+                            sortDirection={orderBy === header.key ? order : false}
                         >
-                            {header.label}
-                        </TableSortLabel>
-                    </TableCell>
-                ))}
+                            {selectable && index === 0 && (
+                                <Checkbox
+                                    indeterminate={numSelected > 0 && numSelected < rowCount}
+                                    css={({ spacing }) => ({ marginRight: spacing() })}
+                                    checked={
+                                        numSelected !== 0 &&
+                                        rowCount !== 0 &&
+                                        numSelected === rowCount
+                                    }
+                                    onChange={onSelectToggleCallback}
+                                />
+                            )}
+                            <TableSortLabel
+                                active={orderBy === header.key}
+                                direction={order}
+                                hideSortIcon={!header.sortable}
+                                css={theme => ({
+                                    fontSize: theme.fontSize.sNormal,
+                                    lineHeight: 1.5,
+                                    fontWeight: 500,
+                                    color: theme.colors.secondary,
+                                    transitionDuration: "0.25s",
+                                    transitionProperty: "color",
+                                    ":hover": { color: theme.colors.black },
+                                })}
+                                onClick={onSortClick}
+                            >
+                                {header.label}
+                            </TableSortLabel>
+                        </TableCell>
+                    );
+                })}
             </TableRow>
         </TableHead>
     );

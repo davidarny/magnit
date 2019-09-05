@@ -25,12 +25,10 @@ export class PushTokenService implements IPushTokenService {
         }
     }
 
-    @Transactional()
     async getTokensByUserId(id: string): Promise<PushToken[]> {
         return this.pushTokenRepository.find({ where: { id_user: id } });
     }
 
-    @Transactional()
     async save(token: PushToken): Promise<PushToken> {
         return this.pushTokenRepository.save(token);
     }

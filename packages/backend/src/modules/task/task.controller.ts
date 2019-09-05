@@ -75,13 +75,21 @@ export class TaskController {
         )
         query?: FindAllQuery,
     ) {
-        const { offset, limit, sort, statuses, status, title } = {
+        const { offset, limit, sortBy, sort, statuses, status, title } = {
             // need this to correctly handle default values
             // not sure if nest creates them on given query
             ...new FindAllQuery(),
             ...query,
         };
-        const tasks = await this.taskService.findAll(offset, limit, sort, status, statuses, title);
+        const tasks = await this.taskService.findAll(
+            offset,
+            limit,
+            sortBy,
+            sort,
+            status,
+            statuses,
+            title,
+        );
         return { success: 1, total: tasks.length, tasks };
     }
 

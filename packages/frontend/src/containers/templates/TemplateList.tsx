@@ -1,25 +1,25 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { SectionTitle } from "components/section-title";
-import { SectionLayout } from "components/section-layout";
-import { Link, Redirect } from "@reach/router";
 import { Button, IColumn, InputField, TableWrapper } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
-import { EmptyList } from "components/list";
-import { getTemplates } from "services/api/templates";
-import { AppContext } from "context";
-import { Grid, Paper, Typography } from "@material-ui/core";
-import _ from "lodash";
 import { getFriendlyDate } from "@magnit/services";
+import { Grid, Paper, Typography } from "@material-ui/core";
+import { Link, Redirect } from "@reach/router";
+import { EmptyList } from "components/list";
+import { SectionLayout } from "components/section-layout";
+import { SectionTitle } from "components/section-title";
+import { AppContext } from "context";
+import _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
+import { getTemplates } from "services/api/templates";
 
 const columns: IColumn[] = [
-    { key: "title", sortable: true, label: "Название шаблона" },
-    { key: "description", label: "Описание" },
-    { key: "createdAt", label: "Дата создания" },
-    { key: "updatedAt", label: "Дата редактирования" },
+    { key: "title", label: "Название шаблона", sortable: true },
+    { key: "description", label: "Описание", sortable: true },
+    { key: "createdAt", label: "Дата создания", sortable: true },
+    { key: "updatedAt", label: "Дата редактирования", sortable: true },
 ];
 
 export const TemplateList: React.FC = () => {

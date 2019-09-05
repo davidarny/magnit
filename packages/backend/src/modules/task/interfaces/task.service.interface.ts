@@ -1,4 +1,5 @@
 import { TaskReportDto } from "../dto/task-report.dto";
+import { TaskDto } from "../dto/task.dto";
 import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
 
@@ -8,6 +9,7 @@ export interface ITaskService {
     findAll(
         offset?: number,
         limit?: number,
+        sortBy?: keyof TaskDto,
         sort?: "ASC" | "DESC",
         status?: ETaskStatus,
         statuses?: ETaskStatus[],

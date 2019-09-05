@@ -11,7 +11,7 @@ import {
     TabsWrapper,
 } from "@magnit/components";
 import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
-import { ETaskStatus, getFriendlyDate } from "@magnit/services";
+import { ETaskStatus, ETerminals, getFriendlyDate } from "@magnit/services";
 import { Grid, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
@@ -20,7 +20,7 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getTasks, IGetTasksResponse, updateTask } from "services/api";
 
 const tabs: ITab[] = [
@@ -31,15 +31,21 @@ const tabs: ITab[] = [
 ];
 
 const columns: IColumn[] = [
-    { key: "title", label: "Название задания" },
-    { key: "description", label: "Описание задания" },
-    { key: "createdAt", label: "Дата создания" },
-    { key: "updatedAt", label: "Дата последнего обновления" },
+    { key: "title", label: "Название задания", sortable: true },
+    { key: "description", label: "Описание задания", sortable: true },
+    { key: "createdAt", label: "Дата создания", sortable: true },
+    { key: "updatedAt", label: "Дата последнего обновления", sortable: true },
 ];
 
 type TRouteProps = { "*": string };
 
 type TTask = IGetTasksResponse["tasks"][0] & { selected: boolean };
+
+interface IUpdateTaskListOptions {
+    sort?: "asc" | "desc";
+    sortBy?: keyof Omit<TTask, "selected">;
+    title?: string;
+}
 
 export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     const tab = props["*"];
@@ -47,34 +53,45 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     const context = useContext(AppContext);
 
     const [tasks, setTasks] = useState<TTask[]>([]);
-    const [allSelected, setAllSelected] = useState(false);
     const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
+    const [searchQuery, setSearchQuery] = useState<string>(ETerminals.EMPTY);
     const [total, setTotal] = useState(0);
 
     const clearSelectedTasks = useCallback(() => {
-        setAllSelected(false);
         selectedTasks.clear();
         setSelectedTasks(new Map(selectedTasks));
     }, [selectedTasks]);
 
-    const updateTasksList = useCallback(() => {
-        clearSelectedTasks();
-        getTasks(context.courier, getTaskStatusByTab(tab))
-            .then(response =>
-                setTasks(
-                    response.tasks.map(task => ({
-                        ...task,
-                        selected: false,
-                        createdAt: getFriendlyDate(new Date(task.createdAt!), true),
-                        updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
-                    })),
-                ),
+    const updateTasksList = useCallback(
+        ({ sort, sortBy, title }: IUpdateTaskListOptions = {}) => {
+            clearSelectedTasks();
+            // get task by current status
+            // also apply queries
+            getTasks(
+                context.courier,
+                getTaskStatusByTab(tab),
+                (sort || "").toUpperCase() as "ASC" | "DESC",
+                sortBy,
+                title,
             )
-            .catch(console.error);
-        getTasks(context.courier)
-            .then(response => setTotal(response.tasks.length))
-            .catch(console.error);
-    }, [clearSelectedTasks, context.courier, tab]);
+                .then(response =>
+                    setTasks(
+                        response.tasks.map(task => ({
+                            ...task,
+                            selected: false,
+                            createdAt: getFriendlyDate(new Date(task.createdAt!), true),
+                            updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
+                        })),
+                    ),
+                )
+                .catch(console.error);
+            // get total count of all tasks
+            getTasks(context.courier)
+                .then(response => setTotal(response.tasks.length))
+                .catch(console.error);
+        },
+        [clearSelectedTasks, context.courier, tab],
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => updateTasksList(), [context.courier, tab]);
@@ -152,7 +169,6 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     const onSelectToggleCallback = useCallback(
         (selected: boolean) => {
-            setAllSelected(true);
             const nextTasks = tasks.map(task => ({ ...task, selected }));
             setTasks(nextTasks);
             if (selected) {
@@ -163,6 +179,20 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             }
         },
         [clearSelectedTasks, selectedTasks, tasks],
+    );
+
+    const updateTaskListDebounced = useRef(_.debounce(updateTasksList, 150));
+
+    function onSearchQueryChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setSearchQuery(event.target.value);
+        updateTaskListDebounced.current({ title: event.target.value });
+    }
+
+    const onRequestSortCallback = useCallback(
+        (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
+            updateTasksList({ sort, sortBy });
+        },
+        [updateTasksList],
     );
 
     const empty = !total;
@@ -236,6 +266,8 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                         <InputField
                                             placeholder="Поиск ..."
                                             fullWidth
+                                            value={searchQuery}
+                                            onChange={onSearchQueryChange}
                                             css={({ spacing, ...theme }) => ({
                                                 borderRadius: theme.radius(5),
                                                 background: theme.colors.white,
@@ -265,13 +297,13 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                 </Grid>
                                 <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                     <TableWrapper
-                                        allSelected={allSelected}
                                         selectable
                                         columns={columns}
                                         data={tasks}
                                         onRowClick={onRowClick}
                                         onRowSelectToggle={onRowSelectToggleCallback}
                                         onSelectToggle={onSelectToggleCallback}
+                                        onRequestSort={onRequestSortCallback}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
