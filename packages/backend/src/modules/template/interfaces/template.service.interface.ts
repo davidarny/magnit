@@ -9,7 +9,7 @@ export interface ITemplateService {
         title?: string,
     ): Promise<Template[]>;
 
-    findByPuzzleId(id: string): Promise<TemplateAnswer>;
+    findByPuzzleId(taskId: string, puzzleId: string): Promise<TemplateAnswer>;
 
     findOneOrFail(id: string): Promise<Template>;
 

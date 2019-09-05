@@ -23,8 +23,10 @@ export class TemplateService implements ITemplateService {
         return this.templateAnswerRepository.find({ where: { id_template: id } });
     }
 
-    async findByPuzzleId(id: string): Promise<TemplateAnswer> {
-        return this.templateAnswerRepository.findOne({ where: { id_puzzle: id } });
+    async findByPuzzleId(taskId: string, puzzleId: string): Promise<TemplateAnswer> {
+        return this.templateAnswerRepository.findOne({
+            where: { id_task: taskId, id_puzzle: puzzleId },
+        });
     }
 
     async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {

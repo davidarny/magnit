@@ -138,7 +138,7 @@ export class TaskService implements ITaskService {
                 const puzzleIds = this.groupKeysBy(templateIds, id =>
                     this.getPuzzleIdFromMultipartKey(id),
                 );
-                await this.ensurePuzzlesSettled(puzzleIds);
+                await this.ensurePuzzlesSettled(taskId, puzzleIds);
                 // remove id of comment suffix
                 // cause we don't store that separately
                 const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
@@ -280,12 +280,12 @@ export class TaskService implements ITaskService {
         return ids.filter(id => id.startsWith(templateId) && !id.includes("comment"));
     }
 
-    private async ensurePuzzlesSettled(ids: string[]): Promise<void> {
+    private async ensurePuzzlesSettled(taskId: string, puzzleIds: string[]): Promise<void> {
         // validating here cause pipe cannot get access
         // to file array and it's keys
-        const promises = ids.map(async id => ({
-            id,
-            result: await this.templateService.findByPuzzleId(id),
+        const promises = puzzleIds.map(async puzzleId => ({
+            id: puzzleId,
+            result: await this.templateService.findByPuzzleId(taskId, puzzleId),
         }));
         let results: Array<{ id: string; result?: TemplateAnswer }>;
         try {
