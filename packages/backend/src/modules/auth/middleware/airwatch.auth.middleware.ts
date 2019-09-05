@@ -27,6 +27,8 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
             try {
                 req.user = this.tokenManager.decode(token);
                 res.set("X-Access-Token", token);
+                // try to get push tokens
+                await this.setPushTokenIfExists(req.user);
                 return next();
             } catch (error) {
                 let message = 'Invalid "X-Access-Token"';
@@ -39,13 +41,13 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
         if (authorization) {
             const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
             req.user = await this.authService.validateUser(username, password);
-            // try to get push token
-            await this.setPushTokenIfExists(req.user);
             if (!req.user) {
                 throw new UserUnauthorizedException("Cannot authorize user");
             }
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
             res.header("Access-Control-Expose-Headers", "X-Access-Token");
+            // try to get push tokens
+            await this.setPushTokenIfExists(req.user);
             return next();
         }
         res.set("WWW-Authenticate", "Basic");
