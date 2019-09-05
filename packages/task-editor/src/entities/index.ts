@@ -14,6 +14,7 @@ export interface IBaseTask {
     title: string;
     descriptions?: string;
     status: ETaskStatus;
+    notifyBefore?: number;
     updatedAt?: string;
     createdAt?: string;
 }

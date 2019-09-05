@@ -17,6 +17,7 @@ import {
     FormControl,
     FormControlLabel,
     Grid,
+    Menu,
     MenuItem,
     Typography,
 } from "@material-ui/core";
@@ -48,6 +49,7 @@ interface IViewTaskProps {
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
+    const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
     const { service, task, focusedPuzzleId, templateSnapshots, documents, templates } = props;
     const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange, onTaskChange } = props;
@@ -178,10 +180,42 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }, [onTaskChange, steps, task]);
 
+    function onMenuClick(event: React.MouseEvent<HTMLElement>) {
+        setMenuAnchorElement(event.currentTarget);
+    }
+
+    function onMenuClose() {
+        setMenuAnchorElement(null);
+    }
+
+    const onNotifyBeforeChange = useCallback(
+        (notifyBefore: number) => {
+            onMenuClose();
+            if (onTaskChange) {
+                onTaskChange({ ...task, notifyBefore });
+            }
+        },
+        [onTaskChange, task],
+    );
+
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
     return (
         <React.Fragment>
+            <Menu
+                keepMounted
+                open={Boolean(menuAnchorElement)}
+                anchorEl={menuAnchorElement}
+                onClose={onMenuClose}
+            >
+                <MenuItem onClick={() => onNotifyBeforeChange(1)}>за 1 день</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(2)}>за 2 дня</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(3)}>за 2 дня</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(4)}>за 4 дня</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(5)}>за 5 дней</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(6)}>за 6 дней</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(7)}>за 7 дней</MenuItem>
+            </Menu>
             <Dialog
                 onClose={onDialogClose}
                 open={open}
@@ -310,46 +344,74 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Grid>
                     </Grid>
                     <Grid item xs>
-                        <StepperWrapper
-                            onTitleChange={onChangeStepTitleCallback}
-                            onTitleBlur={onStepBlurCallback}
-                            onStepDelete={onStepDeleteCallback}
-                            steps={steps.map(step => ({
-                                id: step.id,
-                                editable: step.editable,
-                                completed: step.completed,
-                                title: step.title,
-                                content: (
-                                    <DateField
-                                        disabled={!step.editable}
-                                        onChange={event =>
-                                            onChangeStepDateCallback(step.id, event.target.value)
-                                        }
-                                        onBlur={onStepBlurCallback}
-                                        value={
-                                            !step.editable
-                                                ? getFriendlyDate(new Date(step.deadline))
-                                                : step.deadline
-                                        }
-                                    />
-                                ),
-                            }))}
-                        />
-                        {![ETaskStatus.IN_PROGRESS, ETaskStatus.COMPLETED].includes(task.status!) &&
-                            !steps.some(step => step.editable) && (
-                                <Button
-                                    variant="outlined"
-                                    scheme="outline"
-                                    css={theme => ({
-                                        color: theme.colors.primary,
-                                        marginLeft: theme.spacing(6),
-                                    })}
-                                    onClick={onAddStepCallback}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <StepperWrapper
+                                    onTitleChange={onChangeStepTitleCallback}
+                                    onTitleBlur={onStepBlurCallback}
+                                    onStepDelete={onStepDeleteCallback}
+                                    steps={steps.map(step => ({
+                                        id: step.id,
+                                        editable: step.editable,
+                                        completed: step.completed,
+                                        title: step.title,
+                                        content: (
+                                            <DateField
+                                                disabled={!step.editable}
+                                                onChange={event =>
+                                                    onChangeStepDateCallback(
+                                                        step.id,
+                                                        event.target.value,
+                                                    )
+                                                }
+                                                onBlur={onStepBlurCallback}
+                                                value={
+                                                    !step.editable
+                                                        ? getFriendlyDate(new Date(step.deadline))
+                                                        : step.deadline
+                                                }
+                                            />
+                                        ),
+                                    }))}
+                                />
+                                {![ETaskStatus.IN_PROGRESS, ETaskStatus.COMPLETED].includes(
+                                    task.status!,
+                                ) &&
+                                    !steps.some(step => step.editable) && (
+                                        <Button
+                                            variant="outlined"
+                                            scheme="outline"
+                                            css={theme => ({
+                                                color: theme.colors.primary,
+                                                marginLeft: theme.spacing(6),
+                                            })}
+                                            onClick={onAddStepCallback}
+                                        >
+                                            <AddIcon />
+                                            <Typography>Новый этап</Typography>
+                                        </Button>
+                                    )}
+                            </Grid>
+                            {task.notifyBefore && (
+                                <Grid
+                                    item
+                                    xs={12}
+                                    css={theme => ({ marginLeft: theme.spacing(6) })}
                                 >
-                                    <AddIcon />
-                                    <Typography>Новый этап</Typography>
-                                </Button>
+                                    <Typography>
+                                        Уведомить исполнителя о наступлении <br /> срока выполнения
+                                        этапа
+                                        <ButtonLikeText
+                                            onClick={onMenuClick}
+                                            css={theme => ({ fontSize: theme.fontSize.normal })}
+                                        >
+                                            &nbsp;за {task.notifyBefore}
+                                            &nbsp;{getNotifySuffix(task.notifyBefore)}
+                                        </ButtonLikeText>
+                                    </Typography>
+                                </Grid>
                             )}
+                        </Grid>
                     </Grid>
                 </Grid>
             </SelectableBlockWrapper>
@@ -536,4 +598,14 @@ function getColorByStatus(theme: any, status: ETaskStatus): string {
         [ETaskStatus.COMPLETED]: theme.colors.green,
         [ETaskStatus.DRAFT]: theme.colors.secondary,
     }[status];
+}
+
+function getNotifySuffix(notifyBefore: number): string {
+    if (notifyBefore === 1) {
+        return "день";
+    }
+    if (notifyBefore > 1 && notifyBefore < 5) {
+        return "дня";
+    }
+    return "дней";
 }
