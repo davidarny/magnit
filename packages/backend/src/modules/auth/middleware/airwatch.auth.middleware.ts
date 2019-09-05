@@ -45,6 +45,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
                 throw new UserUnauthorizedException("Cannot authorize user");
             }
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
+            res.header("Access-Control-Expose-Headers", "X-Access-Token");
             return next();
         }
         res.set("WWW-Authenticate", "Basic");

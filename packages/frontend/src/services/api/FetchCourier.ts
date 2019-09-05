@@ -2,6 +2,8 @@ import _ from "lodash";
 import { ICourier, IMiddleware, TMethod } from "./entities";
 
 export class FetchCourier implements ICourier {
+    private token?: string;
+
     constructor(
         private readonly host: string | undefined,
         private readonly version: string,
@@ -67,11 +69,15 @@ export class FetchCourier implements ICourier {
     }
 
     private async fetch(path: string, method: TMethod, body?: object): Promise<Response> {
-        const base64user = `${process.env.REACT_APP_AIRWATCH_USER}:${process.env.REACT_APP_AIRWATCH_PASSWORD}`;
-        const headers = {
+        const headers: { [key: string]: string } = {
             "Content-Type": "application/json",
-            Authorization: `Basic ${btoa(base64user)}`,
         };
+        if (this.token) {
+            headers["X-Access-Token"] = this.token;
+        } else {
+            const base64user = `${process.env.REACT_APP_AIRWATCH_USER}:${process.env.REACT_APP_AIRWATCH_PASSWORD}`;
+            headers["Authorization"] = `Basic ${btoa(base64user)}`;
+        }
         if (body instanceof FormData) {
             delete headers["Content-Type"];
         }
@@ -80,6 +86,14 @@ export class FetchCourier implements ICourier {
             headers,
             body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null,
         });
+        if (response.headers.has("X-Access-Token")) {
+            this.token = response.headers.get("X-Access-Token") || undefined;
+        }
+        // retry with Authorization header if X-Access-Token has expired
+        if (response.status === 401) {
+            this.token = undefined;
+            return this.fetch(path, method, body);
+        }
         if (!response.ok) {
             throw new Error(response.statusText);
         }
