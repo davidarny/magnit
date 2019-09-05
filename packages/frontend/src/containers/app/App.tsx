@@ -1,15 +1,15 @@
 /** @jsx jsx */
 
 import { css, Global, jsx } from "@emotion/core";
-import React, { useEffect, useRef, useState } from "react";
-import { Sidebar } from "components/sidebar";
 import { Grid } from "@material-ui/core";
 import { RouteComponentProps, Router } from "@reach/router";
-import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { Loading } from "components/loading";
-import _ from "lodash";
-import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware } from "services/api";
+import { Sidebar } from "components/sidebar";
 import { AppContext } from "context";
+import _ from "lodash";
+import React, { useEffect, useRef, useState } from "react";
+import Loadable, { OptionsWithoutRender } from "react-loadable";
+import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware } from "services/api";
 import { JsonParseMiddleware } from "../../services/api/middlewares/JsonParseMiddleware";
 
 // ████████╗ █████╗ ███████╗██╗  ██╗███████╗
@@ -74,7 +74,7 @@ const App: React.FC = () => {
         if (!drawer) {
             return;
         }
-        const drawerFirstChild = _.head(Array.from(drawer.children));
+        const drawerFirstChild = _.head([...drawer.children]);
         if (!drawerFirstChild) {
             return;
         }

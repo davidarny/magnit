@@ -2,20 +2,20 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
-import { ETemplateType, IPuzzle, ISection, ITemplate } from "./entities";
-import uuid from "uuid/v4";
-import { traverse } from "./services/json";
-import _ from "lodash";
 import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
-import { SectionHead } from "./components/section-head";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
-import { SectionWrapper } from "./components/section-wrapper";
 import { EEditorType, EPuzzleType, ETerminals, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
+import _ from "lodash";
+import * as React from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import uuid from "uuid/v4";
+import { SectionHead } from "./components/section-head";
+import { SectionWrapper } from "./components/section-wrapper";
 import { EditorContext, ICache } from "./context";
+import { ETemplateType, IPuzzle, ISection, ITemplate } from "./entities";
+import { traverse } from "./services/json";
 
 interface ITemplateEditorProps {
     initialState?: ITemplate;
@@ -135,7 +135,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             // if adding to to a group
             // then trying to find in which section to add
             if (hasPuzzleType(puzzle) && !whitelist.includes(puzzle.puzzleType)) {
-                const puzzles = Array.from(cache.sections.values());
+                const puzzles = [...cache.sections.values()];
                 const parentSection = puzzles.find(el =>
                     el.puzzles.some(child => child.id === puzzle.id),
                 );
@@ -153,7 +153,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         } else {
             // initially adding to last section
             // if not focused to any
-            let section = _.last(Array.from(cache.sections.values())) as ISection | undefined;
+            let section = _.last([...cache.sections.values()]) as ISection | undefined;
             if (cache.sections.has(focusedPuzzleId)) {
                 section = cache.sections.get(focusedPuzzleId);
             }

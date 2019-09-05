@@ -129,7 +129,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     );
 
     const onBulkRejectClickCallback = useCallback(() => {
-        const tasksToUpdate = Array.from(selectedTasks.values());
+        const tasksToUpdate = [...selectedTasks.values()];
         // allow reject only tasks in IN_PROGRESS state
         if (tasksToUpdate.some(task => task.status !== ETaskStatus.IN_PROGRESS)) {
             return;
@@ -146,7 +146,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     }, [context.courier, selectedTasks, updateTasksList]);
 
     const onBulkCompleteClickCallback = useCallback(() => {
-        const tasksToUpdate = Array.from(selectedTasks.values());
+        const tasksToUpdate = [...selectedTasks.values()];
         // allow complete only tasks in DRAFT & ON_CHECK states
         if (
             tasksToUpdate.some(
