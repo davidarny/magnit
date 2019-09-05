@@ -61,9 +61,9 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
     }
 
     private async setPushTokenIfExists(user: IAuthRequest["user"]): Promise<void> {
-        const pushToken = await this.pushTokenService.getTokenByUserId(user.id);
-        if (pushToken) {
-            user.token = pushToken.token;
+        const pushTokens = await this.pushTokenService.getTokensByUserId(user.id);
+        if (pushTokens) {
+            user.tokens = pushTokens.map(pushToken => pushToken.token);
         }
     }
 }

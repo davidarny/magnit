@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
-export class NonCompatiblePropsException extends HttpException {
-    constructor(message: string) {
+export class CannotSendPushNotificationException extends HttpException {
+    constructor(message) {
         super(
             {
-                errorCode: 4,
+                errorCode: 10,
                 error: "Conflict",
                 message,
                 statusCode: HttpStatus.CONFLICT,

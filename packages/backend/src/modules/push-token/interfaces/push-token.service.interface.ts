@@ -7,5 +7,5 @@ export interface IPushTokenService {
 
     createUniqueToken(token: PushToken): Promise<PushToken>;
 
-    getTokenByUserId(id: string): Promise<PushToken>;
+    getTokensByUserId(id: string): Promise<PushToken[]>;
 }

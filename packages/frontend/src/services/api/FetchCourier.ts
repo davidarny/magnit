@@ -67,7 +67,11 @@ export class FetchCourier implements ICourier {
     }
 
     private async fetch(path: string, method: TMethod, body?: object): Promise<Response> {
-        const headers = { "Content-Type": "application/json" };
+        const base64user = `${process.env.REACT_APP_AIRWATCH_USER}:${process.env.REACT_APP_AIRWATCH_PASSWORD}`;
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${btoa(base64user)}`,
+        };
         if (body instanceof FormData) {
             delete headers["Content-Type"];
         }

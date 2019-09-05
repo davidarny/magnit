@@ -26,8 +26,8 @@ export class PushTokenService implements IPushTokenService {
     }
 
     @Transactional()
-    async getTokenByUserId(id: string): Promise<PushToken> {
-        return this.pushTokenRepository.findOne({ where: { id_user: id } });
+    async getTokensByUserId(id: string): Promise<PushToken[]> {
+        return this.pushTokenRepository.find({ where: { id_user: id } });
     }
 
     @Transactional()

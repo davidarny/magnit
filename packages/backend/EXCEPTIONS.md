@@ -13,3 +13,4 @@
 | 7          | 404              | File Not Found                |                                                      |
 | 8          | 401              | User Unauthorized             |                                                      |
 | 9          | 401              | Invalid Token                 |                                                      |
+| 10         | 409              | Cannot send Push Notification |                                                      |

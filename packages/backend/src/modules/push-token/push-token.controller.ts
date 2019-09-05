@@ -1,5 +1,6 @@
 import { Body, Controller, Inject, Post, Req } from "@nestjs/common";
 import { ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { CannotSendPushNotificationException } from "../../shared/exceptions/cannot-send-push-notification.exception";
 import { IAuthRequest } from "../../shared/interfaces/auth.request.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
@@ -31,13 +32,20 @@ export class PushTokenController {
     @ApiOkResponse({ type: BaseResponse })
     async send(@Body() messagePayloadDto: MessagePayloadDto, @Req() req: IAuthRequest) {
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
-        const pushMessage: IPushMessage = {
-            token: req.user.token,
-            message: messagePayloadDto,
-        };
-        await channel.sendToQueue(
-            AmqpService.PUSH_NOTIFICATION,
-            Buffer.from(JSON.stringify(pushMessage)),
+        if (!req.user.tokens) {
+            throw new CannotSendPushNotificationException("User has no push tokens");
+        }
+        await Promise.all(
+            req.user.tokens.map(async token => {
+                const pushMessage: IPushMessage = {
+                    token,
+                    message: messagePayloadDto,
+                };
+                await channel.sendToQueue(
+                    AmqpService.PUSH_NOTIFICATION,
+                    Buffer.from(JSON.stringify(pushMessage)),
+                );
+            }),
         );
         return { success: 1 };
     }

@@ -57,20 +57,24 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         if (!task.id_assignee) {
             return;
         }
-        const pushToken = await this.pushTokenService.getTokenByUserId(task.id_assignee);
-        if (pushToken) {
+        const pushTokens = await this.pushTokenService.getTokensByUserId(task.id_assignee);
+        if (pushTokens) {
             const channel = await this.amqpService.getAssertedChannelFor(
                 AmqpService.PUSH_NOTIFICATION,
             );
-            const pushMessage: IPushMessage = {
-                token: pushToken.token,
-                message: {
-                    body: `Задание "${task.title}" теперь имеет статут "В работе"`,
-                },
-            };
-            await channel.sendToQueue(
-                AmqpService.PUSH_NOTIFICATION,
-                Buffer.from(JSON.stringify(pushMessage)),
+            await Promise.all(
+                pushTokens.map(async pushToken => {
+                    const pushMessage: IPushMessage = {
+                        token: pushToken.token,
+                        message: {
+                            body: `Задание "${task.title}" теперь имеет статут "В работе"`,
+                        },
+                    };
+                    await channel.sendToQueue(
+                        AmqpService.PUSH_NOTIFICATION,
+                        Buffer.from(JSON.stringify(pushMessage)),
+                    );
+                }),
             );
         }
     }
