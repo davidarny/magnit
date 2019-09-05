@@ -122,20 +122,29 @@ export class TaskService implements ITaskService {
 
     @Transactional()
     async setTaskAnswers(
-        ids: string[],
+        taskId: string,
+        templateIds: string[],
         files: Express.Multer.File[],
         body: { [key: string]: string },
     ) {
+        const task = await this.taskRepository.findOne(taskId);
         // get all template ids in keys
-        const templateIds = this.groupKeysBy(ids, id => this.getTemplateIdFromMultipartKey(id));
+        const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
+            this.getTemplateIdFromMultipartKey(id),
+        );
         await Promise.all(
-            templateIds.map(async templateId => {
+            groupedTemplateIds.map(async templateId => {
                 // group all key with array index suffix
-                const puzzleIds = this.groupKeysBy(ids, id => this.getPuzzleIdFromMultipartKey(id));
+                const puzzleIds = this.groupKeysBy(templateIds, id =>
+                    this.getPuzzleIdFromMultipartKey(id),
+                );
                 await this.ensurePuzzlesSettled(puzzleIds);
                 // remove id of comment suffix
                 // cause we don't store that separately
-                const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(ids, templateId);
+                const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
+                    templateIds,
+                    templateId,
+                );
                 const template = await this.templateService.findById(templateId);
                 const puzzles = await this.templateService.findPuzzlesByIds(templateId, puzzleIds);
                 // collect answers
@@ -155,6 +164,7 @@ export class TaskService implements ITaskService {
                                 id_puzzle: puzzle.id,
                                 answer,
                                 template,
+                                task,
                                 answer_type: type,
                                 // save comment if exists
                                 comment: body[`${templateId}_${puzzleId}_comment`] || null,

@@ -24,6 +24,7 @@ describe("TaskController", () => {
         status: "in_progress" as ETaskStatus,
         assignments: [],
         stages: [],
+        answers: [],
         id_assignee: null,
         id_owner: null,
         notify_before: 3,

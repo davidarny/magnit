@@ -234,12 +234,12 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Puzzle not found" })
     @UseInterceptors(AnyFilesInterceptor())
     async setTemplateAnswers(
-        @Param("task_id", TaskByIdPipe) id: string,
+        @Param("task_id", TaskByIdPipe) taskId: string,
         @UploadedFiles() files: Express.Multer.File[],
         @Body() body: { [key: string]: string },
     ) {
-        const ids = [...files.map(file => file.fieldname), ...Object.keys(body)];
-        await this.taskService.setTaskAnswers(ids, files, body);
+        const templateIds = [...files.map(file => file.fieldname), ...Object.keys(body)];
+        await this.taskService.setTaskAnswers(taskId, templateIds, files, body);
         return { success: 1 };
     }
 

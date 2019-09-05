@@ -1,5 +1,6 @@
 import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
+import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
@@ -42,6 +43,9 @@ export class Task extends PrimaryBaseEntity<Task> {
         cascade: true,
     })
     assignments: TemplateAssignment[];
+
+    @OneToMany(() => TemplateAnswer, template_answer => template_answer.task)
+    answers: TemplateAnswer[];
 
     @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
     stages: TaskStage[];

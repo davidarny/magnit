@@ -1,5 +1,15 @@
-import { Column, DeepPartial, Entity, Generated, Index, JoinColumn, ManyToOne } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    Generated,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    PrimaryColumn,
+} from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
+import { Task } from "../../task/entities/task.entity";
 import { Template } from "./template.entity";
 
 @Entity("template_answer")
@@ -13,22 +23,30 @@ export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
     @Generated("rowid")
     id: number;
 
-    @Column({ primary: true })
-    id_template: string;
+    @PrimaryColumn()
+    id_template: number;
 
     @Index()
     @ManyToOne(() => Template, template => template.answers)
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;
 
+    @PrimaryColumn()
+    id_task: number;
+
     @Index()
-    @Column({ type: "varchar", primary: true })
+    @ManyToOne(() => Task, task => task.answers)
+    @JoinColumn({ name: "id_task", referencedColumnName: "id" })
+    task: Task;
+
+    @Index()
+    @PrimaryColumn({ type: "varchar" })
     id_puzzle: string;
 
     @Column("varchar")
     answer_type: string;
 
-    @Column({ type: "varchar", primary: true })
+    @PrimaryColumn({ type: "varchar" })
     answer: string;
 
     @Column({ type: "text", nullable: true })

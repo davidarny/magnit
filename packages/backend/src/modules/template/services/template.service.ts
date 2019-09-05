@@ -69,10 +69,11 @@ export class TemplateService implements ITemplateService {
                 tas.editable,
                 to_jsonb(array_remove(array_agg(ta), NULL)) as answers
             FROM template_assignment tas
-            LEFT JOIN template t ON t.id = tas.id_template
-            LEFT JOIN template_answer ta on t.id = ta.id_template
+            LEFT JOIN template t ON tas.id_template = t.id
+            LEFT JOIN template_answer ta ON ta.id_template = t.id AND ta.id_task = tas.id_task
             WHERE tas.id_task = $1
             GROUP BY t.id, tas.id
+            ORDER BY t.id, tas.id
         `,
             [id],
         );
@@ -141,8 +142,8 @@ export class TemplateService implements ITemplateService {
         await this.templateRepository.delete(id);
     }
 
-    async insertAnswerBulk(assets: TemplateAnswer[]) {
-        return this.templateAnswerRepository.save(assets);
+    async insertAnswerBulk(answers: TemplateAnswer[]) {
+        return this.templateAnswerRepository.save(answers);
     }
 
     @Transactional()

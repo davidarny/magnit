@@ -29,7 +29,8 @@ export interface ITaskService {
     deleteById(id: string): Promise<void>;
 
     setTaskAnswers(
-        ids: string[],
+        taskId: string,
+        templateIds: string[],
         files: Express.Multer.File[],
         body: { [key: string]: string },
     ): Promise<void>;
