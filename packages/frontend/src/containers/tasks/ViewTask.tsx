@@ -22,9 +22,12 @@ import {
     getTaskExtended,
     getTemplate,
     getTemplates,
+    sendPushToken,
     updateTask,
     updateTemplateAssignment,
 } from "services/api";
+import { SimpleModal } from "../../components/modal";
+import { SendMessageForm } from "../../components/view-task/SendMessageForm";
 
 interface IViewTaskProps {
     taskId: number;
@@ -38,6 +41,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+    const [messageModalOpen, setMessageModalOpen] = useState(false);
     const [task, setTask] = useState<IExtendedTask>({
         id: 0,
         title: ETerminals.EMPTY,
@@ -113,9 +117,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
             return;
-        }
-        if (!error) {
-            setRedirect({ to: "/tasks", trigger: true });
         }
         setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
@@ -235,8 +236,32 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         onMenuClose();
     }
 
+    function onOpenSendMessageModel() {
+        onMenuClose();
+        setMessageModalOpen(true);
+    }
+    function onSubmitSendMessage(title: string, message: string) {
+        sendPushToken(context.courier, { title, body: message })
+            .then(() => {
+                setMessageModalOpen(false);
+                setSnackbar({ open: true, message: "Сообщение успешно отправлено!" });
+            })
+            .catch(() => {
+                setMessageModalOpen(false);
+                setSnackbar({ open: true, message: "Ошибка отправки сообщения!" });
+                setError(true);
+            });
+    }
+
+    function onMessageModalClose() {
+        setMessageModalOpen(false);
+    }
+
     return (
         <SectionLayout>
+            <SimpleModal width={370} open={messageModalOpen} onClose={onMessageModalClose}>
+                <SendMessageForm onSubmit={onSubmitSendMessage} />
+            </SimpleModal>
             {redirect.trigger && <Redirect to={redirect.to} noThrow />}
             <SectionTitle title="Информация о задании">
                 <Grid item>
@@ -274,6 +299,9 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                             {task.status !== ETaskStatus.COMPLETED && (
                                 <MenuItem onClick={onTaskCompleteClick}>Завершить задание</MenuItem>
                             )}
+                            <MenuItem onClick={onOpenSendMessageModel}>
+                                Отправить сообщение
+                            </MenuItem>
                         </Menu>
                     </Grid>
                 </Grid>

@@ -1,19 +1,20 @@
 /** @jsx jsx */
 
-import { Button, InputField } from "@magnit/components";
-import { Send } from "@material-ui/icons";
-import { useCallback, useState } from "react";
-import * as React from "react";
 import { jsx } from "@emotion/core";
+import { Button, InputField } from "@magnit/components";
+import { SendIcon } from "@magnit/icons";
+import { ETerminals } from "@magnit/services";
+import * as React from "react";
+import { useCallback, useState } from "react";
 
-interface IProps {
+interface ISendReportFormProps {
     onSubmit(email: string): void;
 }
 
-export const SendReportForm: React.FC<IProps> = props => {
+export const SendReportForm: React.FC<ISendReportFormProps> = props => {
     const { onSubmit } = props;
 
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState<string>(ETerminals.EMPTY);
 
     const onSubmitCallback = useCallback(
         (event: React.FormEvent) => {
@@ -22,6 +23,10 @@ export const SendReportForm: React.FC<IProps> = props => {
         },
         [email, onSubmit],
     );
+
+    function onEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setEmail(event.target.value);
+    }
 
     return (
         <form action="" onSubmit={onSubmitCallback}>
@@ -34,9 +39,9 @@ export const SendReportForm: React.FC<IProps> = props => {
                 Введите email, на который будет отправлен отчет
             </div>
             <InputField
-                onChange={e => setEmail(e.target.value)}
+                onChange={onEmailChange}
                 value={email}
-                placeholder="Email"
+                placeholder="Эл. почта"
                 autoFocus
                 type="email"
                 required
@@ -49,12 +54,7 @@ export const SendReportForm: React.FC<IProps> = props => {
                     margin: `${theme.spacing(6)} auto 0`,
                 })}
             >
-                <Send
-                    css={theme => ({
-                        fontSize: theme.fontSize.normal,
-                        marginRight: theme.spacing(),
-                    })}
-                />
+                <SendIcon />
                 Отправить
             </Button>
         </form>

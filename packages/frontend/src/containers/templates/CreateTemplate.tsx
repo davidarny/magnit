@@ -6,7 +6,6 @@ import { CheckIcon } from "@magnit/icons";
 import { ETerminals } from "@magnit/services";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
-import { Redirect } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
@@ -25,7 +24,6 @@ export const CreateTemplate: React.FC = () => {
         open: false,
         message: ETerminals.EMPTY as string,
     }); // open/close snackbar
-    const [redirect, setRedirect] = useState(false);
 
     function onTemplateChange(template: object) {
         setTemplate(_.cloneDeep(template));
@@ -34,9 +32,6 @@ export const CreateTemplate: React.FC = () => {
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
             return;
-        }
-        if (!error) {
-            setRedirect(true);
         }
         setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
@@ -65,7 +60,6 @@ export const CreateTemplate: React.FC = () => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to="/templates" noThrow />}
             <SectionTitle title="Создание шаблона">
                 <Grid item>
                     <Button

@@ -6,7 +6,6 @@ import { CheckIcon } from "@magnit/icons";
 import { ETerminals } from "@magnit/services";
 import { ITemplate, TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
-import { Redirect } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
@@ -28,7 +27,6 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
         open: false,
         message: ETerminals.EMPTY as string,
     }); // open/close snackbar
-    const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
         getTemplate(context.courier, templateId)
@@ -43,9 +41,6 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
             return;
-        }
-        if (!error) {
-            setRedirect(true);
         }
         setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
@@ -74,7 +69,6 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to="/templates" noThrow />}
             <SectionTitle title="Редактирование шаблона">
                 <Grid item>
                     <Button
@@ -93,9 +87,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
-                    opacity: snackbar.open ? 0.5 : 1,
                     transition: "opacity 0.3s ease-in-out",
-                    pointerEvents: snackbar.open ? "none" : "initial",
                 })}
             >
                 {!_.isEmpty(template) && (

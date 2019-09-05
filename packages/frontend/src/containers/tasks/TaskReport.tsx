@@ -6,10 +6,10 @@ import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { SendReportForm, ReportHeader, ReportStage } from "components/task-report";
-import { useContext, useEffect, useState } from "react";
-import * as React from "react";
+import { ReportHeader, ReportStage, SendReportForm } from "components/task-report";
 import { AppContext } from "context";
+import * as React from "react";
+import { useContext, useEffect, useState } from "react";
 import { getTaskReport, IReportResponse } from "services/api/tasks";
 import { VerticalStepper } from "../../components/vertical-stepper";
 
@@ -20,7 +20,7 @@ interface ITaskReportProps {
 export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
-    const [sendReportModal, setSendReportModal] = useState(false);
+    const [reportModalOpen, setReportModalOpen] = useState(false);
     const [report, setReport] = useState<IReportResponse | null>(null);
     const context = useContext(AppContext);
 
@@ -38,20 +38,20 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     }
     function onOpenSendReportMenuItem() {
         onMenuClose();
-        setSendReportModal(true);
+        setReportModalOpen(true);
     }
     function onSubmitSendReport(email: string) {
-        // TODO: send report to email
+        setReportModalOpen(false);
     }
 
     function onPopupClose() {
-        setSendReportModal(false);
+        setReportModalOpen(false);
     }
 
     return (
         <SectionLayout>
             {/* send report popup */}
-            <SimpleModal width={370} open={sendReportModal} onClose={onPopupClose}>
+            <SimpleModal width={370} open={reportModalOpen} onClose={onPopupClose}>
                 <SendReportForm onSubmit={onSubmitSendReport} />
             </SimpleModal>
 

@@ -7,7 +7,6 @@ import { ETaskStatus, ETerminals } from "@magnit/services";
 import { ITask, TaskEditor } from "@magnit/task-editor";
 import { ITemplate } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
-import { Redirect } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
@@ -31,7 +30,6 @@ export const CreateTask: React.FC = () => {
         stages: [],
         status: ETaskStatus.DRAFT,
     });
-    const [redirect, setRedirect] = useState(false);
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -62,9 +60,6 @@ export const CreateTask: React.FC = () => {
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
             return;
-        }
-        if (!error) {
-            setRedirect(true);
         }
         setSnackbar({ open: false, message: ETerminals.EMPTY });
         // wait till animation ends
@@ -101,7 +96,6 @@ export const CreateTask: React.FC = () => {
 
     return (
         <SectionLayout>
-            {redirect && <Redirect to="/tasks" noThrow />}
             <SectionTitle title="Создание задания">
                 <Grid item>
                     <Button
@@ -121,9 +115,7 @@ export const CreateTask: React.FC = () => {
                     maxWidth: theme.maxTemplateWidth,
                     margin: theme.spacing(4),
                     position: "relative",
-                    opacity: snackbar.open ? 0.5 : 1,
                     transition: "opacity 0.3s ease-in-out",
-                    pointerEvents: snackbar.open ? "none" : "initial",
                 })}
             >
                 <TaskEditor<ITask>

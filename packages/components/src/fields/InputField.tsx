@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { TextField } from "@material-ui/core";
 import { jsx } from "@emotion/core";
+import { TextField } from "@material-ui/core";
+import * as React from "react";
 
 export interface IInputField {
     simple?: boolean;
@@ -10,14 +10,15 @@ export interface IInputField {
 }
 
 export const InputField: React.FC<IInputField & React.ComponentProps<typeof TextField>> = props => {
-    const { fullWidth, placeholder, defaultValue, simple, ...rest } = props;
+    const { fullWidth, placeholder, defaultValue, simple, multiline = false, ...rest } = props;
     return (
         <TextField
             fullWidth={fullWidth}
             placeholder={placeholder}
             defaultValue={defaultValue}
             css={theme => ({
-                height: theme.spacing(6),
+                // handle text-area
+                ...(!multiline ? { height: theme.spacing(6) } : { minHeight: theme.spacing(6) }),
                 cursor: "pointer",
                 input: {
                     boxSizing: "border-box",
@@ -25,7 +26,10 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                     height: "100%",
                 },
                 div: {
-                    height: theme.spacing(6),
+                    // handle text-area
+                    ...(!multiline
+                        ? { height: theme.spacing(6) }
+                        : { minHeight: theme.spacing(6) }),
                     ":before": {
                         borderBottom: simple
                             ? "none !important"
@@ -38,6 +42,7 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
                     },
                 },
             })}
+            multiline={multiline}
             {...rest}
         />
     );

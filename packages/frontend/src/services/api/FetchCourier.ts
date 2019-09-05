@@ -1,6 +1,5 @@
-import { ICourier, TMethod } from "./entities";
-import { IMiddleware } from "./entities";
 import _ from "lodash";
+import { ICourier, IMiddleware, TMethod } from "./entities";
 
 export class FetchCourier implements ICourier {
     constructor(
@@ -72,10 +71,14 @@ export class FetchCourier implements ICourier {
         if (body instanceof FormData) {
             delete headers["Content-Type"];
         }
-        return fetch(`${this.host}/${this.version}/${path}`, {
+        const response = await fetch(`${this.host}/${this.version}/${path}`, {
             method,
             headers,
             body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null,
         });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response;
     }
 }
