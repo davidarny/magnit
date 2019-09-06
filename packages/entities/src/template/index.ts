@@ -1,10 +1,11 @@
-import { EValidationType } from "./EValidationType";
-import { EOperatorType } from "./EOperatorType";
-import { EConditionType } from "./EConditionType";
-import { EActionType } from "./EActionType";
-import { EPuzzleType } from "@magnit/services";
-import * as React from "react";
-import { ETemplateType } from "./ETemplateType";
+import {
+    EActionType,
+    EConditionType,
+    EOperatorType,
+    EPuzzleType,
+    ETemplateType,
+    EValidationType,
+} from "enums";
 
 interface ITitled {
     title: string;
@@ -79,16 +80,3 @@ export interface ISpecificPuzzleProps {
 export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {
     focused: boolean;
 }
-
-interface TChangeParam {
-    name?: string;
-    value: unknown;
-}
-
-export type TChangeEvent = React.ChangeEvent<TChangeParam>;
-
-export * from "./EValidationType";
-export * from "./EOperatorType";
-export * from "./EConditionType";
-export * from "./EActionType";
-export * from "./ETemplateType";

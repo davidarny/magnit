@@ -1,12 +1,11 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { SelectableBlockWrapper } from "@magnit/components";
-import { SectionView } from "components/section-view";
 import { jsx } from "@emotion/core";
-import { ISection, ITemplate } from "entities";
+import { SelectableBlockWrapper } from "@magnit/components";
+import { EPuzzleType, ISection, ITemplate } from "@magnit/entities";
 import { SectionContent } from "components/section-content";
-import { EPuzzleType } from "@magnit/services";
+import { SectionView } from "components/section-view";
+import * as React from "react";
 
 interface ITemplateSectionProps {
     template: ITemplate;

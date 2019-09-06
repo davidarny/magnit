@@ -1,13 +1,18 @@
+import { IPuzzle, IValidation } from "@magnit/entities";
 import * as React from "react";
 import { IService, IServiceOptions } from "./IService";
-import { IPuzzle, IValidation, TChangeEvent } from "entities";
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export interface IRightHandPuzzleBuilder {
     setRightHandPuzzleChangeHandler(
-        handler: (event: TChangeEvent) => void,
+        handler: (event: TSelectChangeEvent) => void,
     ): IRightHandPuzzleBuilder;
 
-    setValueChangeHandler(handler: (event: TChangeEvent) => void): IRightHandPuzzleBuilder;
+    setValueChangeHandler(handler: (event: TSelectChangeEvent) => void): IRightHandPuzzleBuilder;
 
     setValueBlurHandler(handler: () => void): IRightHandPuzzleBuilder;
 

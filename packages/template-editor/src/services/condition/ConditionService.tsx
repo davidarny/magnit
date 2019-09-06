@@ -1,17 +1,21 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
+import { InputField, SelectField } from "@magnit/components";
+import { EActionType, EPuzzleType, ETerminals, IPuzzle } from "@magnit/entities";
+import { MenuItem } from "@material-ui/core";
 import * as React from "react";
 import {
     IAnswerPuzzleBuilder,
     IConditionsService,
     IConditionsServiceOptions,
 } from "./IConditionsService";
-import { EActionType, IPuzzle, TChangeEvent } from "entities";
-import { MenuItem } from "@material-ui/core";
-import { InputField, SelectField } from "@magnit/components";
 import { ServiceImpl } from "./ServiceImpl";
-import { EPuzzleType, ETerminals } from "@magnit/services";
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export class ConditionService extends ServiceImpl implements IConditionsService {
     constructor(protected readonly options: IConditionsServiceOptions) {
@@ -75,8 +79,8 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
     getAnswerPuzzle(answers: IPuzzle[], questions: IPuzzle[]): IAnswerPuzzleBuilder {
         const self = this;
         return new (class implements IAnswerPuzzleBuilder {
-            private onAnswerPuzzleChange?: (event: TChangeEvent) => void;
-            private onValueChange?: (event: TChangeEvent) => void;
+            private onAnswerPuzzleChange?: (event: TSelectChangeEvent) => void;
+            private onValueChange?: (event: TSelectChangeEvent) => void;
             private onValueBlur?: () => void;
 
             build(): React.ReactNode {
@@ -139,13 +143,15 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
             }
 
             setAnswerPuzzleChangeHandler(
-                handler: (event: TChangeEvent) => void,
+                handler: (event: TSelectChangeEvent) => void,
             ): IAnswerPuzzleBuilder {
                 this.onAnswerPuzzleChange = handler;
                 return this;
             }
 
-            setValueChangeHandler(handler: (event: TChangeEvent) => void): IAnswerPuzzleBuilder {
+            setValueChangeHandler(
+                handler: (event: TSelectChangeEvent) => void,
+            ): IAnswerPuzzleBuilder {
                 this.onValueChange = handler;
                 return this;
             }

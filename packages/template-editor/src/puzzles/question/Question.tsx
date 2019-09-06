@@ -2,6 +2,7 @@
 
 import { css, jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
+import { EPuzzleType, ETerminals, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -12,9 +13,7 @@ import {
     TextFieldIcon,
     UploadFilesIcon,
 } from "@magnit/icons";
-import { EPuzzleType, ETerminals } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -39,6 +38,10 @@ const answerMenuItems = [
     { label: "Справочное поле", type: EPuzzleType.REFERENCE_ANSWER, icon: ReferenceFieldIcon },
 ];
 
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
     const { index: index1, title, template, id, focused } = props;
     const { onTemplateChange } = props;
@@ -145,11 +148,11 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => onTemplateChangeCallback(), [answersType, focused]);
 
-    function onAnswerTypeChange(event: TChangeEvent): void {
+    function onAnswerTypeChange(event: TSelectChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
     }
 
-    function onQuestionTitleChange(event: TChangeEvent): void {
+    function onQuestionTitleChange(event: TSelectChangeEvent): void {
         setQuestionTitle(event.target.value as string);
     }
 

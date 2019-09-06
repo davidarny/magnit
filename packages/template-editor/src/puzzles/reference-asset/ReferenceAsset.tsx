@@ -1,15 +1,14 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import * as React from "react";
-import { IFocusedPuzzleProps, IPuzzle } from "entities";
-import { Grid, Typography } from "@material-ui/core";
-import { AddIcon } from "@magnit/icons";
 import { Fab } from "@magnit/components";
+import { ETerminals, IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
+import { AddIcon } from "@magnit/icons";
+import { Grid, Typography } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
-import { useCallback, useRef } from "react";
 import _ from "lodash";
-import { ETerminals } from "@magnit/services";
+import * as React from "react";
+import { useCallback, useRef } from "react";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
     title: string;

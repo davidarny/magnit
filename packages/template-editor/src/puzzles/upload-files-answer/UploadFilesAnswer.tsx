@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import * as React from "react";
-import { Grid, Typography } from "@material-ui/core";
-import { IFocusedPuzzleProps } from "entities";
 import { Fab } from "@magnit/components";
+import { IFocusedPuzzleProps } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
+import { Grid, Typography } from "@material-ui/core";
+import * as React from "react";
 
 export const UploadFilesAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) => {
     return (

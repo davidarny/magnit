@@ -24,6 +24,7 @@
     "dependencies": {
         "@emotion/core": "^10.0.16",
         "@magnit/components": "^0.1.0",
+        "@magnit/entities": "^0.1.0",
         "@magnit/icons": "^0.1.0",
         "@magnit/services": "^0.1.0",
         "@magnit/task-editor": "^0.1.0",

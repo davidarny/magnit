@@ -2,9 +2,9 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
+import { ETerminals, ITemplate } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
-import { ETerminals } from "@magnit/services";
-import { ITemplate, TemplateEditor } from "@magnit/template-editor";
+import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";

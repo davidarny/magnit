@@ -2,23 +2,23 @@
 
 import { jsx } from "@emotion/core";
 import { EditorToolbar } from "@magnit/components";
-import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
-import { EEditorType, ETerminals, getEditorService } from "@magnit/services";
-import _ from "lodash";
-import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import uuid from "uuid/v4";
-import { CreateTask } from "./components/create-task";
-import { ViewTask } from "./components/view-task";
 import {
+    ETerminals,
     IDocument,
     IExtendedTask,
     IStageStep,
     ITask,
     IVirtualDocument,
     IWithAnswers,
-    TChangeEvent,
-} from "./entities";
+} from "@magnit/entities";
+import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
+import { EEditorType, getEditorService } from "@magnit/services";
+import _ from "lodash";
+import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import uuid from "uuid/v4";
+import { CreateTask } from "./components/create-task";
+import { ViewTask } from "./components/view-task";
 
 type TAnyTask = ITask | IExtendedTask;
 
@@ -29,6 +29,11 @@ interface ITaskEditorProps<T extends TAnyTask> {
 
     onTaskChange?(task: Partial<T>): void;
 }
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const { templates, initialState, variant, onTaskChange } = props;
@@ -173,7 +178,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     }, [initialState]);
 
     const onTemplatesChangeCallback = useCallback(
-        (uuid: string, event: TChangeEvent): void => {
+        (uuid: string, event: TSelectChangeEvent): void => {
             const templateId = Number(event.target.value);
             if (documents.some(document => document.__uuid === uuid)) {
                 const templateIndex = templates.findIndex(template => template.id === templateId);

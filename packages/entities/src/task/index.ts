@@ -1,5 +1,4 @@
-import { ETaskStatus } from "@magnit/services";
-import * as React from "react";
+import { ETaskStatus } from "enums";
 
 export interface IStageStep {
     id: number;
@@ -47,10 +46,6 @@ export interface IStage {
     editable?: boolean;
 }
 
-export interface IRenderStage extends IStage {
-    __uuid: string; // need for correct rendering
-}
-
 export interface IAnswer {
     answer: string;
     answerType: "string" | "number";
@@ -72,10 +67,3 @@ export interface IExtendedTask extends IBaseTask {
     templates: Array<IDocument & IWithAnswers>;
     stages: IStage[];
 }
-
-interface TChangeParam {
-    name?: string;
-    value: unknown;
-}
-
-export type TChangeEvent = React.ChangeEvent<TChangeParam>;

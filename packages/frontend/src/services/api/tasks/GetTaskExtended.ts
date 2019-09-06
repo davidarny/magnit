@@ -1,4 +1,4 @@
-import { IExtendedTask } from "@magnit/task-editor";
+import { IExtendedTask } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 
 export interface IGetTaskExtendedResponse extends IResponse {

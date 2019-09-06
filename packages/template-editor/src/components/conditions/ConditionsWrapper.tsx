@@ -1,14 +1,13 @@
 /** @jsx jsx */
 
+import { jsx } from "@emotion/core";
+import { EPuzzleType, ICondition, IValidation } from "@magnit/entities";
+import { Grid, Tab, Tabs } from "@material-ui/core";
+import { EditorContext } from "context";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
-import { jsx } from "@emotion/core";
-import { EditorContext } from "context";
 import { Conditions } from "./Conditions";
 import { Validations } from "./Validations";
-import { EPuzzleType } from "@magnit/services";
-import { Grid, Tab, Tabs } from "@material-ui/core";
-import { ICondition, IValidation } from "entities";
 
 interface IContentConditionsProps {
     puzzleId: string;
@@ -27,7 +26,7 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
 
     const { puzzleId, focused, puzzleType, answerType, alwaysVisible = false } = props;
 
-    function onTabChange(event: React.ChangeEvent<{}>, nextTab: number): void {
+    function onTabChange(event: React.ChangeEvent<unknown>, nextTab: number): void {
         setTab(nextTab);
     }
 

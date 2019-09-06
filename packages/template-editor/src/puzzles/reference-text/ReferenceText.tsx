@@ -2,13 +2,12 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import * as React from "react";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "entities";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import { Grid, TextField } from "@material-ui/core";
-import { useState } from "react";
-import { useCallback } from "react";
-import { traverse } from "services/json";
 import _ from "lodash";
+import * as React from "react";
+import { useCallback, useState } from "react";
+import { traverse } from "services/json";
 
 interface IReferenceTextProps extends IFocusedPuzzleProps {
     template: ITemplate;

@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { ISpecificPuzzleProps, ITemplate } from "entities";
-import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
+import { ISpecificPuzzleProps, ITemplate } from "@magnit/entities";
+import { Grid, Typography } from "@material-ui/core";
+import * as React from "react";
+import { useEffect, useState } from "react";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     id: string;

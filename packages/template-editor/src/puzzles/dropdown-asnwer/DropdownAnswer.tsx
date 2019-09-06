@@ -2,9 +2,9 @@
 
 import { css, jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import { Grid, IconButton, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -23,6 +23,11 @@ interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
 
     onDeleteDropdownButton(id: string): void;
 }
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
     const { focused, template, addDropdownButton, index, id, title } = props;
@@ -47,7 +52,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => onTemplateChangeCallback(), [focused]);
 
-    function onLabelChange(event: TChangeEvent): void {
+    function onLabelChange(event: TSelectChangeEvent): void {
         setLabel(event.target.value as string);
     }
 

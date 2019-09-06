@@ -1,10 +1,9 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
+import { EPuzzleType, IAnswer } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
-import { EPuzzleType } from "@magnit/services";
 import { Grid, Typography } from "@material-ui/core";
-import { IAnswer } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { getPuzzleFactory } from "services/item";

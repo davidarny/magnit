@@ -1,4 +1,4 @@
-import { IBaseTask } from "@magnit/task-editor";
+import { IBaseTask } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 
 export interface ICreateTaskResponse extends IResponse {

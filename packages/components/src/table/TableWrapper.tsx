@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import { ETerminals } from "@magnit/services";
+import { ETerminals } from "@magnit/entities";
 import {
     Grid,
     IconButton,

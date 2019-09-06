@@ -2,9 +2,9 @@
 
 import { css, jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
+import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
@@ -24,13 +24,18 @@ interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     onDeleteCheckboxButton(id: string): void;
 }
 
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
+
 export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
     const { focused, template, index, addCheckboxButton, id, title } = props;
     const { onTemplateChange, onAddCheckboxButton, onDeleteCheckboxButton } = props;
 
     const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
 
-    function onLabelChange(event: TChangeEvent): void {
+    function onLabelChange(event: TSelectChangeEvent): void {
         setLabel(event.target.value as string);
     }
 

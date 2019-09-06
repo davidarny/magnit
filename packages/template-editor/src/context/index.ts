@@ -1,4 +1,4 @@
-import { IPuzzle, ISection, ITemplate } from "entities";
+import { IPuzzle, ISection, ITemplate } from "@magnit/entities";
 import * as React from "react";
 
 export interface ICache {

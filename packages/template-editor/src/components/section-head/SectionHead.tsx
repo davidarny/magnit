@@ -2,8 +2,8 @@
 
 import { jsx } from "@emotion/core";
 import { Checkbox, InputField } from "@magnit/components";
+import { ETemplateType, ITemplate } from "@magnit/entities";
 import { FormControl, FormControlLabel, Grid } from "@material-ui/core";
-import { ETemplateType, ITemplate, TChangeEvent } from "entities";
 import * as React from "react";
 import { useCallback, useState } from "react";
 
@@ -14,6 +14,11 @@ interface IContentSectionProps {
     onTemplateChange(template: ITemplate): void;
 }
 
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
+
 export const SectionHead: React.FC<IContentSectionProps> = props => {
     const { template, focused, onTemplateChange } = props;
 
@@ -21,7 +26,7 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
     const [templateDescription, setTemplateDescription] = useState(template.description);
 
     const onTemplateTypeChangeCallback = useCallback(
-        (event: TChangeEvent, checked: boolean) => {
+        (event: TSelectChangeEvent, checked: boolean) => {
             if (checked) {
                 onTemplateChange({ ...template, type: ETemplateType.COMPLEX });
             } else {

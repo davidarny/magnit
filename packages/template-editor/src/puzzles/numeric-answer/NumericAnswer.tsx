@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { Grid } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { IFocusedPuzzleProps } from "entities";
 import { InputField } from "@magnit/components";
+import { IFocusedPuzzleProps } from "@magnit/entities";
+import { Grid } from "@material-ui/core";
+import * as React from "react";
 
 export const NumericAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) => {
     return (

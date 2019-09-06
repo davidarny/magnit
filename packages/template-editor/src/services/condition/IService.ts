@@ -1,4 +1,4 @@
-import { EConditionType } from "entities";
+import { EConditionType } from "@magnit/entities";
 
 export interface IService {
     getConditionLiteral(): string;

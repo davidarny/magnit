@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType } from "@magnit/services";
+import { EPuzzleType } from "@magnit/entities";
 import { CheckboxAnswerFactory, DropdownAnswerFactory, RadioAnswerFactory } from "puzzles";
 import * as React from "react";
 

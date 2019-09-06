@@ -1,13 +1,12 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { SelectableBlockWrapper } from "@magnit/components";
 import { jsx } from "@emotion/core";
-import { IPuzzle } from "entities";
-import { EPuzzleType } from "@magnit/services";
-import { ItemFactory } from "components/item-factory";
+import { SelectableBlockWrapper } from "@magnit/components";
+import { EPuzzleType, IPuzzle } from "@magnit/entities";
 import { ConditionsWrapper } from "components/conditions";
+import { ItemFactory } from "components/item-factory";
 import _ from "lodash";
+import * as React from "react";
 
 interface IGroupOfItemsProps {
     index: number;

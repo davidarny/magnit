@@ -1,9 +1,7 @@
 /** @jsx jsx */
 
-import * as React from "react";
 import { jsx } from "@emotion/core";
-import { EPuzzleType } from "@magnit/services";
-import { IPuzzle } from "entities";
+import { EPuzzleType, IPuzzle } from "@magnit/entities";
 import {
     CheckboxAnswerFactory,
     DateAnswerFactory,
@@ -17,6 +15,7 @@ import {
     TextAnswerFactory,
     UploadFilesAnswerFactory,
 } from "puzzles";
+import * as React from "react";
 
 export interface IPuzzleFactory {
     create(params: IPuzzleFactoryProps): React.ReactNode;

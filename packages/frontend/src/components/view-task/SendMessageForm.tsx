@@ -2,8 +2,8 @@
 
 import { jsx } from "@emotion/core";
 import { Button, InputField } from "@magnit/components";
+import { ETerminals } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
-import { ETerminals } from "@magnit/services";
 import { Grid } from "@material-ui/core";
 import * as React from "react";
 import { useCallback, useState } from "react";

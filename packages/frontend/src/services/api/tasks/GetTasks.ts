@@ -1,5 +1,4 @@
-import { ETaskStatus } from "@magnit/services";
-import { IBaseTask } from "@magnit/task-editor";
+import { ETaskStatus, IBaseTask } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 import { toSnakeCase } from "services/string";
 

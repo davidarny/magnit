@@ -1,4 +1,4 @@
-import { IStageStep } from "@magnit/task-editor";
+import { IStageStep } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 
 export interface IAddStagesResponse extends IResponse {}

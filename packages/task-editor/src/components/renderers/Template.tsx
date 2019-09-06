@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
+import { IAnswer } from "@magnit/entities";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 import _ from "lodash";
 import * as React from "react";
-import { IAnswer } from "../../entities";
 import { SectionRenderer } from "./Section";
 
 interface ITemplateRendererProps {

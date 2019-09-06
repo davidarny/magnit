@@ -2,16 +2,17 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
+import { ETaskStatus, ETerminals, IExtendedTask, ITemplate } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
-import { ETaskStatus, ETerminals } from "@magnit/services";
-import { IExtendedTask, TaskEditor } from "@magnit/task-editor";
-import { ITemplate } from "@magnit/template-editor";
+import { TaskEditor } from "@magnit/task-editor";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { Redirect } from "@reach/router";
+import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
+import { SendMessageForm } from "components/view-task";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
@@ -26,8 +27,6 @@ import {
     updateTask,
     updateTemplateAssignment,
 } from "services/api";
-import { SimpleModal } from "../../components/modal";
-import { SendMessageForm } from "../../components/view-task/SendMessageForm";
 
 interface IViewTaskProps {
     taskId: number;

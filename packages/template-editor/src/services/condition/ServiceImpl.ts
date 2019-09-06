@@ -1,5 +1,5 @@
+import { EConditionType } from "@magnit/entities";
 import { IService, IServiceOptions } from "./IService";
-import { EConditionType } from "entities";
 
 export class ServiceImpl implements IService {
     constructor(protected readonly options: IServiceOptions) {}

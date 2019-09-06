@@ -1,12 +1,18 @@
+import { EPuzzleType, ICondition, IPuzzle } from "@magnit/entities";
 import * as React from "react";
-import { ICondition, IPuzzle, TChangeEvent } from "entities";
-import { EPuzzleType } from "@magnit/services";
 import { IService, IServiceOptions } from "./IService";
 
-export interface IAnswerPuzzleBuilder {
-    setAnswerPuzzleChangeHandler(handler: (event: TChangeEvent) => void): IAnswerPuzzleBuilder;
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
-    setValueChangeHandler(handler: (event: TChangeEvent) => void): IAnswerPuzzleBuilder;
+export interface IAnswerPuzzleBuilder {
+    setAnswerPuzzleChangeHandler(
+        handler: (event: TSelectChangeEvent) => void,
+    ): IAnswerPuzzleBuilder;
+
+    setValueChangeHandler(handler: (event: TSelectChangeEvent) => void): IAnswerPuzzleBuilder;
 
     setValueBlurHandler(handler: () => void): IAnswerPuzzleBuilder;
 

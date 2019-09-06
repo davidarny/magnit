@@ -10,8 +10,17 @@ import {
     SelectField,
     StepperWrapper,
 } from "@magnit/components";
+import {
+    ETaskStatus,
+    ETerminals,
+    IDocument,
+    IExtendedTask,
+    IStageStep,
+    IVirtualDocument,
+    IWithAnswers,
+} from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { ETaskStatus, ETerminals, getFriendlyDate, IEditorService } from "@magnit/services";
+import { getFriendlyDate, IEditorService } from "@magnit/services";
 import {
     Dialog,
     FormControl,
@@ -22,19 +31,16 @@ import {
     Typography,
 } from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
-import {
-    IDocument,
-    IExtendedTask,
-    IStageStep,
-    IVirtualDocument,
-    IWithAnswers,
-    TChangeEvent,
-} from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneeIllustration } from "./ChangeAssigneeIllustration";
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 interface IViewTaskProps {
     task: Partial<IExtendedTask>;
@@ -52,7 +58,7 @@ interface IViewTaskProps {
 
     onEditableChange?(documentId: number, editable: boolean): void;
 
-    onTemplatesChange?(uuid: string, event: TChangeEvent): void;
+    onTemplatesChange?(uuid: string, event: TSelectChangeEvent): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
@@ -451,7 +457,7 @@ interface ITaskDocumentProps {
 
     onEditableChange?(documentId: number, editable: boolean): void;
 
-    onTemplateChange?(uuid: string, event: TChangeEvent): void;
+    onTemplateChange?(uuid: string, event: TSelectChangeEvent): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
@@ -466,7 +472,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
         .flatMap(template => template.answers || []);
 
     const onEditableChangeCallback = useCallback(
-        (event: TChangeEvent, checked: boolean) => {
+        (event: TSelectChangeEvent, checked: boolean) => {
             if (onEditableChange) {
                 onEditableChange(document.id, checked);
             }
@@ -475,7 +481,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
     );
 
     const onTemplateChangeCallback = useCallback(
-        (event: TChangeEvent) => {
+        (event: TSelectChangeEvent) => {
             if (onTemplateChange) {
                 onTemplateChange(document.__uuid, event);
             }

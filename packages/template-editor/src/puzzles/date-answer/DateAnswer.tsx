@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { FormControl, Grid, Input, InputAdornment, InputLabel } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { IFocusedPuzzleProps } from "entities";
+import { IFocusedPuzzleProps } from "@magnit/entities";
+import { FormControl, Grid, Input, InputAdornment, InputLabel } from "@material-ui/core";
 import { CalendarToday as CalendarIcon } from "@material-ui/icons";
+import * as React from "react";
 
 export const DateAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) => {
     return (

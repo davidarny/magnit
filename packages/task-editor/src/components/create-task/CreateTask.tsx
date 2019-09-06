@@ -8,16 +8,21 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
-import { ETerminals, IEditorService } from "@magnit/services";
+import { ETerminals, IDocument, IRenderDocument, ITask } from "@magnit/entities";
+import { IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
-import { IDocument, IRenderDocument, ITask, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useState } from "react";
 import uuid from "uuid/v4";
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 interface ICreateTaskProps {
     task: Partial<ITask>;
@@ -29,7 +34,7 @@ interface ICreateTaskProps {
 
     onTaskTitleChange(title: string): void;
 
-    onTemplatesChange(uuid: string, event: TChangeEvent): void;
+    onTemplatesChange(uuid: string, event: TSelectChangeEvent): void;
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
@@ -144,7 +149,7 @@ interface ITaskDocumentProps {
     document: IRenderDocument;
     focusedPuzzleId?: string;
 
-    onTemplatesChange(uuid: string, event: TChangeEvent): void;
+    onTemplatesChange(uuid: string, event: TSelectChangeEvent): void;
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
@@ -154,7 +159,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
     const snapshot = templateSnapshots.get(document.id.toString());
 
     const onTemplateChangeCallback = useCallback(
-        (event: TChangeEvent) => {
+        (event: TSelectChangeEvent) => {
             onTemplatesChange(document.__uuid, event);
         },
         [onTemplatesChange, document],

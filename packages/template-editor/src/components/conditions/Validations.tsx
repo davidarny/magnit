@@ -2,8 +2,17 @@
 
 import { css, jsx } from "@emotion/core";
 import { Button, InputField, SelectField } from "@magnit/components";
+import {
+    EConditionType,
+    EOperatorType,
+    EPuzzleType,
+    ETerminals,
+    EValidationType,
+    IPuzzle,
+    ITemplate,
+    IValidation,
+} from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
-import { EPuzzleType, ETerminals } from "@magnit/services";
 import {
     FormControlLabel,
     Grid,
@@ -14,15 +23,6 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import {
-    EConditionType,
-    EOperatorType,
-    EValidationType,
-    IPuzzle,
-    ITemplate,
-    IValidation,
-    TChangeEvent,
-} from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -39,6 +39,11 @@ interface IValidationsProps {
 
     onTemplateChange(template: ITemplate): void;
 }
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzleId, template, disabled = false, focused = true, onTemplateChange } = props;
@@ -262,7 +267,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
         setValidations([...validations]);
     }, [currentQuestion, questions.length, validations]);
 
-    function onErrorMessageChange(event: TChangeEvent) {
+    function onErrorMessageChange(event: TSelectChangeEvent) {
         setErrorMessage(event.target.value as string);
     }
 
@@ -360,7 +365,7 @@ const Validation: React.FC<IValidationProps> = props => {
     const [value, setValue] = useState(validation.value || 0);
 
     const onOperatorTypeChangeCallback = useCallback(
-        (event: TChangeEvent): void => {
+        (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
                 operatorType: event.target.value as EOperatorType,
             });
@@ -369,7 +374,7 @@ const Validation: React.FC<IValidationProps> = props => {
     );
 
     const onRightHandPuzzleChange = useCallback(
-        (event: TChangeEvent): void => {
+        (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
                 rightHandPuzzle: event.target.value as string,
             });
@@ -377,7 +382,7 @@ const Validation: React.FC<IValidationProps> = props => {
         [onValidationChange, validation.id],
     );
 
-    function onValueChange(event: TChangeEvent): void {
+    function onValueChange(event: TSelectChangeEvent): void {
         setValue(event.target.value as number);
     }
 
@@ -386,7 +391,7 @@ const Validation: React.FC<IValidationProps> = props => {
     }, [onValidationChange, validation.id, value]);
 
     const onValidationTypeChangeCallback = useCallback(
-        (event: TChangeEvent): void => {
+        (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
                 validationType: event.target.value as EValidationType,
             });

@@ -10,8 +10,9 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
+import { ETaskStatus, ETerminals } from "@magnit/entities";
 import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
-import { ETaskStatus, ETerminals, getFriendlyDate } from "@magnit/services";
+import { getFriendlyDate } from "@magnit/services";
 import { Grid, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";

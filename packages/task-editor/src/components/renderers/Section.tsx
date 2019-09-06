@@ -2,9 +2,8 @@
 
 import { css, jsx } from "@emotion/core";
 import { ButtonLikeText } from "@magnit/components";
-import { EPuzzleType } from "@magnit/services";
+import { EPuzzleType, IAnswer } from "@magnit/entities";
 import { Grid, Typography } from "@material-ui/core";
-import { IAnswer } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useState } from "react";

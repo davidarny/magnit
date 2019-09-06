@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
-import * as React from "react";
 import { jsx } from "@emotion/core";
-import { PuzzleWrapper } from "components/puzzle-wrapper";
-import { IPuzzle } from "entities";
-import { getPuzzleFactory } from "services/item";
+import { IPuzzle } from "@magnit/entities";
 import { Grid } from "@material-ui/core";
+import { PuzzleWrapper } from "components/puzzle-wrapper";
+import * as React from "react";
+import { getPuzzleFactory } from "services/item";
 
 interface IContentItemProps {
     deep?: boolean;

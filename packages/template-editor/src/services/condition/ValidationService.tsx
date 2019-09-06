@@ -1,5 +1,9 @@
 /** @jsx jsx */
 
+import { jsx } from "@emotion/core";
+import { InputField, SelectField } from "@magnit/components";
+import { EOperatorType, ETerminals, EValidationType, IPuzzle } from "@magnit/entities";
+import { MenuItem } from "@material-ui/core";
 import * as React from "react";
 import {
     IRightHandPuzzleBuilder,
@@ -7,11 +11,11 @@ import {
     IValidationServiceOptions,
 } from "./IValidationService";
 import { ServiceImpl } from "./ServiceImpl";
-import { MenuItem } from "@material-ui/core";
-import { EOperatorType, EValidationType, IPuzzle, IValidation, TChangeEvent } from "entities";
-import { jsx } from "@emotion/core";
-import { InputField, SelectField } from "@magnit/components";
-import { ETerminals } from "@magnit/services";
+
+type TSelectChangeEvent = React.ChangeEvent<{
+    name?: string;
+    value: unknown;
+}>;
 
 export class ValidationService extends ServiceImpl implements IValidationService {
     constructor(protected readonly options: IValidationServiceOptions) {
@@ -60,8 +64,8 @@ export class ValidationService extends ServiceImpl implements IValidationService
     getRightHandPuzzle(questions: IPuzzle[]): IRightHandPuzzleBuilder {
         const self = this;
         return new (class implements IRightHandPuzzleBuilder {
-            private onRightHandPuzzleChange?: (event: TChangeEvent) => void;
-            private onValueChange?: (event: TChangeEvent) => void;
+            private onRightHandPuzzleChange?: (event: TSelectChangeEvent) => void;
+            private onValueChange?: (event: TSelectChangeEvent) => void;
             private onValueBlur?: () => void;
 
             build(): React.ReactNode {
@@ -102,7 +106,7 @@ export class ValidationService extends ServiceImpl implements IValidationService
             }
 
             setRightHandPuzzleChangeHandler(
-                handler: (event: TChangeEvent) => void,
+                handler: (event: TSelectChangeEvent) => void,
             ): IRightHandPuzzleBuilder {
                 this.onRightHandPuzzleChange = handler;
                 return this;
@@ -113,7 +117,9 @@ export class ValidationService extends ServiceImpl implements IValidationService
                 return this;
             }
 
-            setValueChangeHandler(handler: (event: TChangeEvent) => void): IRightHandPuzzleBuilder {
+            setValueChangeHandler(
+                handler: (event: TSelectChangeEvent) => void,
+            ): IRightHandPuzzleBuilder {
                 this.onValueChange = handler;
                 return this;
             }
