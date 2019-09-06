@@ -16,20 +16,21 @@ import {
     IStageStep,
     ITask,
     IVirtualDocument,
+    IWithAnswers,
     TChangeEvent,
 } from "./entities";
 
-type TTask = ITask | IExtendedTask;
+type TAnyTask = ITask | IExtendedTask;
 
-interface ITaskEditorProps<T extends TTask> {
+interface ITaskEditorProps<T extends TAnyTask> {
     initialState?: T;
-    templates: Omit<IDocument, "__uuid">[];
+    templates: T extends IExtendedTask ? Array<IDocument & IWithAnswers> : IDocument[];
     variant: "create" | "view";
 
     onTaskChange?(task: Partial<T>): void;
 }
 
-export const TaskEditor = <T extends TTask>(props: ITaskEditorProps<T>) => {
+export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const { templates, initialState, variant, onTaskChange } = props;
 
     const [task, setTask] = useState<Partial<T>>(initialState || {});

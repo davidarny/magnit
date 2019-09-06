@@ -13,7 +13,7 @@ import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
 import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
-import { IDocument, ITask, TChangeEvent } from "entities";
+import { IDocument, IRenderDocument, ITask, TChangeEvent } from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useState } from "react";
@@ -22,8 +22,8 @@ import uuid from "uuid/v4";
 interface ICreateTaskProps {
     task: Partial<ITask>;
     service: IEditorService;
-    templates: Omit<IDocument, "__uuid">[];
-    documents: IDocument[];
+    templates: IDocument[];
+    documents: IRenderDocument[];
     templateSnapshots: Map<string, object>;
     focusedPuzzleId?: string;
 
@@ -138,10 +138,10 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
 CreateTask.displayName = "CreateTask";
 
 interface ITaskDocumentProps {
-    templates: Omit<IDocument, "__uuid">[];
+    templates: IDocument[];
     service: IEditorService;
     templateSnapshots: Map<string, object>;
-    document: IDocument;
+    document: IRenderDocument;
     focusedPuzzleId?: string;
 
     onTemplatesChange(uuid: string, event: TChangeEvent): void;

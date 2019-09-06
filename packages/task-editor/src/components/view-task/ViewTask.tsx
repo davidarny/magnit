@@ -22,7 +22,14 @@ import {
     Typography,
 } from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
-import { IDocument, IExtendedTask, IStageStep, IVirtualDocument, TChangeEvent } from "entities";
+import {
+    IDocument,
+    IExtendedTask,
+    IStageStep,
+    IVirtualDocument,
+    IWithAnswers,
+    TChangeEvent,
+} from "entities";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -33,7 +40,7 @@ interface IViewTaskProps {
     task: Partial<IExtendedTask>;
     service: IEditorService;
     documents: IVirtualDocument[];
-    templates: Omit<IDocument, "__uuid">[];
+    templates: Array<IDocument & IWithAnswers>;
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
 
@@ -440,7 +447,7 @@ interface ITaskDocumentProps {
     service: IEditorService;
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
-    templates: Omit<IDocument, "__uuid">[];
+    templates: Array<IDocument & IWithAnswers>;
 
     onEditableChange?(documentId: number, editable: boolean): void;
 
@@ -448,19 +455,15 @@ interface ITaskDocumentProps {
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
-    const {
-        templateSnapshots,
-        focusedPuzzleId,
-        service,
-        document,
-        templates,
-        documents,
-        onEditableChange,
-        onTemplateChange,
-    } = props;
+    const { focusedPuzzleId, service, document, templates, documents, templateSnapshots } = props;
+    const { onEditableChange, onTemplateChange } = props;
 
     const snapshot = templateSnapshots.get(document.id.toString());
     const focused = focusedPuzzleId === document.__uuid;
+
+    const answers = templates
+        .filter(template => template.id === document.id)
+        .flatMap(template => template.answers || []);
 
     const onEditableChangeCallback = useCallback(
         (event: TChangeEvent, checked: boolean) => {
@@ -536,7 +539,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                    {focused && <TemplateRenderer template={snapshot} />}
+                    {focused && <TemplateRenderer answers={answers} template={snapshot} />}
                 </Grid>
             </Grid>
         </SelectableBlockWrapper>

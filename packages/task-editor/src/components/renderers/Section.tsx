@@ -1,20 +1,22 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { useState } from "react";
-import { Grid, Typography } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
-import _ from "lodash";
-import { PuzzleRenderer } from "./Puzzle";
 import { ButtonLikeText } from "@magnit/components";
 import { EPuzzleType } from "@magnit/services";
+import { Grid, Typography } from "@material-ui/core";
+import { IAnswer } from "entities";
+import _ from "lodash";
+import * as React from "react";
+import { useState } from "react";
+import { PuzzleRenderer } from "./Puzzle";
 
 interface ISectionRendererProps {
     index: number;
     section: object;
+    answers?: IAnswer[];
 }
 
-export const SectionRenderer: React.FC<ISectionRendererProps> = ({ index, section }) => {
+export const SectionRenderer: React.FC<ISectionRendererProps> = ({ index, section, answers }) => {
     const [collapsed, setCollapsed] = useState(false);
 
     function onCollapsedToggle(): void {
@@ -77,10 +79,15 @@ export const SectionRenderer: React.FC<ISectionRendererProps> = ({ index, sectio
                             return [...puzzles];
                         }, [])
                         .map((puzzle: object, index: number, array: object[]) => {
+                            const puzzleId = _.get(puzzle, "id");
                             const last = index === array.length - 1;
+                            const answer = (answers || []).find(
+                                answer => answer.idPuzzle === puzzleId,
+                            );
                             return (
                                 <PuzzleRenderer
-                                    key={_.get(puzzle, "id")}
+                                    answer={answer}
+                                    key={puzzleId}
                                     puzzle={puzzle}
                                     last={last}
                                 />

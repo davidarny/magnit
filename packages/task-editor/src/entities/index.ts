@@ -29,10 +29,13 @@ export interface IDocument {
     id: number;
     title: string;
     editable: boolean;
+}
+
+export interface IRenderDocument extends IDocument {
     __uuid: string; // need for correct rendering
 }
 
-export interface IVirtualDocument extends IDocument {
+export interface IVirtualDocument extends IRenderDocument {
     virtual?: boolean;
 }
 
@@ -42,13 +45,32 @@ export interface IStage {
     deadline: string; // ISO time format
     finished: boolean;
     editable?: boolean;
+}
+
+export interface IRenderStage extends IStage {
     __uuid: string; // need for correct rendering
+}
+
+export interface IAnswer {
+    answer: string;
+    answerType: "string" | "number";
+    comment?: string;
+    id: number;
+    idPuzzle: number;
+    idTask: number;
+    idTemplate: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface IWithAnswers {
+    answers?: IAnswer[];
 }
 
 export interface IExtendedTask extends IBaseTask {
     id: number;
-    templates: Array<Omit<IDocument, "__uuid">>;
-    stages: Array<Omit<IStage, "__uuid">>;
+    templates: Array<IDocument & IWithAnswers>;
+    stages: IStage[];
 }
 
 interface TChangeParam {

@@ -1,9 +1,9 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { EPuzzleType } from "@magnit/services";
 import { jsx } from "@emotion/core";
-import { CheckboxAnswerFactory, RadioAnswerFactory, DropdownAnswerFactory } from "puzzles";
+import { EPuzzleType } from "@magnit/services";
+import { CheckboxAnswerFactory, DropdownAnswerFactory, RadioAnswerFactory } from "puzzles";
+import * as React from "react";
 
 export interface IPuzzleFactory {
     create(props: IPuzzleProps): React.ReactNode;

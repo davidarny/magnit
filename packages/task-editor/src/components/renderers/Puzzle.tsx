@@ -1,18 +1,23 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import _ from "lodash";
-import { Grid, Typography } from "@material-ui/core";
-import { EPuzzleType } from "@magnit/services";
 import { jsx } from "@emotion/core";
+import { CheckIcon } from "@magnit/icons";
+import { EPuzzleType } from "@magnit/services";
+import { Grid, Typography } from "@material-ui/core";
+import { IAnswer } from "entities";
+import _ from "lodash";
+import * as React from "react";
 import { getPuzzleFactory } from "services/item";
 
 interface IPuzzleRendererProps {
     puzzle: object;
     last?: boolean;
+    answer?: IAnswer;
 }
 
-export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = ({ puzzle, last = false }) => {
+export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
+    const { puzzle, last = false, answer } = props;
+
     return (
         <Grid
             container
@@ -44,9 +49,12 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = ({ puzzle, last = 
                                 border: `2px solid ${theme.colors.primary}`,
                                 zIndex: 2,
                                 position: "relative",
-                                background: theme.colors.white,
+                                background: answer ? theme.colors.primary : theme.colors.white,
+                                color: answer ? theme.colors.white : "initial",
                             })}
-                        />
+                        >
+                            {answer && <CheckIcon />}
+                        </div>
                     </Grid>
                     <Grid item>
                         <Typography
@@ -62,11 +70,15 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = ({ puzzle, last = 
             </Grid>
             <Grid item css={theme => ({ marginLeft: theme.spacing(5) })}>
                 <Grid container direction="column" spacing={1}>
-                    {_.get(puzzle, "puzzles", []).map((puzzle: object, index: number) => {
-                        const puzzleType = _.get(puzzle, "puzzleType") as EPuzzleType;
-                        const factory = getPuzzleFactory(puzzleType);
-                        return factory.create({ index, puzzle });
-                    })}
+                    {_.get(puzzle, "puzzles", [])
+                        .filter((puzzle: object) =>
+                            answer ? answer.answer === _.get(puzzle, "title") : true,
+                        )
+                        .map((puzzle: object, index: number) => {
+                            const puzzleType = _.get(puzzle, "puzzleType") as EPuzzleType;
+                            const factory = getPuzzleFactory(puzzleType);
+                            return factory.create({ index, puzzle });
+                        })}
                 </Grid>
             </Grid>
         </Grid>
