@@ -5,6 +5,8 @@ import { TemplateAnswer } from "./template-answer.entity";
 export enum ENoLocationReason {
     LOCATION_DISABLED,
     LOCATION_NOT_DETERMINED,
+    PERMISSION_NOT_GRANTED,
+    NOT_SUPPORTED,
 }
 
 @Entity("template_answer_location")
@@ -30,10 +32,7 @@ export class TemplateAnswerLocation extends PrimaryBaseEntity<TemplateAnswerLoca
     altitude: number | null;
 
     @Column({ type: "double precision", nullable: true })
-    horizontal_accuracy_meters: number | null;
-
-    @Column({ type: "double precision", nullable: true })
-    vertical_accuracy_meters: number | null;
+    accuracy_meters: number | null;
 
     @Column({ type: "boolean", nullable: true })
     no_location_reason: ENoLocationReason | null;
