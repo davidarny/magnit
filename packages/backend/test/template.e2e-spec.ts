@@ -6,6 +6,7 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
+import { TemplateAnswerLocation } from "../src/modules/template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../src/modules/template/entities/template-answer.entity";
 import { Template } from "../src/modules/template/entities/template.entity";
 import { TemplateService } from "../src/modules/template/services/template.service";
@@ -27,6 +28,8 @@ describe("TemplateController (e2e)", () => {
             .overrideProvider(getRepositoryToken(Template))
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(TemplateAnswer))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(TemplateAnswerLocation))
             .useValue(getMockRepository())
             .overrideProvider(TemplateService)
             .useValue(templateService)

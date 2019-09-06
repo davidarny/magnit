@@ -18,6 +18,7 @@ import { TaskService } from "../src/modules/task/services/task.service";
 import { TaskStageSubscriber } from "../src/modules/task/subscribers/task-stage.subscriber";
 import { TaskSubscriber } from "../src/modules/task/subscribers/task.subscriber";
 import { TaskModule } from "../src/modules/task/task.module";
+import { TemplateAnswerLocation } from "../src/modules/template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../src/modules/template/entities/template-answer.entity";
 import { Template } from "../src/modules/template/entities/template.entity";
 import { TemplateService } from "../src/modules/template/services/template.service";
@@ -80,6 +81,8 @@ describe("TaskController (e2e)", () => {
             .useValue(getMockRepository())
             .overrideProvider(ScheduleService)
             .useValue(scheduleService)
+            .overrideProvider(getRepositoryToken(TemplateAnswerLocation))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();
