@@ -255,82 +255,98 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                             paddingLeft: theme.spacing(2),
                         })}
                     >
-                        <TabsWrapper tabs={tabs}>
-                            <Grid
-                                container
-                                direction="column"
-                                css={theme => ({ padding: theme.spacing(3) })}
-                            >
-                                <Grid container direction="row" spacing={2}>
-                                    <Grid item xs>
-                                        <InputField
-                                            placeholder="Поиск ..."
-                                            fullWidth
-                                            value={searchQuery}
-                                            onChange={onSearchQueryChange}
-                                            css={({ spacing, ...theme }) => ({
-                                                borderRadius: theme.radius(5),
-                                                background: theme.colors.white,
-                                                border: `1px solid ${theme.colors.lightGray}`,
-                                                transition: "border 0.25s ease-in-out",
-                                                cursor: "pointer",
-                                                ":hover, :active": {
-                                                    border: `1px solid ${theme.colors.primary}`,
-                                                },
-                                                div: {
-                                                    ":before, :after": {
-                                                        border: "none !important",
-                                                    },
-                                                },
-                                                input: {
-                                                    padding: `${spacing(2)} ${spacing(4)}`,
-                                                },
-                                            })}
+                        <Grid item xs={12}>
+                            <TabsWrapper tabs={tabs}>
+                                <Grid
+                                    container
+                                    direction="column"
+                                    css={theme => ({ padding: theme.spacing(3) })}
+                                >
+                                    <Grid item xs={12}>
+                                        <Grid container direction="row" spacing={2}>
+                                            <Grid item xs>
+                                                <InputField
+                                                    placeholder="Поиск ..."
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={onSearchQueryChange}
+                                                    css={({ spacing, ...theme }) => ({
+                                                        borderRadius: theme.radius(5),
+                                                        background: theme.colors.white,
+                                                        border: `1px solid ${theme.colors.lightGray}`,
+                                                        transition: "border 0.25s ease-in-out",
+                                                        cursor: "pointer",
+                                                        ":hover, :active": {
+                                                            border: `1px solid ${theme.colors.primary}`,
+                                                        },
+                                                        div: {
+                                                            ":before, :after": {
+                                                                border: "none !important",
+                                                            },
+                                                        },
+                                                        input: {
+                                                            padding: `${spacing(2)} ${spacing(4)}`,
+                                                        },
+                                                    })}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <SelectField
+                                                    placeholder="Выберите регион"
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                            <Grid item xs={2}>
+                                                <SelectField
+                                                    placeholder="Выберите филиал"
+                                                    fullWidth
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid
+                                        xs={12}
+                                        item
+                                        css={theme => ({ padding: theme.spacing(3) })}
+                                    >
+                                        <TableWrapper
+                                            selectable
+                                            columns={columns}
+                                            data={tasks}
+                                            onRowClick={onRowClick}
+                                            onRowSelectToggle={onRowSelectToggleCallback}
+                                            onSelectToggle={onSelectToggleCallback}
+                                            onRequestSort={onRequestSortCallback}
                                         />
                                     </Grid>
-                                    <Grid item xs={2}>
-                                        <SelectField placeholder="Выберите регион" fullWidth />
-                                    </Grid>
-                                    <Grid item xs={2}>
-                                        <SelectField placeholder="Выберите филиал" fullWidth />
-                                    </Grid>
-                                </Grid>
-                                <Grid item css={theme => ({ padding: theme.spacing(3) })}>
-                                    <TableWrapper
-                                        selectable
-                                        columns={columns}
-                                        data={tasks}
-                                        onRowClick={onRowClick}
-                                        onRowSelectToggle={onRowSelectToggleCallback}
-                                        onSelectToggle={onSelectToggleCallback}
-                                        onRequestSort={onRequestSortCallback}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    {tab === ETaskStatus.IN_PROGRESS.replace("_", "-") && (
-                                        <Button
-                                            variant="contained"
-                                            scheme="blue"
-                                            onClick={onBulkRejectClickCallback}
-                                        >
-                                            <ReturnIcon />
-                                            <Typography>Отозвать</Typography>
-                                        </Button>
-                                    )}
-                                    {tab !== ETaskStatus.IN_PROGRESS.replace("_", "-") &&
-                                        tab !== ETaskStatus.COMPLETED && (
+                                    <Grid item xs={12}>
+                                        {(tab === ETaskStatus.IN_PROGRESS.replace("_", "-") ||
+                                            !tab) && (
                                             <Button
                                                 variant="contained"
                                                 scheme="blue"
-                                                onClick={onBulkCompleteClickCallback}
+                                                onClick={onBulkRejectClickCallback}
                                             >
-                                                <SendIcon />
-                                                <Typography>Отправить</Typography>
+                                                <ReturnIcon />
+                                                <Typography>Отозвать</Typography>
                                             </Button>
                                         )}
+                                        {tab &&
+                                            tab !== ETaskStatus.IN_PROGRESS.replace("_", "-") &&
+                                            tab !== ETaskStatus.COMPLETED && (
+                                                <Button
+                                                    variant="contained"
+                                                    scheme="blue"
+                                                    onClick={onBulkCompleteClickCallback}
+                                                >
+                                                    <SendIcon />
+                                                    <Typography>Отправить</Typography>
+                                                </Button>
+                                            )}
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </TabsWrapper>
+                            </TabsWrapper>
+                        </Grid>
                     </Grid>
                 </Paper>
             )}
