@@ -10,7 +10,7 @@ export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
         this.construct(this, dto);
     }
 
-    @Column({ type: "boolean", default: false })
+    @Column({ type: "boolean", default: true })
     editable: boolean;
 
     @Column({ nullable: true })
