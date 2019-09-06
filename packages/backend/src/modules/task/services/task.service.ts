@@ -5,7 +5,9 @@ import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
+import { CannotSavePartialAnswersException } from "../../../shared/exceptions/cannot-save.partial-answers.exception";
 import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
+import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
@@ -132,58 +134,74 @@ export class TaskService implements ITaskService {
         // check if task has IN_PROGRESS status
         // if not, throw error
         if (task.status !== ETaskStatus.IN_PROGRESS) {
-            throw new InvalidTaskStatusException("Cannot save answers");
+            throw new InvalidTaskStatusException(
+                `Cannot save answers while task has status "${task.status}"`,
+            );
         }
-        // move task to COMPLETED status
-        task.status = ETaskStatus.COMPLETED;
-        await this.taskRepository.save(task);
         // get all template ids in keys
         const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
             this.getTemplateIdFromMultipartKey(id),
         );
         await Promise.all(
-            groupedTemplateIds.map(async templateId => {
-                // group all key with array index suffix
-                const puzzleIds = this.groupKeysBy(templateIds, id =>
-                    this.getPuzzleIdFromMultipartKey(id),
-                );
-                await this.ensurePuzzlesSettled(taskId, puzzleIds);
-                // remove id of comment suffix
-                // cause we don't store that separately
-                const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
-                    templateIds,
-                    templateId,
-                );
-                const template = await this.templateService.findById(templateId);
-                const puzzles = await this.templateService.findPuzzlesByIds(templateId, puzzleIds);
-                // collect answers
-                const answers = templatePuzzleIds
-                    .map(templatePuzzleId => {
-                        const puzzleId = this.getPuzzleIdFromMultipartKey(templatePuzzleId);
-                        const puzzle = puzzles.get(puzzleId);
-                        if (puzzle) {
-                            // trying to get puzzle_type
-                            const type = this.getPuzzleType(puzzle);
-                            let filename = this.getFileName(files, templatePuzzleId);
-                            if (filename) {
-                                filename = `${process.env.BACKEND_HOST}/${filename}`;
+            groupedTemplateIds
+                .map(async templateId => {
+                    // group all key with array index suffix
+                    const puzzleIds = this.groupKeysBy(templateIds, id =>
+                        this.getPuzzleIdFromMultipartKey(id),
+                    );
+                    await this.ensurePuzzlesSettled(taskId, puzzleIds);
+                    // remove id of comment suffix
+                    // cause we don't store that separately
+                    const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
+                        templateIds,
+                        templateId,
+                    );
+                    const template = await this.templateService.findById(templateId);
+                    if (!template) {
+                        throw new TemplateNotFoundException(`Template "${templateId}" not found`);
+                    }
+                    const puzzles = await this.templateService.findPuzzlesByIds(
+                        template,
+                        puzzleIds,
+                    );
+                    const allPuzzles = await this.templateService.findAllQuestions(template);
+                    if (allPuzzles.length !== puzzleIds.length) {
+                        throw new CannotSavePartialAnswersException(
+                            "Cannot save answers partially",
+                        );
+                    }
+                    // collect answers
+                    const answers = templatePuzzleIds
+                        .map(templatePuzzleId => {
+                            const puzzleId = this.getPuzzleIdFromMultipartKey(templatePuzzleId);
+                            const puzzle = puzzles.get(puzzleId);
+                            if (puzzle) {
+                                // trying to get puzzle_type
+                                const type = this.getPuzzleType(puzzle);
+                                let filename = this.getFileName(files, templatePuzzleId);
+                                if (filename) {
+                                    filename = `${process.env.BACKEND_HOST}/${filename}`;
+                                }
+                                const answer = filename || body[templatePuzzleId];
+                                return new TemplateAnswer({
+                                    id_puzzle: puzzle.id,
+                                    answer,
+                                    template,
+                                    task,
+                                    answer_type: type,
+                                    // save comment if exists
+                                    comment: body[`${templateId}_${puzzleId}_comment`] || null,
+                                });
                             }
-                            const answer = filename || body[templatePuzzleId];
-                            return new TemplateAnswer({
-                                id_puzzle: puzzle.id,
-                                answer,
-                                template,
-                                task,
-                                answer_type: type,
-                                // save comment if exists
-                                comment: body[`${templateId}_${puzzleId}_comment`] || null,
-                            });
-                        }
-                    })
-                    .filter(Boolean);
-                await this.templateService.insertAnswerBulk(answers);
-            }),
+                        })
+                        .filter(Boolean);
+                    await this.templateService.insertAnswerBulk(answers);
+                })
+                .filter(Boolean),
         );
+        // move task to COMPLETED status
+        task.status = ETaskStatus.COMPLETED;
+        await this.taskRepository.save(task);
     }
 
     getDescriptionByTransition(
@@ -265,7 +283,13 @@ export class TaskService implements ITaskService {
         return XLSX.write(wb, { type: "buffer" });
     }
 
-    private getFileName(files: Express.Multer.File[], templatePuzzleId) {
+    private getFileName(
+        files?: Express.Multer.File[],
+        templatePuzzleId?: string,
+    ): string | undefined {
+        if (!files || !templatePuzzleId) {
+            return;
+        }
         return (
             files.find(file => file.fieldname === templatePuzzleId) || {
                 filename: undefined,

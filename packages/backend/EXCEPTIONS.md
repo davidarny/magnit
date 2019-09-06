@@ -15,3 +15,4 @@
 | 9          | 401              | Invalid Token                              |                                                      |
 | 10         | 409              | Cannot send Push Notification              |                                                      |
 | 11         | 400              | Incorrect Task status when setting Answers |                                                      |
+| 12         | 400              | Cannot save Answers partially              |                                                      |

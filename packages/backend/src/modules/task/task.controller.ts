@@ -238,7 +238,7 @@ export class TaskController {
         @UploadedFiles() files: Express.Multer.File[],
         @Body() body: { [key: string]: string },
     ) {
-        const templateIds = [...files.map(file => file.fieldname), ...Object.keys(body)];
+        const templateIds = [...(files || []).map(file => file.fieldname), ...Object.keys(body)];
         await this.taskService.setTaskAnswers(taskId, templateIds, files, body);
         return { success: 1 };
     }

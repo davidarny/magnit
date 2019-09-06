@@ -23,7 +23,9 @@ export interface ITemplateService {
 
     deleteById(id: string): Promise<void>;
 
-    findPuzzlesByIds(id: string, ids: string[]): Promise<Map<string, IPuzzle>>;
+    findPuzzlesByIds(template: Template, puzzleIds: string[]): Promise<Map<string, IPuzzle>>;
+
+    findAllQuestions(template: Template): Promise<IPuzzle[]>;
 
     findAnswersById(id: string): Promise<TemplateAnswer[]>;
 

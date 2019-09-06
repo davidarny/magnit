@@ -148,22 +148,18 @@ export class TemplateService implements ITemplateService {
         return this.templateAnswerRepository.save(answers);
     }
 
-    @Transactional()
-    async findPuzzlesByIds(id: string, ids: string[]): Promise<Map<string, IPuzzle>> {
+    async findPuzzlesByIds(template: Template, puzzleIds: string[]): Promise<Map<string, IPuzzle>> {
         const result = new Map<string, IPuzzle>();
-        const template = await this.templateRepository.findOne(id);
-        const rest = [...ids];
-        const isValuePuzzle = (value: object): value is IPuzzle =>
-            _.has(value, "id") && _.has(value, "puzzles");
+        const rest = [...puzzleIds];
         // find all puzzles from set of ids
         await this.traverse(template.sections as object[], value => {
-            if (isValuePuzzle(value) && rest.includes(value.id)) {
+            if (this.isPuzzle(value) && rest.includes(value.id)) {
                 const indexToRemove = rest.findIndex(restId => restId === value.id);
                 if (indexToRemove !== -1) {
                     rest.splice(indexToRemove, 1);
                 }
                 result.set(value.id, value);
-                return !ids.length;
+                return !puzzleIds.length;
             }
         });
         // if we are not out of ids
@@ -172,6 +168,21 @@ export class TemplateService implements ITemplateService {
             throw new PuzzleNotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
         }
         return result;
+    }
+
+    async findAllQuestions(template: Template): Promise<IPuzzle[]> {
+        const puzzles: IPuzzle[] = [];
+        await this.traverse(template.sections as object[], value => {
+            if (this.isPuzzle(value) && value.puzzle_type === "question") {
+                puzzles.push(value);
+            }
+            return false;
+        });
+        return puzzles;
+    }
+
+    private isPuzzle(value: object): value is IPuzzle {
+        return _.has(value, "id") && _.has(value, "puzzles");
     }
 
     private async traverse(array: object[], predicate: (value: object) => boolean) {
