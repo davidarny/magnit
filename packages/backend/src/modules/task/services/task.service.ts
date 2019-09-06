@@ -5,6 +5,7 @@ import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
+import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { ITemplateService } from "../../template/interfaces/template.service.interface";
@@ -128,6 +129,14 @@ export class TaskService implements ITaskService {
         body: { [key: string]: string },
     ) {
         const task = await this.taskRepository.findOne(taskId);
+        // check if task has IN_PROGRESS status
+        // if not, throw error
+        if (task.status !== ETaskStatus.IN_PROGRESS) {
+            throw new InvalidTaskStatusException("Cannot save answers");
+        }
+        // move task to COMPLETED status
+        task.status = ETaskStatus.COMPLETED;
+        await this.taskRepository.save(task);
         // get all template ids in keys
         const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
             this.getTemplateIdFromMultipartKey(id),
