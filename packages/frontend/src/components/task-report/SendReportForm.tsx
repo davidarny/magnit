@@ -2,7 +2,6 @@
 
 import { jsx } from "@emotion/core";
 import { Button, InputField } from "@magnit/components";
-import { ETerminals } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import * as React from "react";
 import { useCallback, useState } from "react";
@@ -14,7 +13,7 @@ interface ISendReportFormProps {
 export const SendReportForm: React.FC<ISendReportFormProps> = props => {
     const { onSubmit } = props;
 
-    const [email, setEmail] = useState<string>(ETerminals.EMPTY);
+    const [email, setEmail] = useState("");
 
     const onSubmitCallback = useCallback(
         (event: React.FormEvent) => {

@@ -12,7 +12,6 @@ import {
 } from "@magnit/components";
 import {
     ETaskStatus,
-    ETerminals,
     IDocument,
     IExtendedTask,
     IStageStep,
@@ -79,8 +78,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     const defaultStepsState = [
         {
             id: 0,
-            title: ETerminals.EMPTY,
-            deadline: ETerminals.EMPTY,
+            title: "",
+            deadline: "",
             completed: false,
             editable: true,
         },
@@ -128,8 +127,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             ...steps,
             {
                 id: last.id + 1,
-                title: ETerminals.EMPTY,
-                deadline: ETerminals.EMPTY,
+                title: "",
+                deadline: "",
                 completed: false,
                 editable: true,
             },

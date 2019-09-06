@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Fab } from "@magnit/components";
-import { ETerminals, IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
+import { IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
@@ -46,7 +46,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
             }
             onUploadAsset(file).then(response => {
                 onAddAsset(id, {
-                    title: _.get(file, "name", ETerminals.EMPTY),
+                    title: _.get(file, "name", ""),
                     description: response.filename,
                 });
             });

@@ -6,7 +6,6 @@ import {
     EConditionType,
     EOperatorType,
     EPuzzleType,
-    ETerminals,
     EValidationType,
     IPuzzle,
     ITemplate,
@@ -51,15 +50,15 @@ export const Validations: React.FC<IValidationsProps> = props => {
     const defaultState = {
         id: uuid(),
         order: 0,
-        leftHandPuzzle: ETerminals.EMPTY,
-        errorMessage: ETerminals.EMPTY,
-        operatorType: EOperatorType.NONE,
-        validationType: EValidationType.NONE,
+        leftHandPuzzle: "",
+        errorMessage: "",
+        operatorType: "",
+        validationType: "",
         conditionType: EConditionType.OR,
     };
     const [validations, setValidations] = useState<IValidation[]>(initialState || [defaultState]);
     const [errorMessage, setErrorMessage] = useState<string>(
-        _.get(_.first(validations), "errorMessage", ETerminals.EMPTY),
+        _.get(_.first(validations), "errorMessage", ""),
     );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
@@ -145,8 +144,8 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     if (hasDependentQuestionChanged) {
                         validation.rightHandPuzzle = undefined;
                         validation.value = undefined;
-                        validation.operatorType = EOperatorType.NONE;
-                        validation.validationType = EValidationType.NONE;
+                        validation.operatorType = "";
+                        validation.validationType = "";
                         array[index] = { ...validation };
                     }
                 }
@@ -258,10 +257,10 @@ export const Validations: React.FC<IValidationsProps> = props => {
         validations.push({
             id: uuid(),
             order: validations.length - 1,
-            leftHandPuzzle: (currentQuestion && currentQuestion.id) || ETerminals.EMPTY,
-            validationType: EValidationType.NONE,
-            operatorType: EOperatorType.NONE,
-            errorMessage: ETerminals.EMPTY,
+            leftHandPuzzle: (currentQuestion && currentQuestion.id) || "",
+            validationType: "",
+            operatorType: "",
+            errorMessage: "",
             conditionType: EConditionType.OR,
         });
         setValidations([...validations]);
@@ -421,7 +420,7 @@ const Validation: React.FC<IValidationProps> = props => {
 
     const isFirstRow = index === 0;
 
-    const currentQuestionId = currentQuestion ? currentQuestion.id : ETerminals.EMPTY;
+    const currentQuestionId = currentQuestion ? currentQuestion.id : "";
 
     const currentQuestionTitle = currentQuestion
         ? currentQuestion.title
@@ -499,7 +498,7 @@ const Validation: React.FC<IValidationProps> = props => {
                     <SelectField
                         id="operator-type"
                         fullWidth
-                        value={validation.operatorType || ETerminals.EMPTY}
+                        value={validation.operatorType || ""}
                         onChange={onOperatorTypeChangeCallback}
                         placeholder="Выберите значение"
                     >
@@ -512,7 +511,7 @@ const Validation: React.FC<IValidationProps> = props => {
                     <SelectField
                         id="validation-type"
                         fullWidth
-                        value={validation.validationType || ETerminals.EMPTY}
+                        value={validation.validationType || ""}
                         onChange={onValidationTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

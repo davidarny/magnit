@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ETaskStatus, ETerminals, IExtendedTask, ITemplate } from "@magnit/entities";
+import { ETaskStatus, IExtendedTask, ITemplate } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
@@ -43,7 +43,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const [messageModalOpen, setMessageModalOpen] = useState(false);
     const [task, setTask] = useState<IExtendedTask>({
         id: 0,
-        title: ETerminals.EMPTY,
+        title: "",
         templates: [],
         stages: [],
         status: ETaskStatus.DRAFT,
@@ -51,11 +51,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
-        message: ETerminals.EMPTY as string,
+        message: "",
     }); // open/close snackbar
     const [redirect, setRedirect] = useState({
         trigger: false,
-        to: ETerminals.EMPTY as string,
+        to: "",
     });
 
     const isValidTask = (value: object): value is IExtendedTask =>
@@ -117,7 +117,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         if (reason === "clickaway") {
             return;
         }
-        setSnackbar({ open: false, message: ETerminals.EMPTY });
+        setSnackbar({ open: false, message: "" });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }

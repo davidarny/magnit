@@ -2,7 +2,6 @@
 
 import { jsx } from "@emotion/core";
 import { Button, InputField } from "@magnit/components";
-import { ETerminals } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { Grid } from "@material-ui/core";
 import * as React from "react";
@@ -15,8 +14,8 @@ interface ISendMessageFormProps {
 export const SendMessageForm: React.FC<ISendMessageFormProps> = props => {
     const { onSubmit } = props;
 
-    const [title, setTitle] = useState<string>(ETerminals.EMPTY);
-    const [message, setMessage] = useState<string>(ETerminals.EMPTY);
+    const [title, setTitle] = useState("");
+    const [message, setMessage] = useState("");
 
     const onSubmitCallback = useCallback(
         (event: React.FormEvent) => {

@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EOperatorType, ETerminals, EValidationType, IPuzzle } from "@magnit/entities";
+import { EOperatorType, EValidationType, IPuzzle } from "@magnit/entities";
 import { MenuItem } from "@material-ui/core";
 import * as React from "react";
 import {
@@ -29,7 +29,6 @@ export class ValidationService extends ServiceImpl implements IValidationService
             [EOperatorType.LESS_OR_EQUAL]: "Меньше или равно",
             [EOperatorType.MORE_OR_EQUAL]: "Больше или равно",
             [EOperatorType.EQUAL]: "Равно",
-            [EOperatorType.NONE]: ETerminals.EMPTY,
         }[operatorType];
     }
 
@@ -37,7 +36,6 @@ export class ValidationService extends ServiceImpl implements IValidationService
         return {
             [EValidationType.COMPARE_WITH_ANSWER]: "Сравнить с ответом",
             [EValidationType.SET_VALUE]: "Установить значение",
-            [EValidationType.NONE]: ETerminals.EMPTY,
         }[validationType];
     }
 
@@ -77,7 +75,7 @@ export class ValidationService extends ServiceImpl implements IValidationService
                             fullWidth
                             placeholder="Выберите вопрос"
                             onChange={this.onRightHandPuzzleChange}
-                            value={rightHandPuzzle || ETerminals.EMPTY}
+                            value={rightHandPuzzle || ""}
                         >
                             {questions.length !== 0 &&
                                 questions.map(question => {

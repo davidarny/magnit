@@ -2,7 +2,6 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ETerminals } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -22,7 +21,7 @@ export const CreateTemplate: React.FC = () => {
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
-        message: ETerminals.EMPTY as string,
+        message: "",
     }); // open/close snackbar
 
     function onTemplateChange(template: object) {
@@ -33,7 +32,7 @@ export const CreateTemplate: React.FC = () => {
         if (reason === "clickaway") {
             return;
         }
-        setSnackbar({ open: false, message: ETerminals.EMPTY });
+        setSnackbar({ open: false, message: "" });
         // wait till animation ends
         setTimeout(() => setError(false), 100);
     }

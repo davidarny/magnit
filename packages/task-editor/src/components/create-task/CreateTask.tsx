@@ -8,7 +8,7 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
-import { ETerminals, IDocument, IRenderDocument, ITask } from "@magnit/entities";
+import { IDocument, IRenderDocument, ITask } from "@magnit/entities";
 import { IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
@@ -40,7 +40,7 @@ interface ICreateTaskProps {
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
     const { onTaskTitleChange, onTemplatesChange } = props;
-    const [title, setTitle] = useState<string>(ETerminals.EMPTY);
+    const [title, setTitle] = useState("");
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 

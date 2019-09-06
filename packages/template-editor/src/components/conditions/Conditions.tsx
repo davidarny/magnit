@@ -6,7 +6,6 @@ import {
     EActionType,
     EConditionType,
     EPuzzleType,
-    ETerminals,
     ICondition,
     IPuzzle,
     ITemplate,
@@ -44,10 +43,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     const defaultState = {
         id: uuid(),
         order: 0,
-        questionPuzzle: ETerminals.EMPTY,
-        answerPuzzle: ETerminals.EMPTY,
-        value: ETerminals.EMPTY,
-        actionType: EActionType.NONE,
+        questionPuzzle: "",
+        answerPuzzle: "",
+        value: "",
+        actionType: "",
         conditionType: EConditionType.OR,
     };
     const initialState = props.initialState && props.initialState.length && props.initialState;
@@ -109,9 +108,9 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                         );
                     });
                     if (hasDependentQuestionChanged) {
-                        condition.answerPuzzle = ETerminals.EMPTY;
-                        condition.value = ETerminals.EMPTY;
-                        condition.actionType = EActionType.NONE;
+                        condition.answerPuzzle = "";
+                        condition.value = "";
+                        condition.actionType = "";
                         array[index] = { ...condition };
                     }
                 }
@@ -228,14 +227,14 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         ) {
             return;
         }
-        const conditionsHead = _.head(conditions) || { questionPuzzle: ETerminals.EMPTY };
+        const conditionsHead = _.head(conditions) || { questionPuzzle: "" };
         conditions.push({
             id: uuid(),
             order: conditions.length - 1,
             questionPuzzle: conditionsHead.questionPuzzle,
-            answerPuzzle: ETerminals.EMPTY,
-            value: ETerminals.EMPTY,
-            actionType: EActionType.NONE,
+            answerPuzzle: "",
+            value: "",
+            actionType: "",
             conditionType: EConditionType.OR,
         });
         setConditions([...conditions]);
@@ -304,7 +303,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 const Condition: React.FC<IConditionProps> = props => {
     const { condition, conditions, answers, questions, index, noDeleteButton = false } = props;
     const { onConditionChange, onConditionDelete } = props;
-    const [value, setValue] = useState<string>(condition.value || ETerminals.EMPTY);
+    const [value, setValue] = useState<string>(condition.value || "");
 
     const onQuestionPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
@@ -313,9 +312,9 @@ const Condition: React.FC<IConditionProps> = props => {
             // reset first condition fields when question changed
             // and change questionPuzzle
             onConditionChange(condition.id, {
-                answerPuzzle: ETerminals.EMPTY,
-                value: ETerminals.EMPTY,
-                actionType: EActionType.NONE,
+                answerPuzzle: "",
+                value: "",
+                actionType: "",
                 questionPuzzle: event.target.value as string,
             });
         },
@@ -369,7 +368,7 @@ const Condition: React.FC<IConditionProps> = props => {
         return question.puzzles.some(puzzle => puzzle.id === answer.id);
     });
     const questionAnswersHead = _.head(questionAnswers) || {
-        puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+        puzzleType: ("" as unknown) as EPuzzleType,
     };
 
     const conditionService = getConditionService({
@@ -436,7 +435,7 @@ const Condition: React.FC<IConditionProps> = props => {
                     <SelectField
                         id="question-puzzle"
                         fullWidth={true}
-                        value={condition.questionPuzzle || ETerminals.EMPTY}
+                        value={condition.questionPuzzle || ""}
                         onChange={onQuestionPuzzleChangeCallback}
                         placeholder="Выберите вопрос"
                     >
@@ -453,7 +452,7 @@ const Condition: React.FC<IConditionProps> = props => {
                     <SelectField
                         id="action-type"
                         fullWidth={true}
-                        value={condition.actionType || ETerminals.EMPTY}
+                        value={condition.actionType || ""}
                         onChange={onActionTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

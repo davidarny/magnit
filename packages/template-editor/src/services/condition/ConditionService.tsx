@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EActionType, EPuzzleType, ETerminals, IPuzzle } from "@magnit/entities";
+import { EActionType, EPuzzleType, IPuzzle } from "@magnit/entities";
 import { MenuItem } from "@material-ui/core";
 import * as React from "react";
 import {
@@ -30,7 +30,6 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
             [EActionType.LESS_THAN]: "Меньше чем",
             [EActionType.EQUAL]: "Равно",
             [EActionType.GIVEN_ANSWER]: "Дан ответ",
-            [EActionType.NONE]: ETerminals.EMPTY,
         }[actionType];
     }
 
@@ -93,7 +92,7 @@ export class ConditionService extends ServiceImpl implements IConditionsService 
                                 fullWidth
                                 placeholder="Выберите ответ"
                                 onChange={this.onAnswerPuzzleChange}
-                                value={answerPuzzle || ETerminals.EMPTY}
+                                value={answerPuzzle || ""}
                             >
                                 {answers.length !== 0 &&
                                     answers

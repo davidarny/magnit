@@ -3,7 +3,6 @@
 import { jsx } from "@emotion/core";
 import { EditorToolbar } from "@magnit/components";
 import {
-    ETerminals,
     IDocument,
     IExtendedTask,
     IStageStep,
@@ -91,7 +90,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             setDocuments([
                 {
                     id: -1,
-                    title: ETerminals.EMPTY,
+                    title: "",
                     editable: false,
                     __uuid: uuid(),
                 },
@@ -206,7 +205,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         const nextDocument: IVirtualDocument = {
             id: -1,
             __uuid: uuid(),
-            title: ETerminals.EMPTY,
+            title: "",
             editable: false,
         };
         // TODO: allow only in DRAFT mode

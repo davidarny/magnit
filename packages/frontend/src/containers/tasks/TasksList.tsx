@@ -10,7 +10,7 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
-import { ETaskStatus, ETerminals } from "@magnit/entities";
+import { ETaskStatus } from "@magnit/entities";
 import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, Paper, Typography } from "@material-ui/core";
@@ -55,7 +55,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     const [tasks, setTasks] = useState<TTask[]>([]);
     const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
-    const [searchQuery, setSearchQuery] = useState<string>(ETerminals.EMPTY);
+    const [searchQuery, setSearchQuery] = useState("");
     const [total, setTotal] = useState(0);
 
     const clearSelectedTasks = useCallback(() => {

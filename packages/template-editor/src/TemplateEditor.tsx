@@ -3,14 +3,7 @@
 
 import { jsx } from "@emotion/core";
 import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
-import {
-    EPuzzleType,
-    ETemplateType,
-    ETerminals,
-    IPuzzle,
-    ISection,
-    ITemplate,
-} from "@magnit/entities";
+import { EPuzzleType, ETemplateType, IPuzzle, ISection, ITemplate } from "@magnit/entities";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 import { EEditorType, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
@@ -46,8 +39,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const defaultState = {
         id: 0,
         sections: [],
-        title: ETerminals.EMPTY,
-        description: ETerminals.EMPTY,
+        title: "",
+        description: "",
         type: ETemplateType.LIGHT,
     };
     const [template, setTemplate] = useState<ITemplate>(initialState || defaultState);
@@ -108,8 +101,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 {
                     id: uuid(),
                     puzzleType: EPuzzleType.TEXT_ANSWER,
-                    title: ETerminals.EMPTY,
-                    description: ETerminals.EMPTY,
+                    title: "",
+                    description: "",
                     order: 0,
                     puzzles: [],
                     conditions: [],
@@ -118,8 +111,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             ],
             validations: [],
             conditions: [],
-            title: ETerminals.EMPTY,
-            description: ETerminals.EMPTY,
+            title: "",
+            description: "",
             puzzleType: EPuzzleType.QUESTION,
         };
         // type guards
@@ -190,8 +183,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzles: [],
                 validations: [],
                 conditions: [],
-                description: ETerminals.EMPTY,
-                title: ETerminals.EMPTY,
+                description: "",
+                title: "",
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
@@ -209,8 +202,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzles: [],
                     validations: [],
                     conditions: [],
-                    description: ETerminals.EMPTY,
-                    title: ETerminals.EMPTY,
+                    description: "",
+                    title: "",
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
@@ -227,7 +220,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         template.sections.push({
             id,
             puzzles: [],
-            title: ETerminals.EMPTY,
+            title: "",
             order: (prevSection || { order: -1 }).order + 1,
         });
         cache.sections.set(id, _.last(template.sections)!);
@@ -248,19 +241,19 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             }
             const prevPuzzle = _.last(puzzle.puzzles) || {
                 order: -1,
-                puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
+                puzzleType: "" as EPuzzleType,
             };
             // update last puzzle with payload
             _.assign(prevPuzzle, addition);
             // insert stub puzzle
             puzzle.puzzles.push({
                 id: uuid(),
-                title: ETerminals.EMPTY,
+                title: "",
                 puzzles: [],
                 puzzleType: prevPuzzle.puzzleType,
                 order: prevPuzzle.order + 1,
                 conditions: [],
-                description: ETerminals.EMPTY,
+                description: "",
                 validations: [],
             });
             return true;

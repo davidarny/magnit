@@ -2,7 +2,7 @@
 
 import { css, jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, ETerminals, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -45,18 +45,17 @@ type TSelectChangeEvent = React.ChangeEvent<{
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
     const { index: index1, title, template, id, focused } = props;
     const { onTemplateChange } = props;
-    const [answersType, setAnswersType] = useState((ETerminals.EMPTY as unknown) as EPuzzleType);
+    const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
     const [questionTitle, setQuestionTitle] = useState(title);
 
     const templateSnapshot = useRef<ITemplate>({} as ITemplate);
-    const answerTypeSnapshot = useRef<EPuzzleType>((ETerminals.EMPTY as unknown) as EPuzzleType);
+    const answerTypeSnapshot = useRef<EPuzzleType | "">("");
 
     const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (value: any) => {
-            if (!_.isObject(value) || !("puzzles" in value)) {
+        traverse(template, (puzzle: IPuzzle) => {
+            if (!_.isObject(puzzle) || !("puzzles" in puzzle)) {
                 return;
             }
-            const puzzle = value as IPuzzle;
             if (!("id" in puzzle) || puzzle.id !== id) {
                 return;
             }
@@ -64,9 +63,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
             // first element of question children
             let nextAnswerType = answersType;
             if (!nextAnswerType) {
-                const childrenHeadPuzzle = _.head(puzzle.puzzles) || {
-                    puzzleType: (ETerminals.EMPTY as unknown) as EPuzzleType,
-                };
+                const childrenHeadPuzzle = _.head(puzzle.puzzles) || { puzzleType: "" };
                 setAnswersType(childrenHeadPuzzle.puzzleType);
                 nextAnswerType = childrenHeadPuzzle.puzzleType;
             }
@@ -103,8 +100,8 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                     const puzzle = {
                         id: uuid(),
                         puzzleType: EPuzzleType.REFERENCE_TEXT,
-                        title: ETerminals.EMPTY,
-                        description: ETerminals.EMPTY,
+                        title: "",
+                        description: "",
                         order: childPuzzle.puzzles.length,
                         puzzles: [],
                         conditions: [],
@@ -232,7 +229,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                         <SelectField
                             id="question-puzzle-type"
                             fullWidth={true}
-                            value={answersType || ETerminals.EMPTY}
+                            value={answersType || ""}
                             onChange={onAnswerTypeChange}
                         >
                             {answerMenuItems.map(({ label, type, icon: Icon }, index) => (

@@ -1,5 +1,4 @@
 export enum EOperatorType {
-    NONE = "",
     MORE_THAN = "more_than",
     LESS_THAN = "less_than",
     EQUAL = "equal",

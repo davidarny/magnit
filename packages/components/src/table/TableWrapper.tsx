@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { css, jsx } from "@emotion/core";
-import { ETerminals } from "@magnit/entities";
 import {
     Grid,
     IconButton,
@@ -63,7 +62,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
 
     const [page, setPage] = useState(initialPage);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
-    const [orderBy, setOrderBy] = useState<string>(ETerminals.EMPTY);
+    const [orderBy, setOrderBy] = useState("");
 
     const onRequestSortCallback = useCallback(
         (event: React.MouseEvent<unknown>, property: string) => {
