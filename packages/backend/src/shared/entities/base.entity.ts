@@ -9,7 +9,7 @@ export abstract class BaseEntity<E, T = DeepPartial<E>> extends ConstructableEnt
     updated_at: string;
 
     @BeforeUpdate()
-    private updateUpdatedAt?() {
+    private update?() {
         this.updated_at = new Date().toISOString();
     }
 }

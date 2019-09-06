@@ -1,3 +1,4 @@
+import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
 
@@ -29,5 +30,9 @@ export interface ITemplateService {
 
     findAnswersById(id: string): Promise<TemplateAnswer[]>;
 
-    insertAnswerBulk(assets: TemplateAnswer[]): Promise<TemplateAnswer[]>;
+    saveTemplateLocation(
+        templateAnswerLocation: TemplateAnswerLocation,
+    ): Promise<TemplateAnswerLocation>;
+
+    saveAnswerBulk(assets: TemplateAnswer[]): Promise<TemplateAnswer[]>;
 }

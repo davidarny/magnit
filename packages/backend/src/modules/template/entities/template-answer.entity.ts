@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { Task } from "../../task/entities/task.entity";
+import { TemplateAnswerLocation } from "./template-answer-location.entity";
 import { Template } from "./template.entity";
 
 @Entity("template_answer")
@@ -38,6 +39,10 @@ export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
     @ManyToOne(() => Task, task => task.answers)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
+
+    @ManyToOne(() => TemplateAnswerLocation)
+    @JoinColumn({ name: "id_location", referencedColumnName: "id" })
+    location: TemplateAnswerLocation;
 
     @Index()
     @PrimaryColumn({ type: "varchar" })

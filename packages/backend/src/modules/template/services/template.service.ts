@@ -5,6 +5,7 @@ import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { CannotInsertTemplateException } from "../../../shared/exceptions/cannot-insert-template.exception";
 import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-found.exception";
+import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
 import { ITemplateService } from "../interfaces/template.service.interface";
@@ -17,6 +18,8 @@ export class TemplateService implements ITemplateService {
         private readonly templateRepository: Repository<Template>,
         @InjectRepository(TemplateAnswer)
         private readonly templateAnswerRepository: Repository<TemplateAnswer>,
+        @InjectRepository(TemplateAnswerLocation)
+        private readonly templateAnswerLocationRepository: Repository<TemplateAnswerLocation>,
     ) {}
 
     async findAnswersById(id: string): Promise<TemplateAnswer[]> {
@@ -144,8 +147,12 @@ export class TemplateService implements ITemplateService {
         await this.templateRepository.delete(id);
     }
 
-    async insertAnswerBulk(answers: TemplateAnswer[]) {
+    async saveAnswerBulk(answers: TemplateAnswer[]) {
         return this.templateAnswerRepository.save(answers);
+    }
+
+    async saveTemplateLocation(templateAnswerLocation: TemplateAnswerLocation) {
+        return this.templateAnswerLocationRepository.save(templateAnswerLocation);
     }
 
     async findPuzzlesByIds(template: Template, puzzleIds: string[]): Promise<Map<string, IPuzzle>> {
