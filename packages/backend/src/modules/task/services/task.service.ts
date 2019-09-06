@@ -200,7 +200,7 @@ export class TaskService implements ITaskService {
                 .filter(Boolean),
         );
         // move task to COMPLETED status
-        task.status = ETaskStatus.COMPLETED;
+        task.status = ETaskStatus.ON_CHECK;
         await this.taskRepository.save(task);
     }
 
