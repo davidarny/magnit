@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, In, Like, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { CannotParseLocationException } from "../../../shared/exceptions/cannot-parse-location.exception";
@@ -54,41 +54,50 @@ export class TaskService implements ITaskService {
         statuses?: ETaskStatus[],
         title?: string,
     ) {
-        // TODO: probably need to introduce FindOptionsBuilder
-        const options: FindManyOptions<Task> = {};
-        if (typeof offset !== "undefined") {
-            options.skip = offset;
+        let sql = `
+            SELECT
+                t.id,
+                t.title,
+                t.description,
+                t.status,
+                t.id_owner,
+                t.id_assignee,
+                t.notify_before,
+                t.created_at,
+                t.updated_at
+            FROM task t
+            WHERE 1 = 1
+        `;
+        const params: Array<string | number> = [];
+        if (!_.isNil(status)) {
+            params.push(status);
+            sql += ` AND t.status = $${params.length} `;
         }
-        if (typeof limit !== "undefined") {
-            options.take = limit;
+        if (!_.isNil(statuses)) {
+            params.push(`(${statuses.join(",")})`);
+            sql += ` AND t.status IN $${params.length} `;
         }
-        if (sort) {
-            options.order = { [sortBy || "title"]: sort };
+        if (!_.isNil(title)) {
+            params.push(`%${title.toLowerCase()}%`);
+            sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (status) {
-            if (!options.where) {
-                options.where = {};
-            }
-            Object.assign(options.where, { status });
+        if (!_.isNil(sort)) {
+            sql += ` ORDER BY t.${sortBy || "title"} ${sort} `;
         }
-        if (statuses) {
-            if (!options.where) {
-                options.where = {};
-            }
-            Object.assign(options.where, { status: In(statuses) });
+        if (!_.isNil(limit)) {
+            params.push(limit);
+            sql += ` LIMIT $${params.length} `;
         }
-        if (title) {
-            if (!options.where) {
-                options.where = {};
-            }
-            Object.assign(options.where, { title: Like(`%${title}%`) });
+        if (!_.isNil(offset)) {
+            params.push(offset);
+            sql += ` OFFSET $${params.length} `;
         }
-        return this.taskRepository.find(options);
+        return this.taskRepository.query(sql, params);
     }
 
     async insert(task: Task) {
         // in case if insert() is called with existing task
-        // semantics of this methods is about creating new onde
+        // semantics of this methods is about creating new one
         delete task.id;
         return this.taskRepository.save(task);
     }
