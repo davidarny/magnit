@@ -21,7 +21,7 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { getTasks, IGetTasksResponse, updateTask } from "services/api";
 
 const tabs: ITab[] = [
@@ -182,12 +182,15 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [clearSelectedTasks, selectedTasks, tasks],
     );
 
-    const updateTaskListDebounced = useRef(_.debounce(updateTasksList, 150));
+    const updateTaskListDebounced = _.debounce(updateTasksList, 150);
 
-    function onSearchQueryChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setSearchQuery(event.target.value);
-        updateTaskListDebounced.current({ title: event.target.value });
-    }
+    const onSearchQueryChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchQuery(event.target.value);
+            updateTaskListDebounced({ title: event.target.value });
+        },
+        [updateTaskListDebounced],
+    );
 
     const onRequestSortCallback = useCallback(
         (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
@@ -270,7 +273,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                                     placeholder="Поиск ..."
                                                     fullWidth
                                                     value={searchQuery}
-                                                    onChange={onSearchQueryChange}
+                                                    onChange={onSearchQueryChangeCallback}
                                                     css={({ spacing, ...theme }) => ({
                                                         borderRadius: theme.radius(5),
                                                         background: theme.colors.white,
