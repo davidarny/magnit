@@ -195,6 +195,7 @@ const Condition: React.FC<IConditionProps> = props => {
         index,
         condition.conditionType,
     );
+
     const isFirstRow = index === 0;
 
     return (
