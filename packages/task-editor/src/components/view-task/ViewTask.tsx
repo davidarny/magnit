@@ -222,7 +222,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             >
                 <MenuItem onClick={() => onNotifyBeforeChange(1)}>за 1 день</MenuItem>
                 <MenuItem onClick={() => onNotifyBeforeChange(2)}>за 2 дня</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(3)}>за 2 дня</MenuItem>
+                <MenuItem onClick={() => onNotifyBeforeChange(3)}>за 3 дня</MenuItem>
                 <MenuItem onClick={() => onNotifyBeforeChange(4)}>за 4 дня</MenuItem>
                 <MenuItem onClick={() => onNotifyBeforeChange(5)}>за 5 дней</MenuItem>
                 <MenuItem onClick={() => onNotifyBeforeChange(6)}>за 6 дней</MenuItem>
