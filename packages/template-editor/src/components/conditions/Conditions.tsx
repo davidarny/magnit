@@ -21,12 +21,10 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { useCondition, useConditions } from "hooks/condition";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getConditionService } from "services/condition";
-import { traverse } from "services/json";
-import uuid from "uuid/v4";
+import { useCallback, useState } from "react";
 
 interface IConditionsProps {
     initialState?: ICondition[];
@@ -39,206 +37,23 @@ interface IConditionsProps {
 }
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const { puzzleId, template, disabled = false, focused = true, onTemplateChange } = props;
-    const defaultState = {
-        id: uuid(),
-        order: 0,
-        questionPuzzle: "",
-        answerPuzzle: "",
-        value: "",
-        actionType: "",
-        conditionType: EConditionType.OR,
-    };
-    const initialState = props.initialState && props.initialState.length && props.initialState;
-    const [conditions, setConditions] = useState<ICondition[]>(initialState || [defaultState]);
-    const [questions, setQuestions] = useState<IPuzzle[]>([]);
-    const [answers, setAnswers] = useState<IPuzzle[]>([]);
+    const {
+        initialState,
+        puzzleId,
+        template,
+        disabled = false,
+        focused = true,
+        onTemplateChange,
+    } = props;
 
-    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
-    const isParentPuzzleGroup = useRef(false);
-
-    // check if parent of current puzzle is GROUP
-    // if so we apply special rule when finding questions to reference
-    useEffect(() => {
-        if (disabled) {
-            return;
-        }
-        traverse(template, (value: unknown, parent: unknown) => {
-            if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            const parentPuzzle = parent as IPuzzle;
-            const isGroupParent = parentPuzzle.puzzleType === EPuzzleType.GROUP;
-            isParentPuzzleGroup.current = puzzle.id === puzzleId && isGroupParent;
-        });
-    }, [template, disabled, puzzleId]);
-
-    const prevQuestions = useRef(_.cloneDeep(questions));
-    const prevAnswers = useRef(_.cloneDeep(answers));
-    useEffect(() => {
-        if (disabled) {
-            return;
-        }
-        // track if template is changed
-        // outside of this component
-        if (!_.isEqual(template, templateSnapshot.current)) {
-            conditions.forEach((condition, index, array) => {
-                let hasDependentQuestionChanged = false;
-                const dependentQuestion = questions.find(
-                    question => question.id === condition.questionPuzzle,
-                );
-                if (dependentQuestion) {
-                    traverse(template, (value: unknown) => {
-                        if (!_.has(value, "puzzles")) {
-                            return;
-                        }
-                        const puzzle = value as IPuzzle;
-                        // find dependent question in template
-                        if (
-                            puzzle.puzzleType !== EPuzzleType.QUESTION ||
-                            puzzle.id !== dependentQuestion.id
-                        ) {
-                            return;
-                        }
-                        // check if dependent question has changed
-                        hasDependentQuestionChanged = !_.isEqual(
-                            _.omit(dependentQuestion, "conditions"),
-                            _.omit(puzzle, "conditions"),
-                        );
-                    });
-                    if (hasDependentQuestionChanged) {
-                        condition.answerPuzzle = "";
-                        condition.value = "";
-                        condition.actionType = "";
-                        array[index] = { ...condition };
-                    }
-                }
-            });
-        }
-        // fill questions and answers initially
-        // by traversing whole template tree
-        questions.length = 0;
-        answers.length = 0;
-        traverse(template, (value: any) => {
-            if (!_.has(value, "puzzles")) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            if (!puzzle.puzzles.some(child => child.id === puzzleId)) {
-                return;
-            }
-            // find index of current puzzle in a tree
-            const index = puzzle.puzzles.findIndex(item => item.id === puzzleId);
-            // traverse all children of parent puzzle
-            // in order to find all possible siblings above
-            // so that scope of questionPuzzle is always all puzzles above the current
-            _.range(0, index).forEach(i => {
-                traverse(puzzle.puzzles[i], (value: any, parent: any) => {
-                    if (!_.has(value, "puzzleType")) {
-                        return;
-                    }
-                    const puzzle = value as IPuzzle;
-                    // check if parent of current item is GROUP puzzle
-                    const isGroupParent =
-                        parent &&
-                        parent.puzzleType === EPuzzleType.GROUP &&
-                        !isParentPuzzleGroup.current;
-                    // if puzzle is question and has non-empty title
-                    // then it's allowed to be selected as a questionPuzzle
-                    // disallow referencing to questions in GROUPS
-                    if (
-                        puzzle.puzzleType === EPuzzleType.QUESTION &&
-                        puzzle.title.toString().length > 0 &&
-                        !isGroupParent
-                    ) {
-                        questions.push(puzzle);
-                        return;
-                    }
-                    // if puzzle is one of answers types
-                    // then it's allowed to be selected as an answerPuzzle
-                    const excludedPuzzleTypes = [EPuzzleType.GROUP, EPuzzleType.QUESTION];
-                    if (!excludedPuzzleTypes.includes(puzzle.puzzleType)) {
-                        answers.push(puzzle);
-                        return;
-                    }
-                });
-            });
-            // set conditions of current puzzle
-            puzzle.puzzles[index].conditions = [...conditions].filter(
-                condition =>
-                    !!(
-                        condition.actionType &&
-                        condition.conditionType &&
-                        condition.questionPuzzle &&
-                        (condition.value || condition.answerPuzzle)
-                    ),
-            );
-        });
-        if (!_.isEqual(prevQuestions.current, questions)) {
-            const clonedQuestions = _.cloneDeep(questions);
-            prevQuestions.current = clonedQuestions;
-            setQuestions(clonedQuestions);
-        }
-        if (!_.isEqual(prevAnswers.current, answers)) {
-            const clonedAnswers = _.cloneDeep(answers);
-            prevAnswers.current = clonedAnswers;
-            setAnswers(clonedAnswers);
-        }
-        // trigger template update if snapshot changed
-        // also cloneDeep in order to track changes above in isEqual
-        const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = clonedTemplate;
-            return;
-        }
-        templateSnapshot.current = clonedTemplate;
-        onTemplateChange(templateSnapshot.current);
-    }, [conditions, template, disabled, questions, answers, onTemplateChange, puzzleId]);
-
-    const onConditionDeleteCallback = useCallback(
-        (id: string) => {
-            // do not allow to delete if only one condition present
-            if (conditions.length === 1) {
-                setConditions([defaultState]);
-                return;
-            }
-            setConditions([...conditions.filter(condition => condition.id !== id)]);
-        },
-        [conditions, defaultState],
-    );
-
-    const onConditionChangeCallback = useCallback(
-        (id: string, nextCondition: Partial<ICondition>): void => {
-            const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
-            conditions[changedConditionIdx] = {
-                ...conditions[changedConditionIdx],
-                ...nextCondition,
-            };
-            setConditions([...conditions]);
-        },
-        [conditions],
-    );
-
-    const onAddConditionCallback = useCallback((): void => {
-        if (
-            questions.length === 0 ||
-            (conditions.length !== 0 && !conditions.some(condition => !!condition.questionPuzzle))
-        ) {
-            return;
-        }
-        const conditionsHead = _.head(conditions) || { questionPuzzle: "" };
-        conditions.push({
-            id: uuid(),
-            order: conditions.length - 1,
-            questionPuzzle: conditionsHead.questionPuzzle,
-            answerPuzzle: "",
-            value: "",
-            actionType: "",
-            conditionType: EConditionType.OR,
-        });
-        setConditions([...conditions]);
-    }, [conditions, questions.length]);
+    const [
+        conditions,
+        questions,
+        answers,
+        onConditionDeleteCallback,
+        onConditionChangeCallback,
+        onAddConditionCallback,
+    ] = useConditions(template, disabled, puzzleId, onTemplateChange, initialState);
 
     return (
         <Grid
@@ -281,6 +96,8 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         </Grid>
     );
 };
+
+Conditions.displayName = "Conditions";
 
 interface IConditionProps {
     index: number;
@@ -371,14 +188,13 @@ const Condition: React.FC<IConditionProps> = props => {
         puzzleType: ("" as unknown) as EPuzzleType,
     };
 
-    const conditionService = getConditionService({
-        ...questionAnswersHead,
-        ...condition,
-        index,
+    const [getConditionLiteral, getActionVariants, getAnswerPuzzle] = useCondition(
+        questionAnswersHead.puzzleType,
         condition,
         value,
-    });
-
+        index,
+        condition.conditionType,
+    );
     const isFirstRow = index === 0;
 
     return (
@@ -386,7 +202,7 @@ const Condition: React.FC<IConditionProps> = props => {
             {isFirstRow && (
                 <Grid item>
                     <Typography css={theme => ({ color: theme.colors.secondary })}>
-                        {conditionService.getConditionLiteral()}
+                        {getConditionLiteral()}
                     </Typography>
                 </Grid>
             )}
@@ -456,14 +272,13 @@ const Condition: React.FC<IConditionProps> = props => {
                         onChange={onActionTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >
-                        {conditionService.getActionVariants()}
+                        {getActionVariants()}
                     </SelectField>
                 )}
             </Grid>
             <Grid item xs={4}>
                 {!!condition.actionType &&
-                    conditionService
-                        .getAnswerPuzzle(answers, questions)
+                    getAnswerPuzzle(answers, questions)
                         .setAnswerPuzzleChangeHandler(onAnswerPuzzleChangeCallback)
                         .setValueChangeHandler(onValueChange)
                         .setValueBlurHandler(onValueBlurCallback)
@@ -483,3 +298,5 @@ const Condition: React.FC<IConditionProps> = props => {
         </React.Fragment>
     );
 };
+
+Condition.displayName = "Condition";
