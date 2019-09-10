@@ -117,10 +117,15 @@ export const SectionView: React.FC<ISectionPuzzleProps> = props => {
                     <Grid item>
                         <InputField
                             fullWidth={true}
-                            placeholder="Описание раздела (необязательно)"
+                            placeholder="Описание (необязательно)"
                             defaultValue={description}
                             simple={!focused}
-                            css={theme => ({ input: { fontSize: theme.fontSize.normal } })}
+                            css={theme => ({
+                                input: {
+                                    fontSize: theme.fontSize.medium,
+                                    fontWeight: 500,
+                                },
+                            })}
                             onBlur={onSectionDescriptionBlurCallback}
                             onChange={onSectionDescriptionChange}
                         />
