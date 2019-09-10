@@ -358,6 +358,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     }
 
     const focusedPuzzleId = _.first(focusedPuzzleChain);
+    const focusedOnTemplateHead = focusedPuzzleId === template.id.toString();
 
     context.template = template;
     context.cache = cache;
@@ -367,33 +368,40 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     context.onAddAnswerPuzzle = onAddAnswerPuzzle;
     context.onDeleteAnswerPuzzle = onDeleteAnswerPuzzle;
 
+    const editorToolbarItems = [
+        ...(focusedOnTemplateHead
+            ? []
+            : [
+                  {
+                      label: "Добавить вопрос",
+                      icon: <QuestionIcon />,
+                      action: onToolbarAddQuestion,
+                  },
+                  {
+                      label: "Добавить группу",
+                      icon: <GroupIcon />,
+                      action: onToolbarAddGroup,
+                  },
+              ]),
+        {
+            label: "Добавить раздел",
+            icon: <SectionIcon />,
+            action: onToolbarAddSection,
+        },
+        ...(focusedOnTemplateHead
+            ? []
+            : [
+                  {
+                      label: "Удалить элемент",
+                      icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
+                      action: onDeletePuzzle,
+                  },
+              ]),
+    ];
+
     return (
         <React.Fragment>
-            <EditorToolbar
-                top={toolbarTopPosition}
-                items={[
-                    {
-                        label: "Добавить вопрос",
-                        icon: <QuestionIcon />,
-                        action: onToolbarAddQuestion,
-                    },
-                    {
-                        label: "Добавить группу",
-                        icon: <GroupIcon />,
-                        action: onToolbarAddGroup,
-                    },
-                    {
-                        label: "Добавить раздел",
-                        icon: <SectionIcon />,
-                        action: onToolbarAddSection,
-                    },
-                    {
-                        label: "Удалить элемент",
-                        icon: <TrashIcon />,
-                        action: onDeletePuzzle,
-                    },
-                ]}
-            />
+            <EditorToolbar top={toolbarTopPosition} items={editorToolbarItems} />
             <SelectableBlockWrapper
                 id={template.id.toString()}
                 css={theme => ({
