@@ -136,11 +136,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             // then trying to find in which section to add
             if (hasPuzzleType(puzzle) && !whitelist.includes(puzzle.puzzleType)) {
                 const puzzles = [...cache.sections.values()];
-                const parentSection = puzzles.find(el =>
-                    el.puzzles.some(child => child.id === puzzle.id),
-                );
-                if (parentSection) {
-                    puzzle = parentSection;
+                const parent = puzzles
+                    .flatMap(el => [el, ...el.puzzles])
+                    .find(el => el.puzzles.some(child => child.id === puzzle.id));
+                if (parent) {
+                    puzzle = parent;
                 } else {
                     return;
                 }
