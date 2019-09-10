@@ -32,7 +32,7 @@ export class FetchCourier implements ICourier {
 
     private async send<T>(path: string, method: TMethod, body?: any) {
         try {
-            if (this.middlewares) {
+            if (this.middlewares && !(body instanceof FormData)) {
                 for (const middleware of this.middlewares) {
                     const result = await middleware.request(
                         { path, method, version: this.version },

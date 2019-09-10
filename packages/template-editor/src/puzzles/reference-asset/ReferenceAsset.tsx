@@ -107,13 +107,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                 )}
                 {addAssetButton && (
                     <React.Fragment>
-                        <input
-                            ref={input}
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={onFileChangeCallback}
-                        />
+                        <input ref={input} type="file" hidden onChange={onFileChangeCallback} />
                         <Fab
                             css={theme => ({
                                 width: theme.spacing(5),
