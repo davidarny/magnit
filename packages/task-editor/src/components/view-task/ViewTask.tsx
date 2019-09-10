@@ -212,6 +212,42 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
+    const showNewStageButton =
+        (task.status !== ETaskStatus.IN_PROGRESS || task.status !== ETaskStatus.COMPLETED) &&
+        !steps.some(step => step.editable);
+
+    const showEmptyStages =
+        (!task.stages || task.stages.length === 0) &&
+        (task.status === ETaskStatus.DRAFT || task.status === ETaskStatus.ON_CHECK);
+
+    function onNotifyBeforeOneDay() {
+        onNotifyBeforeChange(1);
+    }
+
+    function onNotifyBeforeTwoDays() {
+        onNotifyBeforeChange(2);
+    }
+
+    function onNotifyBeforeThreeDays() {
+        onNotifyBeforeChange(3);
+    }
+
+    function onNotifyBeforeFourDays() {
+        onNotifyBeforeChange(4);
+    }
+
+    function onNotifyBeforeFiveDays() {
+        onNotifyBeforeChange(5);
+    }
+
+    function onNotifyBeforeSixDays() {
+        onNotifyBeforeChange(6);
+    }
+
+    function onNotifyBeforeSevenDays() {
+        onNotifyBeforeChange(7);
+    }
+
     return (
         <React.Fragment>
             <Menu
@@ -220,13 +256,13 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 anchorEl={menuAnchorElement}
                 onClose={onMenuClose}
             >
-                <MenuItem onClick={() => onNotifyBeforeChange(1)}>за 1 день</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(2)}>за 2 дня</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(3)}>за 3 дня</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(4)}>за 4 дня</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(5)}>за 5 дней</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(6)}>за 6 дней</MenuItem>
-                <MenuItem onClick={() => onNotifyBeforeChange(7)}>за 7 дней</MenuItem>
+                <MenuItem onClick={onNotifyBeforeOneDay}>за 1 день</MenuItem>
+                <MenuItem onClick={onNotifyBeforeTwoDays}>за 2 дня</MenuItem>
+                <MenuItem onClick={onNotifyBeforeThreeDays}>за 3 дня</MenuItem>
+                <MenuItem onClick={onNotifyBeforeFourDays}>за 4 дня</MenuItem>
+                <MenuItem onClick={onNotifyBeforeFiveDays}>за 5 дней</MenuItem>
+                <MenuItem onClick={onNotifyBeforeSixDays}>за 6 дней</MenuItem>
+                <MenuItem onClick={onNotifyBeforeSevenDays}>за 7 дней</MenuItem>
             </Menu>
             <Dialog
                 onClose={onDialogClose}
@@ -333,7 +369,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 </Grid>
                 <Grid container spacing={2}>
                     <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
-                        <Grid container direction="row">
+                        <Grid spacing={2} container direction="row">
                             <InfoField title="Администратор" value="Барановский Прохор Артёмович" />
                             <InfoField
                                 title="Исполнитель"
@@ -345,6 +381,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Grid>
                         <Grid
                             container
+                            spacing={2}
                             direction="row"
                             css={theme => ({ marginTop: theme.spacing(3) })}
                         >
@@ -356,53 +393,61 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Grid>
                     </Grid>
                     <Grid item xs>
-                        <Grid container spacing={2}>
+                        <Grid
+                            container
+                            spacing={2}
+                            css={{
+                                height: "100%",
+                                alignItems: !showEmptyStages ? "flex-end" : "initial",
+                            }}
+                        >
                             <Grid item xs={12}>
-                                <StepperWrapper
-                                    onTitleChange={onChangeStepTitleCallback}
-                                    onTitleBlur={onStepBlurCallback}
-                                    onStepDelete={onStepDeleteCallback}
-                                    steps={steps.map(step => ({
-                                        id: step.id,
-                                        editable: step.editable,
-                                        completed: step.completed,
-                                        title: step.title,
-                                        content: (
-                                            <DateField
-                                                disabled={!step.editable}
-                                                onChange={event =>
-                                                    onChangeStepDateCallback(
-                                                        step.id,
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                onBlur={onStepBlurCallback}
-                                                value={
-                                                    !step.editable
-                                                        ? getFriendlyDate(new Date(step.deadline))
-                                                        : step.deadline
-                                                }
-                                            />
-                                        ),
-                                    }))}
-                                />
-                                {![ETaskStatus.IN_PROGRESS, ETaskStatus.COMPLETED].includes(
-                                    task.status!,
-                                ) &&
-                                    !steps.some(step => step.editable) && (
-                                        <Button
-                                            variant="outlined"
-                                            scheme="outline"
-                                            css={theme => ({
-                                                color: theme.colors.primary,
-                                                marginLeft: theme.spacing(6),
-                                            })}
-                                            onClick={onAddStepCallback}
-                                        >
-                                            <AddIcon />
-                                            <Typography>Новый этап</Typography>
-                                        </Button>
-                                    )}
+                                {showEmptyStages && (
+                                    <StepperWrapper
+                                        onTitleChange={onChangeStepTitleCallback}
+                                        onTitleBlur={onStepBlurCallback}
+                                        onStepDelete={onStepDeleteCallback}
+                                        steps={steps.map(step => ({
+                                            id: step.id,
+                                            editable: step.editable,
+                                            completed: step.completed,
+                                            title: step.title,
+                                            content: (
+                                                <DateField
+                                                    disabled={!step.editable}
+                                                    onChange={event =>
+                                                        onChangeStepDateCallback(
+                                                            step.id,
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    onBlur={onStepBlurCallback}
+                                                    value={
+                                                        !step.editable
+                                                            ? getFriendlyDate(
+                                                                  new Date(step.deadline),
+                                                              )
+                                                            : step.deadline
+                                                    }
+                                                />
+                                            ),
+                                        }))}
+                                    />
+                                )}
+                                {showNewStageButton && (
+                                    <Button
+                                        variant="outlined"
+                                        scheme="outline"
+                                        css={theme => ({
+                                            color: theme.colors.primary,
+                                            marginLeft: theme.spacing(6),
+                                        })}
+                                        onClick={onAddStepCallback}
+                                    >
+                                        <AddIcon />
+                                        <Typography>Новый этап</Typography>
+                                    </Button>
+                                )}
                             </Grid>
                             {task.notifyBefore && (
                                 <Grid
