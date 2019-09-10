@@ -3,14 +3,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
-import { CannotParseLocationException } from "../../../shared/exceptions/cannot-parse-location.exception";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
 import { CannotSavePartialAnswersException } from "../../../shared/exceptions/cannot-save.partial-answers.exception";
 import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
 import { LocationNotFoundInBodyException } from "../../../shared/exceptions/location-not-found-in-body.exception";
 import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
-import { TemplateAnswerLocationDto } from "../../template/dto/template-answer-location.dto";
 import { TemplateAnswerLocation } from "../../template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
@@ -141,7 +139,7 @@ export class TaskService implements ITaskService {
         taskId: string,
         templateIds: string[],
         files: Express.Multer.File[],
-        body: { [key: string]: string },
+        body: { [key: string]: string | object },
     ) {
         const task = await this.taskRepository.findOne(taskId);
         // check if task has IN_PROGRESS status
@@ -155,16 +153,10 @@ export class TaskService implements ITaskService {
         const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
             this.getTemplateIdFromMultipartKey(id),
         );
-        if (!body.location) {
+        if (!body.location || !_.isObject(body.location)) {
             throw new LocationNotFoundInBodyException("Location not found in body");
         }
-        const templateAnswerLocationDto: Error | TemplateAnswerLocationDto = _.attempt(() =>
-            JSON.parse(body.location),
-        );
-        if (templateAnswerLocationDto instanceof Error) {
-            throw new CannotParseLocationException("Cannot parse location JSON");
-        }
-        const location = new TemplateAnswerLocation(templateAnswerLocationDto);
+        const location = new TemplateAnswerLocation(body.location);
         await this.templateService.saveTemplateLocation(location);
         await Promise.all(
             groupedTemplateIds
@@ -207,16 +199,19 @@ export class TaskService implements ITaskService {
                                     filename = `${process.env.BACKEND_HOST}/${filename}`;
                                 }
                                 const answer = filename || body[templatePuzzleId];
-                                return new TemplateAnswer({
-                                    id_puzzle: puzzle.id,
-                                    answer,
-                                    template,
-                                    location,
-                                    task,
-                                    answer_type: type,
-                                    // save comment if exists
-                                    comment: body[`${templateId}_${puzzleId}_comment`] || null,
-                                });
+                                const comment = body[`${templateId}_${puzzleId}_comment`];
+                                if (_.isString(answer)) {
+                                    return new TemplateAnswer({
+                                        id_puzzle: puzzle.id,
+                                        answer,
+                                        template,
+                                        location,
+                                        task,
+                                        answer_type: type,
+                                        // save comment if exists
+                                        comment: _.isString(comment) ? comment : null,
+                                    });
+                                }
                             }
                         })
                         .filter(Boolean);

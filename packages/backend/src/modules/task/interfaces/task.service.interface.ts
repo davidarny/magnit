@@ -32,7 +32,7 @@ export interface ITaskService {
         taskId: string,
         templateIds: string[],
         files: Express.Multer.File[],
-        body: { [key: string]: string },
+        body: { [key: string]: string | object },
     ): Promise<void>;
 
     getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
