@@ -17,3 +17,4 @@
 | 11         | 400              | Incorrect Task status when setting Answers |                                                      |
 | 12         | 400              | Cannot save Answers partially              |                                                      |
 | 13         | 400              | Location not found in body                 |                                                      |
+| 14         | 400              | Cannot parse location JSON                 |                                                      |

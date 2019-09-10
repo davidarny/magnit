@@ -3,12 +3,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
+import { CannotParseLocationException } from "../../../shared/exceptions/cannot-prase-location.location";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
 import { CannotSavePartialAnswersException } from "../../../shared/exceptions/cannot-save.partial-answers.exception";
 import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
 import { LocationNotFoundInBodyException } from "../../../shared/exceptions/location-not-found-in-body.exception";
 import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
+import { TemplateAnswerLocationDto } from "../../template/dto/template-answer-location.dto";
 import { TemplateAnswerLocation } from "../../template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
@@ -139,7 +141,7 @@ export class TaskService implements ITaskService {
         taskId: string,
         templateIds: string[],
         files: Express.Multer.File[],
-        body: { [key: string]: string | object },
+        body: { [key: string]: string },
     ) {
         const task = await this.taskRepository.findOne(taskId);
         // check if task has IN_PROGRESS status
@@ -149,15 +151,21 @@ export class TaskService implements ITaskService {
                 `Cannot save answers while task has status "${task.status}"`,
             );
         }
+        if (!body.location) {
+            throw new LocationNotFoundInBodyException("Location not found in body");
+        }
+        const templateAnswerLocationDto: Error | TemplateAnswerLocationDto = _.attempt(() =>
+            JSON.parse(body.location),
+        );
+        if (templateAnswerLocationDto instanceof Error) {
+            throw new CannotParseLocationException("Cannot parse location JSON");
+        }
+        const location = new TemplateAnswerLocation(templateAnswerLocationDto);
+        await this.templateService.saveTemplateLocation(location);
         // get all template ids in keys
         const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
             this.getTemplateIdFromMultipartKey(id),
         );
-        if (!body.location || !_.isObject(body.location)) {
-            throw new LocationNotFoundInBodyException("Location not found in body");
-        }
-        const location = new TemplateAnswerLocation(body.location);
-        await this.templateService.saveTemplateLocation(location);
         await Promise.all(
             groupedTemplateIds
                 .map(async templateId => {
@@ -180,11 +188,14 @@ export class TaskService implements ITaskService {
                         template,
                         puzzleIds,
                     );
-                    const allPuzzles = await this.templateService.findAllQuestions(template);
-                    if (allPuzzles.length !== puzzleIds.length) {
-                        throw new CannotSavePartialAnswersException(
-                            "Cannot save answers partially",
-                        );
+                    // TODO: correctly handle questions check
+                    if (false) {
+                        const allPuzzles = await this.templateService.findAllQuestions(template);
+                        if (allPuzzles.length !== puzzleIds.length) {
+                            throw new CannotSavePartialAnswersException(
+                                "Cannot save answers partially",
+                            );
+                        }
                     }
                     // collect answers
                     const answers = templatePuzzleIds

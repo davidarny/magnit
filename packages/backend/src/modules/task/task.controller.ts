@@ -236,9 +236,12 @@ export class TaskController {
     async setTemplateAnswers(
         @Param("task_id", TaskByIdPipe) taskId: string,
         @UploadedFiles() files: Express.Multer.File[],
-        @Body() body: { [key: string]: string | object },
+        @Body() body: { [key: string]: string },
     ) {
-        const templateIds = [...(files || []).map(file => file.fieldname), ...Object.keys(body)];
+        const templateIds = [
+            ...(files || []).map(file => file.fieldname),
+            ...Object.keys(body),
+        ].filter(key => key !== "location");
         await this.taskService.setTaskAnswers(taskId, templateIds, files, body);
         return { success: 1 };
     }
