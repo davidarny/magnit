@@ -59,7 +59,12 @@ export interface ITemplate extends ITitled, IWithDescription {
     type: ETemplateType;
 }
 
-export interface ISection extends IOrdered, ITitled, IWithPuzzles<IPuzzle>, IWithId {}
+export interface ISection
+    extends IOrdered,
+        ITitled,
+        IWithPuzzles<IPuzzle>,
+        IWithId,
+        IWithDescription {}
 
 export interface IPuzzle
     extends IOrdered,

@@ -221,6 +221,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             id,
             puzzles: [],
             title: "",
+            description: "",
             order: (prevSection || { order: -1 }).order + 1,
         });
         cache.sections.set(id, _.last(template.sections)!);

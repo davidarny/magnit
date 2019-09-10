@@ -41,6 +41,7 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...pr
         >
             <SectionView
                 id={section.id}
+                description={section.description}
                 title={section.title}
                 index={props.index}
                 focused={focused}

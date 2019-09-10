@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -6,11 +5,12 @@ import { InputField } from "@magnit/components";
 import { ISpecificPuzzleProps, ITemplate } from "@magnit/entities";
 import { Grid, Typography } from "@material-ui/core";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface ISectionPuzzleProps extends ISpecificPuzzleProps {
     id: string;
     title: string;
+    description: string;
     focused: boolean;
     template: ITemplate;
 
@@ -18,17 +18,19 @@ interface ISectionPuzzleProps extends ISpecificPuzzleProps {
 }
 
 export const SectionView: React.FC<ISectionPuzzleProps> = props => {
-    const { id, title, index, focused, children, ...rest } = props;
-    const [sectionTitle, setSectionTitle] = useState<string>(title);
+    const { id, title, index, focused, children, description, template } = props;
+    const { onTemplateChange } = props;
+    const [sectionTitle, setSectionTitle] = useState(title);
+    const [sectionDescription, setSectionDescription] = useState(description);
 
     function onSectionTitleChange(event: React.ChangeEvent<HTMLInputElement>): void {
         setSectionTitle(event.target.value);
     }
 
-    useEffect(() => {
-        rest.onTemplateChange({
-            ...rest.template,
-            sections: rest.template.sections.map(section => {
+    const onSectionTitleBlurCallback = useCallback(() => {
+        onTemplateChange({
+            ...template,
+            sections: template.sections.map(section => {
                 if (section.id === id) {
                     return {
                         ...section,
@@ -38,7 +40,26 @@ export const SectionView: React.FC<ISectionPuzzleProps> = props => {
                 return section;
             }),
         });
-    }, [sectionTitle]);
+    }, [id, onTemplateChange, sectionTitle, template]);
+
+    function onSectionDescriptionChange(event: React.ChangeEvent<HTMLInputElement>): void {
+        setSectionDescription(event.target.value);
+    }
+
+    const onSectionDescriptionBlurCallback = useCallback(() => {
+        onTemplateChange({
+            ...template,
+            sections: template.sections.map(section => {
+                if (section.id === id) {
+                    return {
+                        ...section,
+                        description: sectionDescription,
+                    };
+                }
+                return section;
+            }),
+        });
+    }, [id, onTemplateChange, sectionDescription, template]);
 
     return (
         <React.Fragment>
@@ -66,7 +87,11 @@ export const SectionView: React.FC<ISectionPuzzleProps> = props => {
                         Раздел {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs css={theme => ({ marginLeft: `${theme.spacing(16)} !important` })}>
+                <Grid
+                    item
+                    xs={12}
+                    css={theme => ({ marginLeft: `${theme.spacing(16)} !important` })}
+                >
                     <Grid item>
                         <InputField
                             fullWidth={true}
@@ -79,7 +104,25 @@ export const SectionView: React.FC<ISectionPuzzleProps> = props => {
                                     fontWeight: 500,
                                 },
                             })}
+                            onBlur={onSectionTitleBlurCallback}
                             onChange={onSectionTitleChange}
+                        />
+                    </Grid>
+                </Grid>
+                <Grid
+                    item
+                    xs={12}
+                    css={theme => ({ marginLeft: `${theme.spacing(16)} !important` })}
+                >
+                    <Grid item>
+                        <InputField
+                            fullWidth={true}
+                            placeholder="Описание раздела (необязательно)"
+                            defaultValue={description}
+                            simple={!focused}
+                            css={theme => ({ input: { fontSize: theme.fontSize.normal } })}
+                            onBlur={onSectionDescriptionBlurCallback}
+                            onChange={onSectionDescriptionChange}
                         />
                     </Grid>
                 </Grid>
