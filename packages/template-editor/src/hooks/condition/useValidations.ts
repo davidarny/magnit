@@ -146,9 +146,8 @@ export function useValidations(
 
     const onAddValidationCallback = useCallback((): void => {
         if (
-            questions.length === 0 ||
-            (validations.length !== 0 &&
-                !validations.some(validation => !!validation.leftHandPuzzle))
+            validations.length !== 0 &&
+            !validations.some(validation => !!validation.leftHandPuzzle)
         ) {
             return;
         }
@@ -159,7 +158,7 @@ export function useValidations(
             leftHandPuzzle: (currentQuestion && currentQuestion.id) || "",
         });
         setValidations([...validations]);
-    }, [currentQuestion, questions.length, validations]);
+    }, [currentQuestion, validations]);
 
     function onErrorMessageChange(event: TSelectChangeEvent) {
         setErrorMessage(event.target.value as string);
