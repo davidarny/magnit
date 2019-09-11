@@ -63,8 +63,8 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     padding: theme.spacing(3),
                     zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
                 })}
-                onFocus={service.onPuzzleFocus.bind(service, getTaskId())}
-                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId())}
+                onFocus={service.onPuzzleFocus.bind(service, getTaskId(), false)}
+                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId(), false)}
                 focused={focusedPuzzleId === getTaskId()}
                 id={getTaskId()}
             >
@@ -168,8 +168,8 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
     return (
         <SelectableBlockWrapper
             key={document.__uuid}
-            onFocus={service.onPuzzleFocus.bind(service, document.__uuid)}
-            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid)}
+            onFocus={service.onPuzzleFocus.bind(service, document.__uuid, false)}
+            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid, false)}
             css={theme => ({
                 padding: theme.spacing(3),
                 zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",

@@ -45,6 +45,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
+    const focusedOnTaskHead = focusedPuzzleId === task.id.toString();
     const editable =
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
@@ -202,6 +203,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             nextDocument.virtual = true;
         }
         setDocuments([...documents, nextDocument]);
+        service.current.onPuzzleFocus(nextDocument.__uuid);
     }, [documents, isViewMode, task]);
 
     const onAddStageCallback = useCallback(
@@ -262,6 +264,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             documents.splice(documentIndex, 1);
             setDocuments([...documents]);
             updateTaskTemplates(documents);
+            const idToFocusOn = _.last(documents) ? _.last(documents)!.__uuid : task.id.toString();
+            service.current.onPuzzleFocus(idToFocusOn);
         }
     }, [documents, focusedPuzzleId, isCreateMode, task, updateTaskTemplates]);
 
@@ -280,7 +284,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             icon: <CommentsIcon />,
             action: _.noop,
         },
-        ...(editable
+        ...(editable && !focusedOnTaskHead
             ? [
                   {
                       label: "Удалить шаблон",
