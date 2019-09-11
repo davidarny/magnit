@@ -71,7 +71,10 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
                 <Grid container direction="column" spacing={1}>
                     {_.get(puzzle, "puzzles", [])
                         .filter((puzzle: object) =>
-                            answer ? answer.answer === _.get(puzzle, "title") : true,
+                            answer
+                                ? answer.answer === _.get(puzzle, "title") ||
+                                  answer.answer === _.get(puzzle, "id")
+                                : true,
                         )
                         .map((puzzle: object, index: number) => {
                             const puzzleType = _.get(puzzle, "puzzleType") as EPuzzleType;
