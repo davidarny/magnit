@@ -14,7 +14,7 @@ export class TaskExpiredPipe implements PipeTransform<string | unknown, Promise<
             await Promise.all(tasks.map(async task => this.setTaskExpired(task)));
         } else {
             const task = await this.taskService.findById(id);
-            this.setTaskExpired(task);
+            await this.setTaskExpired(task);
         }
         return id;
     }

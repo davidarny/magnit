@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ETaskStatus, IExtendedTask, ITemplate } from "@magnit/entities";
+import { ETaskStatus, IExtendedTask, IStage, ITemplate } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
@@ -11,12 +11,11 @@ import { Redirect } from "@reach/router";
 import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
-import { Snackbar } from "components/snackbar";
 import { SendMessageForm } from "components/view-task";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
     addStages,
     addTemplateAssignment,
@@ -48,11 +47,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         stages: [],
         status: ETaskStatus.DRAFT,
     });
-    const [error, setError] = useState(false); // success/error snackbar state
-    const [snackbar, setSnackbar] = useState({
-        open: false,
-        message: "",
-    }); // open/close snackbar
     const [redirect, setRedirect] = useState({
         trigger: false,
         to: "",
@@ -69,7 +63,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const isTaskEditable = (task: IExtendedTask) =>
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
-    useEffect(() => {
+    const updateTaskExtended = useCallback(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(response => {
                 if (isValidTask(response.task)) {
@@ -113,14 +107,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             .catch(console.error);
     }, [context.courier, taskId]);
 
-    function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
-        if (reason === "clickaway") {
-            return;
-        }
-        setSnackbar({ open: false, message: "" });
-        // wait till animation ends
-        setTimeout(() => setError(false), 100);
-    }
+    useEffect(() => updateTaskExtended(), [updateTaskExtended]);
 
     function onTaskChange(task: Partial<IExtendedTask>): void {
         if (isValidTask(task)) {
@@ -146,7 +133,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         onMenuClose();
     }
 
-    function onTaskSave(): void {
+    const onTaskSaveCallback = useCallback((): void => {
         // disallow update if task is not editable
         if (!isTaskEditable(task)) {
             return;
@@ -160,20 +147,15 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         ) {
             task.status = ETaskStatus.IN_PROGRESS;
         }
-        updateTask(context.courier, taskId, getTaskPayload(task))
-            .then(async () =>
-                addTemplateAssignment(
-                    context.courier,
-                    Number(taskId),
-                    (task.templates || [])
-                        // filter to only existing templates
-                        .filter(assignment =>
-                            templates.find(template => template.id === assignment.id),
-                        )
-                        .map(template => Number(template.id)),
-                ),
-            )
-            .then(() =>
+        Promise.all([
+            addTemplateAssignment(
+                context.courier,
+                Number(taskId),
+                (task.templates || [])
+                    // filter to only existing templates
+                    .filter(assignment => templates.find(template => template.id === assignment.id))
+                    .map(template => Number(template.id)),
+            ).then(() =>
                 Promise.all(
                     task.templates.map(({ id, editable }) => {
                         const body = {
@@ -182,16 +164,17 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                         return updateTemplateAssignment(context.courier, taskId, Number(id), body);
                     }),
                 ),
-            )
-            .then(async () => {
-                const diffStages = task.stages
+            ),
+            (async () => {
+                const findIfStageExists = (stage: IStage) =>
+                    !initialStages.current.find(initialStage => initialStage.id === stage.id);
+                const filterEmptyStages = (step: IStage) => step.title && step.deadline;
+
+                const diff = task.stages
                     // filter so that add only stages that doesn't exist
-                    .filter(
-                        stage =>
-                            !initialStages.current.find(
-                                initialStage => initialStage.id === stage.id,
-                            ),
-                    )
+                    .filter(findIfStageExists)
+                    // filter empty
+                    .filter(filterEmptyStages)
                     .map(stage => {
                         // TODO: mask input for date
                         const splitted = stage.deadline.split(".");
@@ -201,27 +184,98 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                         date.setFullYear(Number(_.nth(splitted, 2)));
                         return { ...stage, deadline: new Date(date).toISOString() };
                     });
-                if (!diffStages.length) {
+                if (!diff.length) {
                     return;
                 }
-                return addStages(context.courier, taskId, diffStages);
+                return addStages(context.courier, taskId, diff);
+            })(),
+        ])
+            .then(() => updateTask(context.courier, taskId, getTaskPayload(task)))
+            .then(() => {
+                updateTaskExtended();
+                context.setSnackbarState({
+                    open: true,
+                    message: "Задание успешно обновлено!",
+                });
             })
-            .then(() => setSnackbar({ open: true, message: "Задание успешно обновлено!" }))
             .catch(() => {
-                setSnackbar({ open: true, message: "Ошибка обновления задания!" });
-                setError(true);
+                context.setSnackbarState({ open: true, message: "Ошибка обновления задания!" });
+                context.setSnackbarError(true);
             });
-    }
+        // updateTask(context.courier, taskId, getTaskPayload(task))
+        //     .then(async () =>
+        //         addTemplateAssignment(
+        //             context.courier,
+        //             Number(taskId),
+        //             (task.templates || [])
+        //                 // filter to only existing templates
+        //                 .filter(assignment =>
+        //                     templates.find(template => template.id === assignment.id),
+        //                 )
+        //                 .map(template => Number(template.id)),
+        //         ),
+        //     )
+        //     .then(() =>
+        //         Promise.all(
+        //             task.templates.map(({ id, editable }) => {
+        //                 const body = {
+        //                     editable,
+        //                 };
+        //                 return updateTemplateAssignment(context.courier, taskId, Number(id), body);
+        //             }),
+        //         ),
+        //     )
+        //     .then(async () => {
+        //         const diffStages = task.stages
+        //             // filter so that add only stages that doesn't exist
+        //             .filter(
+        //                 stage =>
+        //                     !initialStages.current.find(
+        //                         initialStage => initialStage.id === stage.id,
+        //                     ),
+        //             )
+        //             .map(stage => {
+        //                 // TODO: mask input for date
+        //                 const splitted = stage.deadline.split(".");
+        //                 const date = new Date();
+        //                 date.setDate(Number(_.first(splitted)));
+        //                 date.setMonth(Number(_.nth(splitted, 1)) - 1);
+        //                 date.setFullYear(Number(_.nth(splitted, 2)));
+        //                 return { ...stage, deadline: new Date(date).toISOString() };
+        //             });
+        //         if (!diffStages.length) {
+        //             return;
+        //         }
+        //         return addStages(context.courier, taskId, diffStages);
+        //     })
+        //     .then(() => {
+        //         updateTaskExtended();
+        //         context.setSnackbarState({
+        //             open: true,
+        //             message: "Задание успешно обновлено!",
+        //         });
+        //     })
+        //     .catch(() => {
+        //         context.setSnackbarState({ open: true, message: "Ошибка обновления задания!" });
+        //         context.setSnackbarError(true);
+        //     });
+    }, [context, task, taskId, templates, updateTaskExtended]);
 
     function onTaskWithdrawClick() {
         if (task.status === ETaskStatus.IN_PROGRESS) {
             task.status = ETaskStatus.ON_CHECK;
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
-            .then(() => setSnackbar({ open: true, message: "Задание успешно отозвано!" }))
+            .then(() => {
+                updateTaskExtended();
+                context.setSnackbarState({
+                    open: true,
+                    message: "Задание успешно отозвано!",
+                });
+            })
             .catch(() => {
-                setSnackbar({ open: true, message: "Ошибка отзыва задания!" });
-                setError(true);
+                context.setSnackbarState({ open: true, message: "Ошибка отзыва задания!" });
+                context.setSnackbarError(true);
             });
         onMenuClose();
     }
@@ -231,10 +285,16 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             task.status = ETaskStatus.COMPLETED;
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
-            .then(() => setSnackbar({ open: true, message: "Задание успешно звершено!" }))
+            .then(() => {
+                updateTaskExtended();
+                context.setSnackbarState({
+                    open: true,
+                    message: "Задание успешно звершено!",
+                });
+            })
             .catch(() => {
-                setSnackbar({ open: true, message: "Ошибка завершения задания!" });
-                setError(true);
+                context.setSnackbarState({ open: true, message: "Ошибка завершения задания!" });
+                context.setSnackbarError(true);
             });
         onMenuClose();
     }
@@ -243,16 +303,17 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         onMenuClose();
         setMessageModalOpen(true);
     }
+
     function onSubmitSendMessage(title: string, message: string) {
         sendPushToken(context.courier, { title, body: message })
             .then(() => {
                 setMessageModalOpen(false);
-                setSnackbar({ open: true, message: "Сообщение успешно отправлено!" });
+                context.setSnackbarState({ open: true, message: "Сообщение успешно отправлено!" });
             })
             .catch(() => {
                 setMessageModalOpen(false);
-                setSnackbar({ open: true, message: "Ошибка отправки сообщения!" });
-                setError(true);
+                context.setSnackbarState({ open: true, message: "Ошибка отправки сообщения!" });
+                context.setSnackbarError(true);
             });
     }
 
@@ -275,8 +336,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                                     variant="contained"
                                     scheme="blue"
                                     css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
-                                    onClick={onTaskSave}
-                                    disabled={snackbar.open}
+                                    onClick={onTaskSaveCallback}
+                                    disabled={context.snackbar.open}
                                 >
                                     <SendIcon />
                                     <Typography>Отправить</Typography>
@@ -323,12 +384,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     onTaskChange={onTaskChange}
                 />
             </Grid>
-            <Snackbar
-                open={snackbar.open}
-                error={error}
-                onClose={onSnackbarClose}
-                message={snackbar.message}
-            />
         </SectionLayout>
     );
 };

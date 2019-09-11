@@ -1,13 +1,13 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { IconButton, Snackbar as MaterialSnackbar, SnackbarContent } from "@material-ui/core";
 import { css, jsx } from "@emotion/core";
+import { IconButton, Snackbar as MaterialSnackbar, SnackbarContent } from "@material-ui/core";
 import {
     CheckCircle as CheckCircleIcon,
     Close as CloseIcon,
     Error as ErrorIcon,
 } from "@material-ui/icons";
+import * as React from "react";
 
 interface ISnackbarProps {
     message: string;
@@ -57,3 +57,5 @@ export const Snackbar: React.FC<ISnackbarProps> = ({ message, error, open, ...pr
         </MaterialSnackbar>
     );
 };
+
+Snackbar.displayName = "Snackbar";

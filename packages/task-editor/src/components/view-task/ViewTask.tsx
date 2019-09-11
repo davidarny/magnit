@@ -32,7 +32,7 @@ import {
 import { TemplateRenderer } from "components/renderers";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneeIllustration } from "./ChangeAssigneeIllustration";
 
@@ -66,45 +66,27 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     const { service, task, focusedPuzzleId, templateSnapshots, documents, templates } = props;
     const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange, onTaskChange } = props;
 
-    const { stages } = task;
-    const initialStepsState =
-        stages &&
-        stages.length > 0 &&
-        stages.map(stage => ({
-            ...stage,
-            completed: stage.finished,
-            editable: !!stage.editable,
-        }));
-    const defaultStepsState = [
-        {
-            id: 0,
-            title: "",
-            deadline: "",
-            completed: false,
-            editable: true,
-        },
-    ];
-    const [steps, setSteps] = useState<IStageStep[]>(initialStepsState || defaultStepsState);
+    const [stageTitleMap, setStageTitleMap] = useState(new Map<number, string>());
+    const [stageDeadlineMap, setStageDeadlineMap] = useState(new Map<number, string>());
 
-    const initialStepsSet = useRef(false);
+    const editable =
+        task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
+    const allowUseStageEditable = editable;
+
     useEffect(() => {
-        if (!initialStepsState || initialStepsSet.current) {
+        if (!task.stages || !onAddStage || !editable) {
             return;
         }
-        if (!_.isEqual(steps, initialStepsState)) {
-            initialStepsSet.current = true;
-            setSteps(initialStepsState);
+        if (task.stages.length === 0) {
+            onAddStage({
+                id: 0,
+                editable: true,
+                title: "",
+                completed: false,
+                deadline: "",
+            });
         }
-    }, [initialStepsState, steps]);
-
-    useEffect(() => {
-        const diffSteps = steps
-            .filter(step => step.title && step.deadline)
-            .filter(step => stages && !stages.find(stage => stage.id === step.id));
-        if (diffSteps.length) {
-            diffSteps.forEach(step => onAddStage && onAddStage(step));
-        }
-    }, [steps, stages, onAddStage, onTaskChange, task]);
+    }, [task.stages, onAddStage, editable]);
 
     function onDialogClose(): void {
         setOpen(false);
@@ -119,60 +101,74 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     }
 
     const onAddStepCallback = useCallback((): void => {
-        const last = _.last(steps);
+        const last = _.last(task.stages);
         if (!last) {
             return;
         }
-        setSteps([
-            ...steps,
-            {
+        if (onAddStage) {
+            onAddStage({
                 id: last.id + 1,
                 title: "",
                 deadline: "",
-                completed: false,
                 editable: true,
-            },
-        ]);
-    }, [steps]);
+            });
+        }
+    }, [task.stages, onAddStage]);
 
     const onChangeStepTitleCallback = useCallback(
         (id: number, value: string): void => {
-            if (steps.some(step => step.id === id)) {
-                const stepIndex = steps.findIndex(step => step.id === id);
-                steps[stepIndex].title = value;
-                setSteps([...steps]);
+            if (!task.stages) {
+                return;
+            }
+            if (task.stages.some(step => step.id === id)) {
+                const stageIndex = task.stages.findIndex(step => step.id === id);
+                const stage = task.stages[stageIndex];
+                stageTitleMap.set(stage.id, value);
+                setStageTitleMap(new Map(stageTitleMap));
+                // stage.title = value;
+                // if (onAddStage && onDeleteStage) {
+                //     onDeleteStage(stage.id);
+                //     onAddStage(stage);
+                // }
             }
         },
-        [steps],
+        [task.stages, stageTitleMap],
     );
 
     const onChangeStepDateCallback = useCallback(
         (id: number, value: string): void => {
-            if (steps.some(step => step.id === id)) {
-                const stepIndex = steps.findIndex(step => step.id === id);
-                steps[stepIndex].deadline = value;
-                setSteps([...steps]);
+            if (!task.stages) {
+                return;
+            }
+            if (task.stages.some(step => step.id === id)) {
+                const stageIndex = task.stages.findIndex(step => step.id === id);
+                const stage = task.stages[stageIndex];
+                stageDeadlineMap.set(stage.id, value);
+                setStageDeadlineMap(new Map(stageDeadlineMap));
+                // stage.deadline = value;
+                // if (onAddStage && onDeleteStage) {
+                //     onDeleteStage(stage.id);
+                //     onAddStage(stage);
+                // }
             }
         },
-        [steps],
+        [task.stages, stageDeadlineMap],
     );
 
     const onStepDeleteCallback = useCallback(
         (id: number) => {
-            // disallow deleting if only 1 stage present
-            if (steps.length < 2) {
+            if (!task.stages) {
                 return;
             }
-            if (steps.some(step => step.id === id)) {
-                const stepIndex = steps.findIndex(step => step.id === id);
-                steps.splice(stepIndex, 1);
-                setSteps([...steps]);
-                if (onDeleteStage) {
-                    onDeleteStage(id);
-                }
+            // disallow deleting if only 1 stage present
+            if (task.stages.length < 2) {
+                return;
+            }
+            if (onDeleteStage) {
+                onDeleteStage(id);
             }
         },
-        [onDeleteStage, steps],
+        [onDeleteStage, task.stages],
     );
 
     const onEditableChangeCallback = useCallback(
@@ -185,12 +181,16 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     );
 
     const onStepBlurCallback = useCallback(() => {
-        const validSteps = steps.filter(step => step.title && step.deadline);
-        if (validSteps.length && onTaskChange) {
-            const nextStages = _.cloneDeep(steps).map(stage => ({ ...stage, finished: false }));
-            onTaskChange({ ...task, stages: nextStages });
+        if (!task.stages || !onTaskChange) {
+            return;
         }
-    }, [onTaskChange, steps, task]);
+        const stages = task.stages.map(stage => ({
+            ...stage,
+            title: stage.title || stageTitleMap.get(stage.id) || "",
+            deadline: stage.deadline || stageDeadlineMap.get(stage.id) || "",
+        }));
+        onTaskChange({ ...task, stages });
+    }, [task, onTaskChange, stageTitleMap, stageDeadlineMap]);
 
     function onMenuClick(event: React.MouseEvent<HTMLElement>) {
         setMenuAnchorElement(event.currentTarget);
@@ -213,13 +213,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
     const showNewStageButton =
-        (task.status !== ETaskStatus.IN_PROGRESS || task.status !== ETaskStatus.COMPLETED) &&
-        !steps.some(step => step.editable);
+        allowUseStageEditable && (task.stages || []).every(step => !step.editable);
 
     const showEmptyStages =
         (task.stages && task.stages.length > 0) ||
-        ((!task.stages || task.stages.length === 0) &&
-            (task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED));
+        ((!task.stages || task.stages.length === 0) && allowUseStageEditable);
 
     function onNotifyBeforeOneDay() {
         onNotifyBeforeChange(1);
@@ -408,31 +406,36 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                         onTitleChange={onChangeStepTitleCallback}
                                         onTitleBlur={onStepBlurCallback}
                                         onStepDelete={onStepDeleteCallback}
-                                        steps={steps.map(step => ({
-                                            id: step.id,
-                                            editable: step.editable,
-                                            completed: step.completed,
-                                            title: step.title,
-                                            content: (
-                                                <DateField
-                                                    disabled={!step.editable}
-                                                    onChange={event =>
-                                                        onChangeStepDateCallback(
-                                                            step.id,
-                                                            event.target.value,
-                                                        )
-                                                    }
-                                                    onBlur={onStepBlurCallback}
-                                                    value={
-                                                        !step.editable
-                                                            ? getFriendlyDate(
-                                                                  new Date(step.deadline),
-                                                              )
-                                                            : step.deadline
-                                                    }
-                                                />
-                                            ),
-                                        }))}
+                                        steps={(task.stages || []).map(stage => {
+                                            const safeStageDeadline =
+                                                stage.deadline ||
+                                                stageDeadlineMap.get(stage.id) ||
+                                                "";
+                                            const deadline = !stage.editable
+                                                ? getFriendlyDate(new Date(safeStageDeadline))
+                                                : safeStageDeadline;
+                                            const safeStageTitle =
+                                                stage.title || stageTitleMap.get(stage.id) || "";
+                                            return {
+                                                id: stage.id,
+                                                editable: stage.editable,
+                                                completed: stage.finished,
+                                                title: safeStageTitle,
+                                                content: (
+                                                    <DateField
+                                                        disabled={!stage.editable}
+                                                        onChange={event =>
+                                                            onChangeStepDateCallback(
+                                                                stage.id,
+                                                                event.target.value,
+                                                            )
+                                                        }
+                                                        onBlur={onStepBlurCallback}
+                                                        value={deadline}
+                                                    />
+                                                ),
+                                            };
+                                        })}
                                     />
                                 )}
                                 {showNewStageButton && (
