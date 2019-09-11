@@ -1,5 +1,5 @@
 export interface IEditorService {
-    onPuzzleFocus(id: string): void;
+    onPuzzleFocus(id: string, force?: boolean): void;
 
     updateToolbarTopPosition(): void;
 }

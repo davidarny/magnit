@@ -119,7 +119,7 @@ export const CreateTask: React.FC = () => {
             >
                 <TaskEditor<ITask>
                     variant="create"
-                    initialState={task}
+                    task={task}
                     templates={templates}
                     onTaskChange={onTaskChange}
                 />

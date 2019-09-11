@@ -134,6 +134,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     }
 
     const onTaskSaveCallback = useCallback((): void => {
+        const prevStatus = task.status;
         // disallow update if task is not editable
         if (!isTaskEditable(task)) {
             return;
@@ -184,6 +185,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                         date.setFullYear(Number(_.nth(splitted, 2)));
                         return { ...stage, deadline: new Date(date).toISOString() };
                     });
+                // overall no tasks
+                const validTaskStages = task.stages.filter(stage => stage.title && stage.deadline);
+                if (validTaskStages.length + diff.length === 0) {
+                    throw new Error("Ошибка! Заполните этапы!");
+                }
                 if (!diff.length) {
                     return;
                 }
@@ -199,66 +205,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 });
             })
             .catch(() => {
+                // rollback status
+                task.status = prevStatus;
                 context.setSnackbarState({ open: true, message: "Ошибка обновления задания!" });
                 context.setSnackbarError(true);
             });
-        // updateTask(context.courier, taskId, getTaskPayload(task))
-        //     .then(async () =>
-        //         addTemplateAssignment(
-        //             context.courier,
-        //             Number(taskId),
-        //             (task.templates || [])
-        //                 // filter to only existing templates
-        //                 .filter(assignment =>
-        //                     templates.find(template => template.id === assignment.id),
-        //                 )
-        //                 .map(template => Number(template.id)),
-        //         ),
-        //     )
-        //     .then(() =>
-        //         Promise.all(
-        //             task.templates.map(({ id, editable }) => {
-        //                 const body = {
-        //                     editable,
-        //                 };
-        //                 return updateTemplateAssignment(context.courier, taskId, Number(id), body);
-        //             }),
-        //         ),
-        //     )
-        //     .then(async () => {
-        //         const diffStages = task.stages
-        //             // filter so that add only stages that doesn't exist
-        //             .filter(
-        //                 stage =>
-        //                     !initialStages.current.find(
-        //                         initialStage => initialStage.id === stage.id,
-        //                     ),
-        //             )
-        //             .map(stage => {
-        //                 // TODO: mask input for date
-        //                 const splitted = stage.deadline.split(".");
-        //                 const date = new Date();
-        //                 date.setDate(Number(_.first(splitted)));
-        //                 date.setMonth(Number(_.nth(splitted, 1)) - 1);
-        //                 date.setFullYear(Number(_.nth(splitted, 2)));
-        //                 return { ...stage, deadline: new Date(date).toISOString() };
-        //             });
-        //         if (!diffStages.length) {
-        //             return;
-        //         }
-        //         return addStages(context.courier, taskId, diffStages);
-        //     })
-        //     .then(() => {
-        //         updateTaskExtended();
-        //         context.setSnackbarState({
-        //             open: true,
-        //             message: "Задание успешно обновлено!",
-        //         });
-        //     })
-        //     .catch(() => {
-        //         context.setSnackbarState({ open: true, message: "Ошибка обновления задания!" });
-        //         context.setSnackbarError(true);
-        //     });
     }, [context, task, taskId, templates, updateTaskExtended]);
 
     function onTaskWithdrawClick() {
@@ -337,7 +288,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                                     scheme="blue"
                                     css={theme => ({ margin: `0 ${theme.spacing(1)}` })}
                                     onClick={onTaskSaveCallback}
-                                    disabled={context.snackbar.open}
                                 >
                                     <SendIcon />
                                     <Typography>Отправить</Typography>
@@ -378,7 +328,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 })}
             >
                 <TaskEditor<IExtendedTask>
-                    initialState={task}
+                    task={task}
                     templates={isTaskEditable(task) ? templates : task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}

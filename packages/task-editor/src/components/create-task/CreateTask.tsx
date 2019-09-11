@@ -16,7 +16,7 @@ import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import uuid from "uuid/v4";
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -34,27 +34,27 @@ interface ICreateTaskProps {
 
     onTaskTitleChange(title: string): void;
 
+    onTaskTitleBlur(): void;
+
     onTemplatesChange(uuid: string, event: TSelectChangeEvent): void;
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
-    const { onTaskTitleChange, onTemplatesChange } = props;
-    const [title, setTitle] = useState("");
+    const { onTaskTitleChange, onTemplatesChange, onTaskTitleBlur } = props;
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
-    const onTaskTitleChangeCallback = useCallback(() => {
-        onTaskTitleChange(title);
-    }, [onTaskTitleChange, title]);
+    const onTitleChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            onTaskTitleChange(event.target.value);
+        },
+        [onTaskTitleChange],
+    );
 
-    function onTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        setTitle(event.target.value);
-    }
-
-    const onTitleBlur = useCallback(() => {
-        onTaskTitleChangeCallback();
-    }, [onTaskTitleChangeCallback]);
+    const onTitleBlurCallback = useCallback(() => {
+        onTaskTitleBlur();
+    }, [onTaskTitleBlur]);
 
     return (
         <React.Fragment>
@@ -77,9 +77,9 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     <TaskFieldContainer label="Название задания">
                         <InputField
                             placeholder="Введите название задания"
-                            value={title}
-                            onChange={onTitleChange}
-                            onBlur={onTitleBlur}
+                            value={task.title}
+                            onChange={onTitleChangeCallback}
+                            onBlur={onTitleBlurCallback}
                             fullWidth
                         />
                     </TaskFieldContainer>

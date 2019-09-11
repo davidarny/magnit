@@ -48,6 +48,7 @@ interface IViewTaskProps {
     templates: Array<IDocument & IWithAnswers>;
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
+    editable?: boolean;
 
     onAddStage?(step: IStageStep): void;
 
@@ -63,15 +64,19 @@ interface IViewTaskProps {
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
-    const { service, task, focusedPuzzleId, templateSnapshots, documents, templates } = props;
+    const {
+        service,
+        task,
+        focusedPuzzleId,
+        templateSnapshots,
+        documents,
+        templates,
+        editable = true,
+    } = props;
     const { onAddStage, onDeleteStage, onEditableChange, onTemplatesChange, onTaskChange } = props;
 
     const [stageTitleMap, setStageTitleMap] = useState(new Map<number, string>());
     const [stageDeadlineMap, setStageDeadlineMap] = useState(new Map<number, string>());
-
-    const editable =
-        task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
-    const allowUseStageEditable = editable;
 
     useEffect(() => {
         if (!task.stages || !onAddStage || !editable) {
@@ -212,12 +217,11 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
-    const showNewStageButton =
-        allowUseStageEditable && (task.stages || []).every(step => !step.editable);
+    const showNewStageButton = editable && (task.stages || []).every(step => !step.editable);
 
     const showEmptyStages =
         (task.stages && task.stages.length > 0) ||
-        ((!task.stages || task.stages.length === 0) && allowUseStageEditable);
+        ((!task.stages || task.stages.length === 0) && editable);
 
     function onNotifyBeforeOneDay() {
         onNotifyBeforeChange(1);
@@ -478,6 +482,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             </SelectableBlockWrapper>
             {documents.map(document => (
                 <TaskDocument
+                    editable={editable}
                     documents={documents}
                     key={document.__uuid}
                     document={document}
@@ -502,6 +507,7 @@ interface ITaskDocumentProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
     templates: Array<IDocument & IWithAnswers>;
+    editable: boolean;
 
     onEditableChange?(documentId: number, editable: boolean): void;
 
@@ -509,7 +515,15 @@ interface ITaskDocumentProps {
 }
 
 const TaskDocument: React.FC<ITaskDocumentProps> = props => {
-    const { focusedPuzzleId, service, document, templates, documents, templateSnapshots } = props;
+    const {
+        focusedPuzzleId,
+        service,
+        document,
+        templates,
+        documents,
+        templateSnapshots,
+        editable,
+    } = props;
     const { onEditableChange, onTemplateChange } = props;
 
     const snapshot = templateSnapshots.get(document.id.toString());
@@ -548,7 +562,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
             focused={focused}
             id={document.__uuid}
         >
-            {document.virtual && (
+            {editable && document.virtual && (
                 <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
                     <SelectField
                         placeholder="Выбрать шаблон"
@@ -582,6 +596,7 @@ const TaskDocument: React.FC<ITaskDocumentProps> = props => {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                        disabled={!editable}
                                         checked={document.editable}
                                         css={theme => ({ marginRight: theme.spacing() })}
                                         onChange={onEditableChangeCallback}

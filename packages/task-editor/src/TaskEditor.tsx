@@ -3,6 +3,7 @@
 import { jsx } from "@emotion/core";
 import { EditorToolbar } from "@magnit/components";
 import {
+    ETaskStatus,
     IDocument,
     IExtendedTask,
     IStageStep,
@@ -22,7 +23,7 @@ import { ViewTask } from "./components/view-task";
 type TAnyTask = ITask | IExtendedTask;
 
 interface ITaskEditorProps<T extends TAnyTask> {
-    initialState?: T;
+    task: T;
     templates: T extends IExtendedTask ? Array<IDocument & IWithAnswers> : IDocument[];
     variant: "create" | "view";
 
@@ -35,13 +36,17 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
-    const { templates, initialState, variant, onTaskChange } = props;
+    const { templates, task, variant, onTaskChange } = props;
 
-    const [task, setTask] = useState<Partial<T>>(initialState || {});
+    const [title, setTitle] = useState("");
     const [documents, setDocuments] = useState<IVirtualDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
+
+    const focusedPuzzleId = _.head(focusedPuzzleChain);
+    const editable =
+        task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
     const service = useRef(
         getEditorService(EEditorType.TASK, [
@@ -51,32 +56,13 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     );
 
     const isViewMode = useCallback(
-        (value: object): value is IExtendedTask => {
-            const templates = _.get(value, "templates");
-            if (_.isEmpty(templates)) {
-                return _.eq(variant, "view");
-            }
-            const first = _.first(templates);
-            return _.eq(variant, "view") && _.has(value, "templates") && _.isObject(first);
-        },
+        (value: object): value is IExtendedTask => _.eq(variant, "view"),
         [variant],
     );
 
-    const isCreateMode = useCallback(
-        (value: object): value is ITask => {
-            const templates = _.get(value, "templates");
-            if (_.isEmpty(templates)) {
-                return _.eq(variant, "create");
-            }
-            const first = _.first(templates);
-            return (
-                _.eq(variant, "create") &&
-                _.has(value, "templates") &&
-                (_.isString(first) || _.isNumber(first))
-            );
-        },
-        [variant],
-    );
+    const isCreateMode = useCallback((value: object): value is ITask => _.eq(variant, "create"), [
+        variant,
+    ]);
 
     // set toolbar offset top
     useEffect(() => {
@@ -96,8 +82,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 },
             ]);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [variant, task, isCreateMode]);
+    }, [variant, task, isCreateMode, documents.length]);
 
     // set documents if task has any
     const prevDocuments = useRef(_.cloneDeep(documents));
@@ -119,62 +104,38 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 setDocuments([...nextDocuments]);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [templates, task.templates, isViewMode, isCreateMode]);
+    }, [templates, task.templates, isViewMode, isCreateMode, task, documents, templateSnapshots]);
 
-    // on every documents change we have to
-    // update current task with their id's
-    // also caching template JSON for current active document
+    const initialFocusSet = useRef(false);
     useEffect(() => {
-        const nextTemplates = isCreateMode(task)
-            ? documents
-                  .filter(document => !!document.title)
-                  .filter(document => document.id >= 0)
-                  .map(document => document.id)
-            : task.templates;
-        setTask({ ...task, templates: nextTemplates });
-        if (documents.some(document => document.__uuid === focusedPuzzleId)) {
-            const documentId = documents.find(document => document.__uuid === focusedPuzzleId)!.id;
-            if (documentId) {
-                const template = templates.find(template => template.id === documentId);
-                if (template) {
-                    templateSnapshots.set(documentId.toString(), template);
-                    setTemplateSnapshots(new Map(templateSnapshots));
-                }
-            }
+        if (!initialFocusSet.current) {
+            service.current.onPuzzleFocus(task.id.toString(), true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [documents, isCreateMode, isViewMode]);
+        if (task.id !== 0 || isCreateMode(task)) {
+            initialFocusSet.current = true;
+        }
+    }, [task, focusedPuzzleChain, isCreateMode]);
 
-    const prevTask = useRef(_.cloneDeep(task));
-    useEffect(() => {
-        if (onTaskChange) {
-            if (isViewMode(task)) {
-                task.templates = task.templates.map(template => {
-                    const document = documents.find(document => document.id === template.id);
-                    if (!document) {
-                        return template;
-                    }
-                    return { ...template, ..._.omit(document, "__uuid") };
-                });
+    const updateTaskTemplates = useCallback(
+        (documents: IVirtualDocument[]) => {
+            if (onTaskChange) {
+                const nextTemplates = documents
+                    .filter(document => document.id !== -1)
+                    .map(document => {
+                        if (isViewMode(task)) {
+                            const template = templates.find(
+                                template => template.id === document.id,
+                            );
+                            return { ...template, editable: true };
+                        }
+                        return document.id;
+                    })
+                    .filter(Boolean);
+                onTaskChange({ ...task, templates: nextTemplates });
             }
-            if (!_.isEqual(prevTask.current, task)) {
-                prevTask.current = _.cloneDeep(task);
-                onTaskChange({ ...task });
-            }
-        }
-    }, [task, documents, variant, onTaskChange, isViewMode]);
-
-    useEffect(() => {
-        if (!_.isEqual(task, initialState) && initialState && onTaskChange) {
-            setTask({ ...initialState });
-            onTaskChange({ ...initialState });
-            setFocusedPuzzleChain([initialState.id.toString() || ""]);
-        } else if (!focusedPuzzleChain.length && initialState) {
-            setFocusedPuzzleChain([initialState.id.toString() || ""]);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialState]);
+        },
+        [isViewMode, onTaskChange, task, templates],
+    );
 
     const onTemplatesChangeCallback = useCallback(
         (uuid: string, event: TSelectChangeEvent): void => {
@@ -182,12 +143,37 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             if (documents.some(document => document.__uuid === uuid)) {
                 const templateIndex = templates.findIndex(template => template.id === templateId);
                 const documentIndex = documents.findIndex(document => document.__uuid === uuid);
-                documents[documentIndex].id = templates[templateIndex].id;
+                const documentId = templates[templateIndex].id;
+                documents[documentIndex].id = documentId;
                 documents[documentIndex].title = templates[templateIndex].title;
                 setDocuments([...documents]);
+                templateSnapshots.set(documentId.toString(), templates[templateIndex]);
+                setTemplateSnapshots(new Map(templateSnapshots));
+                updateTaskTemplates(documents);
             }
         },
-        [documents, templates],
+        [documents, templateSnapshots, templates, updateTaskTemplates],
+    );
+
+    const updateTemplateAssignmentEditable = useCallback(
+        (documents: IDocument[]) => {
+            if (!isViewMode(task)) {
+                return;
+            }
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    templates: task.templates!.map(template => {
+                        const document = documents.find(document => document.id === template.id);
+                        if (!document) {
+                            return template;
+                        }
+                        return { ...template, editable: document.editable };
+                    }),
+                });
+            }
+        },
+        [isViewMode, onTaskChange, task],
     );
 
     const onEditableChangeCallback = useCallback(
@@ -196,19 +182,22 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 const documentIndex = documents.findIndex(document => document.id === documentId);
                 documents[documentIndex].editable = editable;
                 setDocuments([...documents]);
+                updateTemplateAssignmentEditable(documents);
             }
         },
-        [documents],
+        [documents, updateTemplateAssignmentEditable],
     );
 
     const onAddDocumentCallback = useCallback((): void => {
+        if (documents.some(document => document.id === -1)) {
+            return;
+        }
         const nextDocument: IVirtualDocument = {
             id: -1,
             __uuid: uuid(),
             title: "",
-            editable: false,
+            editable: true,
         };
-        // TODO: allow only in DRAFT mode
         if (isViewMode(task)) {
             nextDocument.virtual = true;
         }
@@ -248,14 +237,15 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         [isViewMode, onTaskChange, task],
     );
 
-    const onTaskTitleChangeCallback = useCallback(
-        (title: string) => {
-            setTask({ ...task, title });
-        },
-        [task],
-    );
+    function onTaskTitleChange(title: string) {
+        setTitle(title);
+    }
 
-    const focusedPuzzleId = _.head(focusedPuzzleChain);
+    const onTaskTitleBlurCallback = useCallback(() => {
+        if (onTaskChange) {
+            onTaskChange({ ...task, title });
+        }
+    }, [onTaskChange, task, title]);
 
     const onDeleteDocumentCallback = useCallback(() => {
         // do not to delete document if only one exists
@@ -271,25 +261,34 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             const documentIndex = documents.findIndex(document => document.id === documentId);
             documents.splice(documentIndex, 1);
             setDocuments([...documents]);
+            updateTaskTemplates(documents);
         }
-    }, [documents, focusedPuzzleId, isCreateMode, task]);
+    }, [documents, focusedPuzzleId, isCreateMode, task, updateTaskTemplates]);
 
     const editorToolbarItems = [
-        {
-            label: "Добавить шаблон",
-            icon: <QuestionIcon />,
-            action: onAddDocumentCallback,
-        },
+        ...(editable
+            ? [
+                  {
+                      label: "Добавить шаблон",
+                      icon: <QuestionIcon />,
+                      action: onAddDocumentCallback,
+                  },
+              ]
+            : []),
         {
             label: "Оставить комментарий",
             icon: <CommentsIcon />,
             action: _.noop,
         },
-        {
-            label: "Удалить шаблон",
-            icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
-            action: onDeleteDocumentCallback,
-        },
+        ...(editable
+            ? [
+                  {
+                      label: "Удалить шаблон",
+                      icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
+                      action: onDeleteDocumentCallback,
+                  },
+              ]
+            : []),
     ];
 
     return (
@@ -297,19 +296,21 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             <EditorToolbar top={toolbarTopPosition} items={[...editorToolbarItems]} />
             {isCreateMode(task) && (
                 <CreateTask
-                    task={task}
+                    task={{ ...task, title }}
                     service={service.current}
                     templates={templates}
                     documents={documents}
                     focusedPuzzleId={focusedPuzzleId}
                     templateSnapshots={templateSnapshots}
                     onTemplatesChange={onTemplatesChangeCallback}
-                    onTaskTitleChange={onTaskTitleChangeCallback}
+                    onTaskTitleChange={onTaskTitleChange}
+                    onTaskTitleBlur={onTaskTitleBlurCallback}
                 />
             )}
             {isViewMode(task) && (
                 <ViewTask
                     task={task}
+                    editable={editable}
                     service={service.current}
                     templates={templates}
                     documents={documents}

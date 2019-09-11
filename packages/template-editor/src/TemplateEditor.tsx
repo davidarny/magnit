@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -18,7 +17,7 @@ import { EditorContext, ICache } from "./context";
 import { traverse } from "./services/json";
 
 interface ITemplateEditorProps {
-    initialState?: ITemplate;
+    template?: ITemplate;
 
     onChange?(template: ITemplate): void;
 
@@ -28,7 +27,7 @@ interface ITemplateEditorProps {
 }
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
-    const { initialState } = props;
+    const { template: initialState } = props;
 
     const context = useContext(EditorContext);
     const cache = useRef<ICache>({
@@ -53,19 +52,20 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             [focusedPuzzleChain, setFocusedPuzzleChain],
             [toolbarTopPosition, setToolbarTopPosition],
         ]),
-    ).current;
+    );
 
     // set toolbar offset top
     useEffect(() => {
-        service.updateToolbarTopPosition();
+        service.current.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
 
     // handle initial focus
     useEffect(() => {
         const idToFocusOn = initialState ? initialState.id : defaultState.id;
         if (!focusedPuzzleChain.length) {
-            service.onPuzzleFocus(idToFocusOn.toString());
+            service.current.onPuzzleFocus(idToFocusOn.toString());
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialState, focusedPuzzleChain]);
 
     // handle passed onChange callback
@@ -91,6 +91,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 cache.sections.set(element.id, element);
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template]);
 
     function onToolbarAddQuestion(): void {
@@ -164,7 +165,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 section.puzzles!.push({ ...puzzleToInsert, order: 0 });
             }
         }
-        service.onPuzzleFocus(id);
+        service.current.onPuzzleFocus(id);
         setTemplate({ ...template });
     }
 
@@ -210,7 +211,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 cache.puzzles.set(id, _.last(section.puzzles)!);
             });
         }
-        service.onPuzzleFocus(id);
+        service.current.onPuzzleFocus(id);
         setTemplate({ ...template });
     }
 
@@ -225,7 +226,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             order: (prevSection || { order: -1 }).order + 1,
         });
         cache.sections.set(id, _.last(template.sections)!);
-        service.onPuzzleFocus(id);
+        service.current.onPuzzleFocus(id);
         setTemplate({ ...template });
     }
 
@@ -314,9 +315,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        service.onPuzzleFocus(puzzleToFocusOn.id);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
                     } else {
-                        service.onPuzzleFocus(_.first(template.sections)!.id);
+                        service.current.onPuzzleFocus(_.first(template.sections)!.id);
                     }
                     return true;
                 }
@@ -342,9 +343,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        service.onPuzzleFocus(puzzleToFocusOn.id);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
                     } else {
-                        service.onPuzzleFocus(template.id.toString());
+                        service.current.onPuzzleFocus(template.id.toString());
                     }
                     return true;
                 }
@@ -409,8 +410,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     marginBottom: theme.spacing(2),
                 })}
                 focused={focusedPuzzleId === template.id.toString()}
-                onFocus={service.onPuzzleFocus.bind(service, template.id.toString())}
-                onMouseDown={service.onPuzzleFocus.bind(service, template.id.toString())}
+                onFocus={service.current.onPuzzleFocus.bind(service, template.id.toString(), false)}
+                onMouseDown={service.current.onPuzzleFocus.bind(
+                    service,
+                    template.id.toString(),
+                    false,
+                )}
             >
                 <SectionHead
                     template={template}
@@ -426,7 +431,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     template={template}
                     focusedPuzzleId={focusedPuzzleId}
                     onTemplateChange={onTemplateChange}
-                    onPuzzleFocus={service.onPuzzleFocus.bind(service)}
+                    onPuzzleFocus={service.current.onPuzzleFocus.bind(service)}
                 />
             ))}
             {process.env.NODE_ENV !== "production" && (

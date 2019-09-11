@@ -1,6 +1,6 @@
+import _ from "lodash";
 import * as React from "react";
 import { IEditorService } from "./IEditorService";
-import _ from "lodash";
 
 export type TFocusedPuzzleState = [string[], React.Dispatch<React.SetStateAction<string[]>>];
 export type TToolbarTopPositionState = [number, React.Dispatch<React.SetStateAction<number>>];
@@ -24,12 +24,15 @@ export class EditorServiceImpl implements IEditorService {
         );
     }
 
-    onPuzzleFocus(id: string): void {
+    onPuzzleFocus(id: string, force?: boolean): void {
         const [focusedPuzzleChain, setFocusedPuzzleChain] = this.focusedPuzzleState;
         this.debouncedChainCleaning();
         if (focusedPuzzleChain.includes(id)) {
             setFocusedPuzzleChain([...focusedPuzzleChain]);
             return;
+        }
+        if (force) {
+            focusedPuzzleChain.length = 0;
         }
         focusedPuzzleChain.push(id);
         setFocusedPuzzleChain([...focusedPuzzleChain]);
