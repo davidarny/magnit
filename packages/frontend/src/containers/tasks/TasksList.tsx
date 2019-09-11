@@ -27,6 +27,7 @@ import { getTasks, IGetTasksResponse, updateTask } from "services/api";
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS.replace("_", "-"), label: "В работе" },
     { value: ETaskStatus.ON_CHECK.replace("_", "-"), label: "На проверке" },
+    { value: ETaskStatus.EXPIRED, label: "Просроченные" },
     { value: ETaskStatus.DRAFT, label: "Черновики" },
     { value: ETaskStatus.COMPLETED, label: "Завершенные" },
 ];

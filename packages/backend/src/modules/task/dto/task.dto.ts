@@ -11,7 +11,7 @@ export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
     @ApiModelProperty({ nullable: true }) readonly id_owner: string;
     @ApiModelProperty({ nullable: true }) readonly id_assignee: string;
     @ApiModelProperty({ default: 3 }) readonly notify_before: number;
-    @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed"] })
+    @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed", "expired"] })
     readonly status: ETaskStatus;
 }
 

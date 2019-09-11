@@ -18,7 +18,7 @@ export interface ITaskService {
 
     insert(task: Task): Promise<Task>;
 
-    update(id: string, task: Task): Promise<Task>;
+    update(id: number, task: Task): Promise<Task>;
 
     findById(id: string, relations?: string[]): Promise<Task>;
 
@@ -34,6 +34,10 @@ export interface ITaskService {
         files: Express.Multer.File[],
         body: { [key: string]: string },
     ): Promise<void>;
+
+    setAllAssignmentsNonEditable(id: number): Promise<void>;
+
+    findActiveStage(id: string): Promise<TaskStage | undefined>;
 
     getDescriptionByTransition(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string;
 

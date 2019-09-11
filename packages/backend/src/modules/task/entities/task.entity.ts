@@ -9,6 +9,7 @@ export enum ETaskStatus {
     ON_CHECK = "on_check",
     DRAFT = "draft",
     COMPLETED = "completed",
+    EXPIRED = "expired",
 }
 
 @Entity()

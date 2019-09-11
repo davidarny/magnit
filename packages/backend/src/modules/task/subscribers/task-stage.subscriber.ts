@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
 import { Connection, EntitySubscriberInterface, InsertEvent } from "typeorm";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 import { StageHistory } from "../entities/stage-history.entity";
 import { TaskStage } from "../entities/task-stage.entity";
 
@@ -14,6 +15,7 @@ export class TaskStageSubscriber implements EntitySubscriberInterface<TaskStage>
         return TaskStage;
     }
 
+    @Transactional()
     async afterInsert(event: InsertEvent<TaskStage>): Promise<void> {
         const stages = await event.manager.find(TaskStage, {
             where: { id_task: event.entity.id_task },

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { CannotParseLocationException } from "../../../shared/exceptions/cannot-prase-location.location";
@@ -18,14 +18,19 @@ import { ITemplateService } from "../../template/interfaces/template.service.int
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { TaskDto } from "../dto/task.dto";
+import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
+import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
 import { ITaskService, TTaskWithLastStageAndToken } from "../interfaces/task.service.interface";
 import _ = require("lodash");
 
 @Injectable()
 export class TaskService implements ITaskService {
     constructor(
+        @InjectRepository(TaskStage) private readonly taskStageRepository: Repository<TaskStage>,
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
+        @InjectRepository(TemplateAssignment)
+        private readonly templateAssignmentRepository: Repository<TemplateAssignment>,
         @Inject(TemplateService) private readonly templateService: ITemplateService,
     ) {}
 
@@ -132,8 +137,8 @@ export class TaskService implements ITaskService {
         await this.taskRepository.delete(id);
     }
 
-    async update(id: string, task: Task): Promise<Task> {
-        return this.taskRepository.save({ ...task, id: Number(id) });
+    async update(id: number, task: DeepPartial<Task>): Promise<Task> {
+        return this.taskRepository.save({ ...task, id });
     }
 
     @Transactional()
@@ -247,6 +252,10 @@ export class TaskService implements ITaskService {
             },
             [ETaskStatus.IN_PROGRESS]: {
                 [ETaskStatus.ON_CHECK]: "Задание прислано на проверку",
+                [ETaskStatus.COMPLETED]: "Этап завершён",
+            },
+            [ETaskStatus.EXPIRED]: {
+                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
                 [ETaskStatus.COMPLETED]: "Этап завершён",
             },
             [ETaskStatus.ON_CHECK]: {
@@ -374,5 +383,20 @@ export class TaskService implements ITaskService {
             }
             return [...prev, predicate(curr)];
         }, []);
+    }
+
+    async setAllAssignmentsNonEditable(id: number): Promise<void> {
+        const assignments = await this.templateAssignmentRepository.find({
+            where: { id_task: id },
+        });
+        assignments.forEach(assignment => (assignment.editable = false));
+        await this.templateAssignmentRepository.save(assignments);
+    }
+
+    async findActiveStage(id: string): Promise<TaskStage | undefined> {
+        return this.taskStageRepository.findOne({
+            where: { id_task: id, finished: false },
+            order: { created_at: "ASC" },
+        });
     }
 }

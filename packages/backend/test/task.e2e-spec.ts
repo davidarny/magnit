@@ -14,6 +14,7 @@ import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
 import { ETaskStatus, Task } from "../src/modules/task/entities/task.entity";
+import { TemplateAssignment } from "../src/modules/task/entities/tempalte-assignment.entity";
 import { TaskService } from "../src/modules/task/services/task.service";
 import { TaskStageSubscriber } from "../src/modules/task/subscribers/task-stage.subscriber";
 import { TaskSubscriber } from "../src/modules/task/subscribers/task.subscriber";
@@ -82,6 +83,8 @@ describe("TaskController (e2e)", () => {
             .overrideProvider(ScheduleService)
             .useValue(scheduleService)
             .overrideProvider(getRepositoryToken(TemplateAnswerLocation))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(TemplateAssignment))
             .useValue(getMockRepository())
             .compile();
 

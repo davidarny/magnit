@@ -67,7 +67,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const initialStages = useRef<IExtendedTask["stages"]>([]);
 
     const isTaskEditable = (task: IExtendedTask) =>
-        task.status === ETaskStatus.ON_CHECK || task.status === ETaskStatus.DRAFT;
+        task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
     useEffect(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
@@ -153,7 +153,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         // sending from DRAFT to IN_PROGRESS
         // only this transition is allowed
-        if (task.status === ETaskStatus.DRAFT || task.status === ETaskStatus.ON_CHECK) {
+        if (
+            task.status === ETaskStatus.DRAFT ||
+            task.status === ETaskStatus.ON_CHECK ||
+            task.status === ETaskStatus.EXPIRED
+        ) {
             task.status = ETaskStatus.IN_PROGRESS;
         }
         updateTask(context.courier, taskId, getTaskPayload(task))

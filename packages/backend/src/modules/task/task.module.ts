@@ -17,6 +17,7 @@ import { TemplateModule } from "../template/template.module";
 import { StageHistory } from "./entities/stage-history.entity";
 import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
+import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
 import { ITaskService } from "./interfaces/task.service.interface";
 import { TaskService } from "./services/task.service";
 import { TaskStageSubscriber } from "./subscribers/task-stage.subscriber";
@@ -29,7 +30,7 @@ const MAX_HASH_LENGTH = 28;
     controllers: [TaskController],
     providers: [TaskService, TaskSubscriber, TaskStageSubscriber],
     imports: [
-        TypeOrmModule.forFeature([Task, TaskStage, StageHistory]),
+        TypeOrmModule.forFeature([Task, TaskStage, StageHistory, TemplateAssignment]),
         // TODO: delegate to separate module
         MulterModule.register({
             storage: diskStorage({

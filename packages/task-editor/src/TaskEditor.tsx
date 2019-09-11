@@ -274,28 +274,27 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         }
     }, [documents, focusedPuzzleId, isCreateMode, task]);
 
+    const editorToolbarItems = [
+        {
+            label: "Добавить шаблон",
+            icon: <QuestionIcon />,
+            action: onAddDocumentCallback,
+        },
+        {
+            label: "Оставить комментарий",
+            icon: <CommentsIcon />,
+            action: _.noop,
+        },
+        {
+            label: "Удалить шаблон",
+            icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
+            action: onDeleteDocumentCallback,
+        },
+    ];
+
     return (
         <React.Fragment>
-            <EditorToolbar
-                top={toolbarTopPosition}
-                items={[
-                    {
-                        label: "Добавить шаблон",
-                        icon: <QuestionIcon />,
-                        action: onAddDocumentCallback,
-                    },
-                    {
-                        label: "Оставить комментарий",
-                        icon: <CommentsIcon />,
-                        action: _.noop,
-                    },
-                    {
-                        label: "Удалить шаблон",
-                        icon: <TrashIcon />,
-                        action: onDeleteDocumentCallback,
-                    },
-                ]}
-            />
+            <EditorToolbar top={toolbarTopPosition} items={[...editorToolbarItems]} />
             {isCreateMode(task) && (
                 <CreateTask
                     task={task}

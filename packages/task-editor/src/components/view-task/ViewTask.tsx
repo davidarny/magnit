@@ -217,8 +217,9 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         !steps.some(step => step.editable);
 
     const showEmptyStages =
-        (!task.stages || task.stages.length === 0) &&
-        (task.status === ETaskStatus.DRAFT || task.status === ETaskStatus.ON_CHECK);
+        (task.stages && task.stages.length > 0) ||
+        ((!task.stages || task.stages.length === 0) &&
+            (task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED));
 
     function onNotifyBeforeOneDay() {
         onNotifyBeforeChange(1);
@@ -641,6 +642,7 @@ function getTitleByStatus(status: ETaskStatus): string {
         [ETaskStatus.ON_CHECK]: "На проверке",
         [ETaskStatus.COMPLETED]: "Завершено",
         [ETaskStatus.DRAFT]: "Черновик",
+        [ETaskStatus.EXPIRED]: "Просрочено",
     }[status];
 }
 
@@ -650,6 +652,7 @@ function getColorByStatus(theme: any, status: ETaskStatus): string {
         [ETaskStatus.ON_CHECK]: theme.colors.darkYellow,
         [ETaskStatus.COMPLETED]: theme.colors.green,
         [ETaskStatus.DRAFT]: theme.colors.secondary,
+        [ETaskStatus.EXPIRED]: theme.colors.darkRed,
     }[status];
 }
 

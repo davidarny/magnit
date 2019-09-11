@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
 import { Connection, EntitySubscriberInterface, UpdateEvent } from "typeorm";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 import { IAmqpService } from "../../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../../amqp/services/amqp.service";
 import { IPushMessage } from "../../push-token/interfaces/push-message.interface";
@@ -26,6 +27,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         return Task;
     }
 
+    @Transactional()
     async beforeUpdate(event: UpdateEvent<Task>): Promise<void> {
         const currentTask = event.entity;
         const prevTask = await event.manager.findOne(Task, currentTask.id, {
@@ -46,6 +48,10 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         // send push notification when transition to IN_PROGRESS
         if (nextStatus === ETaskStatus.IN_PROGRESS) {
             await this.tryToSendPushNotification(currentTask);
+        }
+        // set all task assignments to non-editable
+        if (nextStatus === ETaskStatus.ON_CHECK) {
+            await this.taskService.setAllAssignmentsNonEditable(currentTask.id);
         }
         if (prevStage && description) {
             const history = new StageHistory({ stage: prevStage, description });

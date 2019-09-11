@@ -11,6 +11,7 @@ import {
     Res,
     UploadedFiles,
     UseInterceptors,
+    UsePipes,
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import {
@@ -45,6 +46,7 @@ import { Task } from "./entities/task.entity";
 import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
 import { ITaskService } from "./interfaces/task.service.interface";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
+import { TaskExpiredPipe } from "./pipes/task-expired.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTaskResponse } from "./responses/create-task.response";
@@ -66,6 +68,7 @@ export class TaskController {
     ) {}
 
     @Get("/")
+    @UsePipes(TaskExpiredPipe)
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
     @ApiBadRequestResponse({ description: "Found non compatible props" })
     async findAll(
@@ -108,14 +111,14 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async update(@Param("id", TaskByIdPipe) id: string, @Body("task") taskDto: TaskDto) {
         const task = await this.taskService.findById(id);
-        const updated = await this.taskService.update(id, { ...task, ...taskDto });
+        const updated = await this.taskService.update(Number(id), { ...task, ...taskDto });
         return { success: 1, task_id: updated.id };
     }
 
     @Get("/:id")
     @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async findById(@Param("id", TaskByIdPipe) id: string) {
+    async findById(@Param("id", TaskByIdPipe, TaskExpiredPipe) id: string) {
         const task = await this.taskService.findById(id, ["stages"]);
         const templates = await this.templateService.findByTaskId(task.id.toString());
         return {
@@ -148,7 +151,7 @@ export class TaskController {
         }
         const task = await this.taskService.findById(id, ["assignments"]);
         task.assignments = templates.map(template => new TemplateAssignment({ task, template }));
-        await this.taskService.update(id, task);
+        await this.taskService.update(Number(id), task);
         return { success: 1 };
     }
 
@@ -169,7 +172,7 @@ export class TaskController {
             .forEach((assignment, index) => {
                 task.assignments[index] = { ...assignment, ...templateAssignmentDto };
             });
-        await this.taskService.update(taskId, task);
+        await this.taskService.update(Number(taskId), task);
         return { success: 1 };
     }
 
@@ -187,7 +190,7 @@ export class TaskController {
             // create stages from dtos
             ...taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto })),
         ];
-        await this.taskService.update(id, task);
+        await this.taskService.update(Number(id), task);
         return { success: 1 };
     }
 
@@ -202,7 +205,7 @@ export class TaskController {
     @Get("/:id/extended")
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async findByIdExtended(@Param("id", TaskByIdPipe) id: string) {
+    async findByIdExtended(@Param("id", TaskByIdPipe, TaskExpiredPipe) id: string) {
         const task = await this.taskService.getTaskExtended(id);
         return { success: 1, task };
     }
@@ -213,7 +216,7 @@ export class TaskController {
         description: "Task Stages with history",
     })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async getStagesWithFullHistory(@Param("id", TaskByIdPipe) id: string) {
+    async getStagesWithFullHistory(@Param("id", TaskByIdPipe, TaskExpiredPipe) id: string) {
         const task = await this.taskService.getTaskStagesWithHistory(id);
         return { success: 1, stages: task.stages };
     }
@@ -221,7 +224,7 @@ export class TaskController {
     @Get("/:id/report")
     @ApiOkResponse({ type: GetReportResponse, description: "Task report" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async getReport(@Param("id", TaskByIdPipe) id: string) {
+    async getReport(@Param("id", TaskByIdPipe, TaskExpiredPipe) id: string) {
         const [, report] = await this.taskService.getReport(id);
         return { success: 1, report };
     }
@@ -250,7 +253,10 @@ export class TaskController {
     @ApiOkResponse({ description: "XLSX file reposnse" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     @ApiProduces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    async getReportFile(@Param("id", TaskByIdPipe) id: string, @Res() res: Response) {
+    async getReportFile(
+        @Param("id", TaskByIdPipe, TaskExpiredPipe) id: string,
+        @Res() res: Response,
+    ) {
         const [, report] = await this.taskService.getReport(id);
         const buffer = this.taskService.getReportBuffer(report);
         res.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -261,7 +267,10 @@ export class TaskController {
     @Get("/:id/report/email/:email")
     @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
-    async getReportByEmail(@Param("id", TaskByIdPipe) id: string, @Param("email") email: string) {
+    async getReportByEmail(
+        @Param("id", TaskByIdPipe, TaskExpiredPipe) id: string,
+        @Param("email") email: string,
+    ) {
         const [task, report] = await this.taskService.getReport(id);
         const buffer = this.taskService.getReportBuffer(report);
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.EMAIL_QUEUE);
