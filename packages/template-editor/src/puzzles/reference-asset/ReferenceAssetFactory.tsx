@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
-import * as React from "react";
-import { ReferenceAsset } from "./ReferenceAsset";
-import { useContext } from "react";
 import { EditorContext } from "context";
+import * as React from "react";
+import { useContext } from "react";
+import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
+import { ReferenceAsset } from "./ReferenceAsset";
 
 export class ReferenceAssetFactory implements IPuzzleFactory {
     create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
@@ -13,7 +13,7 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
         const addAssetButton =
-            !!props.parentPuzzle && props.parentPuzzle.puzzles.length - 1 === props.index;
+            !!props.parentPuzzle && props.parentPuzzle.puzzles.length === props.index;
 
         return (
             <ReferenceAsset

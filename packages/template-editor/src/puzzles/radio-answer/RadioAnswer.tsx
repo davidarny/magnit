@@ -130,7 +130,6 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        paddingTop: theme.spacing(),
                         marginBottom: `${theme.spacing()} !important`,
                     })}
                 >

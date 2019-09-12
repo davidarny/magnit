@@ -42,6 +42,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
     name?: string;
     value: unknown;
 }>;
+
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
     const { index: index1, title, template, id, focused } = props;
     const { onTemplateChange } = props;
@@ -75,11 +76,11 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
             if (answersType !== answerTypeSnapshot.current) {
                 puzzle.puzzles.length = 1;
             }
-            puzzle.puzzles = puzzle.puzzles.map(child => {
+            puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                 return {
-                    ...child,
+                    ...childPuzzle,
                     puzzleType: nextAnswerType,
-                    title: answersType === answerTypeSnapshot.current ? child.title : "",
+                    title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
                 };
             });
             // reset conditions and validations
@@ -97,33 +98,26 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
             // so we have to add it's children when choosing this type
             if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
                 puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
-                    const puzzle = {
-                        id: uuid(),
-                        puzzleType: EPuzzleType.REFERENCE_TEXT,
-                        title: "",
-                        description: "",
-                        order: childPuzzle.puzzles.length,
-                        puzzles: [],
-                        conditions: [],
-                        validations: [],
-                    };
                     return {
                         ...childPuzzle,
                         puzzles: [
-                            puzzle,
                             {
-                                ...puzzle,
                                 id: uuid(),
-                                puzzleType: EPuzzleType.REFERENCE_ASSET,
-                                order: childPuzzle.puzzles.length + 1,
+                                puzzleType: EPuzzleType.REFERENCE_TEXT,
+                                title: "",
+                                description: "",
+                                order: childPuzzle.puzzles.length,
+                                puzzles: [],
+                                conditions: [],
+                                validations: [],
                             },
                         ],
                     };
                 });
             } else if (nextAnswerType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
-                puzzle.puzzles = puzzle.puzzles.map(child => {
+                puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                     return {
-                        ...child,
+                        ...childPuzzle,
                         puzzles: [],
                     };
                 });

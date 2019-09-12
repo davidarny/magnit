@@ -146,7 +146,6 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                     alignItems="flex-end"
                     spacing={2}
                     css={theme => ({
-                        paddingTop: theme.spacing(),
                         marginBottom: `${theme.spacing()} !important`,
                         marginLeft: "0 !important",
                     })}

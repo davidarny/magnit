@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Fab } from "@magnit/components";
-import { IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
@@ -27,7 +27,7 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
 }
 
 export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
-    const { focused, id, description, addAssetButton } = props;
+    const { focused, id, description, addAssetButton, title } = props;
     const { onUploadAsset, onAddAsset, onDeleteAsset, onDeleteAssetPuzzle } = props;
 
     const input = useRef<HTMLInputElement>(null);
@@ -46,6 +46,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
             }
             onUploadAsset(file).then(response => {
                 onAddAsset(id, {
+                    puzzleType: EPuzzleType.REFERENCE_ASSET,
                     title: _.get(file, "name", ""),
                     description: response.filename,
                 });
@@ -61,7 +62,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
     }, [description, id, onDeleteAsset, onDeleteAssetPuzzle]);
 
     return (
-        <Grid css={() => ({ ...(!focused ? { display: "none" } : {}) })} item xs={3}>
+        <Grid css={() => ({ ...(!focused ? { display: "none" } : {}) })} item xs={2}>
             <Grid
                 container
                 justify="center"
@@ -82,8 +83,8 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                                 width: "100%",
                                 maxHeight: theme.spacing(20),
                             })}
-                            alt={props.title}
-                            src={props.description}
+                            alt={title}
+                            src={description}
                         />
                         <div
                             onClick={onDeleteAssetCallback}
@@ -107,11 +108,18 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                 )}
                 {addAssetButton && (
                     <React.Fragment>
-                        <input ref={input} type="file" hidden onChange={onFileChangeCallback} />
+                        <input
+                            ref={input}
+                            accept="image/*,.pdf,.doc,.xls,.xlsx"
+                            type="file"
+                            hidden
+                            onChange={onFileChangeCallback}
+                        />
                         <Fab
                             css={theme => ({
-                                width: theme.spacing(5),
-                                height: theme.spacing(5),
+                                width: theme.spacing(4),
+                                height: theme.spacing(4),
+                                minHeight: theme.spacing(4),
                                 marginBottom: theme.spacing(),
                             })}
                             onClick={onAddAssetTrigger}
@@ -126,7 +134,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                             })}
                             align="center"
                         >
-                            Добавить фото
+                            Добавить файл
                         </Typography>
                     </React.Fragment>
                 )}

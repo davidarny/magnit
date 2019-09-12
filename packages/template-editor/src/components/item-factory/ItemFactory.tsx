@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IPuzzle } from "@magnit/entities";
 import { Grid } from "@material-ui/core";
 import { PuzzleWrapper } from "components/puzzle-wrapper";
 import * as React from "react";
@@ -18,21 +18,23 @@ interface IContentItemProps {
     onFocus(): void;
 }
 
-export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false, ...props }) => {
+export const ItemFactory: React.FC<IContentItemProps> = props => {
+    const { puzzle, parentPuzzle, deep = false, index, active, noWrapper, onFocus } = props;
     const factory = getPuzzleFactory(puzzle.puzzleType);
+
     return (
         <React.Fragment>
             <PuzzleWrapper
                 id={puzzle.id}
-                onFocus={props.onFocus}
-                onMouseDown={props.onFocus}
-                noWrapper={props.noWrapper}
+                onFocus={onFocus}
+                onMouseDown={onFocus}
+                noWrapper={noWrapper}
             >
                 {factory.create({
-                    focused: !!props.active,
+                    focused: !!active,
                     puzzle: puzzle,
-                    index: props.index,
-                    parentPuzzle: props.parentPuzzle,
+                    index: index,
+                    parentPuzzle: parentPuzzle,
                 })}
                 {deep && (
                     <Grid container spacing={2}>
@@ -42,16 +44,34 @@ export const ItemFactory: React.FC<IContentItemProps> = ({ puzzle, deep = false,
                                     noWrapper={true}
                                     puzzle={childPuzzle}
                                     index={index}
-                                    active={props.active}
-                                    onFocus={props.onFocus}
+                                    active={active}
+                                    onFocus={onFocus}
                                     key={index}
                                     parentPuzzle={puzzle}
                                 />
                             );
                         })}
+                        {puzzle.puzzleType === EPuzzleType.REFERENCE_ANSWER &&
+                            getPuzzleFactory(EPuzzleType.REFERENCE_ASSET).create({
+                                focused: !!active,
+                                puzzle: {
+                                    id: puzzle.id,
+                                    puzzleType: EPuzzleType.REFERENCE_ASSET,
+                                    title: "",
+                                    description: "",
+                                    order: puzzle.puzzles.length,
+                                    puzzles: [],
+                                    conditions: [],
+                                    validations: [],
+                                },
+                                parentPuzzle: puzzle,
+                                index: puzzle.puzzles.length,
+                            })}
                     </Grid>
                 )}
             </PuzzleWrapper>
         </React.Fragment>
     );
 };
+
+ItemFactory.displayName = "ItemFactory";

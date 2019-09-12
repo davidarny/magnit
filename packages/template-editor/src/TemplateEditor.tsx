@@ -27,7 +27,7 @@ interface ITemplateEditorProps {
 }
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
-    const { template: initialState } = props;
+    const { template: initialState, onChange, onDeleteAsset, onAddAsset } = props;
 
     const context = useContext(EditorContext);
     const cache = useRef<ICache>({
@@ -71,8 +71,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     // handle passed onChange callback
     // update cache
     useEffect(() => {
-        if (props.onChange) {
-            props.onChange(template);
+        if (onChange) {
+            onChange(template);
         }
 
         const isSection = (object: unknown): object is ISection =>
@@ -232,33 +232,53 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     function onAddAnswerPuzzle(id: string, addition: Partial<IPuzzle> = {}): void {
         traverse(template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id")) {
+            if (!_.has(puzzle, "id") || !_.has(puzzle, "puzzles")) {
                 return;
             }
-            if (!_.has(puzzle, "puzzles")) {
-                return;
+            if (addition.puzzleType === EPuzzleType.REFERENCE_ASSET) {
+                if (puzzle.id !== id) {
+                    return;
+                }
+                const child = _.cloneDeep(_.first(puzzle.puzzles));
+                if (!child) {
+                    return true;
+                }
+                if (child.puzzleType === EPuzzleType.REFERENCE_TEXT) {
+                    child.puzzleType = EPuzzleType.REFERENCE_ASSET;
+                }
+                // insert puzzle
+                puzzle.puzzles.push({
+                    id: uuid(),
+                    title: "",
+                    puzzles: [],
+                    puzzleType: child.puzzleType,
+                    order: child.order + 1,
+                    conditions: [],
+                    description: "",
+                    validations: [],
+                    ...addition,
+                });
+                return true;
+            } else if (puzzle.puzzles.some(child => child.id === id)) {
+                const prevPuzzle = _.last(puzzle.puzzles) || {
+                    order: -1,
+                    puzzleType: "" as EPuzzleType,
+                };
+                // update last puzzle with payload
+                _.assign(prevPuzzle, addition);
+                // insert stub puzzle
+                puzzle.puzzles.push({
+                    id: uuid(),
+                    title: "",
+                    puzzles: [],
+                    puzzleType: prevPuzzle.puzzleType,
+                    order: prevPuzzle.order + 1,
+                    conditions: [],
+                    description: "",
+                    validations: [],
+                });
+                return true;
             }
-            if (!puzzle.puzzles.some(child => child.id === id)) {
-                return;
-            }
-            const prevPuzzle = _.last(puzzle.puzzles) || {
-                order: -1,
-                puzzleType: "" as EPuzzleType,
-            };
-            // update last puzzle with payload
-            _.assign(prevPuzzle, addition);
-            // insert stub puzzle
-            puzzle.puzzles.push({
-                id: uuid(),
-                title: "",
-                puzzles: [],
-                puzzleType: prevPuzzle.puzzleType,
-                order: prevPuzzle.order + 1,
-                conditions: [],
-                description: "",
-                validations: [],
-            });
-            return true;
         });
         setTemplate({ ...template });
     }
@@ -363,8 +383,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
 
     context.template = template;
     context.cache = cache;
-    context.onDeleteAsset = props.onDeleteAsset || context.onDeleteAsset;
-    context.onUploadAsset = props.onAddAsset || context.onUploadAsset;
+    context.onDeleteAsset = onDeleteAsset || context.onDeleteAsset;
+    context.onUploadAsset = onAddAsset || context.onUploadAsset;
     context.onTemplateChange = onTemplateChange;
     context.onAddAnswerPuzzle = onAddAnswerPuzzle;
     context.onDeleteAnswerPuzzle = onDeleteAnswerPuzzle;
