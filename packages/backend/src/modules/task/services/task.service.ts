@@ -1,8 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { existsSync, unlinkSync } from "fs";
 import { DeepPartial, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
+import { AssetNotFoundException } from "../../../shared/exceptions/asset-not-found.exception";
 import { CannotParseLocationException } from "../../../shared/exceptions/cannot-prase-location.location";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
@@ -14,24 +16,27 @@ import { TemplateAnswerLocationDto } from "../../template/dto/template-answer-lo
 import { TemplateAnswerLocation } from "../../template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
-import { ITemplateService } from "../../template/interfaces/template.service.interface";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { TaskDto } from "../dto/task.dto";
+import { TaskDocument } from "../entities/task-document.entity";
 import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
-import { ITaskService, TTaskWithLastStageAndToken } from "../interfaces/task.service.interface";
 import _ = require("lodash");
 
+export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStage };
+
 @Injectable()
-export class TaskService implements ITaskService {
+export class TaskService {
     constructor(
         @InjectRepository(TaskStage) private readonly taskStageRepository: Repository<TaskStage>,
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
         @InjectRepository(TemplateAssignment)
         private readonly templateAssignmentRepository: Repository<TemplateAssignment>,
-        @Inject(TemplateService) private readonly templateService: ITemplateService,
+        @InjectRepository(TaskDocument)
+        private readonly taskDocumentRepository: Repository<TaskDocument>,
+        private readonly templateService: TemplateService,
     ) {}
 
     async findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]> {
@@ -107,22 +112,43 @@ export class TaskService implements ITaskService {
         return this.taskRepository.save(task);
     }
 
-    async findById(id: string, relations: string[] = []) {
+    async findById(id: number, relations: string[] = []) {
         return this.taskRepository.findOne({ where: { id }, relations });
     }
 
-    async getTaskExtended(id: string) {
-        const task = await this.taskRepository
-            .createQueryBuilder("task")
-            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
-            .where("task.id = :id", { id })
-            .orderBy("stage.created_at", "ASC")
-            .getOne();
-        const templates = await this.templateService.findByTaskId(task.id.toString());
+    @Transactional()
+    async getTaskExtended(id: number) {
+        const tasks = await this.taskRepository.query(
+            `
+                SELECT t.*,
+                       to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages,
+                       to_json(array_remove(array_agg(DISTINCT td), NULL)) AS documents
+                FROM task t
+                LEFT JOIN
+                    (
+                        SELECT td.id,
+                           td.id_task,
+                           td.original_name,
+                           td.created_at,
+                           td.updated_at,
+                           concat('${process.env.BACKEND_HOST}', '/', td.filename) AS filename
+                        FROM task_document td
+                    ) td ON td.id_task = t.id AND td.id_task = $1
+                LEFT JOIN task_stage ts ON ts.id_task = t.id AND ts.id_task = $1
+                WHERE t.id = $1
+                GROUP BY t.id;
+        `,
+            [id],
+        );
+        const task = _.first<Task>(tasks);
+        if (!task) {
+            throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
+        }
+        const templates = await this.templateService.findByTaskId(task.id);
         return { ...task, templates };
     }
 
-    async getTaskStagesWithHistory(id: string): Promise<Task> {
+    async getTaskStagesWithHistory(id: number): Promise<Task> {
         return this.taskRepository
             .createQueryBuilder("task")
             .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
@@ -133,7 +159,7 @@ export class TaskService implements ITaskService {
             .getOne();
     }
 
-    async deleteById(id: string) {
+    async deleteById(id: number) {
         await this.taskRepository.delete(id);
     }
 
@@ -143,12 +169,12 @@ export class TaskService implements ITaskService {
 
     @Transactional()
     async setTaskAnswers(
-        taskId: string,
-        templateIds: string[],
+        id: number,
+        keys: string[],
         files: Express.Multer.File[],
         body: { [key: string]: string },
     ) {
-        const task = await this.taskRepository.findOne(taskId);
+        const task = await this.taskRepository.findOne(id);
         // check if task has IN_PROGRESS status
         // if not, throw error
         if (task.status !== ETaskStatus.IN_PROGRESS) {
@@ -168,21 +194,21 @@ export class TaskService implements ITaskService {
         const location = new TemplateAnswerLocation(templateAnswerLocationDto);
         await this.templateService.saveTemplateLocation(location);
         // get all template ids in keys
-        const groupedTemplateIds = this.groupKeysBy(templateIds, id =>
-            this.getTemplateIdFromMultipartKey(id),
-        );
+        const groupedTemplateIds = this.groupKeysBy(keys, key =>
+            this.getTemplateIdFromMultipartKey(key),
+        ).map(templateId => Number(templateId));
         await Promise.all(
             groupedTemplateIds
                 .map(async templateId => {
                     // group all key with array index suffix
-                    const puzzleIds = this.groupKeysBy(templateIds, id =>
-                        this.getPuzzleIdFromMultipartKey(id),
+                    const puzzleIds = this.groupKeysBy(keys, key =>
+                        this.getPuzzleIdFromMultipartKey(key),
                     );
-                    await this.ensurePuzzlesSettled(taskId, puzzleIds);
+                    await this.ensurePuzzlesSettled(id, puzzleIds);
                     // remove id of comment suffix
                     // cause we don't store that separately
                     const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
-                        templateIds,
+                        keys,
                         templateId,
                     );
                     const template = await this.templateService.findById(templateId);
@@ -266,7 +292,7 @@ export class TaskService implements ITaskService {
     }
 
     @Transactional()
-    async getReport(id: string): Promise<[Task, TaskReportDto]> {
+    async getReport(id: number): Promise<[Task, TaskReportDto]> {
         const task = await this.taskRepository
             .createQueryBuilder("task")
             .leftJoinAndSelect("task.assignments", "assignment", "assignment.id_task = :id", { id })
@@ -275,7 +301,7 @@ export class TaskService implements ITaskService {
             .orderBy("assignment.created_at", "ASC")
             .addOrderBy("stage.created_at", "ASC")
             .getOne();
-        const templates = await this.templateService.findByTaskId(task.id.toString());
+        const templates = await this.templateService.findByTaskId(task.id);
         const report = new TaskReportDto({
             ..._.omit(task, "assignments"),
             stages: task.stages.map(stage => {
@@ -300,6 +326,25 @@ export class TaskService implements ITaskService {
             }),
         });
         return [task, report];
+    }
+
+    async addTaskDocument(document: TaskDocument): Promise<TaskDocument> {
+        return this.taskDocumentRepository.save(document);
+    }
+
+    async documentByIdExists(id: number): Promise<boolean> {
+        return !!(await this.taskDocumentRepository.findOne(id));
+    }
+
+    @Transactional()
+    async deleteDocumentById(taskId: number, documentId: number): Promise<void> {
+        const document = await this.taskDocumentRepository.findOne(documentId);
+        await this.taskDocumentRepository.delete({ id_task: taskId, id: documentId });
+        const pathToFile = process.cwd() + `/public/${document.filename}`;
+        if (!existsSync(pathToFile)) {
+            throw new AssetNotFoundException(`File "${document.filename}" Not Found`);
+        }
+        unlinkSync(pathToFile);
     }
 
     getReportBuffer(report: TaskReportDto): Buffer {
@@ -349,11 +394,11 @@ export class TaskService implements ITaskService {
         return _.nth(id.split("_"), 1);
     }
 
-    private getTemplatePuzzleIdsWithoutComments(ids: string[], templateId: string): string[] {
-        return ids.filter(id => id.startsWith(templateId) && !id.includes("comment"));
+    private getTemplatePuzzleIdsWithoutComments(keys: string[], templateId: number): string[] {
+        return keys.filter(id => id.startsWith(templateId.toString()) && !id.includes("comment"));
     }
 
-    private async ensurePuzzlesSettled(taskId: string, puzzleIds: string[]): Promise<void> {
+    private async ensurePuzzlesSettled(taskId: number, puzzleIds: string[]): Promise<void> {
         // validating here cause pipe cannot get access
         // to file array and it's keys
         const promises = puzzleIds.map(async puzzleId => ({
@@ -375,9 +420,9 @@ export class TaskService implements ITaskService {
         }
     }
 
-    private groupKeysBy(ids: string[], predicate: (id: string) => string): string[] {
-        return ids.reduce((prev, curr) => {
-            const existing = prev.find(id => id === predicate(curr));
+    private groupKeysBy(keys: string[], predicate: (key: string) => string): string[] {
+        return keys.reduce((prev, curr) => {
+            const existing = prev.find(key => key === predicate(curr));
             if (existing) {
                 return prev;
             }
@@ -393,7 +438,7 @@ export class TaskService implements ITaskService {
         await this.templateAssignmentRepository.save(assignments);
     }
 
-    async findActiveStage(id: string): Promise<TaskStage | undefined> {
+    async findActiveStage(id: number): Promise<TaskStage | undefined> {
         return this.taskStageRepository.findOne({
             where: { id_task: id, finished: false },
             order: { created_at: "ASC" },

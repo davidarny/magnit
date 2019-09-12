@@ -4,7 +4,6 @@ import { TokenExpiredError } from "jsonwebtoken";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
-import { IPushTokenService } from "../../push-token/interfaces/push-token.service.interface";
 import { PushTokenService } from "../../push-token/services/push-token.service";
 import { User } from "../entities/user.entity";
 import { IAuthService } from "../interfaces/auth.service.interface";
@@ -17,7 +16,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
     constructor(
         @Inject(AirwatchAuthService) private readonly authService: IAuthService,
         @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<User>,
-        @Inject(PushTokenService) private readonly pushTokenService: IPushTokenService,
+        private readonly pushTokenService: PushTokenService,
     ) {}
 
     async use(req: IAuthRequest, res: Response, next: () => void): Promise<void> {

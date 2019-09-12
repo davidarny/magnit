@@ -3,6 +3,7 @@ import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 import { TemplateAnswerDto } from "../../template/dto/template-answer.dto";
 import { TemplateDto } from "../../template/dto/template.dto";
 import { ETaskStatus } from "../entities/task.entity";
+import { TaskDocumentDto } from "./task-document.dto";
 import { TaskStageDto } from "./task-stage.dto";
 
 export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
@@ -18,6 +19,7 @@ export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
 export class FullTaskDto extends TaskDto<FullTaskDto> {
     @ApiModelProperty({ type: [Number] }) readonly templates: number[];
     @ApiModelProperty({ type: [Number] }) readonly stages: number[];
+    @ApiModelProperty({ type: [Number] }) readonly documents: number[];
 }
 
 class EditableTemplateDto extends TemplateDto<EditableTemplateDto> {
@@ -28,4 +30,5 @@ class EditableTemplateDto extends TemplateDto<EditableTemplateDto> {
 export class ExtendedTaskDto extends TaskDto<ExtendedTaskDto> {
     @ApiModelProperty({ type: [EditableTemplateDto] }) readonly templates: EditableTemplateDto[];
     @ApiModelProperty({ type: [TaskStageDto] }) readonly stages: TaskStageDto[];
+    @ApiModelProperty({ type: [TaskDocumentDto] }) readonly documents: TaskDocumentDto[];
 }

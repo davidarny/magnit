@@ -1,16 +1,12 @@
 import { ISendMailOptions, MailerModule } from "@nest-modules/mailer";
-import { Inject, Logger, Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { AmqpModule } from "../amqp/amqp.module";
-import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../amqp/services/amqp.service";
-import { IScheduleService } from "../schedule/interfaces/schedule.service.interface";
 import { ScheduleModule } from "../schedule/schedule.module";
 import { ScheduleService } from "../schedule/services/schedule.service";
-import { ITaskService } from "../task/interfaces/task.service.interface";
 import { TaskService } from "../task/services/task.service";
 import { TaskModule } from "../task/task.module";
 import { IMailMessage } from "./interfaces/mail-message.interface";
-import { IMailService } from "./interfaces/mail.service.interface";
 import { IScheduleMessage } from "./interfaces/schedule-message.interface";
 import { MailService } from "./services/mail.service";
 
@@ -25,10 +21,10 @@ export class MailModule {
     private readonly logger = new Logger(MailModule.name);
 
     constructor(
-        @Inject(AmqpService) private readonly amqpService: IAmqpService,
-        @Inject(ScheduleService) private readonly scheduleService: IScheduleService,
-        @Inject(MailService) private readonly mailService: IMailService,
-        @Inject(TaskService) private readonly taskService: ITaskService,
+        private readonly amqpService: AmqpService,
+        private readonly scheduleService: ScheduleService,
+        private readonly mailService: MailService,
+        private readonly taskService: TaskService,
     ) {
         this.consumeEmailQueue().catch(this.logger.error);
         this.consumeScheduleQueue().catch(this.logger.error);
@@ -41,7 +37,7 @@ export class MailModule {
         );
         await channel.consume(AmqpService.CANCEL_EMAIL_SCHEDULE, async message => {
             const id = message.content.toString();
-            this.scheduleService.cancelJob(getTaskJobName(id));
+            this.scheduleService.cancelJob(getTaskJobName(Number(id)));
             channel.ack(message);
         });
     }
@@ -121,6 +117,6 @@ export class MailModule {
     }
 }
 
-function getTaskJobName(id: string): string {
+function getTaskJobName(id: number): string {
     return `task_${id}`;
 }

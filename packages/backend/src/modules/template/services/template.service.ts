@@ -8,11 +8,10 @@ import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-f
 import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
-import { ITemplateService } from "../interfaces/template.service.interface";
 import _ = require("lodash");
 
 @Injectable()
-export class TemplateService implements ITemplateService {
+export class TemplateService {
     constructor(
         @InjectRepository(Template)
         private readonly templateRepository: Repository<Template>,
@@ -22,11 +21,7 @@ export class TemplateService implements ITemplateService {
         private readonly templateAnswerLocationRepository: Repository<TemplateAnswerLocation>,
     ) {}
 
-    async findAnswersById(id: string): Promise<TemplateAnswer[]> {
-        return this.templateAnswerRepository.find({ where: { id_template: id } });
-    }
-
-    async findByPuzzleId(taskId: string, puzzleId: string): Promise<TemplateAnswer> {
+    async findByPuzzleId(taskId: number, puzzleId: string): Promise<TemplateAnswer> {
         return this.templateAnswerRepository.findOne({
             where: { id_task: taskId, id_puzzle: puzzleId },
         });
@@ -55,11 +50,11 @@ export class TemplateService implements ITemplateService {
 
     // TODO: remove this one and handle 404 more accurately
     /** @deprecated */
-    async findOneOrFail(id: string) {
+    async findOneOrFail(id: number) {
         return this.templateRepository.findOneOrFail({ where: { id } });
     }
 
-    async findByTaskId(id: string) {
+    async findByTaskId(id: number) {
         return this.templateRepository.query(
             `
             SELECT
@@ -116,7 +111,7 @@ export class TemplateService implements ITemplateService {
     }
 
     @Transactional()
-    async update(id: string, template: Template) {
+    async update(id: number, template: Template) {
         // tricky update
         // need this only for jsonb_strip_nulls()
         const builder = await this.templateRepository.createQueryBuilder("template").update();
@@ -134,16 +129,16 @@ export class TemplateService implements ITemplateService {
             values.sections = () =>
                 `to_jsonb(json_strip_nulls('${JSON.stringify(template.sections)}'))`;
         }
-        builder.set(values).where("id = :id", { id: Number(id) });
+        builder.set(values).where("id = :id", { id });
         await builder.execute();
-        return await this.templateRepository.findOne({ id: Number(id) });
+        return await this.templateRepository.findOne({ id });
     }
 
-    async findById(id: string) {
+    async findById(id: number) {
         return this.templateRepository.findOne({ where: { id } });
     }
 
-    async deleteById(id: string) {
+    async deleteById(id: number) {
         await this.templateRepository.delete(id);
     }
 

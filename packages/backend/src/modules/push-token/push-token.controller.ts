@@ -1,22 +1,20 @@
-import { Body, Controller, Inject, Post, Req } from "@nestjs/common";
+import { Body, Controller, Post, Req } from "@nestjs/common";
 import { ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { CannotSendPushNotificationException } from "../../shared/exceptions/cannot-send-push-notification.exception";
 import { IAuthRequest } from "../../shared/interfaces/auth.request.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../amqp/services/amqp.service";
 import { MessagePayloadDto } from "./dto/message-payload.dto";
 import { PushToken } from "./entities/push-token.entity";
 import { IPushMessage } from "./interfaces/push-message.interface";
-import { IPushTokenService } from "./interfaces/push-token.service.interface";
 import { PushTokenService } from "./services/push-token.service";
 
 @ApiUseTags("push_token")
 @Controller("push_token")
 export class PushTokenController {
     constructor(
-        @Inject(PushTokenService) private readonly pushTokenService: IPushTokenService,
-        @Inject(AmqpService) private readonly amqpService: IAmqpService,
+        private readonly pushTokenService: PushTokenService,
+        private readonly amqpService: AmqpService,
     ) {}
 
     @Post("/")

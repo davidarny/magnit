@@ -11,10 +11,10 @@ export class TaskStage extends PrimaryBaseEntity<TaskStage> {
         this.construct(this, dto);
     }
 
+    @Index()
     @Column()
     id_task: string;
 
-    @Index()
     @ManyToOne(() => Task, task => task.stages)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;

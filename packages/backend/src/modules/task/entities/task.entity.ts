@@ -1,6 +1,7 @@
 import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
+import { TaskDocument } from "./task-document.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
@@ -50,4 +51,7 @@ export class Task extends PrimaryBaseEntity<Task> {
 
     @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
     stages: TaskStage[];
+
+    @OneToMany(() => TaskDocument, task_document => task_document.task, { cascade: true })
+    documents: TaskStage[];
 }

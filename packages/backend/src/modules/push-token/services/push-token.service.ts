@@ -2,9 +2,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { PushToken } from "../entities/push-token.entity";
-import { IPushTokenService } from "../interfaces/push-token.service.interface";
 
-export class PushTokenService implements IPushTokenService {
+export class PushTokenService {
     constructor(
         @InjectRepository(PushToken) private readonly pushTokenRepository: Repository<PushToken>,
     ) {}

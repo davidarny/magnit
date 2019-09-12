@@ -10,7 +10,6 @@ import {
 import { existsSync, unlinkSync } from "fs";
 import { AssetNotFoundException } from "../../shared/exceptions/asset-not-found.exception";
 import { BaseResponse } from "../../shared/responses/base.response";
-import { FileDto } from "./dto/file.dto";
 import { UploadFileResponse } from "./responses/upload-file.response";
 
 @ApiUseTags("assets")
@@ -21,7 +20,7 @@ export class AssetController {
     @ApiImplicitFile({ name: "file", required: true })
     @ApiOkResponse({ type: UploadFileResponse })
     @UseInterceptors(FileInterceptor("file"))
-    upload(@UploadedFile() file: FileDto) {
+    upload(@UploadedFile() file: Express.Multer.File) {
         return { success: 1, filename: file.filename };
     }
 

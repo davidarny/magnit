@@ -3,12 +3,13 @@ import { TaskNotFoundException } from "../../../shared/exceptions/task-not-found
 import { TaskService } from "../services/task.service";
 
 @Injectable()
-export class TaskByIdPipe implements PipeTransform<number, Promise<number>> {
+export class DocumentByIdPipe implements PipeTransform<number, Promise<number>> {
     constructor(@Inject(TaskService) private readonly taskService: TaskService) {}
 
     async transform(id: number, metadata: ArgumentMetadata): Promise<number> {
-        if (!(await this.taskService.findById(id))) {
-            throw new TaskNotFoundException(`Task with id ${id} was not found`);
+        const exists = await this.taskService.documentByIdExists(id);
+        if (!exists) {
+            throw new TaskNotFoundException(`Document with id ${id} was not found`);
         }
         return id;
     }

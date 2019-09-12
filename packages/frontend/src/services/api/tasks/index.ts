@@ -7,3 +7,5 @@ export * from "./GetTaskExtended";
 export * from "./AddStages";
 export * from "./GetStagesWithFullHistory";
 export * from "./GetTaskReport";
+export * from "./AddTaskDocument";
+export * from "./DeleteTaskDocument";

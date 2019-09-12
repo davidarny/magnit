@@ -22,10 +22,16 @@ import { ViewTask } from "./components/view-task";
 
 type TAnyTask = ITask | IExtendedTask;
 
+type TDocumentWithAnswers = IDocument & IWithAnswers;
+
 interface ITaskEditorProps<T extends TAnyTask> {
     task: T;
-    templates: T extends IExtendedTask ? Array<IDocument & IWithAnswers> : IDocument[];
+    templates: T extends IExtendedTask ? TDocumentWithAnswers[] : IDocument[];
     variant: "create" | "view";
+
+    onAddAsset?(file: File): void;
+
+    onDeleteAsset?(id: number): void;
 
     onTaskChange?(task: Partial<T>): void;
 }
@@ -36,11 +42,14 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
-    const { templates, task, variant, onTaskChange } = props;
+    const { templates, task, variant, onTaskChange, onAddAsset, onDeleteAsset } = props;
 
     const [title, setTitle] = useState("");
+    // not task documents
+    // contains short template records mainly needed for rendering
     const [documents, setDocuments] = useState<IVirtualDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
+    // full templates mainly needed for rendering
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
 
@@ -107,9 +116,17 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         }
     }, [templates, task.templates, isViewMode, isCreateMode, task, documents, templateSnapshots]);
 
+    const initialFocusThreshold = useRef(0);
     const initialFocusSet = useRef(false);
     useEffect(() => {
+        // view updates it's focus util task is not loaded
+        // so if task is never loaded, we stop at some point or it becomes painful
+        // TODO: pass some bool prop so to know when set focus
+        if (initialFocusThreshold.current > 20) {
+            return;
+        }
         if (!initialFocusSet.current) {
+            initialFocusThreshold.current++;
             service.current.onPuzzleFocus(task.id.toString(), true);
         }
         if (task.id !== 0 || isCreateMode(task)) {
@@ -325,6 +342,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                     onDeleteStage={onDeleteStageCallback}
                     onTemplatesChange={onTemplatesChangeCallback}
                     onTaskChange={onTaskChange as (task: Partial<IExtendedTask>) => void}
+                    onAddAsset={onAddAsset}
+                    onDeleteAsset={onDeleteAsset}
                 />
             )}
         </React.Fragment>

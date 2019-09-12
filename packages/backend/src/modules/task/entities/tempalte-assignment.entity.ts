@@ -13,18 +13,18 @@ export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
     @Column({ type: "boolean", default: true })
     editable: boolean;
 
+    @Index()
     @Column({ nullable: true })
     id_task: number;
 
-    @Index()
     @ManyToOne(() => Task)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
 
+    @Index()
     @Column({ nullable: true })
     id_template: number;
 
-    @Index()
     @ManyToOne(() => Template)
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;

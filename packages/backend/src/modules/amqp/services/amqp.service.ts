@@ -1,10 +1,9 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Channel, Connection, ConsumeMessage } from "amqplib";
 import { InjectAmqpConnection } from "nestjs-amqp";
-import { IAmqpService } from "../interfaces/amqp.service.interface";
 
 @Injectable()
-export class AmqpService implements IAmqpService {
+export class AmqpService {
     private readonly logger = new Logger(AmqpService.name);
 
     static EMAIL_QUEUE = "email";

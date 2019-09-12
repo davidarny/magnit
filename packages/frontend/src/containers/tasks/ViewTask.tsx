@@ -26,7 +26,9 @@ import * as React from "react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
     addStages,
+    addTaskDocument,
     addTemplateAssignment,
+    deleteTaskDocument,
     getTaskExtended,
     getTemplate,
     getTemplates,
@@ -58,6 +60,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         title: "",
         templates: [],
         stages: [],
+        documents: [],
         status: ETaskStatus.DRAFT,
     });
     const [redirect, setRedirect] = useState({
@@ -300,6 +303,30 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         setMessageModalOpen(false);
     }
 
+    const onAddTaskDocument = useCallback(
+        (document: File) => {
+            addTaskDocument(context.courier, taskId, document)
+                .then(() => updateTaskState())
+                .catch(() => {
+                    context.setSnackbarState({ open: true, message: "Ошибка сохранения файла!" });
+                    context.setSnackbarError(true);
+                });
+        },
+        [context, taskId, updateTaskState],
+    );
+
+    const onDeleteTaskDocument = useCallback(
+        (documentId: number) => {
+            deleteTaskDocument(context.courier, taskId, documentId)
+                .then(() => updateTaskState())
+                .catch(() => {
+                    context.setSnackbarState({ open: true, message: "Ошибка удаления файла!" });
+                    context.setSnackbarError(true);
+                });
+        },
+        [context, taskId, updateTaskState],
+    );
+
     return (
         <SectionLayout>
             <SimpleModal width={370} open={messageModalOpen} onClose={onMessageModalClose}>
@@ -372,6 +399,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     templates={isTaskEditable(task) ? templates : task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}
+                    onDeleteAsset={onDeleteTaskDocument}
+                    onAddAsset={onAddTaskDocument}
                 />
             </Grid>
         </SectionLayout>

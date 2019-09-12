@@ -1,24 +1,21 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
 import { Connection, EntitySubscriberInterface, UpdateEvent } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
-import { IAmqpService } from "../../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../../amqp/services/amqp.service";
 import { IPushMessage } from "../../push-token/interfaces/push-message.interface";
-import { IPushTokenService } from "../../push-token/interfaces/push-token.service.interface";
 import { PushTokenService } from "../../push-token/services/push-token.service";
 import { StageHistory } from "../entities/stage-history.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
-import { ITaskService } from "../interfaces/task.service.interface";
 import { TaskService } from "../services/task.service";
 
 @Injectable()
 export class TaskSubscriber implements EntitySubscriberInterface<Task> {
     constructor(
         @InjectConnection() readonly connection: Connection,
-        @Inject(TaskService) private readonly taskService: ITaskService,
-        @Inject(AmqpService) private readonly amqpService: IAmqpService,
-        @Inject(PushTokenService) private readonly pushTokenService: IPushTokenService,
+        private readonly taskService: TaskService,
+        private readonly amqpService: AmqpService,
+        private readonly pushTokenService: PushTokenService,
     ) {
         connection.subscribers.push(this);
     }

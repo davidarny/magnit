@@ -12,6 +12,7 @@ import { PushTokenService } from "../src/modules/push-token/services/push-token.
 import { ScheduleService } from "../src/modules/schedule/services/schedule.service";
 import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
+import { TaskDocument } from "../src/modules/task/entities/task-document.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
 import { ETaskStatus, Task } from "../src/modules/task/entities/task.entity";
 import { TemplateAssignment } from "../src/modules/task/entities/tempalte-assignment.entity";
@@ -44,6 +45,7 @@ describe("TaskController (e2e)", () => {
         assignments: [],
         stages: [],
         answers: [],
+        documents: [],
         id_owner: null,
         id_assignee: null,
         notify_before: 3,
@@ -85,6 +87,8 @@ describe("TaskController (e2e)", () => {
             .overrideProvider(getRepositoryToken(TemplateAnswerLocation))
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(TemplateAssignment))
+            .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(TaskDocument))
             .useValue(getMockRepository())
             .compile();
 
@@ -213,7 +217,7 @@ describe("TaskController (e2e)", () => {
             .get("/v1/tasks/0/report")
             .expect(200);
         const expected = { success: 1, report };
-        expect(taskService.getReport).toHaveBeenCalledWith("0");
+        expect(taskService.getReport).toHaveBeenCalledWith(0);
         expect(response.body).toEqual(expected);
     });
 });

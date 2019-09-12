@@ -62,8 +62,15 @@ export interface IWithAnswers {
     answers?: IAnswer[];
 }
 
+export interface ITaskDocument {
+    id: number;
+    originalName: string;
+    filename: string;
+}
+
 export interface IExtendedTask extends IBaseTask {
     id: number;
     templates: Array<IDocument & IWithAnswers>;
     stages: IStage[];
+    documents: ITaskDocument[];
 }

@@ -25,6 +25,7 @@ describe("TaskController", () => {
         assignments: [],
         stages: [],
         answers: [],
+        documents: [],
         id_assignee: null,
         id_owner: null,
         notify_before: 3,
@@ -87,7 +88,7 @@ describe("TaskController", () => {
         const expected = { success: 1, task: { ...task, templates: [] } };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
         jest.spyOn(templateService, "findByTaskId").mockResolvedValue([]);
-        expect(await taskController.findById("0")).toStrictEqual(expected);
+        expect(await taskController.findById(0)).toStrictEqual(expected);
     });
 
     it("should return list of task with created task", async () => {
@@ -99,21 +100,21 @@ describe("TaskController", () => {
     it("should add template to task", async () => {
         const expected = { success: 1 };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        expect(await taskController.setTemplateAssignments("0", [0])).toStrictEqual(expected);
+        expect(await taskController.setTemplateAssignments(0, [0])).toStrictEqual(expected);
     });
 
     it("should ensure task was added to tasks", async () => {
         const expected = { success: 1, task: { ...task, templates: [0] } };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
         jest.spyOn(templateService, "findByTaskId").mockResolvedValue([template]);
-        expect(await taskController.findById("0")).toStrictEqual(expected);
+        expect(await taskController.findById(0)).toStrictEqual(expected);
     });
 
     it("should update task", async () => {
         const expected = { success: 1, task_id: 0 };
         const updated = { ...task, name: "updated task" };
         jest.spyOn(taskService, "update").mockResolvedValue(updated);
-        expect(await taskController.update("0", updated)).toStrictEqual(expected);
+        expect(await taskController.update(0, updated)).toStrictEqual(expected);
     });
 
     it("should get tasks with updated task", async () => {
@@ -125,14 +126,14 @@ describe("TaskController", () => {
 
     it("should delete task", async () => {
         const expected = { success: 1 };
-        expect(await taskController.deleteById("0")).toStrictEqual(expected);
+        expect(await taskController.deleteById(0)).toStrictEqual(expected);
     });
 
     it("should get task report", async () => {
         const report = new TaskReportDto();
         jest.spyOn(taskService, "getReport").mockResolvedValue([task, report]);
-        const actual = await taskController.getReport("0");
-        expect(taskService.getReport).toHaveBeenCalledWith("0");
+        const actual = await taskController.getReport(0);
+        expect(taskService.getReport).toHaveBeenCalledWith(0);
         const expected = { success: 1, report };
         expect(actual).toEqual(expected);
     });

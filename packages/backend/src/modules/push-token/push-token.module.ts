@@ -1,8 +1,7 @@
-import { Inject, Logger, Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as admin from "firebase-admin";
 import { AmqpModule } from "../amqp/amqp.module";
-import { IAmqpService } from "../amqp/interfaces/amqp.service.interface";
 import { AmqpService } from "../amqp/services/amqp.service";
 import { PushToken } from "./entities/push-token.entity";
 import { IPushMessage } from "./interfaces/push-message.interface";
@@ -20,7 +19,7 @@ const config = require("../../../firebaseconfig.js");
 export class PushTokenModule {
     private readonly logger = new Logger(PushTokenModule.name);
 
-    constructor(@Inject(AmqpService) private readonly amqpService: IAmqpService) {
+    constructor(private readonly amqpService: AmqpService) {
         if (process.env.NODE_ENV === "testing") {
             return;
         }

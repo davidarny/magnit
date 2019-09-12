@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectSchedule, Schedule } from "nest-schedule";
-import { IScheduleService } from "../interfaces/schedule.service.interface";
 
 @Injectable()
-export class ScheduleService implements IScheduleService {
+export class ScheduleService {
     constructor(@InjectSchedule() private readonly schedule: Schedule) {}
 
     createJob(name: string, cron: string, callback: JobCallback): void {

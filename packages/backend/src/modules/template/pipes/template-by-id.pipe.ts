@@ -3,10 +3,10 @@ import { TemplateNotFoundException } from "../../../shared/exceptions/template-n
 import { TemplateService } from "../services/template.service";
 
 @Injectable()
-export class TemplateByIdPipe implements PipeTransform<string, Promise<string>> {
+export class TemplateByIdPipe implements PipeTransform<number, Promise<number>> {
     constructor(@Inject(TemplateService) private readonly templateService: TemplateService) {}
 
-    async transform(id: string, metadata: ArgumentMetadata): Promise<string> {
+    async transform(id: number, metadata: ArgumentMetadata): Promise<number> {
         if (!(await this.templateService.findById(id))) {
             throw new TemplateNotFoundException(`Template with id ${id} was not found`);
         }

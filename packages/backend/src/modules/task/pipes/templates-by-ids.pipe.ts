@@ -6,7 +6,7 @@ export class TemplatesByIdsPipe implements PipeTransform<number[], Promise<numbe
     constructor(@Inject(TemplateService) private readonly templateService: TemplateService) {}
 
     async transform(ids: number[], metadata: ArgumentMetadata): Promise<number[]> {
-        const promises = ids.map(async id => this.templateService.findOneOrFail(id.toString()));
+        const promises = ids.map(async id => this.templateService.findOneOrFail(id));
         try {
             await Promise.all(promises);
         } catch (error) {

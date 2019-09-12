@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Inject, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import {
     ApiCreatedResponse,
     ApiImplicitBody,
@@ -6,11 +6,11 @@ import {
     ApiOkResponse,
     ApiUseTags,
 } from "@nestjs/swagger";
+import { NumericIdPipe } from "../../shared/pipes/numeric-id.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { TemplateDto } from "./dto/template.dto";
 import { Template } from "./entities/template.entity";
-import { ITemplateService } from "./interfaces/template.service.interface";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTemplateResponse } from "./responses/create-template.response";
@@ -22,7 +22,7 @@ import { TemplateService } from "./services/template.service";
 @ApiUseTags("templates")
 @Controller("templates")
 export class TemplateController {
-    constructor(@Inject(TemplateService) private readonly templateService: ITemplateService) {}
+    constructor(private readonly templateService: TemplateService) {}
 
     @Get("/")
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
@@ -46,7 +46,7 @@ export class TemplateController {
     @ApiOkResponse({ type: UpdateTemplateResponse, description: "ID of updated Template" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async update(
-        @Param("id", TemplateByIdPipe) id: string,
+        @Param("id", NumericIdPipe, TemplateByIdPipe) id: number,
         @Body("template") templateDto: TemplateDto,
     ) {
         const template = new Template(templateDto);
@@ -57,7 +57,7 @@ export class TemplateController {
     @Get("/:id")
     @ApiOkResponse({ type: GetTemplateResponse, description: "Stringified Template JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
-    async findById(@Param("id", TemplateByIdPipe) id: string) {
+    async findById(@Param("id", NumericIdPipe, TemplateByIdPipe) id: number) {
         const template = await this.templateService.findById(id);
         return { success: 1, template: JSON.stringify(template) };
     }
@@ -65,7 +65,7 @@ export class TemplateController {
     @Delete("/:id")
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
-    async deleteById(@Param("id", TemplateByIdPipe) id: string) {
+    async deleteById(@Param("id", NumericIdPipe, TemplateByIdPipe) id: number) {
         await this.templateService.deleteById(id);
         return { success: 1 };
     }

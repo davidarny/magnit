@@ -81,6 +81,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                         <img
                             css={theme => ({
                                 width: "100%",
+                                objectFit: "contain",
                                 maxHeight: theme.spacing(20),
                             })}
                             alt={title}

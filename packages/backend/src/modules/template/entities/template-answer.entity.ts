@@ -24,18 +24,18 @@ export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
     @Generated("rowid")
     id: number;
 
+    @Index()
     @PrimaryColumn()
     id_template: number;
 
-    @Index()
     @ManyToOne(() => Template, template => template.answers)
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;
 
+    @Index()
     @PrimaryColumn()
     id_task: number;
 
-    @Index()
     @ManyToOne(() => Task, task => task.answers)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
