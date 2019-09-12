@@ -6,6 +6,7 @@ import { EPuzzleType, ISection, ITemplate } from "@magnit/entities";
 import { SectionContent } from "components/section-content";
 import { SectionView } from "components/section-view";
 import * as React from "react";
+import { useCallback } from "react";
 
 interface ITemplateSectionProps {
     template: ITemplate;
@@ -15,15 +16,15 @@ interface ITemplateSectionProps {
 
     onTemplateChange(template: ITemplate): void;
 
-    onPuzzleFocus(id: string): void;
+    onPuzzleFocus(id: string, force?: boolean): void;
 }
 
-export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...props }) => {
-    const focused = props.focusedPuzzleId === section.id;
+export const SectionWrapper: React.FC<ITemplateSectionProps> = props => {
+    const { section, focusedPuzzleId, template, index, onTemplateChange, onPuzzleFocus } = props;
 
-    function isFocused(id: string) {
-        return id === props.focusedPuzzleId;
-    }
+    const focused = focusedPuzzleId === section.id;
+
+    const isFocused = useCallback((id: string) => id === focusedPuzzleId, [focusedPuzzleId]);
 
     let offset = 0;
 
@@ -35,25 +36,25 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = ({ section, ...pr
                 marginBottom: theme.spacing(2),
                 paddingTop: theme.spacing(2),
             })}
-            onFocus={props.onPuzzleFocus.bind(null, section.id)}
-            onMouseDown={props.onPuzzleFocus.bind(null, section.id)}
+            onFocus={onPuzzleFocus.bind(null, section.id, false)}
+            onMouseDown={onPuzzleFocus.bind(null, section.id, false)}
             focused={focused}
         >
             <SectionView
                 id={section.id}
                 description={section.description}
                 title={section.title}
-                index={props.index}
+                index={index}
                 focused={focused}
-                template={props.template}
-                onTemplateChange={props.onTemplateChange}
+                template={template}
+                onTemplateChange={onTemplateChange}
             >
                 {section.puzzles.map((puzzle, index) => {
                     const result = (
                         <SectionContent
                             key={puzzle.id}
                             puzzle={puzzle}
-                            onFocus={props.onPuzzleFocus}
+                            onFocus={onPuzzleFocus}
                             isFocused={isFocused}
                             index={index + offset}
                         />

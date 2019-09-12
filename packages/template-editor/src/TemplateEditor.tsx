@@ -410,9 +410,13 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     marginBottom: theme.spacing(2),
                 })}
                 focused={focusedPuzzleId === template.id.toString()}
-                onFocus={service.current.onPuzzleFocus.bind(service, template.id.toString(), false)}
+                onFocus={service.current.onPuzzleFocus.bind(
+                    service.current,
+                    template.id.toString(),
+                    false,
+                )}
                 onMouseDown={service.current.onPuzzleFocus.bind(
-                    service,
+                    service.current,
                     template.id.toString(),
                     false,
                 )}
@@ -431,7 +435,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     template={template}
                     focusedPuzzleId={focusedPuzzleId}
                     onTemplateChange={onTemplateChange}
-                    onPuzzleFocus={service.current.onPuzzleFocus.bind(service)}
+                    onPuzzleFocus={service.current.onPuzzleFocus.bind(service.current)}
                 />
             ))}
             {process.env.NODE_ENV !== "production" && (
