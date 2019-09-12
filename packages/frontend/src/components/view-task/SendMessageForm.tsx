@@ -44,7 +44,7 @@ export const SendMessageForm: React.FC<ISendMessageFormProps> = props => {
                         marginBottom: theme.spacing(2),
                     })}
                 >
-                    Введите email, на который будет отправлен отчет
+                    Новое сообщение
                 </Grid>
                 <Grid item xs={12}>
                     <InputField

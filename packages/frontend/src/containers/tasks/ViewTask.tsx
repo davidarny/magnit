@@ -2,7 +2,14 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ETaskStatus, IExtendedTask, IStage, ITemplate } from "@magnit/entities";
+import {
+    ETaskStatus,
+    IDocument,
+    IExtendedTask,
+    IStage,
+    ITemplate,
+    IWithAnswers,
+} from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { Grid, IconButton, Menu, MenuItem, Typography } from "@material-ui/core";
@@ -13,6 +20,7 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { SendMessageForm } from "components/view-task";
 import { AppContext } from "context";
+import { NoStagesException } from "exceptions";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -22,6 +30,9 @@ import {
     getTaskExtended,
     getTemplate,
     getTemplates,
+    IGetTaskExtendedResponse,
+    IGetTemplate,
+    IGetTemplatesResponse,
     sendPushToken,
     updateTask,
     updateTemplateAssignment,
@@ -34,6 +45,8 @@ interface IViewTaskProps {
 interface IEditableTemplate extends ITemplate {
     editable: boolean;
 }
+
+type TDocumentWithAnswers = IDocument & IWithAnswers;
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
@@ -63,51 +76,52 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const isTaskEditable = (task: IExtendedTask) =>
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
-    const updateTaskExtended = useCallback(() => {
+    const setTaskState = useCallback((response: IGetTaskExtendedResponse) => {
+        if (isValidTask(response.task)) {
+            initialStages.current = _.cloneDeep(response.task.stages);
+            setTask({ ...response.task });
+            return response.task;
+        }
+    }, []);
+
+    const fetchFullTemplate = useCallback(
+        (response: IGetTemplatesResponse) => {
+            return Promise.all(
+                response.templates.map(template =>
+                    getTemplate(context.courier, Number(template.id)),
+                ),
+            );
+        },
+        [context.courier],
+    );
+
+    const setTemplateState = (responses: IGetTemplate[], nextTask: IExtendedTask) => {
+        const buffer: any[] = [];
+        responses.forEach(response => buffer.push(response.template));
+        buffer.forEach((data, index, array) => {
+            const template = nextTask.templates.find(template => template.id === data.id);
+            if (template) {
+                array[index] = _.merge(data, template);
+            }
+        });
+        setTemplates([...buffer]);
+    };
+
+    const updateTaskState = useCallback(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
-            .then(response => {
-                if (isValidTask(response.task)) {
-                    initialStages.current = _.cloneDeep(response.task.stages);
-                    setTask({ ...response.task });
-                    return response.task;
-                }
-            })
+            .then(setTaskState)
             .then(async nextTask => {
                 if (!nextTask || !isTaskEditable(nextTask)) {
                     return;
                 }
-                return getTemplates(context.courier)
-                    .then(response =>
-                        response.templates.map(template => ({
-                            ...template,
-                            id: template.id.toString(),
-                        })),
-                    )
-                    .then(templates =>
-                        Promise.all(
-                            templates.map(template =>
-                                getTemplate(context.courier, Number(template.id)),
-                            ),
-                        ),
-                    )
-                    .then(responses => {
-                        const buffer: any[] = [];
-                        responses.forEach(response => buffer.push(response.template));
-                        buffer.forEach((data, index, array) => {
-                            const template = nextTask.templates.find(
-                                template => template.id === data.id,
-                            );
-                            if (template) {
-                                array[index] = _.merge(data, template);
-                            }
-                        });
-                        setTemplates([...buffer]);
-                    });
+                const templates = await getTemplates(context.courier);
+                const fullTemplates = await fetchFullTemplate(templates);
+                setTemplateState(fullTemplates, nextTask);
             })
             .catch(console.error);
-    }, [context.courier, taskId]);
+    }, [context, fetchFullTemplate, setTaskState, taskId]);
 
-    useEffect(() => updateTaskExtended(), [updateTaskExtended]);
+    useEffect(() => updateTaskState(), [updateTaskState]);
 
     function onTaskChange(task: Partial<IExtendedTask>): void {
         if (isValidTask(task)) {
@@ -133,6 +147,40 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         onMenuClose();
     }
 
+    const addTaskStages = useCallback(
+        async (task: IExtendedTask) => {
+            const findIfStageExists = (stage: IStage) =>
+                !initialStages.current.find(initialStage => initialStage.id === stage.id);
+
+            const filterEmptyStages = (step: IStage) => step.title && step.deadline;
+
+            const diff = task.stages
+                // filter so that add only stages that doesn't exist
+                .filter(findIfStageExists)
+                // filter empty
+                .filter(filterEmptyStages)
+                .map(stage => {
+                    // TODO: mask input for date
+                    const splitted = stage.deadline.split(".");
+                    const date = new Date();
+                    date.setDate(Number(_.first(splitted)));
+                    date.setMonth(Number(_.nth(splitted, 1)) - 1);
+                    date.setFullYear(Number(_.nth(splitted, 2)));
+                    return { ...stage, deadline: new Date(date).toISOString() };
+                });
+            // throw error if overall no task stages found
+            const validTaskStages = task.stages.filter(stage => stage.title && stage.deadline);
+            if (validTaskStages.length + diff.length === 0) {
+                throw new NoStagesException();
+            }
+            if (!diff.length) {
+                return;
+            }
+            return addStages(context.courier, taskId, diff);
+        },
+        [context.courier, taskId],
+    );
+
     const onTaskSaveCallback = useCallback((): void => {
         const prevStatus = task.status;
         // disallow update if task is not editable
@@ -148,69 +196,49 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         ) {
             task.status = ETaskStatus.IN_PROGRESS;
         }
+
+        const templateAssignmentExists = (assignment: TDocumentWithAnswers) =>
+            templates.find(template => template.id === assignment.id);
+
+        const templateIdToNumber = (template: TDocumentWithAnswers) => Number(template.id);
+
+        const callUpdateTemplateAssignment = ({ id, editable }: TDocumentWithAnswers) =>
+            updateTemplateAssignment(context.courier, taskId, Number(id), { editable });
+
+        const transformedTemplateAssignments = (task.templates || [])
+            .filter(templateAssignmentExists)
+            .map(templateIdToNumber);
+
+        const addAllTemplateAssignments = () =>
+            Promise.all(task.templates.map(callUpdateTemplateAssignment));
+
         Promise.all([
             addTemplateAssignment(
                 context.courier,
                 Number(taskId),
-                (task.templates || [])
-                    // filter to only existing templates
-                    .filter(assignment => templates.find(template => template.id === assignment.id))
-                    .map(template => Number(template.id)),
-            ).then(() =>
-                Promise.all(
-                    task.templates.map(({ id, editable }) => {
-                        const body = {
-                            editable,
-                        };
-                        return updateTemplateAssignment(context.courier, taskId, Number(id), body);
-                    }),
-                ),
-            ),
-            (async () => {
-                const findIfStageExists = (stage: IStage) =>
-                    !initialStages.current.find(initialStage => initialStage.id === stage.id);
-                const filterEmptyStages = (step: IStage) => step.title && step.deadline;
-
-                const diff = task.stages
-                    // filter so that add only stages that doesn't exist
-                    .filter(findIfStageExists)
-                    // filter empty
-                    .filter(filterEmptyStages)
-                    .map(stage => {
-                        // TODO: mask input for date
-                        const splitted = stage.deadline.split(".");
-                        const date = new Date();
-                        date.setDate(Number(_.first(splitted)));
-                        date.setMonth(Number(_.nth(splitted, 1)) - 1);
-                        date.setFullYear(Number(_.nth(splitted, 2)));
-                        return { ...stage, deadline: new Date(date).toISOString() };
-                    });
-                // overall no tasks
-                const validTaskStages = task.stages.filter(stage => stage.title && stage.deadline);
-                if (validTaskStages.length + diff.length === 0) {
-                    throw new Error("Ошибка! Заполните этапы!");
-                }
-                if (!diff.length) {
-                    return;
-                }
-                return addStages(context.courier, taskId, diff);
-            })(),
+                transformedTemplateAssignments,
+            ).then(addAllTemplateAssignments),
+            addTaskStages(task),
         ])
             .then(() => updateTask(context.courier, taskId, getTaskPayload(task)))
             .then(() => {
-                updateTaskExtended();
+                updateTaskState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно обновлено!",
                 });
             })
-            .catch(() => {
+            .catch((error: Error) => {
                 // rollback status
                 task.status = prevStatus;
-                context.setSnackbarState({ open: true, message: "Ошибка обновления задания!" });
+                let message = "Ошибка обновления задания!";
+                if (error instanceof NoStagesException) {
+                    message = "Ошибка! Заполните поля этапов!";
+                }
+                context.setSnackbarState({ open: true, message });
                 context.setSnackbarError(true);
             });
-    }, [context, task, taskId, templates, updateTaskExtended]);
+    }, [addTaskStages, context, task, taskId, templates, updateTaskState]);
 
     function onTaskWithdrawClick() {
         if (task.status === ETaskStatus.IN_PROGRESS) {
@@ -218,7 +246,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
             .then(() => {
-                updateTaskExtended();
+                updateTaskState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно отозвано!",
@@ -237,7 +265,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
             .then(() => {
-                updateTaskExtended();
+                updateTaskState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно звершено!",
