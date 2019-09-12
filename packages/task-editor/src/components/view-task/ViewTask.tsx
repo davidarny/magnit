@@ -371,7 +371,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                 </Grid>
                 <Grid container spacing={2}>
-                    <Grid item xs css={theme => ({ marginTop: theme.spacing(4) })}>
+                    <Grid item xs={7} css={theme => ({ marginTop: theme.spacing(4) })}>
                         <Grid spacing={2} container direction="row">
                             <InfoField title="Администратор" value="Барановский Прохор Артёмович" />
                             <InfoField
@@ -395,7 +395,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             <InfoField title="Формат объекта" value="МК" />
                         </Grid>
                     </Grid>
-                    <Grid item xs>
+                    <Grid item xs={5}>
                         <Grid
                             container
                             spacing={2}
@@ -457,7 +457,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                     </Button>
                                 )}
                             </Grid>
-                            {task.notifyBefore && (
+                            {task.status !== ETaskStatus.COMPLETED && task.notifyBefore && (
                                 <Grid
                                     item
                                     xs={12}
