@@ -322,29 +322,41 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                                 </Button>
                             )}
                         </Grid>
-                        <Grid item>
-                            <IconButton onClick={onMenuClick}>
-                                <MoreVertIcon />
-                            </IconButton>
-                        </Grid>
-                        <Menu
-                            keepMounted
-                            open={Boolean(menuAnchorElement)}
-                            anchorEl={menuAnchorElement}
-                            onClose={onMenuClose}
-                        >
-                            <MenuItem onClick={onTaskReportClick}>Посмотреть отчет</MenuItem>
-                            <MenuItem onClick={onTaskHistoryClick}>Посмотреть истоию</MenuItem>
-                            {task.status === ETaskStatus.IN_PROGRESS && (
-                                <MenuItem onClick={onTaskWithdrawClick}>Отозвать задание</MenuItem>
-                            )}
-                            {task.status !== ETaskStatus.COMPLETED && (
-                                <MenuItem onClick={onTaskCompleteClick}>Завершить задание</MenuItem>
-                            )}
-                            <MenuItem onClick={onOpenSendMessageModel}>
-                                Отправить сообщение
-                            </MenuItem>
-                        </Menu>
+                        {task.status !== ETaskStatus.DRAFT && (
+                            <React.Fragment>
+                                <Grid item>
+                                    <IconButton onClick={onMenuClick}>
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                </Grid>
+                                <Menu
+                                    keepMounted
+                                    open={Boolean(menuAnchorElement)}
+                                    anchorEl={menuAnchorElement}
+                                    onClose={onMenuClose}
+                                >
+                                    <MenuItem onClick={onTaskReportClick}>
+                                        Посмотреть отчет
+                                    </MenuItem>
+                                    <MenuItem onClick={onTaskHistoryClick}>
+                                        Посмотреть истоию
+                                    </MenuItem>
+                                    {task.status === ETaskStatus.IN_PROGRESS && (
+                                        <MenuItem onClick={onTaskWithdrawClick}>
+                                            Отозвать задание
+                                        </MenuItem>
+                                    )}
+                                    {task.status !== ETaskStatus.COMPLETED && (
+                                        <MenuItem onClick={onTaskCompleteClick}>
+                                            Завершить задание
+                                        </MenuItem>
+                                    )}
+                                    <MenuItem onClick={onOpenSendMessageModel}>
+                                        Отправить сообщение
+                                    </MenuItem>
+                                </Menu>
+                            </React.Fragment>
+                        )}
                     </Grid>
                 </Grid>
             </SectionTitle>
