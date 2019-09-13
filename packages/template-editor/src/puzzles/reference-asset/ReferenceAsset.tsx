@@ -44,13 +44,15 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
             if (!file) {
                 return;
             }
-            onUploadAsset(file).then(response => {
-                onAddAsset(id, {
-                    puzzleType: EPuzzleType.REFERENCE_ASSET,
-                    title: _.get(file, "name", ""),
-                    description: response.filename,
-                });
-            });
+            onUploadAsset(file)
+                .then(response => {
+                    onAddAsset(id, {
+                        puzzleType: EPuzzleType.REFERENCE_ASSET,
+                        title: _.get(file, "name", ""),
+                        description: response.filename,
+                    });
+                })
+                .catch(console.error);
         },
         [id, onUploadAsset, onAddAsset],
     );
@@ -58,7 +60,9 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
     const onDeleteAssetCallback = useCallback(() => {
         const url = description;
         const filename = url.substring(url.lastIndexOf("/") + 1);
-        onDeleteAsset(filename).then(() => onDeleteAssetPuzzle(id));
+        onDeleteAsset(filename)
+            .catch(console.error)
+            .finally(() => onDeleteAssetPuzzle(id));
     }, [description, id, onDeleteAsset, onDeleteAssetPuzzle]);
 
     return (
