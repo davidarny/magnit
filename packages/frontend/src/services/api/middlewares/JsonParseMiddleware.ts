@@ -1,5 +1,5 @@
-import { IMiddleware, IMiddlewareMeta } from "services/api";
 import { traverse } from "@magnit/template-editor";
+import { IMiddleware, IMiddlewareMeta } from "services/api";
 
 export class JsonParseMiddleware implements IMiddleware {
     async response(meta: IMiddlewareMeta, response: any): Promise<object> {
@@ -26,7 +26,7 @@ export class JsonParseMiddleware implements IMiddleware {
             const result = JSON.parse(string);
             const type = Object.prototype.toString.call(result);
             return type === "[object Object]" || type === "[object Array]";
-        } catch {
+        } catch (_error) {
             return false;
         }
     }
