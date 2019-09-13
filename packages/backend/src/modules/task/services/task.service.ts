@@ -272,23 +272,26 @@ export class TaskService {
     ): string | undefined {
         // little state machine with possible transitions
         // between statuses
-        return {
-            [ETaskStatus.DRAFT]: {
-                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
+        return _.get(
+            {
+                [ETaskStatus.DRAFT]: {
+                    [ETaskStatus.IN_PROGRESS]: "Отправка задания",
+                },
+                [ETaskStatus.IN_PROGRESS]: {
+                    [ETaskStatus.ON_CHECK]: "Задание прислано на проверку",
+                    [ETaskStatus.COMPLETED]: "Этап завершён",
+                },
+                [ETaskStatus.EXPIRED]: {
+                    [ETaskStatus.IN_PROGRESS]: "Отправка задания",
+                    [ETaskStatus.COMPLETED]: "Этап завершён",
+                },
+                [ETaskStatus.ON_CHECK]: {
+                    [ETaskStatus.IN_PROGRESS]: "Отправка задания",
+                    [ETaskStatus.COMPLETED]: "Этап завершён",
+                },
             },
-            [ETaskStatus.IN_PROGRESS]: {
-                [ETaskStatus.ON_CHECK]: "Задание прислано на проверку",
-                [ETaskStatus.COMPLETED]: "Этап завершён",
-            },
-            [ETaskStatus.EXPIRED]: {
-                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
-                [ETaskStatus.COMPLETED]: "Этап завершён",
-            },
-            [ETaskStatus.ON_CHECK]: {
-                [ETaskStatus.IN_PROGRESS]: "Отправка задания",
-                [ETaskStatus.COMPLETED]: "Этап завершён",
-            },
-        }[prevStatus][nextStatus];
+            `${prevStatus}.${nextStatus}`,
+        );
     }
 
     @Transactional()
