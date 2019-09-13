@@ -422,7 +422,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             <InfoField
                                 title="Исполнитель"
                                 value="Рукастый Иннокентий Петрович"
-                                editable
+                                editable={editable}
                                 label="Изменить исполнителя"
                                 onEditableClick={onAssigneeChange}
                             />
@@ -512,13 +512,21 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                     <Typography>
                                         Уведомить исполнителя о наступлении <br /> срока выполнения
                                         этапа
-                                        <ButtonLikeText
-                                            onClick={onMenuClick}
-                                            css={theme => ({ fontSize: theme.fontSize.normal })}
-                                        >
-                                            &nbsp;за {task.notifyBefore}
-                                            &nbsp;{getNotifySuffix(task.notifyBefore)}
-                                        </ButtonLikeText>
+                                        {editable && (
+                                            <ButtonLikeText
+                                                onClick={onMenuClick}
+                                                css={theme => ({ fontSize: theme.fontSize.normal })}
+                                            >
+                                                &nbsp;за {task.notifyBefore}
+                                                &nbsp;{getNotifySuffix(task.notifyBefore)}
+                                            </ButtonLikeText>
+                                        )}
+                                        {!editable && (
+                                            <React.Fragment>
+                                                &nbsp;за {task.notifyBefore}
+                                                &nbsp;{getNotifySuffix(task.notifyBefore)}
+                                            </React.Fragment>
+                                        )}
                                     </Typography>
                                 </Grid>
                             )}
@@ -589,50 +597,52 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             </Grid>
                         </Grid>
                     ))}
-                    <Grid item xs={2}>
-                        <Grid
-                            container
-                            justify="center"
-                            alignItems="center"
-                            direction="column"
-                            css={theme => ({
-                                height: "100%",
-                                border: `1px solid ${theme.colors.lightGray}`,
-                                borderRadius: theme.radius(0.5),
-                                minHeight: theme.spacing(20),
-                                position: "relative",
-                            })}
-                        >
-                            <input
-                                ref={input}
-                                accept="image/*,.pdf,.doc,.xls,.xlsx"
-                                type="file"
-                                hidden
-                                onChange={onFileChangeCallback}
-                            />
-                            <Fab
+                    {editable && (
+                        <Grid item xs={2}>
+                            <Grid
+                                container
+                                justify="center"
+                                alignItems="center"
+                                direction="column"
                                 css={theme => ({
-                                    width: theme.spacing(4),
-                                    height: theme.spacing(4),
-                                    minHeight: theme.spacing(4),
-                                    marginBottom: theme.spacing(),
+                                    height: "100%",
+                                    border: `1px solid ${theme.colors.lightGray}`,
+                                    borderRadius: theme.radius(0.5),
+                                    minHeight: theme.spacing(20),
+                                    position: "relative",
                                 })}
-                                onClick={onAddAssetTrigger}
                             >
-                                <AddIcon />
-                            </Fab>
-                            <Typography
-                                css={theme => ({
-                                    userSelect: "none",
-                                    fontSize: theme.fontSize.sNormal,
-                                    color: theme.colors.secondary,
-                                })}
-                                align="center"
-                            >
-                                Добавить файл
-                            </Typography>
+                                <input
+                                    ref={input}
+                                    accept="image/*,.pdf,.doc,.xls,.xlsx"
+                                    type="file"
+                                    hidden
+                                    onChange={onFileChangeCallback}
+                                />
+                                <Fab
+                                    css={theme => ({
+                                        width: theme.spacing(4),
+                                        height: theme.spacing(4),
+                                        minHeight: theme.spacing(4),
+                                        marginBottom: theme.spacing(),
+                                    })}
+                                    onClick={onAddAssetTrigger}
+                                >
+                                    <AddIcon />
+                                </Fab>
+                                <Typography
+                                    css={theme => ({
+                                        userSelect: "none",
+                                        fontSize: theme.fontSize.sNormal,
+                                        color: theme.colors.secondary,
+                                    })}
+                                    align="center"
+                                >
+                                    Добавить файл
+                                </Typography>
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    )}
                 </Grid>
             </SelectableBlockWrapper>
             {documents.map(document => (
