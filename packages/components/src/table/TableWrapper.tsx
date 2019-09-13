@@ -13,7 +13,7 @@ import {
 } from "@material-ui/icons";
 import * as _ from "lodash";
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TableBodyWrapper } from "./TableBodyWrapper";
 import { TableHeader } from "./TableHeader";
 
@@ -63,6 +63,11 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
     const [page, setPage] = useState(initialPage);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
     const [orderBy, setOrderBy] = useState("");
+
+    // reset pagination on data change
+    useEffect(() => {
+        setPage(0);
+    }, [data]);
 
     const onRequestSortCallback = useCallback(
         (event: React.MouseEvent<unknown>, property: string) => {
