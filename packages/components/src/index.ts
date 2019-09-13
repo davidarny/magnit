@@ -9,3 +9,4 @@ export * from "./editor-toolbar";
 export * from "./button-like-text";
 export * from "./fab";
 export * from "./checkbox";
+export * from "./dialog";

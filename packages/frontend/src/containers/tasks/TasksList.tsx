@@ -3,6 +3,7 @@
 import { jsx } from "@emotion/core";
 import {
     Button,
+    Dialog,
     IColumn,
     InputField,
     ITab,
@@ -10,7 +11,7 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
-import { ETaskStatus } from "@magnit/entities";
+import { ETaskStatus, IBaseTask } from "@magnit/entities";
 import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, Paper, Typography } from "@material-ui/core";
@@ -54,6 +55,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     const context = useContext(AppContext);
 
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [tasks, setTasks] = useState<TTask[]>([]);
     const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
     const [searchQuery, setSearchQuery] = useState("");
@@ -63,6 +65,16 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         selectedTasks.clear();
         setSelectedTasks(new Map(selectedTasks));
     }, [selectedTasks]);
+
+    const normalizeTask = useCallback(
+        (task: IBaseTask) => ({
+            ...task,
+            selected: false,
+            createdAt: getFriendlyDate(new Date(task.createdAt!), true),
+            updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
+        }),
+        [],
+    );
 
     const updateTasksList = useCallback(
         ({ sort, sortBy, title }: IUpdateTaskListOptions = {}) => {
@@ -76,23 +88,14 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                 sortBy,
                 title,
             )
-                .then(response =>
-                    setTasks(
-                        response.tasks.map(task => ({
-                            ...task,
-                            selected: false,
-                            createdAt: getFriendlyDate(new Date(task.createdAt!), true),
-                            updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
-                        })),
-                    ),
-                )
+                .then(response => setTasks(response.tasks.map(normalizeTask)))
                 .catch(console.error);
             // get total count of all tasks
             getTasks(context.courier)
                 .then(response => setTotal(response.tasks.length))
                 .catch(console.error);
         },
-        [clearSelectedTasks, context.courier, tab],
+        [clearSelectedTasks, context.courier, normalizeTask, tab],
     );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,44 +133,54 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [selectedTasks, tasks],
     );
 
+    const setTaskToOnCheck = useCallback(
+        async (task: TTask) =>
+            updateTask(context.courier, Number(task.id), { status: ETaskStatus.ON_CHECK }),
+        [context.courier],
+    );
+
     const onBulkRejectClickCallback = useCallback(() => {
         const tasksToUpdate = [...selectedTasks.values()];
+
+        const isNotInProgress = (task: TTask) => task.status !== ETaskStatus.IN_PROGRESS;
+
         // allow reject only tasks in IN_PROGRESS state
-        if (tasksToUpdate.some(task => task.status !== ETaskStatus.IN_PROGRESS)) {
+        if (tasksToUpdate.some(isNotInProgress)) {
             return;
         }
+
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
-        Promise.all(
-            tasksToUpdate.map(async task =>
-                updateTask(context.courier, Number(task.id), { status: ETaskStatus.ON_CHECK }),
-            ),
-        )
+        Promise.all(tasksToUpdate.map(setTaskToOnCheck))
             .then(() => updateTasksList())
-            .catch(console.error);
-    }, [context.courier, selectedTasks, updateTasksList]);
+            .catch(console.error)
+            .finally(onDialogClose);
+    }, [selectedTasks, setTaskToOnCheck, updateTasksList]);
+
+    const setTaskToInProgress = useCallback(
+        async (task: TTask) =>
+            updateTask(context.courier, Number(task.id), { status: ETaskStatus.IN_PROGRESS }),
+        [context.courier],
+    );
 
     const onBulkCompleteClickCallback = useCallback(() => {
         const tasksToUpdate = [...selectedTasks.values()];
+
+        const isNotDraftOrOnCheck = (task: TTask) =>
+            ![ETaskStatus.DRAFT, ETaskStatus.ON_CHECK].includes(task.status);
+
         // allow complete only tasks in DRAFT & ON_CHECK states
-        if (
-            tasksToUpdate.some(
-                task => ![ETaskStatus.DRAFT, ETaskStatus.ON_CHECK].includes(task.status),
-            )
-        ) {
+        if (tasksToUpdate.some(isNotDraftOrOnCheck)) {
             return;
         }
+
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
-        Promise.all(
-            tasksToUpdate.map(async task =>
-                updateTask(context.courier, Number(task.id), { status: ETaskStatus.IN_PROGRESS }),
-            ),
-        )
+        Promise.all(tasksToUpdate.map(setTaskToInProgress))
             .then(() => updateTasksList())
             .then(() => clearSelectedTasks())
             .catch(console.error);
-    }, [clearSelectedTasks, context.courier, selectedTasks, updateTasksList]);
+    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, updateTasksList]);
 
     const onSelectToggleCallback = useCallback(
         (selected: boolean) => {
@@ -200,10 +213,21 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [updateTasksList],
     );
 
+    function onDialogOpen() {
+        setDialogOpen(true);
+    }
+
+    function onDialogClose() {
+        setDialogOpen(false);
+    }
+
     const empty = !total;
 
     return (
         <SectionLayout>
+            <Dialog open={dialogOpen} onClose={onDialogClose} onSuccess={onBulkRejectClickCallback}>
+                Вы действительно хотите отозвать задания?
+            </Dialog>
             {redirect.redirect && <Redirect to={`tasks/view/${redirect.to}`} noThrow />}
             <SectionTitle title="Список заданий">
                 {process.env.REACT_APP_ALLOW_CREATE_TASK && (
@@ -330,7 +354,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                             <Button
                                                 variant="contained"
                                                 scheme="blue"
-                                                onClick={onBulkRejectClickCallback}
+                                                onClick={onDialogOpen}
                                             >
                                                 <ReturnIcon />
                                                 <Typography>Отозвать</Typography>

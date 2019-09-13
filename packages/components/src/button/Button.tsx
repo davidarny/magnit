@@ -1,12 +1,18 @@
 /** @jsx jsx */
 
-import * as React from "react";
 import { jsx } from "@emotion/core";
 import { Button as MaterialButton } from "@material-ui/core";
-import _ from "lodash";
 import { Link } from "@reach/router";
+import _ from "lodash";
+import * as React from "react";
 
 const variants = {
+    gray: ({ spacing, colors }: any) => ({
+        color: colors.gray,
+        border: `1px solid ${colors.gray} !important`,
+        background: "none !important",
+        hover: { boxShadow: `0 ${spacing(0.5)} ${spacing()} ${colors.gray}40 !important` },
+    }),
     blue: ({ spacing, colors }: any) => ({
         color: colors.white,
         border: `1px solid ${colors.primary}`,
