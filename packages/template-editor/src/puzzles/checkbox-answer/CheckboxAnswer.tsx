@@ -142,6 +142,17 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
                             onFocus={onAddCheckboxButtonCallback}
                         />
                     </Grid>
+                    <Grid
+                        item
+                        css={theme => ({
+                            padding: `${theme.spacing(0.25)} !important`,
+                            visibility: "hidden",
+                        })}
+                    >
+                        <IconButton onClick={onDeleteCheckboxButtonCallback}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
             )}
         </React.Fragment>

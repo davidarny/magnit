@@ -98,28 +98,13 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
 
     return (
         <React.Fragment>
-            <Grid
-                container
-                alignItems="center"
-                spacing={2}
-                css={theme => ({
-                    marginTop: `${theme.spacing(-1)} !important`,
-                    marginLeft: "0 !important",
-                })}
-            >
+            <Grid container alignItems="center" spacing={2}>
                 <Grid item>
-                    <Typography
-                        css={theme => ({
-                            fontSize: theme.fontSize.medium,
-                            paddingBottom: theme.spacing(0.25),
-                            marginLeft: `-${theme.spacing()}`,
-                            marginRight: theme.spacing(2),
-                        })}
-                    >
+                    <Typography css={theme => ({ fontSize: theme.fontSize.medium })}>
                         {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid item xs css={{ paddingLeft: "0 !important" }}>
+                <Grid item xs>
                     <InputField
                         fullWidth
                         value={label}
@@ -127,7 +112,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                         onBlur={onTemplateChangeCallback}
                     />
                 </Grid>
-                <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>
+                <Grid item>
                     <IconButton onClick={onDeleteDropdownButtonCallback}>
                         <DeleteIcon />
                     </IconButton>
@@ -139,36 +124,30 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                     container
                     alignItems="flex-end"
                     spacing={2}
-                    css={theme => ({
-                        marginBottom: `${theme.spacing()} !important`,
-                        marginLeft: "0 !important",
-                    })}
+                    css={theme => ({ marginTop: theme.spacing(-2) })}
                 >
                     <Grid item>
                         <Typography
                             css={theme => ({
                                 fontSize: theme.fontSize.medium,
-                                marginLeft: `-${theme.spacing()}`,
-                                paddingBottom: theme.spacing(0.5),
-                                marginRight: theme.spacing(2),
+                                position: "relative",
+                                top: theme.spacing(-1),
                             })}
                         >
                             {index + 2}.
                         </Typography>
                     </Grid>
-                    <Grid
-                        item
-                        xs
-                        css={{
-                            paddingTop: "0 !important",
-                            paddingLeft: "0 !important",
-                        }}
-                    >
+                    <Grid item xs>
                         <InputField
                             fullWidth
                             placeholder="Добавить вариант"
                             onFocus={onAddDropdownButtonCallback}
                         />
+                    </Grid>
+                    <Grid item css={{ visibility: "hidden" }}>
+                        <IconButton onClick={onDeleteDropdownButtonCallback}>
+                            <DeleteIcon />
+                        </IconButton>
                     </Grid>
                 </Grid>
             )}

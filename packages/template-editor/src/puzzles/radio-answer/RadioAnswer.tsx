@@ -143,7 +143,17 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
                             onFocus={onAddRadioButtonCallback}
                         />
                     </Grid>
-                    <Grid item />
+                    <Grid
+                        item
+                        css={theme => ({
+                            padding: `${theme.spacing(0.25)} !important`,
+                            visibility: "hidden",
+                        })}
+                    >
+                        <IconButton onClick={onDeleteRadioButtonCallback}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Grid>
                 </Grid>
             )}
         </React.Fragment>
