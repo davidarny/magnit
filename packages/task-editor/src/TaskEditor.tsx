@@ -122,7 +122,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         // view updates it's focus util task is not loaded
         // so if task is never loaded, we stop at some point or it becomes painful
         // TODO: pass some bool prop so to know when set focus
-        if (initialFocusThreshold.current > 20) {
+        if (initialFocusThreshold.current > 50) {
             return;
         }
         if (!initialFocusSet.current) {

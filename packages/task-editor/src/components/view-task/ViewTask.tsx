@@ -4,12 +4,9 @@ import { css, jsx } from "@emotion/core";
 import {
     Button,
     ButtonLikeText,
-    Checkbox,
-    DateField,
     Fab,
     SelectableBlockWrapper,
     SelectField,
-    StepperWrapper,
 } from "@magnit/components";
 import {
     ETaskStatus,
@@ -20,23 +17,18 @@ import {
     IWithAnswers,
 } from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
-import { getFriendlyDate, IEditorService } from "@magnit/services";
-import {
-    Dialog,
-    FormControl,
-    FormControlLabel,
-    Grid,
-    Menu,
-    MenuItem,
-    Typography,
-} from "@material-ui/core";
+import { IEditorService } from "@magnit/services";
+import { Dialog, Grid, Menu, MenuItem, Typography } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
-import { TemplateRenderer } from "components/renderers";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { ChangeAssigneeIllustration } from "./ChangeAssigneeIllustration";
+import { DraftView } from "./DraftView";
+import { InfoField } from "./InfoField";
+import { TaskDocument } from "./TaskDocument";
+import { TaskStepper } from "./TaskStepper";
 
 type TSelectChangeEvent = React.ChangeEvent<{
     name?: string;
@@ -148,7 +140,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         setOpen(false);
     }
 
-    const onAddStepCallback = useCallback((): void => {
+    const onAddStageCallback = useCallback((): void => {
         const last = _.last(task.stages);
         if (!last) {
             return;
@@ -163,7 +155,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
     }, [task.stages, onAddStage]);
 
-    const onChangeStepTitleCallback = useCallback(
+    const onChangeStageTitleCallback = useCallback(
         (id: number, value: string): void => {
             if (!task.stages) {
                 return;
@@ -173,17 +165,12 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 const stage = task.stages[stageIndex];
                 stageTitleMap.set(stage.id, value);
                 setStageTitleMap(new Map(stageTitleMap));
-                // stage.title = value;
-                // if (onAddStage && onDeleteStage) {
-                //     onDeleteStage(stage.id);
-                //     onAddStage(stage);
-                // }
             }
         },
         [task.stages, stageTitleMap],
     );
 
-    const onChangeStepDateCallback = useCallback(
+    const onChangeStageDeadlineCallback = useCallback(
         (id: number, value: string): void => {
             if (!task.stages) {
                 return;
@@ -193,17 +180,12 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 const stage = task.stages[stageIndex];
                 stageDeadlineMap.set(stage.id, value);
                 setStageDeadlineMap(new Map(stageDeadlineMap));
-                // stage.deadline = value;
-                // if (onAddStage && onDeleteStage) {
-                //     onDeleteStage(stage.id);
-                //     onAddStage(stage);
-                // }
             }
         },
         [task.stages, stageDeadlineMap],
     );
 
-    const onStepDeleteCallback = useCallback(
+    const onDeleteStageCallback = useCallback(
         (id: number) => {
             if (!task.stages) {
                 return;
@@ -228,7 +210,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         [onEditableChange],
     );
 
-    const onStepBlurCallback = useCallback(() => {
+    const onBlurStageCallback = useCallback(() => {
         if (!task.stages || !onTaskChange) {
             return;
         }
@@ -368,172 +350,162 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                 </Grid>
             </Dialog>
-            <SelectableBlockWrapper
-                css={theme => ({
-                    padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
-                })}
-                onFocus={service.onPuzzleFocus.bind(service, getTaskId(), false)}
-                onMouseDown={service.onPuzzleFocus.bind(service, getTaskId(), false)}
-                focused={focusedPuzzleId === getTaskId()}
-                id={getTaskId()}
-            >
-                <Grid container spacing={2}>
-                    <Grid
-                        item
-                        xs={12}
-                        css={theme => ({
-                            paddingLeft: theme.spacing(4),
-                            paddingRight: theme.spacing(4),
-                        })}
-                    >
-                        <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                            {task.title}
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <span
+            {task.status === ETaskStatus.DRAFT && (
+                <DraftView
+                    service={service}
+                    focusedPuzzleId={focusedPuzzleId}
+                    task={{ ...task, id: getTaskId() }}
+                    onBlurStage={onBlurStageCallback}
+                    onChangeStageTitle={onChangeStageTitleCallback}
+                    onChangeStageDeadline={onChangeStageDeadlineCallback}
+                />
+            )}
+            {task.status !== ETaskStatus.DRAFT && (
+                <SelectableBlockWrapper
+                    css={theme => ({
+                        padding: theme.spacing(3),
+                        zIndex: focusedPuzzleId === getTaskId() ? 1300 : "initial",
+                    })}
+                    onFocus={service.onPuzzleFocus.bind(service, getTaskId(), false)}
+                    onMouseDown={service.onPuzzleFocus.bind(service, getTaskId(), false)}
+                    focused={focusedPuzzleId === getTaskId()}
+                    id={getTaskId()}
+                >
+                    <Grid container spacing={2}>
+                        <Grid
+                            item
+                            xs={12}
                             css={theme => ({
-                                width: theme.spacing(),
-                                height: theme.spacing(),
-                                borderRadius: "50%",
-                                display: "inline-block",
-                                background: task.status
-                                    ? getColorByStatus(theme, task.status)
-                                    : "none",
-                                margin: "2px 10px 2px 0",
-                            })}
-                        />
-                        <span
-                            css={theme => ({
-                                color: task.status
-                                    ? getColorByStatus(theme, task.status)
-                                    : "inherit",
+                                paddingLeft: theme.spacing(4),
+                                paddingRight: theme.spacing(4),
                             })}
                         >
-                            {task.status && getTitleByStatus(task.status)}
-                        </span>
-                    </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                    <Grid item xs={7} css={theme => ({ marginTop: theme.spacing(4) })}>
-                        <Grid spacing={2} container direction="row">
-                            <InfoField title="Администратор" value="Барановский Прохор Артёмович" />
-                            <InfoField
-                                title="Исполнитель"
-                                value="Рукастый Иннокентий Петрович"
-                                editable={editable}
-                                label="Изменить исполнителя"
-                                onEditableClick={onAssigneeChange}
-                            />
+                            <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
+                                {task.title}
+                            </Typography>
                         </Grid>
-                        <Grid
-                            container
-                            spacing={2}
-                            direction="row"
-                            css={theme => ({ marginTop: theme.spacing(3) })}
-                        >
-                            <InfoField
-                                title="Местоположение"
-                                value="Челябинская область, г. Челябинск, ул. Железная, д. 5"
+                        <Grid item>
+                            <span
+                                css={theme => ({
+                                    width: theme.spacing(),
+                                    height: theme.spacing(),
+                                    borderRadius: "50%",
+                                    display: "inline-block",
+                                    background: task.status
+                                        ? getColorByStatus(theme, task.status)
+                                        : "none",
+                                    margin: "2px 10px 2px 0",
+                                })}
                             />
-                            <InfoField title="Формат объекта" value="МК" />
+                            <span
+                                css={theme => ({
+                                    color: task.status
+                                        ? getColorByStatus(theme, task.status)
+                                        : "inherit",
+                                })}
+                            >
+                                {task.status && getTitleByStatus(task.status)}
+                            </span>
                         </Grid>
                     </Grid>
-                    <Grid item xs={5}>
-                        <Grid
-                            container
-                            spacing={2}
-                            css={{
-                                height: "100%",
-                                alignItems: !showEmptyStages ? "flex-end" : "initial",
-                            }}
-                        >
-                            <Grid item xs={12}>
-                                {showEmptyStages && (
-                                    <StepperWrapper
-                                        onTitleChange={onChangeStepTitleCallback}
-                                        onTitleBlur={onStepBlurCallback}
-                                        onStepDelete={onStepDeleteCallback}
-                                        steps={(task.stages || []).map(stage => {
-                                            const safeStageDeadline =
-                                                stage.deadline ||
-                                                stageDeadlineMap.get(stage.id) ||
-                                                "";
-                                            const deadline = !stage.editable
-                                                ? getFriendlyDate(new Date(safeStageDeadline))
-                                                : safeStageDeadline;
-                                            const safeStageTitle =
-                                                stage.title || stageTitleMap.get(stage.id) || "";
-                                            return {
-                                                id: stage.id,
-                                                editable: stage.editable,
-                                                completed: stage.finished,
-                                                title: safeStageTitle,
-                                                content: (
-                                                    <DateField
-                                                        key={stage.id}
-                                                        disabled={!stage.editable}
-                                                        onChange={event =>
-                                                            onChangeStepDateCallback(
-                                                                stage.id,
-                                                                event.target.value,
-                                                            )
-                                                        }
-                                                        onBlur={onStepBlurCallback}
-                                                        value={deadline}
-                                                    />
-                                                ),
-                                            };
-                                        })}
-                                    />
-                                )}
-                                {showNewStageButton && (
-                                    <Button
-                                        variant="outlined"
-                                        scheme="outline"
-                                        css={theme => ({
-                                            color: theme.colors.primary,
-                                            marginLeft: theme.spacing(6),
-                                        })}
-                                        onClick={onAddStepCallback}
+                    <Grid container spacing={2}>
+                        <Grid item xs={7} css={theme => ({ marginTop: theme.spacing(4) })}>
+                            <Grid spacing={2} container direction="row">
+                                <InfoField
+                                    title="Администратор"
+                                    value="Барановский Прохор Артёмович"
+                                />
+                                <InfoField
+                                    title="Исполнитель"
+                                    value="Рукастый Иннокентий Петрович"
+                                    editable={editable}
+                                    label="Изменить исполнителя"
+                                    onEditableClick={onAssigneeChange}
+                                />
+                            </Grid>
+                            <Grid
+                                container
+                                spacing={2}
+                                direction="row"
+                                css={theme => ({ marginTop: theme.spacing(3) })}
+                            >
+                                <InfoField
+                                    title="Местоположение"
+                                    value="Челябинская область, г. Челябинск, ул. Железная, д. 5"
+                                />
+                                <InfoField title="Формат объекта" value="МК" />
+                            </Grid>
+                        </Grid>
+                        <Grid item xs={5}>
+                            <Grid
+                                container
+                                spacing={2}
+                                css={{
+                                    height: "100%",
+                                    alignItems: !showEmptyStages ? "flex-end" : "initial",
+                                }}
+                            >
+                                <Grid item xs={12}>
+                                    {showEmptyStages && (
+                                        <TaskStepper
+                                            task={task}
+                                            stageDeadlineMap={stageDeadlineMap}
+                                            stageTitleMap={stageTitleMap}
+                                            onChangeStageDeadline={onChangeStageDeadlineCallback}
+                                            onChangeStageTitle={onChangeStageTitleCallback}
+                                            onBlurStage={onBlurStageCallback}
+                                            onDeleteStage={onDeleteStageCallback}
+                                        />
+                                    )}
+                                    {showNewStageButton && (
+                                        <Button
+                                            variant="outlined"
+                                            scheme="outline"
+                                            css={theme => ({
+                                                color: theme.colors.primary,
+                                                marginLeft: theme.spacing(6),
+                                            })}
+                                            onClick={onAddStageCallback}
+                                        >
+                                            <AddIcon />
+                                            <Typography>Новый этап</Typography>
+                                        </Button>
+                                    )}
+                                </Grid>
+                                {task.status !== ETaskStatus.COMPLETED && task.notifyBefore && (
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        css={theme => ({ marginLeft: theme.spacing(6) })}
                                     >
-                                        <AddIcon />
-                                        <Typography>Новый этап</Typography>
-                                    </Button>
+                                        <Typography>
+                                            Уведомить исполнителя о наступлении <br /> срока
+                                            выполнения этапа
+                                            {editable && (
+                                                <ButtonLikeText
+                                                    onClick={onMenuClick}
+                                                    css={theme => ({
+                                                        fontSize: theme.fontSize.normal,
+                                                    })}
+                                                >
+                                                    &nbsp;за {task.notifyBefore}
+                                                    &nbsp;{getNotifySuffix(task.notifyBefore)}
+                                                </ButtonLikeText>
+                                            )}
+                                            {!editable && (
+                                                <React.Fragment>
+                                                    &nbsp;за {task.notifyBefore}
+                                                    &nbsp;{getNotifySuffix(task.notifyBefore)}
+                                                </React.Fragment>
+                                            )}
+                                        </Typography>
+                                    </Grid>
                                 )}
                             </Grid>
-                            {task.status !== ETaskStatus.COMPLETED && task.notifyBefore && (
-                                <Grid
-                                    item
-                                    xs={12}
-                                    css={theme => ({ marginLeft: theme.spacing(6) })}
-                                >
-                                    <Typography>
-                                        Уведомить исполнителя о наступлении <br /> срока выполнения
-                                        этапа
-                                        {editable && (
-                                            <ButtonLikeText
-                                                onClick={onMenuClick}
-                                                css={theme => ({ fontSize: theme.fontSize.normal })}
-                                            >
-                                                &nbsp;за {task.notifyBefore}
-                                                &nbsp;{getNotifySuffix(task.notifyBefore)}
-                                            </ButtonLikeText>
-                                        )}
-                                        {!editable && (
-                                            <React.Fragment>
-                                                &nbsp;за {task.notifyBefore}
-                                                &nbsp;{getNotifySuffix(task.notifyBefore)}
-                                            </React.Fragment>
-                                        )}
-                                    </Typography>
-                                </Grid>
-                            )}
                         </Grid>
                     </Grid>
-                </Grid>
-            </SelectableBlockWrapper>
+                </SelectableBlockWrapper>
+            )}
             <SelectableBlockWrapper
                 css={theme => ({
                     padding: theme.spacing(3),
@@ -664,160 +636,6 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 };
 
 ViewTask.displayName = "ViewTask";
-
-interface ITaskDocumentProps {
-    documents: IVirtualDocument[];
-    document: IVirtualDocument;
-    service: IEditorService;
-    focusedPuzzleId?: string;
-    templateSnapshots: Map<string, object>;
-    templates: Array<IDocument & IWithAnswers>;
-    editable: boolean;
-
-    onEditableChange?(documentId: number, editable: boolean): void;
-
-    onTemplateChange?(uuid: string, event: TSelectChangeEvent): void;
-}
-
-const TaskDocument: React.FC<ITaskDocumentProps> = props => {
-    const {
-        focusedPuzzleId,
-        service,
-        document,
-        templates,
-        documents,
-        templateSnapshots,
-        editable,
-    } = props;
-    const { onEditableChange, onTemplateChange } = props;
-
-    const snapshot = templateSnapshots.get(document.id.toString());
-    const focused = focusedPuzzleId === document.__uuid;
-
-    const answers = templates
-        .filter(template => template.id === document.id)
-        .flatMap(template => template.answers || []);
-
-    const onEditableChangeCallback = useCallback(
-        (event: TSelectChangeEvent, checked: boolean) => {
-            if (onEditableChange) {
-                onEditableChange(document.id, checked);
-            }
-        },
-        [document.id, onEditableChange],
-    );
-
-    const onTemplateChangeCallback = useCallback(
-        (event: TSelectChangeEvent) => {
-            if (onTemplateChange) {
-                onTemplateChange(document.__uuid, event);
-            }
-        },
-        [document.__uuid, onTemplateChange],
-    );
-
-    return (
-        <SelectableBlockWrapper
-            onFocus={service.onPuzzleFocus.bind(service, document.__uuid, false)}
-            onMouseDown={service.onPuzzleFocus.bind(service, document.__uuid, false)}
-            css={theme => ({
-                padding: theme.spacing(3),
-                zIndex: focusedPuzzleId === document.__uuid ? 1300 : "initial",
-            })}
-            focused={focused}
-            id={document.__uuid}
-        >
-            {editable && document.virtual && (
-                <Grid item xs={3} css={theme => ({ paddingLeft: theme.spacing(3) })}>
-                    <SelectField
-                        placeholder="Выбрать шаблон"
-                        value={document.id === -1 ? "" : document.id}
-                        fullWidth
-                        onChange={onTemplateChangeCallback}
-                    >
-                        {templates
-                            .filter(template =>
-                                document.id !== template.id
-                                    ? !documents.find(document => document.id === template.id)
-                                    : true,
-                            )
-                            .map(template => (
-                                <MenuItem key={template.id} value={template.id}>
-                                    {template.title}
-                                </MenuItem>
-                            ))}
-                    </SelectField>
-                </Grid>
-            )}
-            <Grid container css={theme => ({ padding: theme.spacing(4) })}>
-                <Grid item xs={9}>
-                    <Typography css={theme => ({ fontSize: theme.fontSize.xLarge })}>
-                        {_.get(snapshot, "title")}
-                    </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                    <Grid container justify="center" alignItems="flex-end">
-                        <FormControl>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        disabled={!editable}
-                                        checked={document.editable}
-                                        css={theme => ({ marginRight: theme.spacing() })}
-                                        onChange={onEditableChangeCallback}
-                                    />
-                                }
-                                label="Разрешить редактирование"
-                            />
-                        </FormControl>
-                    </Grid>
-                </Grid>
-                <Grid item xs={12}>
-                    {focused && <TemplateRenderer answers={answers} template={snapshot} />}
-                </Grid>
-            </Grid>
-        </SelectableBlockWrapper>
-    );
-};
-
-TaskDocument.displayName = "TaskDocument";
-
-interface IMainInfoProps {
-    title: string;
-    value: string;
-    editable?: boolean;
-    label?: string;
-
-    onEditableClick?(): void;
-}
-
-const InfoField: React.FC<IMainInfoProps> = props => {
-    const { title, value, editable, label, onEditableClick } = props;
-    return (
-        <Grid item xs>
-            <Typography
-                css={theme => ({
-                    color: theme.colors.secondary,
-                    fontSize: theme.fontSize.smaller,
-                    textTransform: "uppercase",
-                })}
-            >
-                {title}
-            </Typography>
-            <Typography
-                css={theme => ({
-                    fontSize: theme.fontSize.normal,
-                    color: theme.colors.black,
-                })}
-            >
-                {value}
-            </Typography>
-            {editable && <ButtonLikeText onClick={onEditableClick}>{label}</ButtonLikeText>}
-        </Grid>
-    );
-};
-
-InfoField.displayName = "InfoField";
 
 function getTitleByStatus(status: ETaskStatus): string {
     return {
