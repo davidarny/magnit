@@ -95,13 +95,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
                 css={theme => ({ marginTop: `${theme.spacing(-1)} !important` })}
             >
                 <Grid item>
-                    <Radio
-                        disabled
-                        css={theme => ({
-                            marginLeft: `-${theme.spacing()}`,
-                            paddingBottom: theme.spacing(0.5),
-                        })}
-                    />
+                    <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
                 <Grid
                     item
@@ -129,26 +123,19 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
                     container
                     alignItems="flex-end"
                     spacing={2}
-                    css={theme => ({
-                        marginBottom: `${theme.spacing()} !important`,
-                    })}
+                    css={theme => ({ marginBottom: `${theme.spacing()} !important` })}
                 >
                     <Grid item>
-                        <Radio
-                            disabled
-                            css={theme => ({
-                                marginLeft: `-${theme.spacing()}`,
-                                paddingBottom: theme.spacing(0.5),
-                            })}
-                        />
+                        <Radio disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                     </Grid>
                     <Grid
                         item
                         xs
-                        css={css`
-                            padding-top: 0 !important;
-                            padding-left: 0 !important;
-                        `}
+                        css={theme => ({
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                            paddingBottom: theme.spacing(0.5),
+                        })}
                     >
                         <InputField
                             fullWidth

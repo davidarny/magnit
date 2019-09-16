@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
 import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import { Grid, IconButton, Typography } from "@material-ui/core";
@@ -119,13 +119,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                         {index + 1}.
                     </Typography>
                 </Grid>
-                <Grid
-                    item
-                    xs
-                    css={css`
-                        padding-left: 0 !important;
-                    `}
-                >
+                <Grid item xs css={{ paddingLeft: "0 !important" }}>
                     <InputField
                         fullWidth
                         value={label}
@@ -165,10 +159,10 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                     <Grid
                         item
                         xs
-                        css={css`
-                            padding-top: 0 !important;
-                            padding-left: 0 !important;
-                        `}
+                        css={{
+                            paddingTop: "0 !important",
+                            paddingLeft: "0 !important",
+                        }}
                     >
                         <InputField
                             fullWidth
