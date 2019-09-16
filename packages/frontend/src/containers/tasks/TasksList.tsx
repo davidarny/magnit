@@ -271,25 +271,18 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             {!empty && (
                 <Paper
                     square={true}
-                    css={({ spacing, ...theme }) => ({
+                    css={({ spacing, colors }) => ({
                         margin: spacing(3),
-                        boxShadow: `0 0 ${spacing(2)} ${theme.colors.lightGray} !important`,
+                        boxShadow: `0 0 ${spacing(2)} ${colors.lightGray} !important`,
                     })}
                 >
-                    <Grid
-                        container
-                        direction="row"
-                        css={theme => ({
-                            paddingTop: theme.spacing(2),
-                            paddingLeft: theme.spacing(2),
-                        })}
-                    >
+                    <Grid container direction="row" css={theme => ({ padding: theme.spacing(2) })}>
                         <Grid item xs={12}>
                             <TabsWrapper tabs={tabs}>
                                 <Grid
                                     container
                                     direction="column"
-                                    css={theme => ({ padding: theme.spacing(3) })}
+                                    css={theme => ({ padding: theme.spacing(4) })}
                                 >
                                     <Grid item xs={12}>
                                         <Grid container direction="row" spacing={2}>
@@ -336,9 +329,17 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                     <Grid
                                         xs={12}
                                         item
-                                        css={theme => ({ padding: theme.spacing(3) })}
+                                        css={theme => ({
+                                            padding: theme.spacing(3),
+                                            paddingLeft: 0,
+                                            paddingRight: 0,
+                                        })}
                                     >
                                         <TableWrapper
+                                            css={theme => ({
+                                                marginLeft: theme.spacing(-3),
+                                                width: `calc(100% + ${theme.spacing(6)})`,
+                                            })}
                                             selectable
                                             columns={columns}
                                             data={tasks}

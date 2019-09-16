@@ -82,9 +82,10 @@ const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
                 return (
                     <TableCell
                         key={index}
-                        css={theme => ({
-                            borderBottomColor: theme.colors.light,
-                            color: theme.colors.black,
+                        css={({ colors, spacing }) => ({
+                            padding: `${spacing()} ${spacing(3)} ${spacing()} ${spacing(2)}`,
+                            borderBottomColor: colors.light,
+                            color: colors.black,
                             cursor: hover ? "pointer" : "inherit",
                         })}
                         title={label}

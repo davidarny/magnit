@@ -57,8 +57,12 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
         hover = true,
         selectable = false,
         sort = false,
+        onRowClick,
+        onRowSelectToggle,
+        onSelectToggle,
+        onRequestSort,
+        ...rest
     } = props;
-    const { onRowClick, onRowSelectToggle, onSelectToggle, onRequestSort } = props;
 
     const [page, setPage] = useState(initialPage);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
@@ -89,7 +93,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
     }
     return (
         <React.Fragment>
-            <Table>
+            <Table {...rest}>
                 <TableHeader
                     numSelected={data.filter(item => item.selected).length}
                     rowCount={data.length}
