@@ -1,9 +1,9 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { FormControl, Input, InputAdornment, InputLabel } from "@material-ui/core";
-import { CalendarToday as CalendarIcon } from "@material-ui/icons";
 import { jsx } from "@emotion/core";
+import { CalendarIcon } from "@magnit/icons";
+import { FormControl, Input, InputAdornment, InputLabel } from "@material-ui/core";
+import * as React from "react";
 import uuid from "uuid/v4";
 
 interface IDateFieldProps {
@@ -24,7 +24,10 @@ export const DateField: React.FC<TDateFieldProps> = props => {
                 disabled={disabled}
                 endAdornment={
                     <InputAdornment position="end">
-                        <CalendarIcon css={theme => ({ color: theme.colors.secondary })} />
+                        <CalendarIcon
+                            color="#8A94A2"
+                            css={theme => ({ color: theme.colors.secondary })}
+                        />
                     </InputAdornment>
                 }
                 css={theme => ({
