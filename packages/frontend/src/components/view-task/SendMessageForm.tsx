@@ -8,7 +8,7 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface ISendMessageFormProps {
-    onSubmit(title: string, message: string): void;
+    onSubmit?(title: string, message: string): void;
 }
 
 export const SendMessageForm: React.FC<ISendMessageFormProps> = props => {
@@ -20,7 +20,9 @@ export const SendMessageForm: React.FC<ISendMessageFormProps> = props => {
     const onSubmitCallback = useCallback(
         (event: React.FormEvent) => {
             event.preventDefault();
-            onSubmit(title, message);
+            if (onSubmit) {
+                onSubmit(title, message);
+            }
         },
         [title, message, onSubmit],
     );
@@ -85,3 +87,5 @@ export const SendMessageForm: React.FC<ISendMessageFormProps> = props => {
         </form>
     );
 };
+
+SendMessageForm.displayName = "SendMessageForm";

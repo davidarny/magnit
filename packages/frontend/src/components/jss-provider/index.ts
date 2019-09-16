@@ -1,1 +1,1 @@
-export { default as JssProvider } from "./JssProvider";
+export * from "./JssProvider";

@@ -14,7 +14,7 @@ const jss = create({
     insertionPoint: insertionPoint,
 });
 
-const JssProvider: React.FC = ({ children }) => {
+export const JssProvider: React.FC = ({ children }) => {
     return (
         <ReactJssProvider jss={jss} generateClassName={generateClassName}>
             {children}
@@ -22,4 +22,4 @@ const JssProvider: React.FC = ({ children }) => {
     );
 };
 
-export default JssProvider;
+JssProvider.displayName = "JssProvider";

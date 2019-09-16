@@ -58,3 +58,5 @@ export const ReportStage: React.FC<ITaskStageProps> = props => {
         </React.Fragment>
     );
 };
+
+ReportStage.displayName = "ReportStage";

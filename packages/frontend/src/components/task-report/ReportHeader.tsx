@@ -77,3 +77,5 @@ export const ReportHeader: React.FC<IReportHeaderProps> = props => {
         </SelectableBlockWrapper>
     );
 };
+
+ReportHeader.displayName = "ReportHeader";

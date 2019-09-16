@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
-import * as React from "react";
+import { jsx } from "@emotion/core";
 import { SvgIcon } from "@material-ui/core";
+import * as React from "react";
 
 export const MagnitIcon: React.FC = props => {
     return (
@@ -10,11 +10,11 @@ export const MagnitIcon: React.FC = props => {
             width={40}
             height={40}
             viewBox="0 0 40 40"
-            css={css`
-                fill: none;
-                width: 40px;
-                height: 40px;
-            `}
+            css={{
+                fill: "none",
+                width: "40px",
+                height: "40px",
+            }}
             {...props}
         >
             <path
@@ -26,3 +26,5 @@ export const MagnitIcon: React.FC = props => {
         </SvgIcon>
     );
 };
+
+MagnitIcon.displayName = "MagnitIcon";

@@ -9,7 +9,7 @@ interface IProps {
     open?: boolean;
     width?: number | string;
 
-    onClose(): void;
+    onClose?(): void;
 }
 
 export const SimpleModal: React.FC<IProps> = ({ onClose, open, width, children }) => {
@@ -53,3 +53,5 @@ export const SimpleModal: React.FC<IProps> = ({ onClose, open, width, children }
         </Modal>
     );
 };
+
+SimpleModal.displayName = "SimpleModal";

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { IconButton, Snackbar as MaterialSnackbar, SnackbarContent } from "@material-ui/core";
 import {
     CheckCircle as CheckCircleIcon,
@@ -17,7 +17,7 @@ interface ISnackbarProps {
     onClose?(event?: React.SyntheticEvent, reason?: string): void;
 }
 
-export const Snackbar: React.FC<ISnackbarProps> = ({ message, error, open, ...props }) => {
+export const Snackbar: React.FC<ISnackbarProps> = ({ message, error, open, onClose }) => {
     return (
         <MaterialSnackbar
             anchorOrigin={{
@@ -26,30 +26,30 @@ export const Snackbar: React.FC<ISnackbarProps> = ({ message, error, open, ...pr
             }}
             open={open}
             autoHideDuration={2500}
-            onClose={props.onClose}
+            onClose={onClose}
         >
             <SnackbarContent
-                css={theme => ({
-                    background: error ? theme.colors.red : theme.colors.green,
-                    boxShadow: `0 4px 8px ${error ? theme.colors.red : theme.colors.green}50`,
+                css={({ colors }) => ({
+                    background: error ? colors.red : colors.green,
+                    boxShadow: `0 4px 8px ${error ? colors.red : colors.green}50`,
                 })}
                 message={
                     <span
-                        css={css`
-                            display: flex;
-                            align-items: center;
-                        `}
+                        css={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
                     >
                         {error ? (
-                            <ErrorIcon css={theme => ({ marginRight: theme.spacing(1) })} />
+                            <ErrorIcon css={({ spacing }) => ({ marginRight: spacing(1) })} />
                         ) : (
-                            <CheckCircleIcon css={theme => ({ marginRight: theme.spacing(1) })} />
+                            <CheckCircleIcon css={({ spacing }) => ({ marginRight: spacing(1) })} />
                         )}
                         {message}
                     </span>
                 }
                 action={[
-                    <IconButton key="close" color="inherit" onClick={props.onClose}>
+                    <IconButton key="close" color="inherit" onClick={onClose}>
                         <CloseIcon />
                     </IconButton>,
                 ]}

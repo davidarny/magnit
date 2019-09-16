@@ -7,7 +7,7 @@ import * as React from "react";
 
 interface IEmptyListProps {
     title: string;
-    button: React.ReactNode;
+    button?: React.ReactNode;
 }
 
 export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, children }) => {
@@ -48,3 +48,5 @@ export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, children }
         </CenteredSectionItem>
     );
 };
+
+EmptyList.displayName = "EmptyList";

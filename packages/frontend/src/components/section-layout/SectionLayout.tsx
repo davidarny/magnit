@@ -1,20 +1,22 @@
 /** @jsx jsx */
 
-import { jsx, css } from "@emotion/core";
-import * as React from "react";
+import { jsx } from "@emotion/core";
 import { Grid } from "@material-ui/core";
+import * as React from "react";
 
 export const SectionLayout: React.FC = ({ children }) => {
     return (
         <Grid
             container
             direction="column"
-            css={css`
-                width: 100%;
-                min-height: 100vh;
-            `}
+            css={{
+                width: "100%",
+                minHeight: "100vh",
+            }}
         >
             {children}
         </Grid>
     );
 };
+
+SectionLayout.displayName = "SectionLayout";

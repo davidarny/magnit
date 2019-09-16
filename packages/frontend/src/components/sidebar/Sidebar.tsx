@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
-import * as React from "react";
+import { jsx } from "@emotion/core";
+import { ExecutorIcon, ObjectIcon, ReportsIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
-import { ReportsIcon, TasksIcon, TemplatesIcon, ExecutorIcon, ObjectIcon } from "@magnit/icons";
 import _ from "lodash";
+import * as React from "react";
 import { MagnitIcon } from "./MagnitIcon";
 
 export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
@@ -14,10 +14,10 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
             variant="permanent"
             open={true}
             id="drawer"
-            css={theme => ({
+            css={({ spacing, colors }) => ({
                 ".paper": {
                     border: "none",
-                    boxShadow: `${theme.spacing(0.5)} 0 ${theme.spacing(2)} ${theme.colors.gray}40`,
+                    boxShadow: `${spacing(0.5)} 0 ${spacing(2)} ${colors.gray}40`,
                 },
             })}
             classes={{ paper: "paper" }}
@@ -38,10 +38,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                         height: theme.spacing(12),
                     })}
                 >
-                    <Grid
-                        item
-                        css={theme => ({ padding: `${theme.spacing(2)} ${theme.spacing()}` })}
-                    >
+                    <Grid item css={({ spacing }) => ({ padding: `${spacing(2)} ${spacing()}` })}>
                         <Link to="/">
                             <MagnitIcon />
                         </Link>
@@ -61,12 +58,12 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                                 component={Link}
                                 to={to}
                                 key={text}
-                                css={theme => ({
+                                css={({ spacing, colors }) => ({
                                     position: "relative",
-                                    padding: `${theme.spacing(3)} 0`,
+                                    padding: `${spacing(3)} 0`,
                                     display: "block",
-                                    ":visited": { color: theme.colors.blue },
-                                    ":hover, :active": { color: theme.colors.black },
+                                    ":visited": { color: colors.blue },
+                                    ":hover, :active": { color: colors.black },
                                 })}
                             >
                                 <Grid
@@ -74,49 +71,40 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                                     direction="column"
                                     justify="center"
                                     alignItems="center"
-                                    css={theme => ({
+                                    css={({ colors }) => ({
                                         position: "relative",
                                         ":hover": {
-                                            "div:first-of-type": {
-                                                background: theme.colors.primary,
-                                            },
+                                            "div:first-of-type": { background: colors.primary },
                                         },
                                     })}
                                 >
                                     <Grid
                                         item
-                                        css={theme => ({
+                                        css={({ spacing, radius, colors }) => ({
                                             display: "block",
                                             position: "absolute",
                                             transition: "0.25s",
-                                            top: theme.spacing(-0.5),
+                                            top: spacing(-0.5),
                                             left: 0,
-                                            width: theme.spacing(0.5),
-                                            height: theme.spacing(8),
-                                            borderTopRightRadius: theme.radius(0.5),
-                                            borderBottomRightRadius: theme.radius(0.5),
-                                            background: active ? theme.colors.primary : "none",
+                                            width: spacing(0.5),
+                                            height: spacing(8),
+                                            borderTopRightRadius: radius(0.5),
+                                            borderBottomRightRadius: radius(0.5),
+                                            background: active ? colors.primary : "none",
                                             boxShadow: active
-                                                ? `1px 0 ${theme.colors.shadowBlue}40`
+                                                ? `1px 0 ${colors.shadowBlue}40`
                                                 : "none",
                                         })}
                                     />
-                                    <Grid
-                                        item
-                                        css={css`
-                                            div {
-                                                background: none !important;
-                                            }
-                                        `}
-                                    >
+                                    <Grid item css={{ div: { background: "none !important" } }}>
                                         <ListItemIcon>
                                             <Grid container justify="center" alignItems="center">
                                                 <Grid item>
                                                     <Icon
-                                                        css={theme => ({
+                                                        css={({ colors }) => ({
                                                             color: active
-                                                                ? theme.colors.primary
-                                                                : theme.colors.gray,
+                                                                ? colors.primary
+                                                                : colors.gray,
                                                         })}
                                                     />
                                                 </Grid>
@@ -125,11 +113,9 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                                     </Grid>
                                     <Grid item>
                                         <Typography
-                                            css={theme => ({
-                                                color: active
-                                                    ? theme.colors.primary
-                                                    : theme.colors.gray,
-                                                fontSize: theme.fontSize.small,
+                                            css={({ colors, fontSize }) => ({
+                                                color: active ? colors.primary : colors.gray,
+                                                fontSize: fontSize.small,
                                                 fontWeight: 500,
                                             })}
                                         >
@@ -145,3 +131,5 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
         </Drawer>
     );
 };
+
+Sidebar.displayName = "Sidebar";

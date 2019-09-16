@@ -7,7 +7,7 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface ISendReportFormProps {
-    onSubmit(email: string): void;
+    onSubmit?(email: string): void;
 }
 
 export const SendReportForm: React.FC<ISendReportFormProps> = props => {
@@ -18,7 +18,9 @@ export const SendReportForm: React.FC<ISendReportFormProps> = props => {
     const onSubmitCallback = useCallback(
         (event: React.FormEvent) => {
             event.preventDefault();
-            onSubmit(email);
+            if (onSubmit) {
+                onSubmit(email);
+            }
         },
         [email, onSubmit],
     );
@@ -59,3 +61,5 @@ export const SendReportForm: React.FC<ISendReportFormProps> = props => {
         </form>
     );
 };
+
+SendReportForm.displayName = "SendReportForm";

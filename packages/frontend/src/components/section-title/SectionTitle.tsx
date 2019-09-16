@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
-import * as React from "react";
+import { jsx } from "@emotion/core";
 import { Grid, Paper, Typography } from "@material-ui/core";
+import * as React from "react";
 
 interface ISectionTitleProps {
     title: string;
@@ -12,19 +12,19 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
     return (
         <Grid
             item
-            css={css`
-                height: var(--section-title-height);
-                box-shadow: 0 6px 20px rgba(220, 227, 235, 0.3);
-            `}
+            css={{
+                height: "var(--section-title-height)",
+                boxShadow: "0 6px 20px rgba(220, 227, 235, 0.3)",
+            }}
         >
             <Paper
                 square={true}
-                css={css`
-                    height: 100%;
-                    display: flex;
-                    align-items: center;
-                    box-shadow: none !important;
-                `}
+                css={{
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    boxShadow: "none !important",
+                }}
             >
                 <Grid
                     container
@@ -44,3 +44,5 @@ export const SectionTitle: React.FC<ISectionTitleProps> = ({ title, children }) 
         </Grid>
     );
 };
+
+SectionTitle.displayName = "SectionTitle";

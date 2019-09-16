@@ -1,10 +1,11 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { SelectableBlockWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, Typography } from "@material-ui/core";
+import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
@@ -34,6 +35,7 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
     return (
         <SectionLayout>
             <SectionTitle title="История изменений" />
+            {!stages.length && <EmptyList title="Нет истории" />}
             <Grid
                 css={theme => ({
                     maxWidth: theme.maxTemplateWidth,
@@ -63,13 +65,7 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
                             onMouseDown={onSelectableBlockFocus}
                             onFocus={onSelectableBlockFocus}
                         >
-                            <Grid
-                                container
-                                spacing={2}
-                                css={css`
-                                    position: relative;
-                                `}
-                            >
+                            <Grid container spacing={2} css={{ position: "relative" }}>
                                 <Grid item>
                                     <Grid container justify="flex-end">
                                         <div

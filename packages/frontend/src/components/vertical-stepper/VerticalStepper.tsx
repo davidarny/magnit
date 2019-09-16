@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
+import { jsx } from "@emotion/core";
 import { SelectableBlockWrapper } from "@magnit/components";
 import { CheckIcon } from "@magnit/icons";
 import { Grid } from "@material-ui/core";
 import * as React from "react";
-import { jsx } from "@emotion/core";
 
 interface IVerticalStepperProps {
     focused?: boolean;
@@ -19,16 +19,17 @@ interface IVerticalStepperProps {
 }
 
 export const VerticalStepper: React.FC<IVerticalStepperProps> = props => {
+    const { index, onMouseDown, onFocus, focused, last, checked, first, children } = props;
     return (
         <SelectableBlockWrapper
             css={theme => ({
                 padding: `${theme.spacing(3)} ${theme.spacing(4)}`,
                 "&:hover": { background: theme.colors.light },
-                zIndex: props.focused ? 1300 : "initial",
+                zIndex: focused ? 1300 : "initial",
             })}
-            focused={props.focused}
-            onMouseDown={props.onMouseDown}
-            onFocus={props.onFocus}
+            focused={focused}
+            onMouseDown={onMouseDown}
+            onFocus={onFocus}
         >
             <Grid container spacing={2}>
                 <Grid item css={{ position: "relative" }}>
@@ -39,27 +40,27 @@ export const VerticalStepper: React.FC<IVerticalStepperProps> = props => {
                             borderRadius: "50%",
                             border: `2px solid ${theme.colors.primary}`,
                             zIndex: 2,
-                            color: props.checked ? theme.colors.white : "initial",
-                            background: props.checked ? theme.colors.primary : theme.colors.white,
+                            color: checked ? theme.colors.white : "initial",
+                            background: checked ? theme.colors.primary : theme.colors.white,
                             position: "relative",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                         })}
                     >
-                        {props.checked && <CheckIcon />}
-                        {!props.checked && props.index && (
+                        {checked && <CheckIcon />}
+                        {!checked && index && (
                             <div
                                 css={theme => ({
                                     fontSize: theme.fontSize.small,
                                     color: theme.colors.primary,
                                 })}
                             >
-                                {props.index}
+                                {index}
                             </div>
                         )}
                     </div>
-                    {!props.first && (
+                    {!first && (
                         <div
                             css={theme => ({
                                 width: theme.spacing(0.25),
@@ -74,7 +75,7 @@ export const VerticalStepper: React.FC<IVerticalStepperProps> = props => {
                             })}
                         />
                     )}
-                    {!props.last && (
+                    {!last && (
                         <div
                             css={theme => ({
                                 width: theme.spacing(0.25),
@@ -90,8 +91,10 @@ export const VerticalStepper: React.FC<IVerticalStepperProps> = props => {
                         />
                     )}
                 </Grid>
-                <Grid item>{props.children}</Grid>
+                <Grid item>{children}</Grid>
             </Grid>
         </SelectableBlockWrapper>
     );
 };
+
+VerticalStepper.displayName = "VerticalStepper";
