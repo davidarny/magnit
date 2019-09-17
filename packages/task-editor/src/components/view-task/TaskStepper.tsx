@@ -24,29 +24,37 @@ export const TaskStepper: React.FC<ITaskStepperProps> = props => {
     const { task, stageDeadlineMap, stageTitleMap } = props;
     const { onChangeStageDeadline, onBlurStage, onChangeStageTitle, onDeleteStage } = props;
 
+    const stages = (task.stages || []).map((stage, index) => ({ ...stage, __index: index + 1 }));
+    const addingNewStage = stages.reduce((prev, curr) => (!prev ? !!curr.editable : prev), false);
+
     return (
         <StepperWrapper
             onTitleChange={onChangeStageTitle}
             onTitleBlur={onBlurStage}
             onStepDelete={onDeleteStage}
-            steps={(task.stages || []).map(stage => {
-                const safeStageDeadline = stage.deadline || stageDeadlineMap.get(stage.id) || "";
-                const deadline = !stage.editable
-                    ? getFriendlyDate(new Date(safeStageDeadline))
-                    : safeStageDeadline;
-                const safeStageTitle = stage.title || stageTitleMap.get(stage.id) || "";
+            steps={(!addingNewStage
+                ? [stages[stages.length - 1]]
+                : [stages[stages.length - 2], stages[stages.length - 1]]
+            ).map(stage => {
+                function onChangeDeadline(event: React.ChangeEvent<HTMLInputElement>) {
+                    onChangeStageDeadline(stage.id, event.target.value);
+                }
+
+                const deadline = stage.deadline || stageDeadlineMap.get(stage.id) || "";
+                const date = !stage.editable ? getFriendlyDate(new Date(deadline)) : deadline;
+                const title = stage.title || stageTitleMap.get(stage.id) || "";
+
                 return {
-                    id: stage.id,
-                    editable: stage.editable,
+                    ...stage,
+                    title,
                     completed: stage.finished,
-                    title: safeStageTitle,
                     content: (
                         <DateField
                             key={stage.id}
                             disabled={!stage.editable}
-                            onChange={event => onChangeStageDeadline(stage.id, event.target.value)}
+                            onChange={onChangeDeadline}
                             onBlur={onBlurStage}
-                            value={deadline}
+                            value={date}
                         />
                     ),
                 };

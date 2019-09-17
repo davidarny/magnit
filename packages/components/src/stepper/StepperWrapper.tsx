@@ -1,19 +1,9 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import {
-    Grid,
-    IconButton,
-    Step,
-    StepContent,
-    StepLabel,
-    Stepper,
-    Typography,
-} from "@material-ui/core";
-import { Close as DeleteIcon } from "@material-ui/icons";
-import { InputField } from "fields";
+import { Stepper } from "@material-ui/core";
 import * as React from "react";
-import { useCallback } from "react";
+import { StepWrapper } from "./StepWrapper";
 
 export interface IStep {
     id: number;
@@ -21,6 +11,7 @@ export interface IStep {
     content: React.ReactNode;
     title: string;
     editable?: boolean;
+    __index?: number;
 }
 
 interface IStepperWrapperProps {
@@ -40,7 +31,7 @@ export const StepperWrapper: React.FC<TStepperProps> = props => {
 
     return (
         <Stepper orientation="vertical">
-            {steps.map(({ completed, title, content, editable, id }) => (
+            {steps.map(({ completed, title, content, editable, id, __index }) => (
                 <StepWrapper
                     key={id}
                     editable={editable}
@@ -48,6 +39,7 @@ export const StepperWrapper: React.FC<TStepperProps> = props => {
                     content={content}
                     id={id}
                     title={title}
+                    __index={__index}
                     onTitleChange={onTitleChange}
                     onStepDelete={onStepDelete}
                     onTitleBlur={onTitleBlur}
@@ -58,90 +50,3 @@ export const StepperWrapper: React.FC<TStepperProps> = props => {
 };
 
 StepperWrapper.displayName = "StepperWrapper";
-
-interface IStepWrapperProps extends IStep {
-    onTitleBlur?(id: number): void;
-
-    onTitleChange?(id: number, value: string): void;
-
-    onStepDelete?(id: number): void;
-}
-
-export const StepWrapper: React.FC<IStepWrapperProps> = props => {
-    const {
-        id,
-        completed,
-        content,
-        title,
-        editable,
-        onStepDelete,
-        onTitleChange,
-        onTitleBlur,
-        ...rest
-    } = props;
-
-    const onClickCallback = useCallback(() => {
-        if (onStepDelete) {
-            onStepDelete(id);
-        }
-    }, [id, onStepDelete]);
-
-    const onChangeCallback = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            if (onTitleChange) {
-                onTitleChange(id, event.target.value);
-            }
-        },
-        [id, onTitleChange],
-    );
-
-    const onBlurCallback = useCallback(() => {
-        if (onTitleBlur) {
-            onTitleBlur(id);
-        }
-    }, [id, onTitleBlur]);
-
-    return (
-        <Step {...rest} active={true} completed={completed}>
-            <StepLabel
-                css={theme => ({
-                    svg: { color: `${theme.colors.primary} !important` },
-                })}
-            >
-                {!editable && (
-                    <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                        {title}
-                    </Typography>
-                )}
-                {editable && (
-                    <Grid container>
-                        <Grid item xs={10}>
-                            <InputField
-                                fullWidth
-                                css={theme => ({
-                                    input: { fontSize: theme.fontSize.larger },
-                                })}
-                                value={title}
-                                onChange={onChangeCallback}
-                                onBlur={onBlurCallback}
-                            />
-                        </Grid>
-                        <Grid item xs>
-                            <IconButton
-                                css={theme => ({
-                                    svg: { color: `${theme.colors.gray} !important` },
-                                })}
-                                onClick={onClickCallback}
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                        </Grid>
-                    </Grid>
-                )}
-            </StepLabel>
-            <StepContent>{content}</StepContent>
-        </Step>
-    );
-};
-
-StepWrapper.displayName = "StepWrapper";
