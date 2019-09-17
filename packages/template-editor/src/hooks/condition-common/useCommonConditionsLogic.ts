@@ -114,7 +114,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                     // disallow referencing to questions in GROUPS
                     if (
                         childValue.puzzleType === EPuzzleType.QUESTION &&
-                        service.shouldSetQuestions(puzzle) &&
+                        service.shouldSetQuestions(childValue) &&
                         childValue.title.toString().length > 0 &&
                         !isGroupParent
                     ) {

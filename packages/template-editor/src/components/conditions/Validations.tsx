@@ -311,7 +311,7 @@ const Validation: React.FC<IValidationProps> = props => {
                         .setValueBlurHandler(onValueBlurCallback)
                         .build()}
             </Grid>
-            {!noDeleteButton && validation.operatorType && (
+            {!noDeleteButton && (validation.operatorType || index !== 0) && (
                 <Grid item xs>
                     <Grid container justify="flex-end">
                         <Grid item>
