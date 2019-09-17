@@ -144,3 +144,5 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
         </Grid>
     );
 };
+
+ConditionsWrapper.displayName = "ConditionsWrapper";
