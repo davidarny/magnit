@@ -51,7 +51,7 @@ export const TableHeader: React.FC<ITableHeaderProps> = props => {
                             {selectable && index === 0 && (
                                 <Checkbox
                                     indeterminate={numSelected > 0 && numSelected < rowCount}
-                                    css={({ spacing }) => ({ marginRight: spacing() })}
+                                    css={({ spacing }) => ({ marginRight: spacing(), padding: 0 })}
                                     checked={
                                         numSelected !== 0 &&
                                         rowCount !== 0 &&

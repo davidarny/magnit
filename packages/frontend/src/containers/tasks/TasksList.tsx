@@ -337,8 +337,8 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                     >
                                         <TableWrapper
                                             css={theme => ({
-                                                marginLeft: theme.spacing(-3),
-                                                width: `calc(100% + ${theme.spacing(6)})`,
+                                                marginLeft: theme.spacing(-2),
+                                                width: `calc(100% + ${theme.spacing(4)})`,
                                             })}
                                             selectable
                                             columns={columns}

@@ -82,8 +82,7 @@ const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
                 return (
                     <TableCell
                         key={index}
-                        css={({ colors, spacing }) => ({
-                            padding: `${spacing()} ${spacing(3)} ${spacing()} ${spacing(2)}`,
+                        css={({ colors }) => ({
                             borderBottomColor: colors.light,
                             color: colors.black,
                             cursor: hover ? "pointer" : "inherit",
@@ -92,7 +91,7 @@ const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
                     >
                         {selectable && index === 0 && (
                             <Checkbox
-                                css={({ spacing }) => ({ marginRight: spacing() })}
+                                css={({ spacing }) => ({ marginRight: spacing(), padding: 0 })}
                                 checked={!!value.selected}
                                 onChange={onSelectedChange}
                                 onClick={event => event.stopPropagation()}
