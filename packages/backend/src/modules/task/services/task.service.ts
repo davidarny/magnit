@@ -19,6 +19,7 @@ import { IPuzzle } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { TaskDto } from "../dto/task.dto";
+import { Comment } from "../entities/comment.entity";
 import { TaskDocument } from "../entities/task-document.entity";
 import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
@@ -30,6 +31,7 @@ export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStag
 @Injectable()
 export class TaskService {
     constructor(
+        @InjectRepository(Comment) private readonly commentRepository: Repository<Comment>,
         @InjectRepository(TaskStage) private readonly taskStageRepository: Repository<TaskStage>,
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
         @InjectRepository(TemplateAssignment)
@@ -144,7 +146,7 @@ export class TaskService {
         if (!task) {
             throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
         }
-        const templates = await this.templateService.findByTaskId(task.id);
+        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
         return { ...task, templates };
     }
 
@@ -304,7 +306,7 @@ export class TaskService {
             .orderBy("assignment.created_at", "ASC")
             .addOrderBy("stage.created_at", "ASC")
             .getOne();
-        const templates = await this.templateService.findByTaskId(task.id);
+        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
         const report = new TaskReportDto({
             ..._.omit(task, "assignments"),
             stages: task.stages.map(stage => {
@@ -446,5 +448,32 @@ export class TaskService {
             where: { id_task: id, finished: false },
             order: { created_at: "ASC" },
         });
+    }
+
+    @Transactional()
+    async addCommentToAssignment(
+        taskId: number,
+        templateId: number,
+        userId: string,
+        text: string,
+    ): Promise<void> {
+        const assignment = await this.templateAssignmentRepository.findOne({
+            where: { id_task: taskId, id_template: templateId },
+        });
+        const comment = new Comment({
+            assignment,
+            id_user: userId,
+            text,
+        });
+        assignment.comments = [...(assignment.comments || []), comment];
+        await this.templateAssignmentRepository.save(assignment);
+    }
+
+    async removeAssignmentComment(commentId: number): Promise<void> {
+        await this.commentRepository.delete(commentId);
+    }
+
+    async commentExists(commentId: number): Promise<boolean> {
+        return !!(await this.commentRepository.findOne(commentId));
     }
 }

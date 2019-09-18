@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
 import {
+    ApiBearerAuth,
     ApiCreatedResponse,
     ApiImplicitBody,
     ApiNotFoundResponse,
@@ -20,6 +21,7 @@ import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { TemplateService } from "./services/template.service";
 
 @ApiUseTags("templates")
+@ApiBearerAuth()
 @Controller("templates")
 export class TemplateController {
     constructor(private readonly templateService: TemplateService) {}

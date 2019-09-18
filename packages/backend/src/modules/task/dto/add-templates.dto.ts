@@ -1,5 +1,5 @@
 import { ApiModelProperty } from "@nestjs/swagger";
 
-export class AddTemplatesBody {
+export class AddTemplatesDto {
     @ApiModelProperty({ type: [Number] }) readonly templates: number[];
 }

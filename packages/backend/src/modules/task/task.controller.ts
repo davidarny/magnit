@@ -8,6 +8,7 @@ import {
     Post,
     Put,
     Query,
+    Req,
     Res,
     UploadedFiles,
     UseInterceptors,
@@ -16,6 +17,7 @@ import {
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import {
     ApiBadRequestResponse,
+    ApiBearerAuth,
     ApiConsumes,
     ApiCreatedResponse,
     ApiImplicitBody,
@@ -26,6 +28,7 @@ import {
 } from "@nestjs/swagger";
 import { Response } from "express";
 import * as _ from "lodash";
+import { IAuthRequest } from "../../shared/interfaces/auth.request.interface";
 import { NonCompatiblePropsPipe } from "../../shared/pipes/non-compatible-props.pipe";
 import { NumericIdPipe } from "../../shared/pipes/numeric-id.pipe";
 import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
@@ -37,7 +40,7 @@ import { IScheduleMessage } from "../mail/interfaces/schedule-message.interface"
 import { Template } from "../template/entities/template.entity";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
 import { TemplateService } from "../template/services/template.service";
-import { AddTemplatesBody } from "./bodies/add-templates.body";
+import { AddTemplatesDto } from "./dto/add-templates.dto";
 import { TaskStageDto } from "./dto/task-stage.dto";
 import { TaskDto } from "./dto/task.dto";
 import { TemplateAssignmentDto } from "./dto/template-assignment.dto";
@@ -45,6 +48,7 @@ import { TaskDocument } from "./entities/task-document.entity";
 import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
 import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
+import { CommentByIdPipe } from "./pipes/comment-by-id.pipe";
 import { DocumentByIdPipe } from "./pipes/document-by-id.pipe";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TaskExpiredPipe } from "./pipes/task-expired.pipe";
@@ -60,6 +64,7 @@ import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
 
 @ApiUseTags("tasks")
+@ApiBearerAuth()
 @Controller("tasks")
 export class TaskController {
     constructor(
@@ -124,7 +129,7 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findById(@Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number) {
         const task = await this.taskService.findById(id, ["stages"]);
-        const templates = await this.templateService.findByTaskId(task.id);
+        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
         return {
             success: 1,
             task: {
@@ -138,7 +143,7 @@ export class TaskController {
     @Post("/:id/templates")
     @ApiImplicitBody({
         name: "templates",
-        type: AddTemplatesBody,
+        type: AddTemplatesDto,
         description: "IDs of Templates to add",
     })
     @ApiOkResponse({ type: BaseResponse })
@@ -358,6 +363,32 @@ export class TaskController {
         @Param("document_id", NumericIdPipe, DocumentByIdPipe) documentId: number,
     ) {
         await this.taskService.deleteDocumentById(taskId, documentId);
+        return { success: 1 };
+    }
+
+    @Post("/:task_id/templates/:template_id/comments")
+    @ApiOkResponse({ type: BaseResponse })
+    @ApiImplicitBody({ name: "text", type: String })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    async addAssignmentComment(
+        @Param("task_id", NumericIdPipe, TaskByIdPipe) taskId: number,
+        @Param("template_id", NumericIdPipe, TemplateByIdPipe) templateId: number,
+        @Req() req: IAuthRequest,
+        @Body("text") text: string,
+    ) {
+        await this.taskService.addCommentToAssignment(taskId, templateId, req.user.id, text);
+        return { success: 1 };
+    }
+
+    @Delete("/:task_id/comments/:comment_id")
+    @ApiOkResponse({ type: BaseResponse })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Comment not found" })
+    @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
+    async deleteAssignmentComment(
+        @Param("comment_id", NumericIdPipe, CommentByIdPipe) commentId: number,
+    ) {
+        await this.taskService.removeAssignmentComment(commentId);
         return { success: 1 };
     }
 }

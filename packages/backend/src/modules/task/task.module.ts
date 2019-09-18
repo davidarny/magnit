@@ -9,6 +9,7 @@ import { ScheduleModule } from "../schedule/schedule.module";
 import { ScheduleService } from "../schedule/services/schedule.service";
 import { TemplateModule } from "../template/template.module";
 import { UploadModule } from "../upload/upload.module";
+import { Comment } from "./entities/comment.entity";
 import { StageHistory } from "./entities/stage-history.entity";
 import { TaskDocument } from "./entities/task-document.entity";
 import { TaskStage } from "./entities/task-stage.entity";
@@ -23,7 +24,14 @@ import { TaskController } from "./task.controller";
     controllers: [TaskController],
     providers: [TaskService, TaskSubscriber, TaskStageSubscriber],
     imports: [
-        TypeOrmModule.forFeature([Task, TaskStage, StageHistory, TemplateAssignment, TaskDocument]),
+        TypeOrmModule.forFeature([
+            Task,
+            TaskStage,
+            StageHistory,
+            TemplateAssignment,
+            TaskDocument,
+            Comment,
+        ]),
         UploadModule,
         PushTokenModule,
         AmqpModule,

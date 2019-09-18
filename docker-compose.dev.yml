@@ -3,7 +3,6 @@ version: "3.3"
 services:
     frontend:
         image: node:10-alpine
-        build: .
         volumes:
             - .:/devel
         working_dir: /devel/packages/frontend
@@ -21,7 +20,6 @@ services:
 
     backend:
         image: node:10-alpine
-        build: .
         volumes:
             - .:/devel
         working_dir: /devel/packages/backend

@@ -72,8 +72,13 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
         // api docs
         const config = new DocumentBuilder()
             .setTitle("Templates API")
-            .setHost("91.144.161.208:1337/v1")
+            .setHost(
+                process.env.NODE_ENV === "production"
+                    ? "91.144.161.208:1336/v1"
+                    : "localhost:1337/v1",
+            )
             .setVersion("1.0")
+            .addBearerAuth("basic", "header", "basic")
             .build();
         const document = SwaggerModule.createDocument(app, config);
         SwaggerModule.setup("api", app, document);

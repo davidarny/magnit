@@ -1,6 +1,7 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { Template } from "../../template/entities/template.entity";
+import { Comment } from "./comment.entity";
 import { Task } from "./task.entity";
 
 @Entity({ name: "template_assignment" })
@@ -28,4 +29,7 @@ export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
     @ManyToOne(() => Template)
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;
+
+    @OneToOne(() => Comment, comment => comment.assignment, { cascade: true })
+    comments: Comment[];
 }

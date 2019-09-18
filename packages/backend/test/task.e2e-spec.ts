@@ -11,6 +11,7 @@ import { PushToken } from "../src/modules/push-token/entities/push-token.entity"
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { ScheduleService } from "../src/modules/schedule/services/schedule.service";
 import { TaskReportDto } from "../src/modules/task/dto/task-report.dto";
+import { Comment } from "../src/modules/task/entities/comment.entity";
 import { StageHistory } from "../src/modules/task/entities/stage-history.entity";
 import { TaskDocument } from "../src/modules/task/entities/task-document.entity";
 import { TaskStage } from "../src/modules/task/entities/task-stage.entity";
@@ -90,6 +91,8 @@ describe("TaskController (e2e)", () => {
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(TaskDocument))
             .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(Comment))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();
@@ -128,7 +131,7 @@ describe("TaskController (e2e)", () => {
 
     it("should get task by id", async () => {
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(templateService, "findByTaskId").mockResolvedValue([]);
+        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([]);
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)
@@ -192,7 +195,7 @@ describe("TaskController (e2e)", () => {
     it("should ensure returns updated task", async () => {
         const updated = { ...task, name: "updated task" };
         jest.spyOn(taskService, "findById").mockResolvedValue(updated);
-        jest.spyOn(templateService, "findByTaskId").mockResolvedValue([]);
+        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([]);
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)

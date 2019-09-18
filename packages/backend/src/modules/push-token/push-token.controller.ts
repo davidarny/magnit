@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req } from "@nestjs/common";
-import { ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { CannotSendPushNotificationException } from "../../shared/exceptions/cannot-send-push-notification.exception";
 import { IAuthRequest } from "../../shared/interfaces/auth.request.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
@@ -10,6 +10,7 @@ import { IPushMessage } from "./interfaces/push-message.interface";
 import { PushTokenService } from "./services/push-token.service";
 
 @ApiUseTags("push_token")
+@ApiBearerAuth()
 @Controller("push_token")
 export class PushTokenController {
     constructor(

@@ -54,7 +54,7 @@ export class TemplateService {
         return this.templateRepository.findOneOrFail({ where: { id } });
     }
 
-    async findByTaskId(id: number) {
+    async findTemplateAssignmentByIdExtended(id: number) {
         return this.templateRepository.query(
             `
             SELECT
@@ -67,10 +67,12 @@ export class TemplateService {
                 t.updated_at,
                 t.version,
                 tas.editable,
-                to_jsonb(array_remove(array_agg(ta), NULL)) as answers
+                to_jsonb(array_remove(array_agg(ta), NULL)) as answers,
+                to_jsonb(array_remove(array_agg(c), NULL)) as comments
             FROM template_assignment tas
-            LEFT JOIN template t ON tas.id_template = t.id
+            LEFT JOIN template t ON t.id = tas.id_template
             LEFT JOIN template_answer ta ON ta.id_template = t.id AND ta.id_task = tas.id_task
+            LEFT JOIN comment c ON c.id_assignment = tas.id
             WHERE tas.id_task = $1
             GROUP BY t.id, tas.id
             ORDER BY t.id, tas.id

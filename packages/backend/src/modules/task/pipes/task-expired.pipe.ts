@@ -1,12 +1,12 @@
 /* tslint:disable:no-shadowed-variable */
 
-import { ArgumentMetadata, Inject, Injectable, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskService } from "../services/task.service";
 
 @Injectable()
 export class TaskExpiredPipe implements PipeTransform<number | unknown, Promise<number | unknown>> {
-    constructor(@Inject(TaskService) private readonly taskService: TaskService) {}
+    constructor(private readonly taskService: TaskService) {}
 
     async transform(id: number | unknown, metadata: ArgumentMetadata): Promise<number | unknown> {
         if (typeof id !== "number") {

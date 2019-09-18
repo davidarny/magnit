@@ -1,6 +1,7 @@
 import { Controller, Delete, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
+    ApiBearerAuth,
     ApiConsumes,
     ApiImplicitFile,
     ApiNotFoundResponse,
@@ -13,6 +14,7 @@ import { BaseResponse } from "../../shared/responses/base.response";
 import { UploadFileResponse } from "./responses/upload-file.response";
 
 @ApiUseTags("assets")
+@ApiBearerAuth()
 @Controller("assets")
 export class AssetController {
     @Post("/")

@@ -87,7 +87,7 @@ describe("TaskController", () => {
     it("should get task by id", async () => {
         const expected = { success: 1, task: { ...task, templates: [] } };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(templateService, "findByTaskId").mockResolvedValue([]);
+        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([]);
         expect(await taskController.findById(0)).toStrictEqual(expected);
     });
 
@@ -106,7 +106,9 @@ describe("TaskController", () => {
     it("should ensure task was added to tasks", async () => {
         const expected = { success: 1, task: { ...task, templates: [0] } };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(templateService, "findByTaskId").mockResolvedValue([template]);
+        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([
+            template,
+        ]);
         expect(await taskController.findById(0)).toStrictEqual(expected);
     });
 
