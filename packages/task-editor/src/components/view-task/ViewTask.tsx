@@ -290,6 +290,9 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const documentsBlockId = useRef(uuid());
 
+    const deleteAssetVisible =
+        task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
+
     return (
         <React.Fragment>
             <Menu
@@ -558,26 +561,28 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                     alt={document.originalName}
                                     src={document.filename}
                                 />
-                                <div
-                                    onClick={() => onDeleteAssetCallback(document.id)}
-                                    css={theme => ({
-                                        padding: theme.spacing(0.5),
-                                        borderRadius: "50%",
-                                        background: theme.colors.gray,
-                                        color: theme.colors.white,
-                                        position: "absolute",
-                                        top: "-12px", // TODO: dynamic calculation
-                                        right: "-12px", // TODO: dynamic calculation
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        cursor: "pointer",
-                                    })}
-                                >
-                                    <CloseIcon
-                                        css={theme => ({ fontSize: theme.fontSize.normal })}
-                                    />
-                                </div>
+                                {deleteAssetVisible && (
+                                    <div
+                                        onClick={() => onDeleteAssetCallback(document.id)}
+                                        css={theme => ({
+                                            padding: theme.spacing(0.5),
+                                            borderRadius: "50%",
+                                            background: theme.colors.gray,
+                                            color: theme.colors.white,
+                                            position: "absolute",
+                                            top: "-12px", // TODO: dynamic calculation
+                                            right: "-12px", // TODO: dynamic calculation
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                        })}
+                                    >
+                                        <CloseIcon
+                                            css={theme => ({ fontSize: theme.fontSize.normal })}
+                                        />
+                                    </div>
+                                )}
                             </Grid>
                         </Grid>
                     ))}

@@ -191,13 +191,13 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async addTaskStages(
         @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
-        @Body("stages") taskStageDtos: TaskStageDto[],
+        @Body("stages") stageDtoArray: TaskStageDto[],
     ) {
         const task = await this.taskService.findById(id, ["stages"]);
         task.stages = [
             ...task.stages,
-            // create stages from dtos
-            ...taskStageDtos.map(taskStageDto => new TaskStage({ ...taskStageDto })),
+            // create stages from dto array
+            ...stageDtoArray.map(taskStageDto => new TaskStage({ ...taskStageDto })),
         ];
         await this.taskService.update(id, task);
         return { success: 1 };

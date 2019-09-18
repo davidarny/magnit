@@ -41,17 +41,15 @@ export class Task extends PrimaryBaseEntity<Task> {
     @Column({ type: "int", default: 3 })
     notify_before: number;
 
-    @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.task, {
-        cascade: true,
-    })
+    @OneToMany(() => TemplateAssignment, assignment => assignment.task, { cascade: true })
     assignments: TemplateAssignment[];
 
-    @OneToMany(() => TemplateAnswer, template_answer => template_answer.task)
+    @OneToMany(() => TemplateAnswer, answer => answer.task)
     answers: TemplateAnswer[];
 
-    @OneToMany(() => TaskStage, task_stage => task_stage.task, { cascade: true })
+    @OneToMany(() => TaskStage, stage => stage.task, { cascade: true })
     stages: TaskStage[];
 
-    @OneToMany(() => TaskDocument, task_document => task_document.task, { cascade: true })
+    @OneToMany(() => TaskDocument, document => document.task)
     documents: TaskStage[];
 }

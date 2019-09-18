@@ -19,7 +19,7 @@ export class TaskStage extends PrimaryBaseEntity<TaskStage> {
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })
     task: Task;
 
-    @OneToMany(() => StageHistory, history => history.stage, { cascade: true })
+    @OneToMany(() => StageHistory, history => history.stage)
     history: StageHistory[];
 
     @Column("varchar")

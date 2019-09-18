@@ -37,12 +37,10 @@ export class Template extends PrimaryBaseEntity<Template> {
     @Column({ type: "jsonb", default: [] })
     sections: object;
 
-    @OneToMany(() => TemplateAssignment, template_assignment => template_assignment.template, {
-        cascade: true,
-    })
+    @OneToMany(() => TemplateAssignment, assignment => assignment.template, { cascade: true })
     assignments: TemplateAssignment[];
 
-    @OneToMany(() => TemplateAnswer, answer => answer.template, { cascade: true })
+    @OneToMany(() => TemplateAnswer, answer => answer.template)
     answers: TemplateAnswer[];
 
     @Column({ type: "varchar", default: "light" })
