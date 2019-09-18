@@ -634,12 +634,12 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     comment => comment.idAssignment === document.id,
                 );
 
-                const taskTemplate = (task.templates || []).find(
+                const template = (task.templates || []).find(
                     template => template.id === document.id,
                 );
                 const comments: IComment[] = [];
-                if (taskTemplate) {
-                    comments.push(...taskTemplate.comments);
+                if (template && _.isArray(template.comments)) {
+                    comments.push(...template.comments);
                 }
 
                 return (

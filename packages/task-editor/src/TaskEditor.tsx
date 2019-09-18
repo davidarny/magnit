@@ -359,11 +359,17 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             icon: <QuestionIcon />,
             action: onAddDocumentCallback,
         },
-        {
-            label: "Оставить комментарий",
-            icon: <CommentsIcon />,
-            action: onAddCommentClick,
-        },
+        // show comments button if focused on template
+        ...(documents.some(document => document.__uuid === focusedPuzzleId)
+            ? [
+                  {
+                      label: "Оставить комментарий",
+                      icon: <CommentsIcon />,
+                      action: onAddCommentClick,
+                  },
+              ]
+            : []),
+        // show trash button if not focused on head
         ...(!focusedOnTaskHead
             ? [
                   {

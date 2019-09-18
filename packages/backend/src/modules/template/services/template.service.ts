@@ -67,8 +67,8 @@ export class TemplateService {
                 t.updated_at,
                 t.version,
                 tas.editable,
-                to_jsonb(array_remove(array_agg(ta), NULL)) as answers,
-                to_jsonb(array_remove(array_agg(c), NULL)) as comments
+                to_jsonb(array_remove(array_agg(DISTINCT ta), NULL)) as answers,
+                to_jsonb(array_remove(array_agg(DISTINCT c), NULL)) as comments
             FROM template_assignment tas
             LEFT JOIN template t ON t.id = tas.id_template
             LEFT JOIN template_answer ta ON ta.id_template = t.id AND ta.id_task = tas.id_task
