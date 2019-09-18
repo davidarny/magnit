@@ -228,8 +228,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         }
         const stages = task.stages.map(stage => ({
             ...stage,
-            title: stage.title || stageTitleMap.get(stage.id) || "",
-            deadline: stage.deadline || stageDeadlineMap.get(stage.id) || "",
+            title: stageTitleMap.get(stage.id) || stage.title || "",
+            deadline: stageDeadlineMap.get(stage.id) || stage.deadline || "",
         }));
         onTaskChange({ ...task, stages });
     }, [task, onTaskChange, stageTitleMap, stageDeadlineMap]);
@@ -369,7 +369,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 <DraftView
                     service={service}
                     focusedPuzzleId={focusedPuzzleId}
-                    task={{ ...task, id: getTaskId() }}
+                    task={task}
+                    onTaskChange={onTaskChange}
                     onBlurStage={onBlurStageCallback}
                     onChangeStageTitle={onChangeStageTitleCallback}
                     onChangeStageDeadline={onChangeStageDeadlineCallback}

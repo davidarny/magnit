@@ -3,7 +3,7 @@
 import { jsx } from "@emotion/core";
 import { DateField, InputField, SelectableBlockWrapper, SelectField } from "@magnit/components";
 import { IExtendedTask } from "@magnit/entities";
-import { IEditorService } from "@magnit/services";
+import { getFriendlyDate, IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { TaskFieldContainer } from "components/task-field-container";
 import _ from "lodash";
@@ -12,22 +12,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface IDraftViewProps {
     service: IEditorService;
-    task: Partial<Omit<IExtendedTask, "id">> & { id: string };
+    task: Partial<IExtendedTask>;
     focusedPuzzleId?: string;
 
     onTaskChange?(task: Partial<IExtendedTask>): void;
 
-    onChangeStageTitle(id: number, value: string): void;
+    onChangeStageTitle?(id: number, value: string): void;
 
-    onChangeStageDeadline(id: number, value: string): void;
+    onChangeStageDeadline?(id: number, value: string): void;
 
-    onBlurStage(): void;
+    onBlurStage?(): void;
 }
 
 export const DraftView: React.FC<IDraftViewProps> = props => {
     const { focusedPuzzleId, service, task } = props;
     const { onChangeStageTitle, onBlurStage, onChangeStageDeadline, onTaskChange } = props;
-    const { stages, id, title, notifyBefore } = task;
+    const { stages, title, notifyBefore } = task;
+    const id = task.id ? task.id.toString() : "";
 
     const lastStage = _.last(stages);
 
@@ -58,9 +59,15 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         if (!lastStage) {
             return;
         }
-        onChangeStageTitle(lastStage.id, lastStageTitle);
-        onChangeStageDeadline(lastStage.id, lastStageDeadline);
-        onBlurStage();
+        if (onChangeStageTitle) {
+            onChangeStageTitle(lastStage.id, lastStageTitle);
+        }
+        if (onChangeStageDeadline) {
+            onChangeStageDeadline(lastStage.id, lastStageDeadline);
+        }
+        if (onBlurStage) {
+            onBlurStage();
+        }
     }, [
         lastStage,
         lastStageDeadline,
@@ -72,9 +79,9 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
 
     const onBlurTaskTitleCallback = useCallback(() => {
         if (onTaskChange) {
-            onTaskChange({ title, ..._.omit(task, "id") });
+            onTaskChange({ ...task, title: taskTitle });
         }
-    }, [onTaskChange, task, title]);
+    }, [onTaskChange, task, taskTitle]);
 
     function onStageTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
         setLastStageTitle(event.target.value);
@@ -87,6 +94,15 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
     function onTaskTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
         setTaskTitle(event.target.value);
     }
+
+    const onNotifyBeforeChangeCallback = useCallback(
+        (event: React.ChangeEvent<{ name?: string; value: unknown }>) => {
+            if (onTaskChange) {
+                onTaskChange({ ...task, notifyBefore: event.target.value as number });
+            }
+        },
+        [onTaskChange, task],
+    );
 
     return (
         <SelectableBlockWrapper
@@ -127,7 +143,11 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                         </Grid>
                         <Grid item>
                             <DateField
-                                value={lastStageDeadline}
+                                value={
+                                    !_.isNaN(Date.parse(lastStageDeadline))
+                                        ? getFriendlyDate(new Date(lastStageDeadline))
+                                        : ""
+                                }
                                 placeholder="Срок выполнения"
                                 onChange={onStageDeadlineChange}
                                 onBlur={onBlurStageCallback}
@@ -137,6 +157,7 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                 </TaskFieldContainer>
                 <TaskFieldContainer label="Уведомить исполнителя о наступлении срока выполнения заказа">
                     <SelectField
+                        onChange={onNotifyBeforeChangeCallback}
                         value={notifyBefore || 3}
                         css={theme => ({ minWidth: theme.spacing(30) })}
                     >
