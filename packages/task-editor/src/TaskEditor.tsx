@@ -4,12 +4,13 @@ import { jsx } from "@emotion/core";
 import { EditorToolbar } from "@magnit/components";
 import {
     ETaskStatus,
+    IComment,
     IDocument,
+    IExtendedDocument,
     IExtendedTask,
     IStageStep,
     ITask,
     IVirtualDocument,
-    IWithAnswers,
 } from "@magnit/entities";
 import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
 import { EEditorType, getEditorService } from "@magnit/services";
@@ -22,7 +23,7 @@ import { ViewTask } from "./components/view-task";
 
 type TAnyTask = ITask | IExtendedTask;
 
-type TDocumentWithAnswers = IDocument & IWithAnswers;
+type TDocumentWithAnswers = IDocument & IExtendedDocument;
 
 interface ITaskEditorProps<T extends TAnyTask> {
     task: T;
@@ -31,9 +32,13 @@ interface ITaskEditorProps<T extends TAnyTask> {
 
     onAddAsset?(file: File): void;
 
-    onDeleteAsset?(id: number): void;
+    onDeleteAsset?(assetId: number): void;
 
-    onTaskChange?(task: Partial<T>): void;
+    onAddComment?(comment: IComment): void;
+
+    onDeleteComment?(commentId: number): void;
+
+    onTaskChange?(task: Partial<TAnyTask>): void;
 }
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -42,7 +47,16 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
-    const { templates, task, variant, onTaskChange, onAddAsset, onDeleteAsset } = props;
+    const {
+        templates,
+        task,
+        variant,
+        onTaskChange,
+        onAddAsset,
+        onDeleteAsset,
+        onAddComment,
+        onDeleteComment,
+    } = props;
 
     const [title, setTitle] = useState("");
     // not task documents
@@ -52,6 +66,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     // full templates mainly needed for rendering
     const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
+    // local comments storage
+    const [pendingComments, setPendingComments] = useState<IComment[]>([]);
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
     const focusedOnTaskHead = focusedPuzzleId === task.id.toString();
@@ -286,6 +302,57 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         }
     }, [documents, focusedPuzzleId, isCreateMode, task, updateTaskTemplates]);
 
+    function onAddCommentClick() {
+        // allow to add if 0 pending comments
+        if (pendingComments.length) {
+            return;
+        }
+        const document = documents.find(document => document.__uuid === focusedPuzzleId);
+        if (!document) {
+            return;
+        }
+        const lastComment = _.last(pendingComments) || { id: -1 };
+        const comment: IComment = {
+            id: lastComment.id + 1,
+            idAssignment: document.id,
+            idUser: "",
+            text: "",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        setPendingComments([...pendingComments, comment]);
+    }
+
+    const onPendingCommentDeleteCallback = useCallback(
+        (commentId: number) => {
+            const index = pendingComments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+                pendingComments.splice(index, 1);
+                setPendingComments([...pendingComments]);
+            }
+        },
+        [pendingComments],
+    );
+
+    const onPendingCommentAcceptCallback = useCallback(
+        (comment: IComment) => {
+            if (onAddComment) {
+                onAddComment({ ...comment });
+                onPendingCommentDeleteCallback(comment.id);
+            }
+        },
+        [onAddComment, onPendingCommentDeleteCallback],
+    );
+
+    const onCommentDeleteCallback = useCallback(
+        (commentId: number) => {
+            if (onDeleteComment) {
+                onDeleteComment(commentId);
+            }
+        },
+        [onDeleteComment],
+    );
+
     const editorToolbarItems = [
         {
             label: "Добавить шаблон",
@@ -295,7 +362,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         {
             label: "Оставить комментарий",
             icon: <CommentsIcon />,
-            action: _.noop,
+            action: onAddCommentClick,
         },
         ...(!focusedOnTaskHead
             ? [
@@ -327,6 +394,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             {isViewMode(task) && (
                 <ViewTask
                     task={task}
+                    pendingComments={pendingComments}
                     editable={editable}
                     service={service.current}
                     templates={templates}
@@ -337,9 +405,12 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                     onAddStage={onAddStageCallback}
                     onDeleteStage={onDeleteStageCallback}
                     onTemplatesChange={onTemplatesChangeCallback}
-                    onTaskChange={onTaskChange as (task: Partial<IExtendedTask>) => void}
+                    onTaskChange={onTaskChange}
                     onAddAsset={onAddAsset}
                     onDeleteAsset={onDeleteAsset}
+                    onPendingCommentDelete={onPendingCommentDeleteCallback}
+                    onPendingCommentAccept={onPendingCommentAcceptCallback}
+                    onCommentDelete={onCommentDeleteCallback}
                 />
             )}
         </React.Fragment>

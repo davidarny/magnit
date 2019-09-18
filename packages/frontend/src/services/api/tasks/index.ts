@@ -9,3 +9,5 @@ export * from "./GetStagesWithFullHistory";
 export * from "./GetTaskReport";
 export * from "./AddTaskDocument";
 export * from "./DeleteTaskDocument";
+export * from "./AddComment";
+export * from "./DeleteComment";

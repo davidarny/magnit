@@ -9,8 +9,8 @@ export class Comment extends PrimaryBaseEntity<Comment> {
         this.construct(this, dto);
     }
 
-    @Column({ type: "varchar", nullable: true })
-    id_user: string | null;
+    @Column("varchar")
+    id_user: string;
 
     @Column("text")
     text: string;

@@ -2,13 +2,22 @@
 
 import { jsx } from "@emotion/core";
 import { Checkbox, SelectableBlockWrapper, SelectField } from "@magnit/components";
-import { IDocument, IVirtualDocument, IWithAnswers } from "@magnit/entities";
+import { IComment, IDocument, IExtendedDocument, IVirtualDocument } from "@magnit/entities";
 import { IEditorService } from "@magnit/services";
-import { FormControl, FormControlLabel, Grid, MenuItem, Typography } from "@material-ui/core";
+import {
+    Divider,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    MenuItem,
+    Typography,
+} from "@material-ui/core";
 import { TemplateRenderer } from "components/renderers";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback } from "react";
+import { Comment } from "./Comment";
+import { PendingComment } from "./PendingComment";
 
 type TSelectChangeEvent = React.ChangeEvent<{
     name?: string;
@@ -21,12 +30,20 @@ interface ITaskDocumentProps {
     service: IEditorService;
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
-    templates: Array<IDocument & IWithAnswers>;
+    templates: Array<IDocument & IExtendedDocument>;
     editable: boolean;
+    pendingComments: IComment[];
+    comments: IComment[];
 
     onEditableChange?(documentId: number, editable: boolean): void;
 
     onTemplateChange?(uuid: string, event: TSelectChangeEvent): void;
+
+    onPendingCommentDelete?(commentId: number): void;
+
+    onPendingCommentAccept?(comment: IComment): void;
+
+    onCommentDelete?(commentId: number): void;
 }
 
 export const TaskDocument: React.FC<ITaskDocumentProps> = props => {
@@ -38,8 +55,14 @@ export const TaskDocument: React.FC<ITaskDocumentProps> = props => {
         documents,
         templateSnapshots,
         editable,
+        pendingComments,
+        comments,
+        onEditableChange,
+        onTemplateChange,
+        onPendingCommentDelete,
+        onPendingCommentAccept,
+        onCommentDelete,
     } = props;
-    const { onEditableChange, onTemplateChange } = props;
 
     const snapshot = templateSnapshots.get(document.id.toString());
     const focused = focusedPuzzleId === document.__uuid;
@@ -124,6 +147,32 @@ export const TaskDocument: React.FC<ITaskDocumentProps> = props => {
                 </Grid>
                 <Grid item xs={12}>
                     {focused && <TemplateRenderer answers={answers} template={snapshot} />}
+                </Grid>
+                {!!comments.length && (
+                    <React.Fragment>
+                        <Grid item xs={12} css={theme => ({ marginTop: theme.spacing(3) })}>
+                            <Divider variant="fullWidth" />
+                        </Grid>
+                        <Grid item xs={12} css={theme => ({ marginTop: theme.spacing(3) })}>
+                            {comments.map(comment => (
+                                <Comment
+                                    key={comment.id}
+                                    comment={comment}
+                                    onCommentDelete={onCommentDelete}
+                                />
+                            ))}
+                        </Grid>
+                    </React.Fragment>
+                )}
+                <Grid item xs={12} css={theme => ({ marginTop: theme.spacing(3) })}>
+                    {pendingComments.map(comment => (
+                        <PendingComment
+                            key={comment.id}
+                            comment={comment}
+                            onCommentDelete={onPendingCommentDelete}
+                            onCommentAccept={onPendingCommentAccept}
+                        />
+                    ))}
                 </Grid>
             </Grid>
         </SelectableBlockWrapper>

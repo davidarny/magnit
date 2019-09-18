@@ -1,7 +1,8 @@
-import { ArgumentMetadata, PipeTransform } from "@nestjs/common";
+import { ArgumentMetadata, Injectable, PipeTransform } from "@nestjs/common";
 import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
 import { TemplateService } from "../../template/services/template.service";
 
+@Injectable()
 export class TemplatesByIdsPipe implements PipeTransform<number[], Promise<number[]>> {
     constructor(private readonly templateService: TemplateService) {}
 

@@ -10,11 +10,12 @@ import {
 } from "@magnit/components";
 import {
     ETaskStatus,
+    IComment,
     IDocument,
+    IExtendedDocument,
     IExtendedTask,
     IStageStep,
     IVirtualDocument,
-    IWithAnswers,
 } from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
 import { IEditorService } from "@magnit/services";
@@ -39,7 +40,8 @@ interface IViewTaskProps {
     task: Partial<IExtendedTask>;
     service: IEditorService;
     documents: IVirtualDocument[];
-    templates: Array<IDocument & IWithAnswers>;
+    templates: Array<IDocument & IExtendedDocument>;
+    pendingComments: IComment[];
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
     editable?: boolean;
@@ -57,12 +59,19 @@ interface IViewTaskProps {
     onAddAsset?(file: File): void;
 
     onDeleteAsset?(id: number): void;
+
+    onPendingCommentDelete?(commentId: number): void;
+
+    onPendingCommentAccept?(comment: IComment): void;
+
+    onCommentDelete?(commentId: number): void;
 }
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const {
         service,
         task,
+        pendingComments,
         focusedPuzzleId,
         templateSnapshots,
         documents,
@@ -75,6 +84,9 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         onTaskChange,
         onAddAsset,
         onDeleteAsset,
+        onPendingCommentDelete,
+        onPendingCommentAccept,
+        onCommentDelete,
     } = props;
 
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
@@ -617,20 +629,39 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     )}
                 </Grid>
             </SelectableBlockWrapper>
-            {documents.map(document => (
-                <TaskDocument
-                    editable={editable}
-                    documents={documents}
-                    key={document.__uuid}
-                    document={document}
-                    templates={templates}
-                    service={service}
-                    templateSnapshots={templateSnapshots}
-                    focusedPuzzleId={focusedPuzzleId}
-                    onEditableChange={onEditableChangeCallback}
-                    onTemplateChange={onTemplatesChange}
-                />
-            ))}
+            {documents.map(document => {
+                const documentPendingComments = pendingComments.filter(
+                    comment => comment.idAssignment === document.id,
+                );
+
+                const taskTemplate = (task.templates || []).find(
+                    template => template.id === document.id,
+                );
+                const comments: IComment[] = [];
+                if (taskTemplate) {
+                    comments.push(...taskTemplate.comments);
+                }
+
+                return (
+                    <TaskDocument
+                        key={document.__uuid}
+                        pendingComments={documentPendingComments}
+                        comments={comments}
+                        editable={editable}
+                        documents={documents}
+                        document={document}
+                        templates={templates}
+                        service={service}
+                        templateSnapshots={templateSnapshots}
+                        focusedPuzzleId={focusedPuzzleId}
+                        onEditableChange={onEditableChangeCallback}
+                        onTemplateChange={onTemplatesChange}
+                        onPendingCommentDelete={onPendingCommentDelete}
+                        onPendingCommentAccept={onPendingCommentAccept}
+                        onCommentDelete={onCommentDelete}
+                    />
+                );
+            })}
         </React.Fragment>
     );
 };

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
+import * as _ from "lodash";
 import { Connection, EntitySubscriberInterface, UpdateEvent } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { AmqpService } from "../../amqp/services/amqp.service";
@@ -36,7 +37,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         // find non-finished stage
         // it means it's active
         // usually there should be only one non-finished stage
-        const prevStage = prevTask.stages.find(stage => !stage.finished);
+        const prevStage = prevTask.stages.find(stage => !stage.finished) || _.last(prevTask.stages);
         // handle task completion
         if (nextStatus === ETaskStatus.COMPLETED) {
             prevStage.finished = true;

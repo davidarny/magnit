@@ -4,11 +4,12 @@ import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
 import {
     ETaskStatus,
+    IComment,
     IDocument,
+    IExtendedDocument,
     IExtendedTask,
     IStage,
     ITemplate,
-    IWithAnswers,
 } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
@@ -25,9 +26,11 @@ import _ from "lodash";
 import * as React from "react";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
+    addComment,
     addStages,
     addTaskDocument,
     addTemplateAssignment,
+    deleteComment,
     deleteTaskDocument,
     getTaskExtended,
     getTemplate,
@@ -48,7 +51,7 @@ interface IEditableTemplate extends ITemplate {
     editable: boolean;
 }
 
-type TDocumentWithAnswers = IDocument & IWithAnswers;
+type TDocumentWithAnswers = IDocument & IExtendedDocument;
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
@@ -228,15 +231,15 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 updateTaskState();
                 context.setSnackbarState({
                     open: true,
-                    message: "Задание успешно обновлено!",
+                    message: "Задание успешно обновлено",
                 });
             })
             .catch((error: Error) => {
                 // rollback status
                 task.status = prevStatus;
-                let message = "Ошибка обновления задания!";
+                let message = "Не удалось обновить задание";
                 if (error instanceof NoStagesException) {
-                    message = "Ошибка! Заполните поля этапов!";
+                    message = "Заполнение этапов обязательно";
                 }
                 context.setSnackbarState({ open: true, message });
                 context.setSnackbarError(true);
@@ -252,11 +255,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 updateTaskState();
                 context.setSnackbarState({
                     open: true,
-                    message: "Задание успешно отозвано!",
+                    message: "Задание успешно отозвано",
                 });
             })
             .catch(() => {
-                context.setSnackbarState({ open: true, message: "Ошибка отзыва задания!" });
+                context.setSnackbarState({ open: true, message: "Не удалось отозвать задание" });
                 context.setSnackbarError(true);
             });
         onMenuClose();
@@ -271,11 +274,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 updateTaskState();
                 context.setSnackbarState({
                     open: true,
-                    message: "Задание успешно звершено!",
+                    message: "Задание успешно звершено",
                 });
             })
             .catch(() => {
-                context.setSnackbarState({ open: true, message: "Ошибка завершения задания!" });
+                context.setSnackbarState({ open: true, message: "Не удалось завершить задание" });
                 context.setSnackbarError(true);
             });
         onMenuClose();
@@ -290,11 +293,11 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         sendPushToken(context.courier, { title, body: message })
             .then(() => {
                 setMessageModalOpen(false);
-                context.setSnackbarState({ open: true, message: "Сообщение успешно отправлено!" });
+                context.setSnackbarState({ open: true, message: "Сообщение успешно отправлено" });
             })
             .catch(() => {
                 setMessageModalOpen(false);
-                context.setSnackbarState({ open: true, message: "Ошибка отправки сообщения!" });
+                context.setSnackbarState({ open: true, message: "Не удалось отправить сообщениу" });
                 context.setSnackbarError(true);
             });
     }
@@ -308,7 +311,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             addTaskDocument(context.courier, taskId, document)
                 .then(() => updateTaskState())
                 .catch(() => {
-                    context.setSnackbarState({ open: true, message: "Ошибка сохранения файла!" });
+                    context.setSnackbarState({ open: true, message: "Не удалось сохранить файл" });
                     context.setSnackbarError(true);
                 });
         },
@@ -320,7 +323,37 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             deleteTaskDocument(context.courier, taskId, documentId)
                 .then(() => updateTaskState())
                 .catch(() => {
-                    context.setSnackbarState({ open: true, message: "Ошибка удаления файла!" });
+                    context.setSnackbarState({ open: true, message: "Не удалось удалить файл" });
+                    context.setSnackbarError(true);
+                });
+        },
+        [context, taskId, updateTaskState],
+    );
+
+    const onAddComment = useCallback(
+        (comment: IComment) => {
+            addComment(context.courier, taskId, comment.idAssignment, comment.text)
+                .then(() => updateTaskState())
+                .catch(() => {
+                    context.setSnackbarState({
+                        open: true,
+                        message: "Не удалось добавить комментарий",
+                    });
+                    context.setSnackbarError(true);
+                });
+        },
+        [context, taskId, updateTaskState],
+    );
+
+    const onDeleteComment = useCallback(
+        (commentId: number) => {
+            deleteComment(context.courier, taskId, commentId)
+                .then(() => updateTaskState())
+                .catch(() => {
+                    context.setSnackbarState({
+                        open: true,
+                        message: "Не удалось удалить комментарий",
+                    });
                     context.setSnackbarError(true);
                 });
         },
@@ -401,6 +434,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     onTaskChange={onTaskChange}
                     onDeleteAsset={onDeleteTaskDocument}
                     onAddAsset={onAddTaskDocument}
+                    onAddComment={onAddComment}
+                    onDeleteComment={onDeleteComment}
                 />
             </Grid>
         </SectionLayout>

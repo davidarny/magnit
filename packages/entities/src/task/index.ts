@@ -59,8 +59,18 @@ export interface IAnswer {
     updatedAt: string;
 }
 
-export interface IWithAnswers {
+export interface IComment {
+    id: number;
+    text: string;
+    idUser: string;
+    idAssignment: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface IExtendedDocument {
     answers?: IAnswer[];
+    comments?: IComment[];
 }
 
 export interface ITaskDocument {
@@ -71,7 +81,7 @@ export interface ITaskDocument {
 
 export interface IExtendedTask extends IBaseTask {
     id: number;
-    templates: Array<IDocument & IWithAnswers>;
+    templates: Array<IDocument & IExtendedDocument>;
     stages: IStage[];
     documents: ITaskDocument[];
 }
