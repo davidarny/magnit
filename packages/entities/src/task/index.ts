@@ -20,8 +20,10 @@ export interface IBaseTask {
 
 export interface ITask extends IBaseTask {
     id: number;
-    templates: string[];
-    stages: string[];
+    templates: number[];
+    stages: number[];
+    // id to marketplace entity
+    marketplace: number | null;
 }
 
 export interface IDocument {
@@ -73,6 +75,13 @@ export interface IExtendedDocument {
     comments?: IComment[];
 }
 
+export interface IMarketPlace {
+    region: string;
+    city: string;
+    format: string;
+    address: string;
+}
+
 export interface ITaskDocument {
     id: number;
     originalName: string;
@@ -84,4 +93,5 @@ export interface IExtendedTask extends IBaseTask {
     templates: Array<IDocument & IExtendedDocument>;
     stages: IStage[];
     documents: ITaskDocument[];
+    marketplace: IMarketPlace;
 }

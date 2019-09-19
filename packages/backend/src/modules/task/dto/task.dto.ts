@@ -1,5 +1,6 @@
-import { ApiModelProperty } from "@nestjs/swagger";
+import { ApiModelProperty, ApiModelPropertyOptional } from "@nestjs/swagger";
 import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
+import { MarketplaceDto } from "../../marketplace/dto/marketplace.dto";
 import { TemplateAnswerDto } from "../../template/dto/template-answer.dto";
 import { TemplateDto } from "../../template/dto/template.dto";
 import { ETaskStatus } from "../entities/task.entity";
@@ -21,6 +22,9 @@ export class FullTaskDto extends TaskDto<FullTaskDto> {
     @ApiModelProperty({ type: [Number] }) readonly templates: number[];
     @ApiModelProperty({ type: [Number] }) readonly stages: number[];
     @ApiModelProperty({ type: [Number] }) readonly documents: number[];
+    @ApiModelPropertyOptional({ description: "Marketplace ID" }) readonly marketplace:
+        | number
+        | null;
 }
 
 class ExtendedTemplateDto extends TemplateDto<ExtendedTemplateDto> {
@@ -33,4 +37,5 @@ export class ExtendedTaskDto extends TaskDto<ExtendedTaskDto> {
     @ApiModelProperty({ type: [ExtendedTemplateDto] }) readonly templates: ExtendedTemplateDto[];
     @ApiModelProperty({ type: [TaskStageDto] }) readonly stages: TaskStageDto[];
     @ApiModelProperty({ type: [TaskDocumentDto] }) readonly documents: TaskDocumentDto[];
+    @ApiModelPropertyOptional({ type: MarketplaceDto }) readonly marketplace: MarketplaceDto | null;
 }

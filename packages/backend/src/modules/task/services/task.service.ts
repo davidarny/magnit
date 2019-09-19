@@ -31,6 +31,7 @@ export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStag
 @Injectable()
 export class TaskService {
     constructor(
+        private readonly templateService: TemplateService,
         @InjectRepository(Comment) private readonly commentRepository: Repository<Comment>,
         @InjectRepository(TaskStage) private readonly taskStageRepository: Repository<TaskStage>,
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
@@ -38,7 +39,6 @@ export class TaskService {
         private readonly templateAssignmentRepository: Repository<TemplateAssignment>,
         @InjectRepository(TaskDocument)
         private readonly taskDocumentRepository: Repository<TaskDocument>,
-        private readonly templateService: TemplateService,
     ) {}
 
     async findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]> {

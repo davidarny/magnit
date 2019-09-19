@@ -27,6 +27,7 @@ export const CreateTask: React.FC = () => {
         title: "",
         templates: [],
         stages: [],
+        marketplace: null,
         status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
@@ -75,7 +76,7 @@ export const CreateTask: React.FC = () => {
     }
 
     function onTaskSave(): void {
-        createTask(context.courier, _.omit(task, ["id", "templates"]))
+        createTask(context.courier, task)
             .then(async response => {
                 if (!response.taskId) {
                     return;

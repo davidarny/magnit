@@ -20,7 +20,7 @@ export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
         this.construct(this, dto);
     }
 
-    @Column()
+    @Column({ unique: true })
     @Generated("rowid")
     id: number;
 

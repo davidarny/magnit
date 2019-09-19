@@ -64,6 +64,12 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         templates: [],
         stages: [],
         documents: [],
+        marketplace: {
+            address: "",
+            city: "",
+            format: "",
+            region: "",
+        },
         status: ETaskStatus.DRAFT,
     });
     const [redirect, setRedirect] = useState({

@@ -1,5 +1,6 @@
-import { Column, DeepPartial, Entity, Index, OneToMany } from "typeorm";
+import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
+import { Marketplace } from "../../marketplace/entities/marketplace.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { TaskDocument } from "./task-document.entity";
 import { TaskStage } from "./task-stage.entity";
@@ -40,6 +41,14 @@ export class Task extends PrimaryBaseEntity<Task> {
 
     @Column({ type: "int", default: 3 })
     notify_before: number;
+
+    @Index()
+    @Column({ nullable: true })
+    id_marketplace: string | null;
+
+    @ManyToOne(() => Marketplace)
+    @JoinColumn({ name: "id_marketplace", referencedColumnName: "id" })
+    marketplace: Marketplace;
 
     @OneToMany(() => TemplateAssignment, assignment => assignment.task, { cascade: true })
     assignments: TemplateAssignment[];
