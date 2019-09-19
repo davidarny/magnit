@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "build": "lerna run build:lib --stream && cross-env SKIP_PREFLIGHT_CHECK=true react-scripts build",
+        "build:no-lib": "cross-env SKIP_PREFLIGHT_CHECK=true react-scripts build",
         "clean": "rimraf build",
         "eject": "react-scripts eject",
         "start": "cross-env SKIP_PREFLIGHT_CHECK=true react-scripts start",
