@@ -30,6 +30,6 @@ export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
     @JoinColumn({ name: "id_template", referencedColumnName: "id" })
     template: Template;
 
-    @OneToOne(() => Comment, comment => comment.assignment, { cascade: true })
+    @OneToOne(() => Comment, comment => comment.assignment)
     comments: Comment[];
 }

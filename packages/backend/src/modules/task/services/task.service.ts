@@ -465,8 +465,7 @@ export class TaskService {
             id_user: userId,
             text,
         });
-        assignment.comments = [...(assignment.comments || []), comment];
-        await this.templateAssignmentRepository.save(assignment);
+        await this.commentRepository.save(comment);
     }
 
     async removeAssignmentComment(commentId: number): Promise<void> {
