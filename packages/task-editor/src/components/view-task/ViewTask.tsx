@@ -29,7 +29,7 @@ import { ChangeAssigneeIllustration } from "./ChangeAssigneeIllustration";
 import { DraftView } from "./DraftView";
 import { InfoField } from "./InfoField";
 import { TaskDocument } from "./TaskDocument";
-import { TaskStepper } from "./TaskStepper";
+import { TaskStages } from "./TaskStages";
 
 type TSelectChangeEvent = React.ChangeEvent<{
     name?: string;
@@ -168,37 +168,41 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     }, [task.stages, onAddStage]);
 
     const onChangeStageTitleCallback = useCallback(
-        (id: number, value: string): void => {
+        (stageId: number, title: string): void => {
             if (!task.stages) {
                 return;
             }
-            if (task.stages.some(step => step.id === id)) {
-                const stageIndex = task.stages.findIndex(step => step.id === id);
+            if (task.stages.some(stage => stage.id === stageId)) {
+                const stageIndex = task.stages.findIndex(step => step.id === stageId);
                 const stage = task.stages[stageIndex];
-                stageTitleMap.set(stage.id, value);
-                setStageTitleMap(new Map(stageTitleMap));
+                stage.title = title;
+            }
+            if (onTaskChange) {
+                onTaskChange({ ...task });
             }
         },
-        [task.stages, stageTitleMap],
+        [task, onTaskChange],
     );
 
     const onChangeStageDeadlineCallback = useCallback(
-        (id: number, value: string): void => {
+        (stageId: number, deadline: string): void => {
             if (!task.stages) {
                 return;
             }
-            if (task.stages.some(step => step.id === id)) {
-                const stageIndex = task.stages.findIndex(step => step.id === id);
+            if (task.stages.some(step => step.id === stageId)) {
+                const stageIndex = task.stages.findIndex(step => step.id === stageId);
                 const stage = task.stages[stageIndex];
-                stageDeadlineMap.set(stage.id, value);
-                setStageDeadlineMap(new Map(stageDeadlineMap));
+                stage.deadline = deadline;
+            }
+            if (onTaskChange) {
+                onTaskChange({ ...task });
             }
         },
-        [task.stages, stageDeadlineMap],
+        [task, onTaskChange],
     );
 
     const onDeleteStageCallback = useCallback(
-        (id: number) => {
+        (stageId: number) => {
             if (!task.stages) {
                 return;
             }
@@ -207,7 +211,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 return;
             }
             if (onDeleteStage) {
-                onDeleteStage(id);
+                onDeleteStage(stageId);
             }
         },
         [onDeleteStage, task.stages],
@@ -221,18 +225,6 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         },
         [onEditableChange],
     );
-
-    const onBlurStageCallback = useCallback(() => {
-        if (!task.stages || !onTaskChange) {
-            return;
-        }
-        const stages = task.stages.map(stage => ({
-            ...stage,
-            title: stageTitleMap.get(stage.id) || stage.title || "",
-            deadline: stageDeadlineMap.get(stage.id) || stage.deadline || "",
-        }));
-        onTaskChange({ ...task, stages });
-    }, [task, onTaskChange, stageTitleMap, stageDeadlineMap]);
 
     function onMenuClick(event: React.MouseEvent<HTMLElement>) {
         setMenuAnchorElement(event.currentTarget);
@@ -371,7 +363,6 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     focusedPuzzleId={focusedPuzzleId}
                     task={task}
                     onTaskChange={onTaskChange}
-                    onBlurStage={onBlurStageCallback}
                     onChangeStageTitle={onChangeStageTitleCallback}
                     onChangeStageDeadline={onChangeStageDeadlineCallback}
                 />
@@ -463,13 +454,10 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                             >
                                 <Grid item xs={12}>
                                     {showEmptyStages && (
-                                        <TaskStepper
+                                        <TaskStages
                                             task={task}
-                                            stageDeadlineMap={stageDeadlineMap}
-                                            stageTitleMap={stageTitleMap}
                                             onChangeStageDeadline={onChangeStageDeadlineCallback}
                                             onChangeStageTitle={onChangeStageTitleCallback}
-                                            onBlurStage={onBlurStageCallback}
                                             onDeleteStage={onDeleteStageCallback}
                                         />
                                     )}

@@ -20,26 +20,29 @@ interface IDraftViewProps {
     onChangeStageTitle?(id: number, value: string): void;
 
     onChangeStageDeadline?(id: number, value: string): void;
-
-    onBlurStage?(): void;
 }
 
 export const DraftView: React.FC<IDraftViewProps> = props => {
     const { focusedPuzzleId, service, task } = props;
-    const { onChangeStageTitle, onBlurStage, onChangeStageDeadline, onTaskChange } = props;
+    const { onChangeStageTitle, onChangeStageDeadline, onTaskChange } = props;
     const { stages, title, notifyBefore } = task;
     const id = task.id ? task.id.toString() : "";
 
     const lastStage = _.last(stages);
 
     const [lastStageTitle, setLastStageTitle] = useState(lastStage ? lastStage.title : "");
-    const [lastStageDeadline, setLastStageDeadline] = useState(lastStage ? lastStage.deadline : "");
+    const [lastStageDeadline, setLastStageDeadline] = useState(
+        lastStage
+            ? !_.isNaN(Date.parse(lastStage.deadline))
+                ? getFriendlyDate(new Date(lastStage.deadline))
+                : ""
+            : "",
+    );
     const [taskTitle, setTaskTitle] = useState(title || "");
 
     const prevTitle = useRef(title);
     const prevStageTitle = useRef(lastStage ? lastStage.title : "");
     const prevStageDeadline = useRef(lastStage ? lastStage.deadline : "");
-
     useEffect(() => {
         if (title && prevTitle.current !== title) {
             prevTitle.current = title;
@@ -51,7 +54,11 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         }
         if (lastStage && prevStageDeadline.current !== lastStage.deadline) {
             prevStageDeadline.current = lastStage.deadline;
-            setLastStageDeadline(lastStage.deadline);
+            setLastStageDeadline(
+                !_.isNaN(Date.parse(lastStage.deadline))
+                    ? getFriendlyDate(new Date(lastStage.deadline))
+                    : "",
+            );
         }
     }, [lastStage, title]);
 
@@ -65,17 +72,7 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         if (onChangeStageDeadline) {
             onChangeStageDeadline(lastStage.id, lastStageDeadline);
         }
-        if (onBlurStage) {
-            onBlurStage();
-        }
-    }, [
-        lastStage,
-        lastStageDeadline,
-        lastStageTitle,
-        onBlurStage,
-        onChangeStageDeadline,
-        onChangeStageTitle,
-    ]);
+    }, [lastStage, lastStageDeadline, lastStageTitle, onChangeStageDeadline, onChangeStageTitle]);
 
     const onBlurTaskTitleCallback = useCallback(() => {
         if (onTaskChange) {
@@ -143,11 +140,7 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                         </Grid>
                         <Grid item>
                             <DateField
-                                value={
-                                    !_.isNaN(Date.parse(lastStageDeadline))
-                                        ? getFriendlyDate(new Date(lastStageDeadline))
-                                        : ""
-                                }
+                                value={lastStageDeadline}
                                 placeholder="Срок выполнения"
                                 onChange={onStageDeadlineChange}
                                 onBlur={onBlurStageCallback}

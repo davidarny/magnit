@@ -3,7 +3,6 @@ export * from "./fields";
 export * from "./tabs";
 export * from "./table";
 export * from "./block";
-export * from "./stepper";
 export * from "./route-matcher";
 export * from "./editor-toolbar";
 export * from "./button-like-text";
