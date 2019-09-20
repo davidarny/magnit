@@ -38,6 +38,6 @@ describe("TemplateController", () => {
 
     it("should delete template", async () => {
         const result = { success: 1 };
-        expect(await templateController.deleteById("0")).toStrictEqual(result);
+        expect(await templateController.deleteById(0)).toStrictEqual(result);
     });
 });
