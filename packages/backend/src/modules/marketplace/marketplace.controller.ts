@@ -1,5 +1,6 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Param } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { GetCitiesForRegionResponse } from "./responses/get-cities-for-region.response";
 import { GetRegionsResponse } from "./responses/get-regions.response";
 import { MarketplaceService } from "./services/marketplace.service";
 
@@ -14,5 +15,15 @@ export class MarketplaceController {
     async getAllRegions() {
         const regions = await this.marketplaceService.getAllRegions();
         return { success: 1, regions };
+    }
+
+    @Get("/regions/:region")
+    @ApiOkResponse({
+        type: GetCitiesForRegionResponse,
+        description: "List of cities of current region",
+    })
+    async getCitiesForRegion(@Param("region") region: string) {
+        const cities = await this.marketplaceService.getCitiesForRegion(region);
+        return { success: 1, cities };
     }
 }

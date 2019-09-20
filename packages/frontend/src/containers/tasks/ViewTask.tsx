@@ -32,6 +32,8 @@ import {
     addTemplateAssignment,
     deleteComment,
     deleteTaskDocument,
+    getAllRegions,
+    getCitiesForRegion,
     getTaskExtended,
     getTemplate,
     getTemplates,
@@ -76,6 +78,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         trigger: false,
         to: "",
     });
+    const [regions, setRegions] = useState<string[]>([]);
+    const [citiesForRegion, setCitiesForRegion] = useState<string[]>([]);
 
     const isValidTask = (value: object): value is IExtendedTask =>
         _.has(value, "id") &&
@@ -134,6 +138,28 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     }, [context, fetchFullTemplate, setTaskState, taskId]);
 
     useEffect(() => updateTaskState(), [updateTaskState]);
+
+    useEffect(() => {
+        // only draft mode contains marketplace selects
+        if (task.status !== ETaskStatus.DRAFT) {
+            return;
+        }
+        getAllRegions(context.courier)
+            .then(response => setRegions(response.regions))
+            .catch(console.error);
+    }, [context.courier, task.status]);
+
+    // fetching all available cities for region
+    // if task marketplace region has changed
+    const region = (task.marketplace || {}).region;
+    const prevTaskRegion = useRef(region);
+    useEffect(() => {
+        if (prevTaskRegion.current !== region) {
+            getCitiesForRegion(context.courier, region)
+                .then(response => setCitiesForRegion(response.cities))
+                .catch(console.error);
+        }
+    }, [context.courier, region]);
 
     function onTaskChange(task: Partial<IExtendedTask>): void {
         if (isValidTask(task)) {
@@ -435,6 +461,8 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             >
                 <TaskEditor<IExtendedTask>
                     task={task}
+                    regions={regions}
+                    cities={citiesForRegion}
                     templates={isTaskEditable(task) ? templates : task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}

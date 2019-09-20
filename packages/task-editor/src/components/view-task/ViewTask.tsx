@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import {
     Button,
     ButtonLikeText,
@@ -45,6 +45,8 @@ interface IViewTaskProps {
     focusedPuzzleId?: string;
     templateSnapshots: Map<string, object>;
     editable?: boolean;
+    regions?: string[];
+    cities?: string[];
 
     onAddStage?(step: IStageStep): void;
 
@@ -87,13 +89,12 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         onPendingCommentDelete,
         onPendingCommentAccept,
         onCommentDelete,
+        regions,
+        cities,
     } = props;
 
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
-
-    const [stageTitleMap, setStageTitleMap] = useState(new Map<number, string>());
-    const [stageDeadlineMap, setStageDeadlineMap] = useState(new Map<number, string>());
 
     const input = useRef<HTMLInputElement>(null);
 
@@ -305,11 +306,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 onClose={onDialogClose}
                 open={open}
                 classes={{ paper: "paper" }}
-                css={css`
-                    .paper {
-                        overflow: hidden;
-                    }
-                `}
+                css={{ ".paper": { overflow: "hidden" } }}
             >
                 <Grid
                     container
@@ -359,6 +356,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             </Dialog>
             {task.status === ETaskStatus.DRAFT && (
                 <DraftView
+                    cities={cities}
+                    regions={regions}
                     service={service}
                     focusedPuzzleId={focusedPuzzleId}
                     task={task}

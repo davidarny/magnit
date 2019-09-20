@@ -44,8 +44,8 @@ export class TaskModule {
     private readonly logger = new Logger(TaskModule.name);
 
     private static NOTIFICATION_CHECK_JOB = "notification_check";
-    // every day at 6:00
-    private static NOTIFICATION_CHECK_CRON = "0 6 * * *";
+    // every 15 minutes
+    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
 
     constructor(
         private readonly scheduleService: ScheduleService,
@@ -95,7 +95,6 @@ export class TaskModule {
                     .filter(Boolean),
             );
         }
-        this.logger.debug(tasks);
         return true;
     }
 }

@@ -29,6 +29,8 @@ interface ITaskEditorProps<T extends TAnyTask> {
     task: T;
     templates: T extends IExtendedTask ? TDocumentWithAnswers[] : IDocument[];
     variant: "create" | "view";
+    regions?: string[];
+    cities?: string[];
 
     onAddAsset?(file: File): void;
 
@@ -56,6 +58,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         onDeleteAsset,
         onAddComment,
         onDeleteComment,
+        regions,
+        cities,
     } = props;
 
     const [title, setTitle] = useState("");
@@ -399,6 +403,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             )}
             {isViewMode(task) && (
                 <ViewTask
+                    cities={cities}
+                    regions={regions}
                     task={task}
                     pendingComments={pendingComments}
                     editable={editable}
