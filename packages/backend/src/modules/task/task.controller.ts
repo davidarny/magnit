@@ -60,7 +60,6 @@ import { GetStagesWithFullHistoryResponse } from "./responses/get-stages-with-fu
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { GetTaskResponse } from "./responses/get-task.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
-import { UpdateTaskResponse } from "./responses/update-task.response";
 import { TaskService } from "./services/task.service";
 
 @ApiUseTags("tasks")
@@ -113,15 +112,14 @@ export class TaskController {
 
     @Put("/:id")
     @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
-    @ApiOkResponse({ type: UpdateTaskResponse, description: "ID of updated Template" })
+    @ApiOkResponse({ type: BaseResponse })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async update(
         @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
         @Body("task") taskDto: TaskDto,
     ) {
-        const task = await this.taskService.findById(id);
-        const updated = await this.taskService.update(id, { ...task, ...taskDto });
-        return { success: 1, task_id: updated.id };
+        await this.taskService.update(id, taskDto);
+        return { success: 1 };
     }
 
     @Get("/:id")

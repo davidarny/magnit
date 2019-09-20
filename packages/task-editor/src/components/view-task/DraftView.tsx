@@ -16,6 +16,8 @@ interface IDraftViewProps {
     focusedPuzzleId?: string;
     regions?: string[];
     cities?: string[];
+    formats?: string[];
+    addresses?: string[];
 
     onTaskChange?(task: Partial<IExtendedTask>): void;
 
@@ -36,6 +38,8 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         onTaskChange,
         regions,
         cities,
+        addresses,
+        formats,
     } = props;
 
     const { stages, title, notifyBefore } = task;
@@ -74,6 +78,44 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
             );
         }
     }, [lastStage, title]);
+
+    // resetting fields if any marketplace value has changed
+    const prevTask = useRef(_.cloneDeep(task));
+    const prevTaskRegion = useRef(task.marketplace ? task.marketplace.region : "");
+    const prevTaskCity = useRef(task.marketplace ? task.marketplace.city : "");
+    const prevTaskFormat = useRef(task.marketplace ? task.marketplace.format : "");
+    useEffect(() => {
+        if (!onTaskChange || _.isEqual(prevTask.current, task) || !task.marketplace) {
+            return;
+        }
+
+        const nextTask = { ...task };
+
+        const format = task.marketplace.format;
+        const city = task.marketplace.city;
+        const region = task.marketplace.region;
+
+        if (prevTaskFormat.current && prevTaskFormat.current !== format) {
+            nextTask.marketplace!.address = "";
+        }
+        if (prevTaskCity.current && prevTaskCity.current !== city) {
+            nextTask.marketplace!.address = "";
+            nextTask.marketplace!.format = "";
+        }
+        if (prevTaskRegion.current && prevTaskRegion.current !== region) {
+            nextTask.marketplace!.address = "";
+            nextTask.marketplace!.format = "";
+            nextTask.marketplace!.city = "";
+        }
+
+        prevTask.current = _.cloneDeep(nextTask);
+
+        prevTaskRegion.current = region;
+        prevTaskCity.current = city;
+        prevTaskFormat.current = format;
+
+        onTaskChange(nextTask);
+    }, [onTaskChange, task]);
 
     const onBlurStageCallback = useCallback(() => {
         if (!lastStage) {
@@ -147,6 +189,36 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         [onTaskChange, task],
     );
 
+    const onFormatChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        format: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
+
+    const onAddressChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        address: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
+
     return (
         <SelectableBlockWrapper
             css={theme => ({
@@ -211,7 +283,7 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                 </TaskFieldContainer>
                 <TaskFieldContainer label="Местоположение">
                     <Grid container direction="row" alignItems="flex-end" spacing={2}>
-                        <Grid item xs>
+                        <Grid item xs={3}>
                             <SelectField
                                 value={task.marketplace ? task.marketplace.region : ""}
                                 placeholder="Регион"
@@ -226,7 +298,7 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                             </SelectField>
                         </Grid>
                         {task.marketplace && task.marketplace.region && (
-                            <Grid item xs>
+                            <Grid item xs={3}>
                                 <SelectField
                                     value={task.marketplace ? task.marketplace.city : ""}
                                     placeholder="Филиал"
@@ -242,13 +314,35 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                             </Grid>
                         )}
                         {task.marketplace && task.marketplace.city && (
-                            <Grid item xs>
-                                <SelectField placeholder="Формат" fullWidth />
+                            <Grid item xs={3}>
+                                <SelectField
+                                    value={task.marketplace ? task.marketplace.format : ""}
+                                    placeholder="Формат"
+                                    fullWidth
+                                    onChange={onFormatChangeCallback}
+                                >
+                                    {(formats || []).map(format => (
+                                        <MenuItem key={format} value={format}>
+                                            {format}
+                                        </MenuItem>
+                                    ))}
+                                </SelectField>
                             </Grid>
                         )}
                         {task.marketplace && task.marketplace.format && (
-                            <Grid item xs>
-                                <SelectField placeholder="Адрес" fullWidth />
+                            <Grid item xs={3}>
+                                <SelectField
+                                    value={task.marketplace ? task.marketplace.address : ""}
+                                    placeholder="Адрес"
+                                    fullWidth
+                                    onChange={onAddressChangeCallback}
+                                >
+                                    {(addresses || []).map(address => (
+                                        <MenuItem key={address} value={address}>
+                                            {address}
+                                        </MenuItem>
+                                    ))}
+                                </SelectField>
                             </Grid>
                         )}
                     </Grid>

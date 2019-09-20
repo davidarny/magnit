@@ -7,6 +7,7 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AmqpService } from "../src/modules/amqp/services/amqp.service";
+import { Marketplace } from "../src/modules/marketplace/entities/marketplace.entity";
 import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { ScheduleService } from "../src/modules/schedule/services/schedule.service";
@@ -103,6 +104,8 @@ describe("TaskController (e2e)", () => {
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(Comment))
             .useValue(getMockRepository())
+            .overrideProvider(getRepositoryToken(Marketplace))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();
@@ -167,12 +170,11 @@ describe("TaskController (e2e)", () => {
     it("should update task", async () => {
         const updated = { ...task, name: "updated task" };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "update").mockResolvedValue(updated);
         return request(app.getHttpServer())
             .put("/v1/tasks/0")
             .send({ task: updated })
             .expect(200)
-            .expect({ success: 1, task_id: 0 });
+            .expect({ success: 1 });
     });
 
     it("should ensure throws if task not exists", async () => {

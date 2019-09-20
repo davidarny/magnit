@@ -12,8 +12,17 @@ import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { addTemplateAssignment, createTask, getTemplate, getTemplates } from "services/api";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+    addTemplateAssignment,
+    createTask,
+    getAddressesForFormat,
+    getAllRegions,
+    getCitiesForRegion,
+    getFormatsForCity,
+    getTemplate,
+    getTemplates,
+} from "services/api";
 
 interface IEditableTemplate extends ITemplate {
     editable: boolean;
@@ -27,7 +36,12 @@ export const CreateTask: React.FC = () => {
         title: "",
         templates: [],
         stages: [],
-        marketplace: null,
+        marketplace: {
+            address: "",
+            city: "",
+            format: "",
+            region: "",
+        },
         status: ETaskStatus.DRAFT,
     });
     const [error, setError] = useState(false); // success/error snackbar state
@@ -35,6 +49,10 @@ export const CreateTask: React.FC = () => {
         open: false,
         message: "",
     }); // open/close snackbar
+    const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
+    const [regionCities, setRegionCities] = useState<string[]>([]);
+    const [cityFormats, setCityFormats] = useState<string[]>([]);
+    const [formatAddresses, setFormatAddresses] = useState<string[]>([]);
 
     useEffect(() => {
         getTemplates(context.courier)
@@ -56,6 +74,51 @@ export const CreateTask: React.FC = () => {
             })
             .catch(console.error);
     }, [context.courier]);
+
+    useEffect(() => {
+        // only draft mode contains marketplace selects
+        if (task.status !== ETaskStatus.DRAFT) {
+            return;
+        }
+        getAllRegions(context.courier)
+            .then(response => setMarketplaceRegions(response.regions))
+            .catch(console.error);
+    }, [context.courier, task.status]);
+
+    // get all regions initially
+    const region = (task.marketplace || {}).region;
+    const prevTaskRegion = useRef(region);
+    useEffect(() => {
+        if (region && prevTaskRegion.current !== region) {
+            getCitiesForRegion(context.courier, region)
+                .then(response => setRegionCities(response.cities))
+                .catch(console.error);
+        }
+    }, [context.courier, region]);
+
+    // fetching all available formats for city
+    // if task marketplace city has changed
+    const city = (task.marketplace || {}).city;
+    const prevTaskCity = useRef(city);
+    useEffect(() => {
+        if (city && region && prevTaskCity.current !== city) {
+            getFormatsForCity(context.courier, region, city)
+                .then(response => setCityFormats(response.formats))
+                .catch(console.error);
+        }
+    }, [context.courier, region, city]);
+
+    // fetching all available addresses for format
+    // if task marketplace format has changed
+    const format = (task.marketplace || {}).format;
+    const prevTaskFormat = useRef(format);
+    useEffect(() => {
+        if (city && region && format && prevTaskFormat.current !== format) {
+            getAddressesForFormat(context.courier, region, city, format)
+                .then(response => setFormatAddresses(response.addresses))
+                .catch(console.error);
+        }
+    }, [context.courier, format, region, city]);
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
@@ -122,6 +185,10 @@ export const CreateTask: React.FC = () => {
                     variant="create"
                     task={task}
                     templates={templates}
+                    regions={marketplaceRegions}
+                    cities={regionCities}
+                    formats={cityFormats}
+                    addresses={formatAddresses}
                     onTaskChange={onTaskChange}
                 />
             </Grid>

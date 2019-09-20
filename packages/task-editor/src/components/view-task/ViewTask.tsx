@@ -47,6 +47,8 @@ interface IViewTaskProps {
     editable?: boolean;
     regions?: string[];
     cities?: string[];
+    formats?: string[];
+    addresses?: string[];
 
     onAddStage?(step: IStageStep): void;
 
@@ -91,6 +93,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         onCommentDelete,
         regions,
         cities,
+        addresses,
+        formats,
     } = props;
 
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
@@ -358,6 +362,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                 <DraftView
                     cities={cities}
                     regions={regions}
+                    formats={formats}
+                    addresses={addresses}
                     service={service}
                     focusedPuzzleId={focusedPuzzleId}
                     task={task}
@@ -435,11 +441,21 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                                 direction="row"
                                 css={theme => ({ marginTop: theme.spacing(3) })}
                             >
-                                <InfoField
-                                    title="Местоположение"
-                                    value="Челябинская область, г. Челябинск, ул. Железная, д. 5"
-                                />
-                                <InfoField title="Формат объекта" value="МК" />
+                                {task.marketplace &&
+                                    task.marketplace.region &&
+                                    task.marketplace.city &&
+                                    task.marketplace.address && (
+                                        <InfoField
+                                            title="Местоположение"
+                                            value={`${task.marketplace.region}, г. ${task.marketplace.city}, ул. ${task.marketplace.address}`}
+                                        />
+                                    )}
+                                {task.marketplace && task.marketplace.format && (
+                                    <InfoField
+                                        title="Формат объекта"
+                                        value={task.marketplace.format}
+                                    />
+                                )}
                             </Grid>
                         </Grid>
                         <Grid item xs={5}>

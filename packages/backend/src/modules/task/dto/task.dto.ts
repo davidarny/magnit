@@ -10,9 +10,10 @@ import { TaskStageDto } from "./task-stage.dto";
 
 export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
     @ApiModelProperty() readonly title: string;
-    @ApiModelProperty({ nullable: true }) readonly description: string;
-    @ApiModelProperty({ nullable: true }) readonly id_owner: string;
-    @ApiModelProperty({ nullable: true }) readonly id_assignee: string;
+    @ApiModelPropertyOptional() readonly description: string;
+    @ApiModelPropertyOptional() readonly id_owner: string;
+    @ApiModelPropertyOptional() readonly id_assignee: string;
+    @ApiModelPropertyOptional() readonly id_marketplace: number;
     @ApiModelProperty({ default: 3 }) readonly notify_before: number;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed", "expired"] })
     readonly status: ETaskStatus;

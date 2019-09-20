@@ -5,5 +5,5 @@ export interface IGetAllRegionsResponse extends IResponse {
 }
 
 export function getAllRegions(courier: ICourier) {
-    return courier.get<IGetAllRegionsResponse>("marketplace/regions");
+    return courier.get<IGetAllRegionsResponse>("marketplaces/regions");
 }

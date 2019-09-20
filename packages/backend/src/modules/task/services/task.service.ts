@@ -12,6 +12,7 @@ import { CannotSavePartialAnswersException } from "../../../shared/exceptions/ca
 import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
 import { LocationNotFoundInBodyException } from "../../../shared/exceptions/location-not-found-in-body.exception";
 import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
+import { MarketplaceService } from "../../marketplace/services/marketplace.service";
 import { TemplateAnswerLocationDto } from "../../template/dto/template-answer-location.dto";
 import { TemplateAnswerLocation } from "../../template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
@@ -32,6 +33,7 @@ export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStag
 export class TaskService {
     constructor(
         private readonly templateService: TemplateService,
+        private readonly marketplaceService: MarketplaceService,
         @InjectRepository(Comment) private readonly commentRepository: Repository<Comment>,
         @InjectRepository(TaskStage) private readonly taskStageRepository: Repository<TaskStage>,
         @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
@@ -107,10 +109,12 @@ export class TaskService {
         return this.taskRepository.query(sql, params);
     }
 
+    @Transactional()
     async insert(task: Task) {
         // in case if insert() is called with existing task
         // semantics of this methods is about creating new one
         delete task.id;
+        await this.appendMarketplaceIfExists(task);
         return this.taskRepository.save(task);
     }
 
@@ -123,6 +127,7 @@ export class TaskService {
         const tasks = await this.taskRepository.query(
             `
                 SELECT t.*,
+                       to_json(m.*) AS marketplace,
                        to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages,
                        to_json(array_remove(array_agg(DISTINCT td), NULL)) AS documents
                 FROM task t
@@ -137,8 +142,9 @@ export class TaskService {
                         FROM task_document td
                     ) td ON td.id_task = t.id AND td.id_task = $1
                 LEFT JOIN task_stage ts ON ts.id_task = t.id AND ts.id_task = $1
+                LEFT JOIN marketplace m ON m.id = t.id_marketplace
                 WHERE t.id = $1
-                GROUP BY t.id;
+                GROUP BY t.id, m.*;
         `,
             [id],
         );
@@ -165,8 +171,25 @@ export class TaskService {
         await this.taskRepository.delete(id);
     }
 
-    async update(id: number, task: DeepPartial<Task>): Promise<Task> {
-        return this.taskRepository.save({ ...task, id });
+    @Transactional()
+    async update(id: number, task: DeepPartial<Task>): Promise<void> {
+        await this.appendMarketplaceIfExists(task);
+        await this.taskRepository.save({ id, ...task });
+    }
+
+    private async appendMarketplaceIfExists(task: DeepPartial<Task>) {
+        if (task.marketplace) {
+            const { city, region, address, format } = task.marketplace;
+            const marketplace = await this.marketplaceService.findByPrimaries(
+                region,
+                city,
+                format,
+                address,
+            );
+            if (marketplace) {
+                task.marketplace = marketplace;
+            }
+        }
     }
 
     @Transactional()

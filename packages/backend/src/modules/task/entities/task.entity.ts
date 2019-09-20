@@ -44,7 +44,7 @@ export class Task extends PrimaryBaseEntity<Task> {
 
     @Index()
     @Column({ nullable: true })
-    id_marketplace: string | null;
+    id_marketplace: number | null;
 
     @ManyToOne(() => Marketplace)
     @JoinColumn({ name: "id_marketplace", referencedColumnName: "id" })

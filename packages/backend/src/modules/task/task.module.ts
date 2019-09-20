@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getFriendlyDate } from "../../utils/date";
 import { AmqpModule } from "../amqp/amqp.module";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { MarketplaceModule } from "../marketplace/marketplace.module";
 import { IPushMessage } from "../push-token/interfaces/push-message.interface";
 import { PushTokenModule } from "../push-token/push-token.module";
 import { ScheduleModule } from "../schedule/schedule.module";
@@ -37,6 +38,7 @@ import { TaskController } from "./task.controller";
         AmqpModule,
         TemplateModule,
         ScheduleModule,
+        MarketplaceModule,
     ],
     exports: [TaskService],
 })

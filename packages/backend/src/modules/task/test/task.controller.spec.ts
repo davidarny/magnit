@@ -123,9 +123,8 @@ describe("TaskController", () => {
     });
 
     it("should update task", async () => {
-        const expected = { success: 1, task_id: 0 };
+        const expected = { success: 1 };
         const updated = { ...task, name: "updated task" };
-        jest.spyOn(taskService, "update").mockResolvedValue(updated);
         expect(await taskController.update(0, updated)).toStrictEqual(expected);
     });
 
