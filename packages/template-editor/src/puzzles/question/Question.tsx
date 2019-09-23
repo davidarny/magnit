@@ -44,7 +44,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index: index1, title, template, id, focused } = props;
+    const { index, title, template, id, focused } = props;
     const { onTemplateChange } = props;
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
     const [questionTitle, setQuestionTitle] = useState(title);
@@ -54,10 +54,12 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
 
     const onTemplateChangeCallback = useCallback(() => {
         traverse(template, (puzzle: IPuzzle) => {
-            if (!_.isObject(puzzle) || !("puzzles" in puzzle)) {
-                return;
-            }
-            if (!("id" in puzzle) || puzzle.id !== id) {
+            if (
+                !_.isObject(puzzle) ||
+                !("puzzles" in puzzle) ||
+                !("id" in puzzle) ||
+                puzzle.id !== id
+            ) {
                 return;
             }
             // set initial answerType based on
@@ -73,7 +75,10 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
             }
             // set changed puzzle type of question children
             // and strip it's length to 1 only after initial render
+            // clear validation & conditions
             if (answersType !== answerTypeSnapshot.current) {
+                puzzle.validations = [];
+                puzzle.conditions = [];
                 puzzle.puzzles.length = 1;
             }
             puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
@@ -83,9 +88,6 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                     title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
                 };
             });
-            // reset conditions and validations
-            puzzle.validations = [];
-            puzzle.conditions = [];
             // check if there are nested children of answer
             // if there aren't any, we proceed with adding stub ones
             const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
@@ -128,12 +130,13 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
         });
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
+        const clonedTemplate = _.cloneDeep(template);
         if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = _.cloneDeep(template);
+            templateSnapshot.current = clonedTemplate;
             return;
         }
-        templateSnapshot.current = _.cloneDeep(template);
-        onTemplateChange(templateSnapshot.current);
+        templateSnapshot.current = clonedTemplate;
+        onTemplateChange(clonedTemplate);
     }, [answersType, questionTitle, template, id, onTemplateChange]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,7 +167,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                         variant="body1"
                         css={theme => ({ paddingRight: theme.spacing() })}
                     >
-                        {index1 + 1}.
+                        {index + 1}.
                     </Typography>
                 </Grid>
                 <Grid item>
@@ -201,7 +204,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                                 marginBottom: theme.spacing(0.25),
                             })}
                         >
-                            {index1 + 1}.
+                            {index + 1}.
                         </Typography>
                     </Grid>
                     <Grid

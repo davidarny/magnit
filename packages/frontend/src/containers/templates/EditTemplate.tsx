@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ITemplate } from "@magnit/entities";
+import { ETemplateType, ITemplate } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -21,7 +21,13 @@ interface IEditTemplateProps {
 
 export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     const context = useContext(AppContext);
-    const [template, setTemplate] = useState<object>({});
+    const [template, setTemplate] = useState<ITemplate>({
+        id: 0,
+        sections: [],
+        title: "",
+        description: "",
+        type: ETemplateType.LIGHT,
+    });
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -34,7 +40,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             .catch(console.error);
     }, [context.courier, templateId]);
 
-    function onTemplateChange(template: object) {
+    function onTemplateChange(template: ITemplate) {
         setTemplate(_.cloneDeep(template));
     }
 

@@ -2,6 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
+import { ETemplateType, ITemplate } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -17,14 +18,20 @@ import { createTemplate } from "services/api/templates";
 
 export const CreateTemplate: React.FC = () => {
     const context = useContext(AppContext);
-    const [template, setTemplate] = useState<object>({});
+    const [template, setTemplate] = useState<ITemplate>({
+        id: 0,
+        sections: [],
+        title: "",
+        description: "",
+        type: ETemplateType.LIGHT,
+    });
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
     }); // open/close snackbar
 
-    function onTemplateChange(template: object) {
+    function onTemplateChange(template: ITemplate) {
         setTemplate(_.cloneDeep(template));
     }
 
@@ -83,6 +90,7 @@ export const CreateTemplate: React.FC = () => {
                 })}
             >
                 <TemplateEditor
+                    template={template}
                     css={theme => ({ background: theme.colors.main })}
                     onChange={onTemplateChange}
                     onAddAsset={onAddAsset}

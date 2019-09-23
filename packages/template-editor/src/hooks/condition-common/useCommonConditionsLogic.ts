@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { traverse } from "services/json";
 
 export interface IUseConditionsService<T> {
+    setConditionsObjects(conditions: T[]): void;
+
     getConditionObjects(): T[];
 
     getRightPuzzle(condition: T): string;
@@ -19,7 +21,6 @@ export interface IUseConditionsService<T> {
 
 export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     template: ITemplate,
-    disabled: boolean,
     puzzleId: string,
     service: IUseConditionsService<T>,
     onTemplateChange: (template: ITemplate) => void,
@@ -27,13 +28,9 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
-    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
     const isParentPuzzleGroup = useRef(false);
 
     useEffect(() => {
-        if (disabled) {
-            return;
-        }
         traverse(template, (value: IPuzzle, parent: IPuzzle) => {
             if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
                 return;
@@ -41,24 +38,23 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             const isGroupParent = parent.puzzleType === EPuzzleType.GROUP;
             isParentPuzzleGroup.current = value.id === puzzleId && isGroupParent;
         });
-    }, [template, disabled, puzzleId]);
+    }, [template, puzzleId]);
 
+    const prevTemplate = useRef<ITemplate>(template);
     const prevQuestions = useRef(_.cloneDeep(questions));
     const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
-        if (disabled) {
-            return;
-        }
         // track if template is changed
         // outside of this component
-        if (!_.isEqual(template, templateSnapshot.current)) {
+        if (!_.isEqual(template, prevTemplate.current)) {
+            const filter: number[] = [];
             service.getConditionObjects().forEach((condition, index, array) => {
                 let hasDependentQuestionChanged = false;
                 const dependentQuestion = questions.find(
                     question => question.id === service.getRightPuzzle(condition),
                 );
                 if (dependentQuestion) {
-                    traverse(template, (value: IPuzzle) => {
+                    traverse(prevTemplate.current, (value: IPuzzle) => {
                         if (!_.has(value, "puzzles")) {
                             return;
                         }
@@ -78,9 +74,16 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                     if (hasDependentQuestionChanged) {
                         service.resetConditionObject(condition);
                         array[index] = { ...condition };
+                        if (index > 0) {
+                            filter.push(index);
+                        }
                     }
                 }
             });
+            const conditions = service
+                .getConditionObjects()
+                .filter((_value, index) => !filter.includes(index));
+            service.setConditionsObjects(conditions);
         }
         // fill questions and answers initially
         // by traversing whole template tree
@@ -146,13 +149,13 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
         const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = clonedTemplate;
+        if (_.isEqual(template, prevTemplate.current)) {
+            prevTemplate.current = clonedTemplate;
             return;
         }
-        templateSnapshot.current = clonedTemplate;
-        onTemplateChange(templateSnapshot.current);
-    }, [template, disabled, questions, answers, onTemplateChange, puzzleId, service]);
+        prevTemplate.current = clonedTemplate;
+        onTemplateChange(clonedTemplate);
+    }, [template, questions, answers, onTemplateChange, puzzleId, service]);
 
     return [questions, answers];
 }

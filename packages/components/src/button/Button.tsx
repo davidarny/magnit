@@ -90,3 +90,5 @@ export const Button: React.FC<TButtonProps> = props => {
         </MaterialButton>
     );
 };
+
+Button.displayName = "Button";

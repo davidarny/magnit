@@ -1,7 +1,8 @@
+import { ITemplate } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 
 export interface IGetTemplate extends IResponse {
-    template: object;
+    template: ITemplate;
 }
 
 export async function getTemplate(courier: ICourier, id: number) {

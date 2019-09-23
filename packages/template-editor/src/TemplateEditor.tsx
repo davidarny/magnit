@@ -2,14 +2,14 @@
 
 import { jsx } from "@emotion/core";
 import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
-import { EPuzzleType, ETemplateType, IPuzzle, ISection, ITemplate } from "@magnit/entities";
+import { EPuzzleType, IPuzzle, ISection, ITemplate } from "@magnit/entities";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
 import { EEditorType, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { SectionHead } from "./components/section-head";
 import { SectionWrapper } from "./components/section-wrapper";
@@ -17,7 +17,7 @@ import { EditorContext, ICache } from "./context";
 import { traverse } from "./services/json";
 
 interface ITemplateEditorProps {
-    template?: ITemplate;
+    template: ITemplate;
 
     onChange?(template: ITemplate): void;
 
@@ -27,22 +27,13 @@ interface ITemplateEditorProps {
 }
 
 export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
-    const { template: initialState, onChange, onDeleteAsset, onAddAsset } = props;
+    const { template, onChange: onTemplateChange, onDeleteAsset, onAddAsset } = props;
 
     const context = useContext(EditorContext);
     const cache = useRef<ICache>({
         sections: new Map<string, ISection>(),
         puzzles: new Map<string, IPuzzle>(),
     }).current;
-
-    const defaultState = {
-        id: 0,
-        sections: [],
-        title: "",
-        description: "",
-        type: ETemplateType.LIGHT,
-    };
-    const [template, setTemplate] = useState<ITemplate>(initialState || defaultState);
 
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
@@ -59,22 +50,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         service.current.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
 
-    // handle initial focus
-    useEffect(() => {
-        const idToFocusOn = initialState ? initialState.id : defaultState.id;
-        if (!focusedPuzzleChain.length) {
-            service.current.onPuzzleFocus(idToFocusOn.toString());
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialState, focusedPuzzleChain]);
-
     // handle passed onChange callback
     // update cache
     useEffect(() => {
-        if (onChange) {
-            onChange(template);
-        }
-
         const isSection = (object: unknown): object is ISection =>
             !_.has(object, "puzzleType") && _.has(object, "puzzles");
         const isPuzzle = (object: unknown): object is IPuzzle =>
@@ -93,6 +71,24 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template]);
+
+    const initialFocusThreshold = useRef(0);
+    const initialFocusSet = useRef(false);
+    useEffect(() => {
+        // view updates it's focus util task is not loaded
+        // so if task is never loaded, we stop at some point or it becomes painful
+        // TODO: pass some bool prop so to know when set focus
+        if (initialFocusThreshold.current > 100) {
+            return;
+        }
+        if (!initialFocusSet.current) {
+            initialFocusThreshold.current++;
+            service.current.onPuzzleFocus(template.id.toString(), true);
+        }
+        if (template.id !== 0) {
+            initialFocusSet.current = true;
+        }
+    }, [template, focusedPuzzleChain]);
 
     function onToolbarAddQuestion(): void {
         const id = uuid();
@@ -166,7 +162,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             }
         }
         service.current.onPuzzleFocus(id);
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
     function onToolbarAddGroup(): void {
@@ -212,7 +210,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             });
         }
         service.current.onPuzzleFocus(id);
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
     function onToolbarAddSection(): void {
@@ -227,7 +227,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         });
         cache.sections.set(id, _.last(template.sections)!);
         service.current.onPuzzleFocus(id);
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
     function onAddAnswerPuzzle(id: string, addition: Partial<IPuzzle> = {}): void {
@@ -280,7 +282,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 return true;
             }
         });
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
     function onDeleteAnswerPuzzle(id: string): void {
@@ -305,7 +309,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             });
             return true;
         });
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
     function onDeletePuzzle(): void {
@@ -371,12 +377,19 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 }
             }
         });
-        setTemplate({ ...template });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
     }
 
-    function onTemplateChange(template: ITemplate) {
-        setTemplate({ ...template });
-    }
+    const onTemplateChangeCallback = useCallback(
+        (template: ITemplate) => {
+            if (onTemplateChange) {
+                onTemplateChange({ ...template });
+            }
+        },
+        [onTemplateChange],
+    );
 
     const focusedPuzzleId = _.first(focusedPuzzleChain);
     const focusedOnTemplateHead = focusedPuzzleId === template.id.toString();
@@ -385,7 +398,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     context.cache = cache;
     context.onDeleteAsset = onDeleteAsset || context.onDeleteAsset;
     context.onUploadAsset = onAddAsset || context.onUploadAsset;
-    context.onTemplateChange = onTemplateChange;
+    context.onTemplateChange = onTemplateChangeCallback;
     context.onAddAnswerPuzzle = onAddAnswerPuzzle;
     context.onDeleteAnswerPuzzle = onDeleteAnswerPuzzle;
 
@@ -444,7 +457,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 <SectionHead
                     template={template}
                     focused={focusedPuzzleId === template.id.toString()}
-                    onTemplateChange={onTemplateChange}
+                    onTemplateChange={onTemplateChangeCallback}
                 />
             </SelectableBlockWrapper>
             {(template.sections || []).map((section, index) => (
@@ -454,7 +467,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     index={index}
                     template={template}
                     focusedPuzzleId={focusedPuzzleId}
-                    onTemplateChange={onTemplateChange}
+                    onTemplateChange={onTemplateChangeCallback}
                     onPuzzleFocus={service.current.onPuzzleFocus.bind(service.current)}
                 />
             ))}

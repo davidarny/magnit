@@ -52,6 +52,10 @@ export function useValidations(
             );
         },
 
+        setConditionsObjects(conditions: IValidation[]) {
+            setValidations(conditions);
+        },
+
         getConditionObjects(): IValidation[] {
             return validations;
         },
@@ -65,6 +69,8 @@ export function useValidations(
             validation.value = undefined;
             validation.operatorType = "";
             validation.validationType = "";
+            validation.errorMessage = "";
+            setErrorMessage("");
         },
 
         setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void {
@@ -89,7 +95,6 @@ export function useValidations(
 
     const [questions] = useCommonConditionsLogic<IValidation>(
         template,
-        disabled,
         puzzleId,
         useConditionService,
         onTemplateChange,

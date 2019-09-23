@@ -39,6 +39,10 @@ export function useConditions(
             );
         },
 
+        setConditionsObjects(conditions: ICondition[]) {
+            setConditions(conditions);
+        },
+
         getConditionObjects(): ICondition[] {
             return conditions;
         },
@@ -72,7 +76,6 @@ export function useConditions(
 
     const [questions, answers] = useCommonConditionsLogic<ICondition>(
         template,
-        disabled,
         puzzleId,
         useConditionService,
         onTemplateChange,
