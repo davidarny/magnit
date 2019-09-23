@@ -1,15 +1,20 @@
 import { Injectable, Inject } from "@nestjs/common";
 
 import { User } from "../entities/user.entity";
-import { IAuthService } from "../interface/auth.service.interface";
+import { CreateUserDTO } from "../dto/create-user.dto";
 import { UserService } from "./user.service";
-import { IUserService } from "../interface/user.service.interface";
 
 @Injectable()
-export class AuthService implements IAuthService {
-    constructor(@Inject(UserService) private readonly userService: IUserService) {}
+export class AuthService {
+    constructor(@Inject(UserService) private readonly userService: UserService) {}
 
-    async validateUser(username: string, pass: string): Promise<User | undefined> {
+    async validateUser(username: string, pass: string) {
         return this.userService.findOne(username);
+    }
+
+    async createUser(user: User) {
+        console.log("asdasd");
+        const res = await this.userService.create(user);
+        return res;
     }
 }
