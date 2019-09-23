@@ -5,10 +5,15 @@ import { IUserService } from "../interface/user.service.interface";
 import { User } from "../entities/user.entity";
 
 @Injectable()
-export class UserService implements IUserService {
-    constructor(@InjectRepository(User) private readonly repository: Repository<User>) {}
+export class UserService {
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) {
+        console.log("asdsa ");
+    }
 
     async findOne(username: String): Promise<User | undefined> {
-        return await this.repository.findOne({ username: `$${username}` });
+        return await this.userRepository.findOne({ username: `$${username}` });
     }
 }

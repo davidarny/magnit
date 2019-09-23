@@ -30,6 +30,7 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         MailModule,
         PushTokenModule,
         MarketplaceModule,
+        AuthModule,
         ...(process.env.ALLOW_AUTH ? [] : []),
     ],
 })
