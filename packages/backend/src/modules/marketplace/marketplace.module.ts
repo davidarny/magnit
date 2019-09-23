@@ -8,5 +8,6 @@ import { MarketplaceService } from "./services/marketplace.service";
     imports: [TypeOrmModule.forFeature([Marketplace])],
     controllers: [MarketplaceController],
     providers: [MarketplaceService],
+    exports: [MarketplaceService],
 })
 export class MarketplaceModule {}

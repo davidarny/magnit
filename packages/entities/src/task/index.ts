@@ -22,8 +22,7 @@ export interface ITask extends IBaseTask {
     id: number;
     templates: number[];
     stages: number[];
-    // id to marketplace entity
-    marketplace: number | null;
+    marketplace: IMarketPlace;
 }
 
 export interface IDocument {

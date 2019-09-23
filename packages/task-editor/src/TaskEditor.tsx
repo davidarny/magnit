@@ -29,6 +29,10 @@ interface ITaskEditorProps<T extends TAnyTask> {
     task: T;
     templates: T extends IExtendedTask ? TDocumentWithAnswers[] : IDocument[];
     variant: "create" | "view";
+    regions?: string[];
+    cities?: string[];
+    formats?: string[];
+    addresses?: string[];
 
     onAddAsset?(file: File): void;
 
@@ -56,6 +60,10 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         onDeleteAsset,
         onAddComment,
         onDeleteComment,
+        regions,
+        cities,
+        formats,
+        addresses,
     } = props;
 
     const [title, setTitle] = useState("");
@@ -386,6 +394,10 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             {editable && <EditorToolbar top={toolbarTopPosition} items={[...editorToolbarItems]} />}
             {isCreateMode(task) && (
                 <CreateTask
+                    cities={cities}
+                    regions={regions}
+                    formats={formats}
+                    addresses={addresses}
                     task={{ ...task, title }}
                     service={service.current}
                     templates={templates}
@@ -395,10 +407,15 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                     onTemplatesChange={onTemplatesChangeCallback}
                     onTaskTitleChange={onTaskTitleChange}
                     onTaskTitleBlur={onTaskTitleBlurCallback}
+                    onTaskChange={onTaskChange}
                 />
             )}
             {isViewMode(task) && (
                 <ViewTask
+                    cities={cities}
+                    regions={regions}
+                    formats={formats}
+                    addresses={addresses}
                     task={task}
                     pendingComments={pendingComments}
                     editable={editable}

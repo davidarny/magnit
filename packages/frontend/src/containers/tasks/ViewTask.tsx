@@ -32,6 +32,10 @@ import {
     addTemplateAssignment,
     deleteComment,
     deleteTaskDocument,
+    getAddressesForFormat,
+    getAllRegions,
+    getCitiesForRegion,
+    getFormatsForCity,
     getTaskExtended,
     getTemplate,
     getTemplates,
@@ -76,6 +80,14 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         trigger: false,
         to: "",
     });
+    const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
+    const [regionCities, setRegionCities] = useState<string[]>([]);
+    const [cityFormats, setCityFormats] = useState<string[]>([]);
+    const [formatAddresses, setFormatAddresses] = useState<string[]>([]);
+
+    const region = (task.marketplace || {}).region;
+    const city = (task.marketplace || {}).city;
+    const format = (task.marketplace || {}).format;
 
     const isValidTask = (value: object): value is IExtendedTask =>
         _.has(value, "id") &&
@@ -107,7 +119,40 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         [context.courier],
     );
 
-    const setTemplateState = (responses: IGetTemplate[], nextTask: IExtendedTask) => {
+    const fetchFormatsAndUpdateState = useCallback(
+        (region: string, city: string) => {
+            getFormatsForCity(context.courier, region, city)
+                .then(response => setCityFormats(response.formats))
+                .catch(console.error);
+        },
+        [context.courier],
+    );
+
+    const fetchRegionsAndUpdateState = useCallback(() => {
+        getAllRegions(context.courier)
+            .then(response => setMarketplaceRegions(response.regions))
+            .catch(console.error);
+    }, [context.courier]);
+
+    const fetchCitiesAndUpdateState = useCallback(
+        (region: string) => {
+            getCitiesForRegion(context.courier, region)
+                .then(response => setRegionCities(response.cities))
+                .catch(console.error);
+        },
+        [context.courier],
+    );
+
+    const fetchAddressesAndUpdateState = useCallback(
+        (region: string, city: string, format: string) => {
+            getAddressesForFormat(context.courier, region, city, format)
+                .then(response => setFormatAddresses(response.addresses))
+                .catch(console.error);
+        },
+        [context.courier],
+    );
+
+    function setTemplateState(responses: IGetTemplate[], nextTask: IExtendedTask) {
         const buffer: any[] = [];
         responses.forEach(response => buffer.push(response.template));
         buffer.forEach((data, index, array) => {
@@ -117,23 +162,82 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             }
         });
         setTemplates([...buffer]);
-    };
+    }
 
-    const updateTaskState = useCallback(() => {
+    const fetchTaskAndUpdateState = useCallback(() => {
         getTaskExtended(context.courier, _.toNumber(taskId))
             .then(setTaskState)
             .then(async nextTask => {
                 if (!nextTask || !isTaskEditable(nextTask)) {
                     return;
                 }
+
                 const templates = await getTemplates(context.courier);
                 const fullTemplates = await fetchFullTemplate(templates);
+
                 setTemplateState(fullTemplates, nextTask);
+
+                if (nextTask.marketplace) {
+                    const { city, region, format } = nextTask.marketplace;
+                    await Promise.all([
+                        fetchRegionsAndUpdateState(),
+                        fetchCitiesAndUpdateState(region),
+                        fetchFormatsAndUpdateState(region, city),
+                        fetchAddressesAndUpdateState(region, city, format),
+                    ]).catch(console.error);
+                }
             })
             .catch(console.error);
-    }, [context, fetchFullTemplate, setTaskState, taskId]);
+    }, [
+        context.courier,
+        fetchAddressesAndUpdateState,
+        fetchCitiesAndUpdateState,
+        fetchFormatsAndUpdateState,
+        fetchFullTemplate,
+        fetchRegionsAndUpdateState,
+        setTaskState,
+        taskId,
+    ]);
 
-    useEffect(() => updateTaskState(), [updateTaskState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => fetchTaskAndUpdateState(), []);
+
+    useEffect(() => {
+        // only draft mode contains marketplace selects
+        if (task.status !== ETaskStatus.DRAFT) {
+            return;
+        }
+        fetchRegionsAndUpdateState();
+    }, [fetchRegionsAndUpdateState, task.status]);
+
+    // get all regions initially
+    const prevTaskRegion = useRef(region);
+    useEffect(() => {
+        if (!(region && prevTaskRegion.current !== region)) {
+            return;
+        }
+        fetchCitiesAndUpdateState(region);
+    }, [fetchCitiesAndUpdateState, region]);
+
+    // fetching all available formats for city
+    // if task marketplace city has changed
+    const prevTaskCity = useRef(city);
+    useEffect(() => {
+        if (!(city && region && prevTaskCity.current !== city)) {
+            return;
+        }
+        fetchFormatsAndUpdateState(region, city);
+    }, [region, city, fetchFormatsAndUpdateState]);
+
+    // fetching all available addresses for format
+    // if task marketplace format has changed
+    const prevTaskFormat = useRef(format);
+    useEffect(() => {
+        if (!(city && region && format && prevTaskFormat.current !== format)) {
+            return;
+        }
+        fetchAddressesAndUpdateState(region, city, format);
+    }, [format, region, city, fetchAddressesAndUpdateState]);
 
     function onTaskChange(task: Partial<IExtendedTask>): void {
         if (isValidTask(task)) {
@@ -234,7 +338,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         ])
             .then(() => updateTask(context.courier, taskId, getTaskPayload(task)))
             .then(() => {
-                updateTaskState();
+                fetchTaskAndUpdateState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно обновлено",
@@ -250,7 +354,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 context.setSnackbarState({ open: true, message });
                 context.setSnackbarError(true);
             });
-    }, [addTaskStages, context, task, taskId, templates, updateTaskState]);
+    }, [addTaskStages, context, task, taskId, templates, fetchTaskAndUpdateState]);
 
     function onTaskWithdrawClick() {
         if (task.status === ETaskStatus.IN_PROGRESS) {
@@ -258,7 +362,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
             .then(() => {
-                updateTaskState();
+                fetchTaskAndUpdateState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно отозвано",
@@ -277,7 +381,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
         updateTask(context.courier, taskId, getTaskPayload(task))
             .then(() => {
-                updateTaskState();
+                fetchTaskAndUpdateState();
                 context.setSnackbarState({
                     open: true,
                     message: "Задание успешно звершено",
@@ -315,31 +419,31 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const onAddTaskDocument = useCallback(
         (document: File) => {
             addTaskDocument(context.courier, taskId, document)
-                .then(() => updateTaskState())
+                .then(() => fetchTaskAndUpdateState())
                 .catch(() => {
                     context.setSnackbarState({ open: true, message: "Не удалось сохранить файл" });
                     context.setSnackbarError(true);
                 });
         },
-        [context, taskId, updateTaskState],
+        [context, taskId, fetchTaskAndUpdateState],
     );
 
     const onDeleteTaskDocument = useCallback(
         (documentId: number) => {
             deleteTaskDocument(context.courier, taskId, documentId)
-                .then(() => updateTaskState())
+                .then(() => fetchTaskAndUpdateState())
                 .catch(() => {
                     context.setSnackbarState({ open: true, message: "Не удалось удалить файл" });
                     context.setSnackbarError(true);
                 });
         },
-        [context, taskId, updateTaskState],
+        [context, taskId, fetchTaskAndUpdateState],
     );
 
     const onAddComment = useCallback(
         (comment: IComment) => {
             addComment(context.courier, taskId, comment.idAssignment, comment.text)
-                .then(() => updateTaskState())
+                .then(() => fetchTaskAndUpdateState())
                 .catch(() => {
                     context.setSnackbarState({
                         open: true,
@@ -348,13 +452,13 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     context.setSnackbarError(true);
                 });
         },
-        [context, taskId, updateTaskState],
+        [context, taskId, fetchTaskAndUpdateState],
     );
 
     const onDeleteComment = useCallback(
         (commentId: number) => {
             deleteComment(context.courier, taskId, commentId)
-                .then(() => updateTaskState())
+                .then(() => fetchTaskAndUpdateState())
                 .catch(() => {
                     context.setSnackbarState({
                         open: true,
@@ -363,7 +467,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                     context.setSnackbarError(true);
                 });
         },
-        [context, taskId, updateTaskState],
+        [context, taskId, fetchTaskAndUpdateState],
     );
 
     return (
@@ -435,6 +539,10 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
             >
                 <TaskEditor<IExtendedTask>
                     task={task}
+                    regions={marketplaceRegions}
+                    cities={regionCities}
+                    formats={cityFormats}
+                    addresses={formatAddresses}
                     templates={isTaskEditable(task) ? templates : task.templates}
                     variant="view"
                     onTaskChange={onTaskChange}

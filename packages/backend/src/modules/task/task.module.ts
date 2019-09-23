@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getFriendlyDate } from "../../utils/date";
 import { AmqpModule } from "../amqp/amqp.module";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { MarketplaceModule } from "../marketplace/marketplace.module";
 import { IPushMessage } from "../push-token/interfaces/push-message.interface";
 import { PushTokenModule } from "../push-token/push-token.module";
 import { ScheduleModule } from "../schedule/schedule.module";
@@ -37,6 +38,7 @@ import { TaskController } from "./task.controller";
         AmqpModule,
         TemplateModule,
         ScheduleModule,
+        MarketplaceModule,
     ],
     exports: [TaskService],
 })
@@ -44,8 +46,8 @@ export class TaskModule {
     private readonly logger = new Logger(TaskModule.name);
 
     private static NOTIFICATION_CHECK_JOB = "notification_check";
-    // every day at 6:00
-    private static NOTIFICATION_CHECK_CRON = "0 6 * * *";
+    // every 15 minutes
+    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
 
     constructor(
         private readonly scheduleService: ScheduleService,
@@ -95,7 +97,6 @@ export class TaskModule {
                     .filter(Boolean),
             );
         }
-        this.logger.debug(tasks);
         return true;
     }
 }

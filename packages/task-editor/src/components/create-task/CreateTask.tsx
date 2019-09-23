@@ -16,7 +16,7 @@ import { TemplateRenderer } from "components/renderers";
 import { TaskFieldContainer } from "components/task-field-container";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import uuid from "uuid/v4";
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -31,6 +31,12 @@ interface ICreateTaskProps {
     documents: IRenderDocument[];
     templateSnapshots: Map<string, object>;
     focusedPuzzleId?: string;
+    regions?: string[];
+    cities?: string[];
+    formats?: string[];
+    addresses?: string[];
+
+    onTaskChange?(task: Partial<ITask>): void;
 
     onTaskTitleChange(title: string): void;
 
@@ -40,8 +46,22 @@ interface ICreateTaskProps {
 }
 
 export const CreateTask: React.FC<ICreateTaskProps> = props => {
-    const { task, service, documents, focusedPuzzleId, templates, templateSnapshots } = props;
-    const { onTaskTitleChange, onTemplatesChange, onTaskTitleBlur } = props;
+    const {
+        task,
+        service,
+        documents,
+        focusedPuzzleId,
+        templates,
+        templateSnapshots,
+        onTaskTitleChange,
+        onTemplatesChange,
+        onTaskTitleBlur,
+        regions,
+        cities,
+        addresses,
+        formats,
+        onTaskChange,
+    } = props;
 
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
@@ -55,6 +75,104 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
     const onTitleBlurCallback = useCallback(() => {
         onTaskTitleBlur();
     }, [onTaskTitleBlur]);
+
+    // resetting fields if any marketplace value has changed
+    const prevTask = useRef(_.cloneDeep(task));
+    const prevTaskRegion = useRef(task.marketplace ? task.marketplace.region : "");
+    const prevTaskCity = useRef(task.marketplace ? task.marketplace.city : "");
+    const prevTaskFormat = useRef(task.marketplace ? task.marketplace.format : "");
+    useEffect(() => {
+        if (!onTaskChange || _.isEqual(prevTask.current, task) || !task.marketplace) {
+            return;
+        }
+
+        const nextTask = { ...task };
+
+        const format = task.marketplace.format;
+        const city = task.marketplace.city;
+        const region = task.marketplace.region;
+
+        if (prevTaskFormat.current && prevTaskFormat.current !== format) {
+            nextTask.marketplace!.address = "";
+        }
+        if (prevTaskCity.current && prevTaskCity.current !== city) {
+            nextTask.marketplace!.address = "";
+            nextTask.marketplace!.format = "";
+        }
+        if (prevTaskRegion.current && prevTaskRegion.current !== region) {
+            nextTask.marketplace!.address = "";
+            nextTask.marketplace!.format = "";
+            nextTask.marketplace!.city = "";
+        }
+
+        prevTask.current = _.cloneDeep(nextTask);
+
+        prevTaskRegion.current = region;
+        prevTaskCity.current = city;
+        prevTaskFormat.current = format;
+
+        onTaskChange(nextTask);
+    }, [onTaskChange, task]);
+
+    const onRegionChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        region: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
+
+    const onCityChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        city: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
+
+    const onFormatChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        format: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
+
+    const onAddressChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({
+                    ...task,
+                    marketplace: {
+                        ...task.marketplace!,
+                        address: event.target.value as string,
+                    },
+                });
+            }
+        },
+        [onTaskChange, task],
+    );
 
     return (
         <React.Fragment>
@@ -95,18 +213,68 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
                     </TaskFieldContainer>
                     <TaskFieldContainer label="Местоположение">
                         <Grid container direction="row" alignItems="flex-end" spacing={2}>
-                            <Grid item xs>
-                                <SelectField placeholder="Регион" fullWidth />
+                            <Grid item xs={3}>
+                                <SelectField
+                                    value={task.marketplace ? task.marketplace.region : ""}
+                                    placeholder="Регион"
+                                    fullWidth
+                                    onChange={onRegionChangeCallback}
+                                >
+                                    {(regions || []).map(region => (
+                                        <MenuItem key={region} value={region}>
+                                            {region}
+                                        </MenuItem>
+                                    ))}
+                                </SelectField>
                             </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Филиал" fullWidth />
-                            </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Формат" fullWidth />
-                            </Grid>
-                            <Grid item xs>
-                                <SelectField placeholder="Адрес" fullWidth />
-                            </Grid>
+                            {task.marketplace && task.marketplace.region && (
+                                <Grid item xs={3}>
+                                    <SelectField
+                                        value={task.marketplace ? task.marketplace.city : ""}
+                                        placeholder="Филиал"
+                                        fullWidth
+                                        onChange={onCityChangeCallback}
+                                    >
+                                        {(cities || []).map(city => (
+                                            <MenuItem key={city} value={city}>
+                                                {city}
+                                            </MenuItem>
+                                        ))}
+                                    </SelectField>
+                                </Grid>
+                            )}
+                            {task.marketplace && task.marketplace.city && (
+                                <Grid item xs={3}>
+                                    <SelectField
+                                        value={task.marketplace ? task.marketplace.format : ""}
+                                        placeholder="Формат"
+                                        fullWidth
+                                        onChange={onFormatChangeCallback}
+                                    >
+                                        {(formats || []).map(format => (
+                                            <MenuItem key={format} value={format}>
+                                                {format}
+                                            </MenuItem>
+                                        ))}
+                                    </SelectField>
+                                </Grid>
+                            )}
+                            {task.marketplace && task.marketplace.format && (
+                                <Grid item xs={3}>
+                                    <SelectField
+                                        value={task.marketplace ? task.marketplace.address : ""}
+                                        placeholder="Адрес"
+                                        fullWidth
+                                        onChange={onAddressChangeCallback}
+                                    >
+                                        {(addresses || []).map(address => (
+                                            <MenuItem key={address} value={address}>
+                                                {address}
+                                            </MenuItem>
+                                        ))}
+                                    </SelectField>
+                                </Grid>
+                            )}
                         </Grid>
                     </TaskFieldContainer>
                     <TaskFieldContainer label="Исполнитель">
