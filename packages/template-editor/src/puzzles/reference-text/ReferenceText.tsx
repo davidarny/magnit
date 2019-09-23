@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
@@ -16,23 +15,24 @@ interface IReferenceTextProps extends IFocusedPuzzleProps {
     onTemplateChange(template: ITemplate): void;
 }
 
-export const ReferenceText: React.FC<IReferenceTextProps> = ({ focused, ...props }) => {
+export const ReferenceText: React.FC<IReferenceTextProps> = props => {
+    const { id, focused, template, onTemplateChange } = props;
     const [text, setText] = useState<string>(props.text);
 
-    const onTemplateChange = useCallback(() => {
-        traverse(props.template, (value: any) => {
+    const onTemplateChangeCallback = useCallback(() => {
+        traverse(template, (value: any) => {
             if (!_.has(value, "id")) {
                 return;
             }
             const puzzle = value as IPuzzle;
-            if (puzzle.id !== props.id) {
+            if (puzzle.id !== id) {
                 return;
             }
             puzzle.description = text;
             return true;
         });
-        props.onTemplateChange({ ...props.template });
-    }, [text]);
+        onTemplateChange({ ...template });
+    }, [onTemplateChange, id, template, text]);
 
     function onTextChange(event: React.ChangeEvent<HTMLInputElement>) {
         setText(event.target.value);
@@ -57,7 +57,7 @@ export const ReferenceText: React.FC<IReferenceTextProps> = ({ focused, ...props
                 multiline
                 value={text}
                 onChange={onTextChange}
-                onBlur={onTemplateChange}
+                onBlur={onTemplateChangeCallback}
             />
         </Grid>
     );

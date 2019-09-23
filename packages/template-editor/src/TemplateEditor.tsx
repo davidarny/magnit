@@ -471,3 +471,5 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         </React.Fragment>
     );
 };
+
+TemplateEditor.displayName = "TemplateEditor";

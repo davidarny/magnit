@@ -47,8 +47,8 @@ export function useValidations(
     const useConditionService: IUseConditionsService<IValidation> = {
         checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
             return !_.isEqual(
-                _.omit(leftQuestion, "conditions"),
-                _.omit(rightQuestion, "conditions"),
+                _.omit(leftQuestion, "validations"),
+                _.omit(rightQuestion, "validations"),
             );
         },
 
@@ -102,10 +102,7 @@ export function useValidations(
             return;
         }
         traverse(template, (value: IPuzzle) => {
-            if (!_.has(value, "puzzles")) {
-                return;
-            }
-            if (!_.has(value, "id") || value.id !== puzzleId) {
+            if (!_.has(value, "puzzles") || !_.has(value, "id") || value.id !== puzzleId) {
                 return;
             }
             setCurrentQuestion(value);
@@ -153,6 +150,8 @@ export function useValidations(
         }
         validations.push({
             ...defaultState.current,
+            // copy error message
+            errorMessage: (_.first(validations) || { errorMessage: "" }).errorMessage,
             id: uuid(),
             order: validations.length - 1,
             leftHandPuzzle: (currentQuestion && currentQuestion.id) || "",

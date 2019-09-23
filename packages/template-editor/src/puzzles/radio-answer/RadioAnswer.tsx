@@ -37,10 +37,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
 
     const onTemplateChangeCallback = useCallback(() => {
         traverse(template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id")) {
-                return;
-            }
-            if (puzzle.id !== id) {
+            if (!_.has(puzzle, "id") || puzzle.id !== id) {
                 return;
             }
             puzzle.title = label;
