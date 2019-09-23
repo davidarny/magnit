@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
 import { EPuzzleType, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
 import {
@@ -44,13 +44,12 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index, title, template, id, focused } = props;
-    const { onTemplateChange } = props;
+    const { index, title, template, id, focused, onTemplateChange } = props;
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
     const [questionTitle, setQuestionTitle] = useState(title);
 
-    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
-    const answerTypeSnapshot = useRef<EPuzzleType | "">("");
+    const prevTemplate = useRef<ITemplate>({} as ITemplate);
+    const prevAnswerType = useRef<EPuzzleType | "">("");
 
     const onTemplateChangeCallback = useCallback(() => {
         traverse(template, (puzzle: IPuzzle) => {
@@ -76,7 +75,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
             // set changed puzzle type of question children
             // and strip it's length to 1 only after initial render
             // clear validation & conditions
-            if (answersType !== answerTypeSnapshot.current) {
+            if (answersType !== prevAnswerType.current) {
                 puzzle.validations = [];
                 puzzle.conditions = [];
                 puzzle.puzzles.length = 1;
@@ -85,7 +84,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                 return {
                     ...childPuzzle,
                     puzzleType: nextAnswerType,
-                    title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
+                    title: answersType === prevAnswerType.current ? childPuzzle.title : "",
                 };
             });
             // check if there are nested children of answer
@@ -125,22 +124,28 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                 });
             }
             puzzle.title = questionTitle;
-            answerTypeSnapshot.current = nextAnswerType;
+            prevAnswerType.current = nextAnswerType;
             return true;
         });
         // trigger template update if snapshot changed
         // also cloneDeep in order to track changes above in isEqual
         const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = clonedTemplate;
+        if (_.isEqual(template, prevTemplate.current) || _.isEmpty(prevTemplate.current)) {
+            prevTemplate.current = clonedTemplate;
             return;
         }
-        templateSnapshot.current = clonedTemplate;
+        prevTemplate.current = clonedTemplate;
         onTemplateChange(clonedTemplate);
     }, [answersType, questionTitle, template, id, onTemplateChange]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => onTemplateChangeCallback(), [answersType, focused]);
+    const prevFocused = useRef(focused);
+    useEffect(() => {
+        if (prevAnswerType.current !== answersType || prevFocused.current !== focused) {
+            prevAnswerType.current = answersType;
+            prevFocused.current = focused;
+            onTemplateChangeCallback();
+        }
+    }, [answersType, focused, onTemplateChangeCallback]);
 
     function onAnswerTypeChange(event: TSelectChangeEvent): void {
         setAnswersType(event.target.value as EPuzzleType);
@@ -207,13 +212,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                             {index + 1}.
                         </Typography>
                     </Grid>
-                    <Grid
-                        item
-                        xs
-                        css={css`
-                            padding-left: 0;
-                        `}
-                    >
+                    <Grid item xs css={{ paddingLeft: 0 }}>
                         <InputField
                             fullWidth
                             placeholder="Введите вопрос"

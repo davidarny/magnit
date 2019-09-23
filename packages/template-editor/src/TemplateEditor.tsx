@@ -33,7 +33,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const cache = useRef<ICache>({
         sections: new Map<string, ISection>(),
         puzzles: new Map<string, IPuzzle>(),
-    }).current;
+    });
 
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
@@ -58,15 +58,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         const isPuzzle = (object: unknown): object is IPuzzle =>
             _.has(object, "puzzleType") && _.has(object, "puzzles");
 
-        cache.puzzles.clear();
-        cache.sections.clear();
+        cache.current.puzzles.clear();
+        cache.current.sections.clear();
 
         traverse(template, (element: IPuzzle | ISection) => {
             if (isPuzzle(element)) {
-                cache.puzzles.set(element.id, element);
+                cache.current.puzzles.set(element.id, element);
             }
             if (isSection(element)) {
-                cache.sections.set(element.id, element);
+                cache.current.sections.set(element.id, element);
             }
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,12 +127,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         }
         // check if adding question to puzzle
         // probably this puzzle is GROUP
-        if (cache.puzzles.has(focusedPuzzleId)) {
-            let puzzle: IPuzzle | ISection = cache.puzzles.get(focusedPuzzleId)!;
+        if (cache.current.puzzles.has(focusedPuzzleId)) {
+            let puzzle: IPuzzle | ISection = cache.current.puzzles.get(focusedPuzzleId)!;
             // if adding to to a group
             // then trying to find in which section to add
             if (hasPuzzleType(puzzle) && !whitelist.includes(puzzle.puzzleType)) {
-                const puzzles = [...cache.sections.values()];
+                const puzzles = [...cache.current.sections.values()];
                 const parent = puzzles
                     .flatMap(el => [el, ...el.puzzles])
                     .find(el => el.puzzles.some(child => child.id === puzzle.id));
@@ -150,9 +150,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         } else {
             // initially adding to last section
             // if not focused to any
-            let section = _.last([...cache.sections.values()]) as ISection | undefined;
-            if (cache.sections.has(focusedPuzzleId)) {
-                section = cache.sections.get(focusedPuzzleId);
+            let section = _.last([...cache.current.sections.values()]) as ISection | undefined;
+            if (cache.current.sections.has(focusedPuzzleId)) {
+                section = cache.current.sections.get(focusedPuzzleId);
             }
             if (section) {
                 if (!_.has(section, "puzzles")) {
@@ -187,7 +187,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-            cache.puzzles.set(id, _.last(section.puzzles)!);
+            cache.current.puzzles.set(id, _.last(section.puzzles)!);
         }
         // else adding to section which is in focused puzzle chain
         else {
@@ -206,7 +206,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
-                cache.puzzles.set(id, _.last(section.puzzles)!);
+                cache.current.puzzles.set(id, _.last(section.puzzles)!);
             });
         }
         service.current.onPuzzleFocus(id);
@@ -225,7 +225,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
             description: "",
             order: (prevSection || { order: -1 }).order + 1,
         });
-        cache.sections.set(id, _.last(template.sections)!);
+        cache.current.sections.set(id, _.last(template.sections)!);
         service.current.onPuzzleFocus(id);
         if (onTemplateChange) {
             onTemplateChange({ ...template });
@@ -395,7 +395,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const focusedOnTemplateHead = focusedPuzzleId === template.id.toString();
 
     context.template = template;
-    context.cache = cache;
+    context.cache = cache.current;
     context.onDeleteAsset = onDeleteAsset || context.onDeleteAsset;
     context.onUploadAsset = onAddAsset || context.onUploadAsset;
     context.onTemplateChange = onTemplateChangeCallback;
