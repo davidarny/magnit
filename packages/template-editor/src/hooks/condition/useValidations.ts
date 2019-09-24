@@ -52,11 +52,14 @@ export function useValidations(
             );
         },
 
-        setConditionsObjects(conditions: IValidation[]) {
+        setConditions(conditions: IValidation[]) {
+            if (conditions.length === 0) {
+                conditions.push(defaultState.current);
+            }
             setValidations(conditions);
         },
 
-        getConditionObjects(): IValidation[] {
+        getConditions(): IValidation[] {
             return validations;
         },
 
@@ -64,7 +67,7 @@ export function useValidations(
             return validation.rightHandPuzzle!;
         },
 
-        resetConditionObject(validation: IValidation): void {
+        resetConditions(validation: IValidation): void {
             validation.rightHandPuzzle = undefined;
             validation.value = undefined;
             validation.operatorType = "";
@@ -73,7 +76,11 @@ export function useValidations(
             setErrorMessage("");
         },
 
-        setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void {
+        getPuzzleConditions(puzzle: IPuzzle, index: number) {
+            return puzzle.puzzles[index].validations;
+        },
+
+        setPuzzleConditions(puzzle: IPuzzle, index: number): void {
             puzzle.puzzles[index].validations = [...validations].filter(
                 validation =>
                     !!(

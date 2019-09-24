@@ -13,7 +13,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { SectionHead } from "./components/section-head";
 import { SectionWrapper } from "./components/section-wrapper";
-import { EditorContext, ICache } from "./context";
+import { EditorContext, ICache, IPuzzleWithParent } from "./context";
 import { traverse } from "./services/json";
 
 interface ITemplateEditorProps {
@@ -30,10 +30,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const { template, onChange: onTemplateChange, onDeleteAsset, onAddAsset } = props;
 
     const context = useContext(EditorContext);
-    const cache = useRef<ICache>({
-        sections: new Map<string, ISection>(),
-        puzzles: new Map<string, IPuzzle>(),
-    });
+    const cache = useRef<ICache>({ sections: new Map(), puzzles: new Map() });
 
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
@@ -50,7 +47,6 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         service.current.updateToolbarTopPosition();
     }, [focusedPuzzleChain]);
 
-    // handle passed onChange callback
     // update cache
     useEffect(() => {
         const isSection = (object: unknown): object is ISection =>
@@ -61,15 +57,15 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         cache.current.puzzles.clear();
         cache.current.sections.clear();
 
-        traverse(template, (element: IPuzzle | ISection) => {
-            if (isPuzzle(element)) {
-                cache.current.puzzles.set(element.id, element);
-            }
+        traverse(template, (element: IPuzzle | ISection, parent: IPuzzle | ISection) => {
             if (isSection(element)) {
                 cache.current.sections.set(element.id, element);
+            } else if (isPuzzle(element)) {
+                const puzzle = element as IPuzzleWithParent;
+                puzzle.parent = parent;
+                cache.current.puzzles.set(puzzle.id, puzzle);
             }
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [template]);
 
     const initialFocusThreshold = useRef(0);
@@ -187,7 +183,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-            cache.current.puzzles.set(id, _.last(section.puzzles)!);
+            const last = _.last(section.puzzles)! as IPuzzleWithParent;
+            last.parent = section;
+            cache.current.puzzles.set(id, last);
         }
         // else adding to section which is in focused puzzle chain
         else {
@@ -206,7 +204,9 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
-                cache.current.puzzles.set(id, _.last(section.puzzles)!);
+                const last = _.last(section.puzzles)! as IPuzzleWithParent;
+                last.parent = section;
+                cache.current.puzzles.set(id, last);
             });
         }
         service.current.onPuzzleFocus(id);
@@ -433,6 +433,8 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
               ]),
     ];
 
+    const json: any[] = [];
+
     return (
         <React.Fragment>
             <EditorToolbar top={toolbarTopPosition} items={editorToolbarItems} />
@@ -477,7 +479,21 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                         JSON
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                        <pre>{JSON.stringify(template, null, 2)}</pre>
+                        <pre>
+                            {JSON.stringify(
+                                template,
+                                (key, value) => {
+                                    if (typeof value === "object" && value !== null) {
+                                        if (json.indexOf(value) !== -1) {
+                                            return;
+                                        }
+                                        json.push(value);
+                                    }
+                                    return value;
+                                },
+                                2,
+                            )}
+                        </pre>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             )}

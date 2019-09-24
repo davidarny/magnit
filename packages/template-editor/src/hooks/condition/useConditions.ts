@@ -39,11 +39,14 @@ export function useConditions(
             );
         },
 
-        setConditionsObjects(conditions: ICondition[]) {
+        setConditions(conditions: ICondition[]) {
+            if (conditions.length === 0) {
+                conditions.push(defaultState.current);
+            }
             setConditions(conditions);
         },
 
-        getConditionObjects(): ICondition[] {
+        getConditions(): ICondition[] {
             return conditions;
         },
 
@@ -51,13 +54,13 @@ export function useConditions(
             return condition.questionPuzzle!;
         },
 
-        resetConditionObject(condition: ICondition): void {
+        resetConditions(condition: ICondition): void {
             condition.answerPuzzle = "";
             condition.value = "";
             condition.actionType = "";
         },
 
-        setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void {
+        setPuzzleConditions(puzzle: IPuzzle, index: number): void {
             puzzle.puzzles[index].conditions = [...conditions].filter(
                 condition =>
                     !!(
@@ -67,6 +70,10 @@ export function useConditions(
                         (condition.value || condition.answerPuzzle)
                     ),
             );
+        },
+
+        getPuzzleConditions(puzzle: IPuzzle, index: number) {
+            return puzzle.puzzles[index].conditions;
         },
 
         shouldSetQuestions(_puzzle: IPuzzle): boolean {

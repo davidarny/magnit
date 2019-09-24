@@ -10,7 +10,6 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
-import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
@@ -41,7 +40,7 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     }, [context.courier, templateId]);
 
     function onTemplateChange(template: ITemplate) {
-        setTemplate(_.cloneDeep(template));
+        setTemplate({ ...template });
     }
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
@@ -96,15 +95,13 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                     transition: "opacity 0.3s ease-in-out",
                 })}
             >
-                {!_.isEmpty(template) && (
-                    <TemplateEditor
-                        template={(template as unknown) as ITemplate}
-                        css={theme => ({ background: theme.colors.main })}
-                        onChange={onTemplateChange}
-                        onAddAsset={onAddAsset}
-                        onDeleteAsset={onDeleteAsset}
-                    />
-                )}
+                <TemplateEditor
+                    template={template}
+                    css={theme => ({ background: theme.colors.main })}
+                    onChange={onTemplateChange}
+                    onAddAsset={onAddAsset}
+                    onDeleteAsset={onDeleteAsset}
+                />
             </Grid>
             <Snackbar
                 open={snackbar.open}

@@ -14,6 +14,7 @@ export class QuestionFactory implements IPuzzleFactory {
 
         return (
             <Question
+                puzzles={context.cache.puzzles}
                 template={template!}
                 id={puzzle.id}
                 title={puzzle.title}

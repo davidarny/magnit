@@ -1,9 +1,13 @@
 import { IPuzzle, ISection, ITemplate } from "@magnit/entities";
 import * as React from "react";
 
+export interface IPuzzleWithParent extends IPuzzle {
+    parent: IPuzzleWithParent | ISection;
+}
+
 export interface ICache {
     sections: Map<string, ISection>;
-    puzzles: Map<string, IPuzzle>;
+    puzzles: Map<string, IPuzzleWithParent>;
 }
 
 export interface IEditorContext {

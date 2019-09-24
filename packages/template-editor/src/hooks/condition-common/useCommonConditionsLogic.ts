@@ -4,17 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { traverse } from "services/json";
 
 export interface IUseConditionsService<T> {
-    setConditionsObjects(conditions: T[]): void;
+    setConditions(conditions: T[]): void;
 
-    getConditionObjects(): T[];
+    getConditions(): T[];
 
     getRightPuzzle(condition: T): string;
 
-    resetConditionObject(condition: T): void;
+    resetConditions(condition: T): void;
 
     checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean;
 
-    setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void;
+    setPuzzleConditions(puzzle: IPuzzle, index: number): void;
+
+    getPuzzleConditions(puzzle: IPuzzle, index: number): T[];
 
     shouldSetQuestions(puzzle: IPuzzle): boolean;
 }
@@ -40,7 +42,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         });
     }, [template, puzzleId]);
 
-    const prevTemplate = useRef<ITemplate>(template);
+    const prevTemplate = useRef(_.cloneDeep(template));
     const prevQuestions = useRef(_.cloneDeep(questions));
     const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
@@ -48,12 +50,12 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         // outside of this component
         if (!_.isEqual(template, prevTemplate.current)) {
             const filter: number[] = [];
-            service.getConditionObjects().forEach((condition, index, array) => {
-                let hasDependentQuestionChanged = false;
-                const dependentQuestion = questions.find(
+            service.getConditions().forEach((condition, index, array) => {
+                let dependentsChanged = false;
+                const dependents = questions.find(
                     question => question.id === service.getRightPuzzle(condition),
                 );
-                if (dependentQuestion) {
+                if (dependents) {
                     traverse(prevTemplate.current, (value: IPuzzle) => {
                         if (!_.has(value, "puzzles")) {
                             return;
@@ -61,18 +63,18 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                         // find dependent question in template
                         if (
                             value.puzzleType !== EPuzzleType.QUESTION ||
-                            value.id !== dependentQuestion.id
+                            value.id !== dependents.id
                         ) {
                             return;
                         }
                         // check if dependent question has changed
-                        hasDependentQuestionChanged = service.checkDependentQuestionChanged(
-                            dependentQuestion,
+                        dependentsChanged = service.checkDependentQuestionChanged(
+                            dependents,
                             value,
                         );
                     });
-                    if (hasDependentQuestionChanged) {
-                        service.resetConditionObject(condition);
+                    if (dependentsChanged) {
+                        service.resetConditions(condition);
                         array[index] = { ...condition };
                         if (index > 0) {
                             filter.push(index);
@@ -81,9 +83,9 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 }
             });
             const conditions = service
-                .getConditionObjects()
+                .getConditions()
                 .filter((_value, index) => !filter.includes(index));
-            service.setConditionsObjects(conditions);
+            service.setConditions(conditions);
         }
         // fill questions and answers initially
         // by traversing whole template tree
@@ -134,7 +136,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 });
             });
             // set conditions of current puzzle
-            service.setPuzzleConditionObjects(puzzle, index);
+            service.setPuzzleConditions(puzzle, index);
         });
         if (!_.isEqual(prevQuestions.current, questions)) {
             const clonedQuestions = _.cloneDeep(questions);
@@ -146,15 +148,10 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             prevAnswers.current = clonedAnswers;
             setAnswers(clonedAnswers);
         }
-        // trigger template update if snapshot changed
-        // also cloneDeep in order to track changes above in isEqual
-        const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, prevTemplate.current)) {
-            prevTemplate.current = clonedTemplate;
-            return;
+        if (!_.isEqual(template, prevTemplate.current)) {
+            prevTemplate.current = _.cloneDeep(template);
+            onTemplateChange(template);
         }
-        prevTemplate.current = clonedTemplate;
-        onTemplateChange(clonedTemplate);
     }, [template, questions, answers, onTemplateChange, puzzleId, service]);
 
     return [questions, answers];

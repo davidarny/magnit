@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps, ITemplate } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -14,15 +14,16 @@ import {
     UploadFilesIcon,
 } from "@magnit/icons";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
+import { IPuzzleWithParent } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { traverse } from "services/json";
 import uuid from "uuid/v4";
 
 interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
     template: ITemplate;
     title: string;
+    puzzles: Map<string, IPuzzleWithParent>;
 
     onTemplateChange(template: ITemplate): void;
 }
@@ -44,104 +45,93 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index, title, template, id, focused, onTemplateChange } = props;
+    const { index, title, template, id, focused, onTemplateChange, puzzles } = props;
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
     const [questionTitle, setQuestionTitle] = useState(title);
 
-    const prevTemplate = useRef<ITemplate>({} as ITemplate);
-    const prevAnswerType = useRef<EPuzzleType | "">("");
+    const prevAnswerTypeCallback = useRef<EPuzzleType | "">("");
+    const prevPuzzle = useRef<IPuzzleWithParent | null>(null);
 
     const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (puzzle: IPuzzle) => {
-            if (
-                !_.isObject(puzzle) ||
-                !("puzzles" in puzzle) ||
-                !("id" in puzzle) ||
-                puzzle.id !== id
-            ) {
-                return;
+        if (!puzzles.has(id)) {
+            return;
+        }
+        const puzzle = puzzles.get(id)!;
+        // set initial answerType based on
+        // first element of question children
+        let nextAnswerType = answersType;
+        if (!nextAnswerType) {
+            const childrenHeadPuzzle = _.head(puzzle.puzzles) || { puzzleType: "" };
+            setAnswersType(childrenHeadPuzzle.puzzleType);
+            nextAnswerType = childrenHeadPuzzle.puzzleType;
+        }
+        if (!puzzle.puzzles.length) {
+            return;
+        }
+        // set changed puzzle type of question children
+        // and strip it's length to 1 only after initial render
+        // clear validation & conditions
+        if (answersType !== prevAnswerTypeCallback.current) {
+            puzzle.validations = [];
+            puzzle.conditions = [];
+            puzzle.puzzles.length = 1;
+        }
+        puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+            return {
+                ...childPuzzle,
+                puzzleType: nextAnswerType,
+                title: answersType === prevAnswerTypeCallback.current ? childPuzzle.title : "",
+            };
+        });
+        // check if there are nested children of answer
+        // if there aren't any, we proceed with adding stub ones
+        const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
+            if (prev) {
+                return prev;
             }
-            // set initial answerType based on
-            // first element of question children
-            let nextAnswerType = answersType;
-            if (!nextAnswerType) {
-                const childrenHeadPuzzle = _.head(puzzle.puzzles) || { puzzleType: "" };
-                setAnswersType(childrenHeadPuzzle.puzzleType);
-                nextAnswerType = childrenHeadPuzzle.puzzleType;
-            }
-            if (!puzzle.puzzles.length) {
-                return;
-            }
-            // set changed puzzle type of question children
-            // and strip it's length to 1 only after initial render
-            // clear validation & conditions
-            if (answersType !== prevAnswerType.current) {
-                puzzle.validations = [];
-                puzzle.conditions = [];
-                puzzle.puzzles.length = 1;
-            }
+            return !!(curr.puzzles || []).length;
+        }, false);
+        // REFERENCE_ANSWER needs specific handling as it's nested answer
+        // so we have to add it's children when choosing this type
+        if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
             puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                 return {
                     ...childPuzzle,
-                    puzzleType: nextAnswerType,
-                    title: answersType === prevAnswerType.current ? childPuzzle.title : "",
+                    puzzles: [
+                        {
+                            id: uuid(),
+                            puzzleType: EPuzzleType.REFERENCE_TEXT,
+                            title: "",
+                            description: "",
+                            order: childPuzzle.puzzles.length,
+                            puzzles: [],
+                            conditions: [],
+                            validations: [],
+                        },
+                    ],
                 };
             });
-            // check if there are nested children of answer
-            // if there aren't any, we proceed with adding stub ones
-            const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
-                if (prev) {
-                    return prev;
-                }
-                return !!(curr.puzzles || []).length;
-            }, false);
-            // REFERENCE_ANSWER needs specific handling as it's nested answer
-            // so we have to add it's children when choosing this type
-            if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
-                puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
-                    return {
-                        ...childPuzzle,
-                        puzzles: [
-                            {
-                                id: uuid(),
-                                puzzleType: EPuzzleType.REFERENCE_TEXT,
-                                title: "",
-                                description: "",
-                                order: childPuzzle.puzzles.length,
-                                puzzles: [],
-                                conditions: [],
-                                validations: [],
-                            },
-                        ],
-                    };
-                });
-            } else if (nextAnswerType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
-                puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
-                    return {
-                        ...childPuzzle,
-                        puzzles: [],
-                    };
-                });
-            }
-            puzzle.title = questionTitle;
-            prevAnswerType.current = nextAnswerType;
-            return true;
-        });
-        // trigger template update if snapshot changed
-        // also cloneDeep in order to track changes above in isEqual
-        const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, prevTemplate.current) || _.isEmpty(prevTemplate.current)) {
-            prevTemplate.current = clonedTemplate;
-            return;
+        } else if (nextAnswerType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
+            puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
+                return {
+                    ...childPuzzle,
+                    puzzles: [],
+                };
+            });
         }
-        prevTemplate.current = clonedTemplate;
-        onTemplateChange(clonedTemplate);
-    }, [answersType, questionTitle, template, id, onTemplateChange]);
+        puzzle.title = questionTitle;
+        prevAnswerTypeCallback.current = nextAnswerType;
+        if (!_.isEqual(prevPuzzle.current, puzzle)) {
+            prevPuzzle.current = _.cloneDeep(puzzle);
+            onTemplateChange(template);
+        }
+    }, [answersType, id, onTemplateChange, puzzles, questionTitle, template]);
 
+    const prevAnswerTypeEffect = useRef<EPuzzleType | "">("");
     const prevFocused = useRef(focused);
     useEffect(() => {
-        if (prevAnswerType.current !== answersType || prevFocused.current !== focused) {
-            prevAnswerType.current = answersType;
+        if (prevAnswerTypeEffect.current !== answersType || prevFocused.current !== focused) {
+            prevAnswerTypeEffect.current = answersType;
             prevFocused.current = focused;
             onTemplateChangeCallback();
         }
