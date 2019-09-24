@@ -13,7 +13,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { SectionHead } from "./components/section-head";
 import { SectionWrapper } from "./components/section-wrapper";
-import { EditorContext, ICache, IPuzzleWithParent } from "./context";
+import { EditorContext, ICache } from "./context";
 import { traverse } from "./services/json";
 
 interface ITemplateEditorProps {
@@ -57,13 +57,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         cache.current.puzzles.clear();
         cache.current.sections.clear();
 
-        traverse(template, (element: IPuzzle | ISection, parent: IPuzzle | ISection) => {
+        traverse(template, (element: IPuzzle | ISection) => {
             if (isSection(element)) {
                 cache.current.sections.set(element.id, element);
-            } else if (isPuzzle(element)) {
-                const puzzle = element as IPuzzleWithParent;
-                puzzle.parent = parent;
-                cache.current.puzzles.set(puzzle.id, puzzle);
+            }
+            if (isPuzzle(element)) {
+                cache.current.puzzles.set(element.id, element);
             }
         });
     }, [template]);
@@ -183,9 +182,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-            const last = _.last(section.puzzles)! as IPuzzleWithParent;
-            last.parent = section;
-            cache.current.puzzles.set(id, last);
+            cache.current.puzzles.set(id, _.last(section.puzzles)!);
         }
         // else adding to section which is in focused puzzle chain
         else {
@@ -204,9 +201,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
-                const last = _.last(section.puzzles)! as IPuzzleWithParent;
-                last.parent = section;
-                cache.current.puzzles.set(id, last);
+                cache.current.puzzles.set(id, _.last(section.puzzles)!);
             });
         }
         service.current.onPuzzleFocus(id);
@@ -382,14 +377,11 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         }
     }
 
-    const onTemplateChangeCallback = useCallback(
-        (template: ITemplate) => {
-            if (onTemplateChange) {
-                onTemplateChange({ ...template });
-            }
-        },
-        [onTemplateChange],
-    );
+    const onTemplateChangeCallback = useCallback(() => {
+        if (onTemplateChange) {
+            onTemplateChange({ ...template });
+        }
+    }, [onTemplateChange, template]);
 
     const focusedPuzzleId = _.first(focusedPuzzleChain);
     const focusedOnTemplateHead = focusedPuzzleId === template.id.toString();

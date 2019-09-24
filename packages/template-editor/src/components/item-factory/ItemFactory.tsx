@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType, IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IPuzzle, ISection } from "@magnit/entities";
 import { Grid } from "@material-ui/core";
 import { PuzzleWrapper } from "components/puzzle-wrapper";
 import * as React from "react";
@@ -12,14 +12,15 @@ interface IContentItemProps {
     puzzle: IPuzzle;
     index: number;
     active?: boolean;
-    parentPuzzle?: IPuzzle;
+    parent: IPuzzle | ISection;
     noWrapper?: boolean;
 
     onFocus(): void;
 }
 
 export const ItemFactory: React.FC<IContentItemProps> = props => {
-    const { puzzle, parentPuzzle, deep = false, index, active, noWrapper, onFocus } = props;
+    const { puzzle, parent, deep = false, index, active, noWrapper, onFocus } = props;
+
     const factory = getPuzzleFactory(puzzle.puzzleType);
 
     return (
@@ -32,9 +33,9 @@ export const ItemFactory: React.FC<IContentItemProps> = props => {
             >
                 {factory.create({
                     focused: !!active,
-                    puzzle: puzzle,
-                    index: index,
-                    parentPuzzle: parentPuzzle,
+                    puzzle,
+                    index,
+                    parent,
                 })}
                 {deep && (
                     <Grid container spacing={2}>
@@ -47,7 +48,7 @@ export const ItemFactory: React.FC<IContentItemProps> = props => {
                                     active={active}
                                     onFocus={onFocus}
                                     key={index}
-                                    parentPuzzle={puzzle}
+                                    parent={puzzle}
                                 />
                             );
                         })}
@@ -64,7 +65,7 @@ export const ItemFactory: React.FC<IContentItemProps> = props => {
                                     conditions: [],
                                     validations: [],
                                 },
-                                parentPuzzle: puzzle,
+                                parent: puzzle,
                                 index: puzzle.puzzles.length,
                             })}
                     </Grid>

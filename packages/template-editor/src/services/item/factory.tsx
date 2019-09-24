@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType, IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IPuzzle, ISection } from "@magnit/entities";
 import {
     CheckboxAnswerFactory,
     DateAnswerFactory,
@@ -25,7 +25,7 @@ export interface IPuzzleFactoryProps {
     index: number;
     focused: boolean;
     puzzle: IPuzzle;
-    parentPuzzle?: IPuzzle;
+    parent: IPuzzle | ISection;
 }
 
 class DefaultFactory implements IPuzzleFactory {

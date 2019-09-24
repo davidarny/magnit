@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType, ICondition, IValidation } from "@magnit/entities";
+import { EPuzzleType, IPuzzle, ISection } from "@magnit/entities";
 import { Grid, Tab, Tabs } from "@material-ui/core";
 import { EditorContext } from "context";
 import * as React from "react";
@@ -10,21 +10,20 @@ import { Conditions } from "./Conditions";
 import { Validations } from "./Validations";
 
 interface IContentConditionsProps {
-    puzzleId: string;
+    puzzle: IPuzzle;
+    parent: IPuzzle | ISection;
     focused: boolean;
-    conditions: ICondition[];
-    validations: IValidation[];
-    puzzleType: EPuzzleType;
     answerType?: EPuzzleType;
     alwaysVisible?: boolean;
 }
 
 export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
-    const context = useContext(EditorContext);
-    const { onTemplateChange, template } = context;
-    const [tab, setTab] = useState(0);
+    const { focused, puzzle, parent, answerType, alwaysVisible = false } = props;
 
-    const { puzzleId, focused, puzzleType, answerType, alwaysVisible = false } = props;
+    const context = useContext(EditorContext);
+    const { onTemplateChange } = context;
+
+    const [tab, setTab] = useState(0);
 
     function onTabChange(event: React.ChangeEvent<unknown>, nextTab: number): void {
         setTab(nextTab);
@@ -34,10 +33,12 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
     useEffect(() => setTab(0), [answerType]);
 
     const conditionsTitle =
-        puzzleType === EPuzzleType.GROUP ? "Условия показа группы" : "Условия показа вопроса";
+        puzzle.puzzleType === EPuzzleType.GROUP
+            ? "Условия показа группы"
+            : "Условия показа вопроса";
 
     const validationsTitle =
-        puzzleType === EPuzzleType.QUESTION ? "Условия валидации поля ответа" : "";
+        puzzle.puzzleType === EPuzzleType.QUESTION ? "Условия валидации поля ответа" : "";
 
     const validationsEnabled = answerType === EPuzzleType.NUMERIC_ANSWER;
 
@@ -122,21 +123,21 @@ export const ConditionsWrapper: React.FC<IContentConditionsProps> = props => {
             >
                 <div css={{ display: tab === 0 ? "block" : "none" }}>
                     <Conditions
+                        puzzle={puzzle}
+                        parent={parent}
+                        puzzles={context.cache.puzzles}
                         disabled={alwaysVisible ? false : !focused || tab !== 0}
-                        puzzleId={puzzleId}
-                        initialState={props.conditions}
                         onTemplateChange={onTemplateChange}
-                        template={template}
                         focused={focused}
                     />
                 </div>
                 <div css={{ display: tab === 1 && validationsEnabled ? "block" : "none" }}>
                     <Validations
+                        puzzle={puzzle}
+                        parent={parent}
+                        puzzles={context.cache.puzzles}
                         disabled={alwaysVisible ? false : !focused || tab !== 1}
-                        puzzleId={puzzleId}
-                        initialState={props.validations}
                         onTemplateChange={onTemplateChange}
-                        template={template}
                         focused={focused}
                     />
                 </div>

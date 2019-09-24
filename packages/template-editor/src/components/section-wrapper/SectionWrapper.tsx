@@ -54,6 +54,7 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = props => {
                         <SectionContent
                             key={puzzle.id}
                             puzzle={puzzle}
+                            parent={section}
                             onFocus={onPuzzleFocus}
                             isFocused={isFocused}
                             index={index + offset}

@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, IFocusedPuzzleProps, ITemplate } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -14,18 +14,16 @@ import {
     UploadFilesIcon,
 } from "@magnit/icons";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
-import { IPuzzleWithParent } from "context";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 
 interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
-    template: ITemplate;
     title: string;
-    puzzles: Map<string, IPuzzleWithParent>;
+    puzzle: IPuzzle;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 }
 
 const answerMenuItems = [
@@ -45,18 +43,14 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index, title, template, id, focused, onTemplateChange, puzzles } = props;
+    const { index, title, focused, onTemplateChange, puzzle } = props;
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
     const [questionTitle, setQuestionTitle] = useState(title);
 
     const prevAnswerTypeCallback = useRef<EPuzzleType | "">("");
-    const prevPuzzle = useRef<IPuzzleWithParent | null>(null);
+    const prevPuzzle = useRef<IPuzzle>(puzzle);
 
     const onTemplateChangeCallback = useCallback(() => {
-        if (!puzzles.has(id)) {
-            return;
-        }
-        const puzzle = puzzles.get(id)!;
         // set initial answerType based on
         // first element of question children
         let nextAnswerType = answersType;
@@ -123,9 +117,9 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
         prevAnswerTypeCallback.current = nextAnswerType;
         if (!_.isEqual(prevPuzzle.current, puzzle)) {
             prevPuzzle.current = _.cloneDeep(puzzle);
-            onTemplateChange(template);
+            onTemplateChange();
         }
-    }, [answersType, id, onTemplateChange, puzzles, questionTitle, template]);
+    }, [answersType, onTemplateChange, puzzle, questionTitle]);
 
     const prevAnswerTypeEffect = useRef<EPuzzleType | "">("");
     const prevFocused = useRef(focused);

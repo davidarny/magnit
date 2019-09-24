@@ -2,57 +2,61 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ICondition, ITemplate } from "@magnit/entities";
+import { ICondition, IPuzzle, ISection } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { useConditions } from "hooks/condition";
+import _ from "lodash";
 import * as React from "react";
 import { Condition } from "./Condition";
 
 interface IConditionsProps {
-    initialState?: ICondition[];
-    puzzleId: string;
-    template: ITemplate;
+    puzzle: IPuzzle;
+    parent: IPuzzle | ISection;
+    puzzles: Map<string, IPuzzle>;
     disabled?: boolean;
     focused?: boolean;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 }
 
 export const Conditions: React.FC<IConditionsProps> = props => {
-    const {
-        initialState,
-        puzzleId,
-        template,
-        disabled = false,
-        focused = true,
-        onTemplateChange,
-    } = props;
+    const { puzzle, parent, puzzles, disabled = false, focused = true, onTemplateChange } = props;
 
     const [
-        conditions,
+        virtualCondition,
         questions,
         answers,
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
-    ] = useConditions(template, disabled, puzzleId, onTemplateChange, initialState);
+    ] = useConditions(puzzle, puzzles, disabled, onTemplateChange, parent);
+
+    const { conditions } = puzzle;
 
     return (
-        <Grid container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
-            {conditions.map((condition, index) => (
-                <Condition
-                    key={condition.id}
-                    answers={answers}
-                    condition={condition}
-                    conditions={conditions}
-                    index={index}
-                    onConditionChange={onConditionChangeCallback}
-                    onConditionDelete={onConditionDeleteCallback}
-                    questions={questions}
-                    noDeleteButton={!focused}
-                />
-            ))}
+        <Grid
+            container
+            spacing={2}
+            css={{ marginBottom: 0, outline: "none" }}
+            alignItems="center"
+            tabIndex={0}
+        >
+            {[...conditions, virtualCondition]
+                .filter<ICondition>((condition): condition is ICondition => !_.isNil(condition))
+                .map((condition, index) => (
+                    <Condition
+                        key={condition.id}
+                        answers={answers}
+                        condition={condition}
+                        conditions={conditions}
+                        index={index}
+                        onConditionChange={onConditionChangeCallback}
+                        onConditionDelete={onConditionDeleteCallback}
+                        questions={questions}
+                        noDeleteButton={!focused}
+                    />
+                ))}
             {focused && (
                 <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(9) })}>
                     <Button

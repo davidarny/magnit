@@ -13,10 +13,10 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import _ from "lodash";
-import { useCallback, useState } from "react";
-import * as React from "react";
 import { useCondition } from "hooks/condition";
+import _ from "lodash";
+import * as React from "react";
+import { useCallback, useState } from "react";
 
 interface IConditionProps {
     index: number;
@@ -26,7 +26,7 @@ interface IConditionProps {
     questions: IPuzzle[];
     answers: IPuzzle[];
 
-    onConditionChange(id: string, update: Partial<ICondition>): void;
+    onConditionChange(id: string, update: ICondition): void;
 
     onConditionDelete(id: string): void;
 }
@@ -37,17 +37,28 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Condition: React.FC<IConditionProps> = props => {
-    const { condition, conditions, answers, questions, index, noDeleteButton = false } = props;
-    const { onConditionChange, onConditionDelete } = props;
+    const {
+        condition,
+        conditions,
+        answers,
+        questions,
+        index,
+        noDeleteButton = false,
+        onConditionChange,
+        onConditionDelete,
+    } = props;
     const [value, setValue] = useState<string>(condition.value || "");
 
     const onQuestionPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             // reset conditions length when question changed
-            conditions.length = 1;
+            if (conditions.length > 0) {
+                conditions.length = 1;
+            }
             // reset first condition fields when question changed
             // and change questionPuzzle
             onConditionChange(condition.id, {
+                ...condition,
                 answerPuzzle: "",
                 value: "",
                 actionType: "",
@@ -60,6 +71,7 @@ export const Condition: React.FC<IConditionProps> = props => {
     const onActionTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 actionType: event.target.value as EActionType,
             });
         },
@@ -69,6 +81,7 @@ export const Condition: React.FC<IConditionProps> = props => {
     const onAnswerPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 answerPuzzle: event.target.value as string,
             });
         },
@@ -80,12 +93,13 @@ export const Condition: React.FC<IConditionProps> = props => {
     }
 
     const onValueBlurCallback = useCallback(() => {
-        onConditionChange(condition.id, { value });
+        onConditionChange(condition.id, { ...condition, value });
     }, [condition.id, onConditionChange, value]);
 
     const onConditionTypeChangeCallback = useCallback(
         (event: unknown, value: unknown): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 conditionType: value as EConditionType,
             });
         },

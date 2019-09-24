@@ -1,20 +1,16 @@
 import { IPuzzle, ISection, ITemplate } from "@magnit/entities";
 import * as React from "react";
 
-export interface IPuzzleWithParent extends IPuzzle {
-    parent: IPuzzleWithParent | ISection;
-}
-
 export interface ICache {
     sections: Map<string, ISection>;
-    puzzles: Map<string, IPuzzleWithParent>;
+    puzzles: Map<string, IPuzzle>;
 }
 
 export interface IEditorContext {
     template: ITemplate;
     cache: ICache;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 
     onAddAnswerPuzzle(id: string, addition?: Partial<IPuzzle>): void;
 
@@ -42,7 +38,7 @@ export const EditorContext = React.createContext<IEditorContext>(
             throw new Error("Not implemented");
         }
 
-        onTemplateChange(template: ITemplate): void {
+        onTemplateChange(): void {
             throw new Error("Not implemented");
         }
 

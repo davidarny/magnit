@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button, InputField } from "@magnit/components";
-import { ITemplate, IValidation } from "@magnit/entities";
+import { IPuzzle, ISection } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { useValidations } from "hooks/condition";
@@ -10,36 +10,29 @@ import * as React from "react";
 import { Validation } from "./Validation";
 
 interface IValidationsProps {
-    initialState?: IValidation[];
-    puzzleId: string;
-    template: ITemplate;
+    puzzle: IPuzzle;
+    parent: IPuzzle | ISection;
+    puzzles: Map<string, IPuzzle>;
     disabled?: boolean;
     focused?: boolean;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 }
 
 export const Validations: React.FC<IValidationsProps> = props => {
-    const {
-        initialState,
-        puzzleId,
-        template,
-        disabled = false,
-        focused = true,
-        onTemplateChange,
-    } = props;
+    const { puzzle, parent, puzzles, disabled = false, focused = true, onTemplateChange } = props;
 
     const [
-        validations,
         questions,
-        currentQuestion,
         errorMessage,
         onDeleteValidationCallback,
         onValidationChangeCallback,
         onAddValidationCallback,
         onErrorMessageChange,
         onErrorMessageBlurCallback,
-    ] = useValidations(template, disabled, puzzleId, onTemplateChange, initialState);
+    ] = useValidations(puzzle, puzzles, disabled, onTemplateChange, parent);
+
+    const { validations } = puzzle;
 
     return (
         <Grid container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
@@ -48,7 +41,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
                     key={validation.id}
                     validation={validation}
                     index={index}
-                    currentQuestion={currentQuestion}
+                    puzzle={puzzle}
                     onDeleteValidation={onDeleteValidationCallback}
                     onValidationChange={onValidationChangeCallback}
                     questions={questions}

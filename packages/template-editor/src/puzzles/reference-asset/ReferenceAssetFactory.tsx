@@ -12,8 +12,7 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
-        const addAssetButton =
-            !!props.parentPuzzle && props.parentPuzzle.puzzles.length === props.index;
+        const addAssetButton = !!props.parent && props.parent.puzzles.length === props.index;
 
         return (
             <ReferenceAsset

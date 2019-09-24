@@ -2,16 +2,17 @@
 
 import { jsx } from "@emotion/core";
 import { SelectableBlockWrapper } from "@magnit/components";
-import { EPuzzleType, IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IPuzzle, ISection } from "@magnit/entities";
 import { ConditionsWrapper } from "components/conditions";
 import { ItemFactory } from "components/item-factory";
 import _ from "lodash";
 import * as React from "react";
+import { useCallback } from "react";
 
 interface IGroupOfItemsProps {
     index: number;
     puzzle: IPuzzle;
-    parent?: IPuzzle;
+    parent: IPuzzle | ISection;
 
     isFocused(id: string): boolean;
 
@@ -19,20 +20,22 @@ interface IGroupOfItemsProps {
 }
 
 export const SectionContent: React.FC<IGroupOfItemsProps> = props => {
-    const { puzzle, parent } = props;
+    const { puzzle, parent, isFocused, onFocus } = props;
 
-    function onFocus(): void {
-        props.onFocus(puzzle.id);
-    }
+    const isSection = (object: unknown): object is ISection => !_.has(object, "puzzleType");
 
-    const focused = props.isFocused(puzzle.id);
+    const onFocusCallback = useCallback((): void => {
+        onFocus(puzzle.id);
+    }, [onFocus, puzzle.id]);
+
+    const focused = isFocused(puzzle.id);
     const isGroup = puzzle.puzzleType === EPuzzleType.GROUP;
     const hasBorder = !focused && isGroup;
 
     return (
         <SelectableBlockWrapper
-            onFocus={onFocus}
-            onMouseDown={onFocus}
+            onFocus={onFocusCallback}
+            onMouseDown={onFocusCallback}
             focused={focused}
             css={theme => ({
                 paddingTop: theme.spacing(2),
@@ -42,7 +45,7 @@ export const SectionContent: React.FC<IGroupOfItemsProps> = props => {
         >
             <div
                 css={theme => ({
-                    paddingLeft: !!parent ? theme.spacing(4) : 0,
+                    paddingLeft: !!parent && !isSection(parent) ? theme.spacing(4) : 0,
                     paddingTop: theme.spacing(),
                     paddingBottom: theme.spacing(),
                     borderTop: hasBorder ? `1px dashed ${theme.colors.gray}` : "none",
@@ -51,19 +54,17 @@ export const SectionContent: React.FC<IGroupOfItemsProps> = props => {
             >
                 <ItemFactory
                     puzzle={puzzle}
-                    parentPuzzle={parent}
+                    parent={parent}
                     index={props.index}
                     active={focused}
-                    onFocus={onFocus}
+                    onFocus={onFocusCallback}
                 />
                 {isGroup && (
                     <ConditionsWrapper
                         alwaysVisible
-                        puzzleId={puzzle.id}
-                        conditions={puzzle.conditions}
-                        validations={puzzle.validations}
+                        puzzle={puzzle}
+                        parent={parent}
                         focused={focused}
-                        puzzleType={puzzle.puzzleType}
                         answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
                     />
                 )}
@@ -73,32 +74,32 @@ export const SectionContent: React.FC<IGroupOfItemsProps> = props => {
                             <SectionContent
                                 key={childPuzzle.id}
                                 puzzle={childPuzzle}
-                                onFocus={props.onFocus}
-                                isFocused={props.isFocused}
+                                onFocus={onFocus}
+                                isFocused={isFocused}
                                 index={props.index + index}
-                                parent={childPuzzle}
+                                parent={
+                                    puzzle.puzzleType === EPuzzleType.GROUP ? puzzle : childPuzzle
+                                }
                             />
                         );
                     }
                     return (
                         <ItemFactory
+                            key={childPuzzle.id}
                             deep={childPuzzle.puzzleType === EPuzzleType.REFERENCE_ANSWER}
                             puzzle={childPuzzle}
                             index={index}
                             active={focused}
-                            onFocus={onFocus}
-                            key={childPuzzle.id}
-                            parentPuzzle={puzzle}
+                            onFocus={onFocusCallback}
+                            parent={puzzle}
                         />
                     );
                 })}
                 {!isGroup && (
                     <ConditionsWrapper
-                        puzzleId={puzzle.id}
-                        conditions={puzzle.conditions}
-                        validations={puzzle.validations}
+                        puzzle={puzzle}
+                        parent={parent}
                         focused={focused}
-                        puzzleType={puzzle.puzzleType}
                         answerType={_.get(_.head(puzzle.puzzles), "puzzleType")}
                     />
                 )}

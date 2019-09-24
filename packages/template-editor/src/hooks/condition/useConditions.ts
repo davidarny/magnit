@@ -1,136 +1,168 @@
-import { EConditionType, ICondition, IPuzzle, ITemplate } from "@magnit/entities";
+import { EConditionType, ICondition, IPuzzle, ISection } from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import uuid from "uuid/v4";
 
 export function useConditions(
-    template: ITemplate,
+    puzzle: IPuzzle,
+    puzzles: Map<string, IPuzzle>,
     disabled: boolean,
-    puzzleId: string,
-    onTemplateChange: (template: ITemplate) => void,
-    initialState?: ICondition[],
+    onTemplateChange: () => void,
+    parent: IPuzzle | ISection,
 ): [
-    ICondition[],
+    ICondition | null,
     IPuzzle[],
     IPuzzle[],
     (id: string) => void,
-    (id: string, nextCondition: Partial<ICondition>) => void,
+    (id: string, nextCondition: ICondition) => void,
     () => void,
 ] {
-    const defaultState = useRef({
+    const [virtualCondition, setVirtualCondition] = useState<ICondition | null>({
         id: uuid(),
-        order: 0,
-        questionPuzzle: "",
         answerPuzzle: "",
         value: "",
         actionType: "",
         conditionType: EConditionType.OR,
+        order: 0,
+        questionPuzzle: "",
     });
-    const [conditions, setConditions] = useState<ICondition[]>(
-        _.isArray(initialState) && !_.isEmpty(initialState) ? initialState : [defaultState.current],
+
+    const useConditionService: IUseConditionsService<ICondition> = useMemo(
+        () => ({
+            checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
+                return !_.isEqual(
+                    _.omit(leftQuestion, "conditions"),
+                    _.omit(rightQuestion, "conditions"),
+                );
+            },
+
+            setConditions(conditions: ICondition[]) {
+                puzzle.conditions = [...conditions];
+            },
+
+            getConditions(): ICondition[] {
+                return puzzle.conditions;
+            },
+
+            getRightPuzzle(condition: ICondition): string {
+                return condition.questionPuzzle!;
+            },
+
+            resetConditions(condition: ICondition): void {
+                condition.answerPuzzle = "";
+                condition.value = "";
+                condition.actionType = "";
+            },
+
+            onConditionsChange(): void {
+                puzzle.conditions = [...puzzle.conditions, virtualCondition].filter<ICondition>(
+                    (condition): condition is ICondition =>
+                        !_.isNil(condition) &&
+                        !!(
+                            condition.actionType &&
+                            condition.conditionType &&
+                            condition.questionPuzzle &&
+                            (condition.value || condition.answerPuzzle)
+                        ),
+                );
+                onTemplateChange();
+            },
+
+            shouldSetQuestions(_puzzle: IPuzzle): boolean {
+                return true;
+            },
+        }),
+        [puzzle.conditions, onTemplateChange, virtualCondition],
     );
-
-    const useConditionService: IUseConditionsService<ICondition> = {
-        checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
-            return !_.isEqual(
-                _.omit(leftQuestion, "conditions"),
-                _.omit(rightQuestion, "conditions"),
-            );
-        },
-
-        setConditions(conditions: ICondition[]) {
-            if (conditions.length === 0) {
-                conditions.push(defaultState.current);
-            }
-            setConditions(conditions);
-        },
-
-        getConditions(): ICondition[] {
-            return conditions;
-        },
-
-        getRightPuzzle(condition: ICondition): string {
-            return condition.questionPuzzle!;
-        },
-
-        resetConditions(condition: ICondition): void {
-            condition.answerPuzzle = "";
-            condition.value = "";
-            condition.actionType = "";
-        },
-
-        setPuzzleConditions(puzzle: IPuzzle, index: number): void {
-            puzzle.puzzles[index].conditions = [...conditions].filter(
-                condition =>
-                    !!(
-                        condition.actionType &&
-                        condition.conditionType &&
-                        condition.questionPuzzle &&
-                        (condition.value || condition.answerPuzzle)
-                    ),
-            );
-        },
-
-        getPuzzleConditions(puzzle: IPuzzle, index: number) {
-            return puzzle.puzzles[index].conditions;
-        },
-
-        shouldSetQuestions(_puzzle: IPuzzle): boolean {
-            return true;
-        },
-    };
 
     const [questions, answers] = useCommonConditionsLogic<ICondition>(
-        template,
-        puzzleId,
+        puzzle,
+        puzzles,
+        parent,
         useConditionService,
-        onTemplateChange,
     );
+
+    const initial = useRef(false);
+    useEffect(() => {
+        if (puzzle.conditions.length > 0 && !initial.current) {
+            setVirtualCondition(null);
+        }
+        initial.current = true;
+    }, [puzzle.conditions.length]);
 
     const onConditionDeleteCallback = useCallback(
         (id: string) => {
-            // do not allow to delete if only one condition present
-            if (conditions.length === 1) {
-                setConditions([defaultState.current]);
-                return;
+            if (virtualCondition && virtualCondition.id === id) {
+                if (puzzle.conditions.length > 0) {
+                    setVirtualCondition(null);
+                } else {
+                    setVirtualCondition({
+                        id: uuid(),
+                        answerPuzzle: "",
+                        value: "",
+                        actionType: "",
+                        conditionType: EConditionType.OR,
+                        order: 0,
+                        questionPuzzle: "",
+                    });
+                }
+            } else {
+                puzzle.conditions = [...puzzle.conditions.filter(condition => condition.id !== id)];
+                if (puzzle.conditions.length === 0) {
+                    setVirtualCondition({
+                        id: uuid(),
+                        answerPuzzle: "",
+                        value: "",
+                        actionType: "",
+                        conditionType: EConditionType.OR,
+                        order: 0,
+                        questionPuzzle: "",
+                    });
+                }
+                onTemplateChange();
             }
-            setConditions([...conditions.filter(condition => condition.id !== id)]);
         },
-        [conditions, defaultState],
+        [puzzle.conditions, onTemplateChange, virtualCondition],
     );
 
     const onConditionChangeCallback = useCallback(
-        (id: string, nextCondition: Partial<ICondition>): void => {
-            const changedConditionIdx = conditions.findIndex(condition => condition.id === id);
-            conditions[changedConditionIdx] = {
-                ...conditions[changedConditionIdx],
-                ...nextCondition,
-            };
-            setConditions([...conditions]);
+        (id: string, update: ICondition): void => {
+            if (virtualCondition && virtualCondition.id === id) {
+                setVirtualCondition({ ...virtualCondition, ...update });
+            } else {
+                const changedConditionIdx = puzzle.conditions.findIndex(
+                    condition => condition.id === id,
+                );
+                puzzle.conditions[changedConditionIdx] = {
+                    ...puzzle.conditions[changedConditionIdx],
+                    ...update,
+                };
+                puzzle.conditions = [...puzzle.conditions];
+                onTemplateChange();
+            }
         },
-        [conditions],
+        [puzzle.conditions, onTemplateChange, virtualCondition],
     );
 
     const onAddConditionCallback = useCallback((): void => {
-        if (
-            questions.length === 0 ||
-            (conditions.length !== 0 && !conditions.some(condition => !!condition.questionPuzzle))
-        ) {
-            return;
+        useConditionService.onConditionsChange();
+        const last = _.last(puzzle.conditions);
+        if (last) {
+            setVirtualCondition({
+                id: uuid(),
+                answerPuzzle: "",
+                value: "",
+                actionType: "",
+                conditionType: EConditionType.OR,
+                order: last.order + 1,
+                questionPuzzle: last.questionPuzzle,
+            });
         }
-        const conditionsHead = _.head(conditions) || { questionPuzzle: "" };
-        conditions.push({
-            ...defaultState.current,
-            id: uuid(),
-            order: conditions.length - 1,
-            questionPuzzle: conditionsHead.questionPuzzle,
-        });
-        setConditions([...conditions]);
-    }, [conditions, questions.length]);
+    }, [puzzle.conditions, useConditionService]);
 
     return [
-        conditions,
+        virtualCondition,
         questions,
         answers,
         onConditionDeleteCallback,

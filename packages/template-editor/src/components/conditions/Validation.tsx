@@ -19,15 +19,15 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { useCallback, useState } from "react";
-import * as React from "react";
 import { useValidation } from "hooks/condition";
+import * as React from "react";
+import { useCallback, useState } from "react";
 
 interface IValidationProps {
     index: number;
     noDeleteButton: boolean;
     validation: IValidation;
-    currentQuestion: IPuzzle | null;
+    puzzle: IPuzzle;
     questions: IPuzzle[];
 
     onValidationChange(id: string, update: Partial<IValidation>): void;
@@ -41,8 +41,16 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Validation: React.FC<IValidationProps> = props => {
-    const { validation, index, questions, currentQuestion, noDeleteButton = false } = props;
-    const { onValidationChange, onDeleteValidation } = props;
+    const {
+        validation,
+        index,
+        questions,
+        puzzle,
+        noDeleteButton = false,
+        onValidationChange,
+        onDeleteValidation,
+    } = props;
+
     const [value, setValue] = useState(validation.value || 0);
 
     const onOperatorTypeChangeCallback = useCallback(
@@ -102,11 +110,11 @@ export const Validation: React.FC<IValidationProps> = props => {
 
     const isFirstRow = index === 0;
 
-    const currentQuestionId = currentQuestion ? currentQuestion.id : "";
+    const currentQuestionId = puzzle ? puzzle.id : "";
 
-    const currentQuestionTitle = currentQuestion
-        ? currentQuestion.title
-            ? currentQuestion.title
+    const currentQuestionTitle = puzzle
+        ? puzzle.title
+            ? puzzle.title
             : "(текущий вопрос)"
         : "(текущий вопрос)";
 

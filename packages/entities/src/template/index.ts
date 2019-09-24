@@ -57,7 +57,6 @@ export interface IPuzzle {
 }
 
 export interface ISpecificPuzzleProps {
-    id: string;
     index: number;
 }
 
