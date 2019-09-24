@@ -8,21 +8,18 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-    ) {
-        console.log("asdsa ");
-    }
+    ) {}
 
     async findOne(username: String) {
-        return this.userRepository.findOne({ username: `$${username}` });
+        return this.userRepository.findOne({ username: `${username}` });
+    }
+
+    async findOneByEmail(email: string) {
+        return this.userRepository.findOne({ email: `${email}` });
     }
 
     async create(user: User) {
-        try {
-            var res = await this.userRepository.save(user);
-            console.log(res);
-            return res;
-        } catch (err) {
-            console.log(err);
-        }
+        const savedUser = await this.userRepository.save(user);
+        return savedUser;
     }
 }

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthController } from "../auth.controller";
 import { createMockFrom } from "../../../utils/create-mock.util";
 import { UserService } from "../services/user.service";
@@ -41,8 +42,9 @@ describe("Auth Controller", () => {
 
     it("register user", async () => {
         const expected = { success: 1, user: {} };
-        controller.register(userInfo);
-        let res = await controller.register(userInfo);
+        console.log(controller);
+
+        // let res = await controller.register(userInfo);
         // console.log(res);
     });
 });
