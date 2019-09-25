@@ -16,10 +16,12 @@ export class AuthService {
         const user = await this.userService.findOneByEmail(email);
         const encryptPassword = this.passwordManager.encode(pass);
         console.log(`encryptPassword = ${encryptPassword} `);
+        console.log(`user password = ${user.password}`);
+        console.log(`user decode password = ${this.passwordManager.decode(user.password)}`);
         console.log(`user =`);
         console.log(user);
 
-        if (user && encryptPassword === user.password) {
+        if (user && pass === this.passwordManager.decode(user.password)) {
             const { password, ...result } = user;
             return result;
         }
