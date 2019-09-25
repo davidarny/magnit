@@ -34,22 +34,23 @@ export function useValidation(
     value: number,
     index: number,
     conditionType: EConditionType,
+    puzzleId: string,
 ): [
     () => string,
-    () => any[],
+    () => React.ReactNode[],
     (questions: IPuzzle[]) => NarrowCallside<IRightHandPuzzleBuilder>,
-    () => any[],
+    () => React.ReactNode[],
 ] {
     const [getConditionLiteral] = useCommonConditionLogic(index, conditionType);
 
-    const getValidationLiteral = (validationType: EValidationType) => {
+    function getValidationLiteral(validationType: EValidationType) {
         return {
             [EValidationType.COMPARE_WITH_ANSWER]: "Сравнить с ответом",
             [EValidationType.SET_VALUE]: "Установить значение",
         }[validationType];
-    };
+    }
 
-    const getOperatorLiteral = (operatorType: EOperatorType) => {
+    function getOperatorLiteral(operatorType: EOperatorType) {
         return {
             [EOperatorType.MORE_THAN]: "Больше чем",
             [EOperatorType.LESS_THAN]: "Меньше чем",
@@ -57,27 +58,47 @@ export function useValidation(
             [EOperatorType.MORE_OR_EQUAL]: "Больше или равно",
             [EOperatorType.EQUAL]: "Равно",
         }[operatorType];
-    };
+    }
 
-    const getOperatorVariants = () => {
+    function getOperatorVariants() {
         return [
-            <MenuItem key={EOperatorType.EQUAL} value={EOperatorType.EQUAL}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EOperatorType.EQUAL}
+                value={EOperatorType.EQUAL}
+            >
                 {getOperatorLiteral(EOperatorType.EQUAL)}
             </MenuItem>,
-            <MenuItem key={EOperatorType.MORE_THAN} value={EOperatorType.MORE_THAN}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EOperatorType.MORE_THAN}
+                value={EOperatorType.MORE_THAN}
+            >
                 {getOperatorLiteral(EOperatorType.MORE_THAN)}
             </MenuItem>,
-            <MenuItem key={EOperatorType.LESS_THAN} value={EOperatorType.LESS_THAN}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EOperatorType.LESS_THAN}
+                value={EOperatorType.LESS_THAN}
+            >
                 {getOperatorLiteral(EOperatorType.LESS_THAN)}
             </MenuItem>,
-            <MenuItem key={EOperatorType.MORE_OR_EQUAL} value={EOperatorType.MORE_OR_EQUAL}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EOperatorType.MORE_OR_EQUAL}
+                value={EOperatorType.MORE_OR_EQUAL}
+            >
                 {getOperatorLiteral(EOperatorType.MORE_OR_EQUAL)}
             </MenuItem>,
-            <MenuItem key={EOperatorType.LESS_OR_EQUAL} value={EOperatorType.LESS_OR_EQUAL}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EOperatorType.LESS_OR_EQUAL}
+                value={EOperatorType.LESS_OR_EQUAL}
+            >
                 {getOperatorLiteral(EOperatorType.LESS_OR_EQUAL)}
             </MenuItem>,
         ];
-    };
+    }
 
     const getRightHandPuzzle = useCallback(
         (questions: IPuzzle[]): NarrowCallside<IRightHandPuzzleBuilder> => {
@@ -94,12 +115,16 @@ export function useValidation(
                                 fullWidth
                                 placeholder="Выберите вопрос"
                                 onChange={this.onRightHandPuzzleChange}
-                                value={rightHandPuzzle || ""}
+                                value={rightHandPuzzle}
                             >
                                 {questions.length !== 0 &&
                                     questions.map(question => {
                                         return (
-                                            <MenuItem key={question.id} value={question.id}>
+                                            <MenuItem
+                                                className={`select__sentinel__${puzzleId}`}
+                                                key={question.id}
+                                                value={question.id}
+                                            >
                                                 {question.title}
                                             </MenuItem>
                                         );
@@ -110,7 +135,7 @@ export function useValidation(
                         return (
                             <InputField
                                 fullWidth
-                                value={value || ""}
+                                value={value}
                                 onChange={this.onValueChange}
                                 onBlur={this.onValueBlur}
                                 css={theme => ({ marginTop: theme.spacing(-2) })}
@@ -140,7 +165,7 @@ export function useValidation(
                 }
             })();
         },
-        [validation, value],
+        [puzzleId, validation, value],
     );
 
     const getValidationVariants = () => {

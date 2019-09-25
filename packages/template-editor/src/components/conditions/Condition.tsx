@@ -19,6 +19,7 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface IConditionProps {
+    puzzleId: string;
     index: number;
     noDeleteButton: boolean;
     condition: ICondition;
@@ -38,6 +39,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 
 export const Condition: React.FC<IConditionProps> = props => {
     const {
+        puzzleId,
         condition,
         conditions,
         answers,
@@ -127,6 +129,7 @@ export const Condition: React.FC<IConditionProps> = props => {
         value,
         index,
         condition.conditionType,
+        puzzleId,
     );
 
     const isFirstRow = index === 0;
@@ -183,14 +186,17 @@ export const Condition: React.FC<IConditionProps> = props => {
             {isFirstRow && (
                 <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id="question-puzzle"
-                        fullWidth={true}
-                        value={condition.questionPuzzle || ""}
+                        fullWidth
+                        value={condition.questionPuzzle}
                         onChange={onQuestionPuzzleChangeCallback}
                         placeholder="Выберите вопрос"
                     >
                         {questions.map(questionToChoseFrom => (
-                            <MenuItem key={questionToChoseFrom.id} value={questionToChoseFrom.id}>
+                            <MenuItem
+                                className={`select__sentinel__${puzzleId}`}
+                                key={questionToChoseFrom.id}
+                                value={questionToChoseFrom.id}
+                            >
                                 {questionToChoseFrom.title}
                             </MenuItem>
                         ))}
@@ -200,9 +206,8 @@ export const Condition: React.FC<IConditionProps> = props => {
             <Grid item xs={2}>
                 {!!condition.questionPuzzle && (
                     <SelectField
-                        id="action-type"
-                        fullWidth={true}
-                        value={condition.actionType || ""}
+                        fullWidth
+                        value={condition.actionType}
                         onChange={onActionTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

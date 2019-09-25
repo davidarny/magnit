@@ -22,7 +22,7 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getTasks, IGetTasksResponse, updateTask } from "services/api";
 
 const tabs: ITab[] = [
@@ -51,7 +51,7 @@ interface IUpdateTaskListOptions {
 }
 
 export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
-    const tab = props["*"];
+    const tab = props["*"]!;
 
     const context = useContext(AppContext);
 
@@ -76,18 +76,13 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [],
     );
 
-    const updateTasksList = useCallback(
+    const fetchTaskAndUpdateState = useCallback(
         ({ sort, sortBy, title }: IUpdateTaskListOptions = {}) => {
             clearSelectedTasks();
             // get task by current status
             // also apply queries
-            getTasks(
-                context.courier,
-                getTaskStatusByTab(tab),
-                (sort || "").toUpperCase() as "ASC" | "DESC",
-                sortBy,
-                title,
-            )
+            const upperCaseSort = (sort || "ASC").toUpperCase() as "ASC" | "DESC";
+            getTasks(context.courier, getTaskStatusByTab(tab), upperCaseSort, sortBy, title)
                 .then(response => setTasks(response.tasks.map(normalizeTask)))
                 .catch(console.error);
             // get total count of all tasks
@@ -98,8 +93,13 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [clearSelectedTasks, context.courier, normalizeTask, tab],
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => updateTasksList(), [context.courier, tab]);
+    const prevTab = useRef<string | null>(null);
+    useEffect(() => {
+        if (prevTab.current !== tab) {
+            prevTab.current = tab;
+            fetchTaskAndUpdateState();
+        }
+    }, [tab, fetchTaskAndUpdateState]);
 
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
@@ -152,10 +152,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToOnCheck))
-            .then(() => updateTasksList())
+            .then(() => fetchTaskAndUpdateState())
             .catch(console.error)
             .finally(onDialogClose);
-    }, [selectedTasks, setTaskToOnCheck, updateTasksList]);
+    }, [selectedTasks, setTaskToOnCheck, fetchTaskAndUpdateState]);
 
     const setTaskToInProgress = useCallback(
         async (task: TTask) =>
@@ -177,10 +177,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToInProgress))
-            .then(() => updateTasksList())
+            .then(() => fetchTaskAndUpdateState())
             .then(() => clearSelectedTasks())
             .catch(console.error);
-    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, updateTasksList]);
+    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, fetchTaskAndUpdateState]);
 
     const onSelectToggleCallback = useCallback(
         (selected: boolean) => {
@@ -196,7 +196,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [clearSelectedTasks, selectedTasks, tasks],
     );
 
-    const updateTaskListDebounced = _.debounce(updateTasksList, 150);
+    const updateTaskListDebounced = _.debounce(fetchTaskAndUpdateState, 150);
 
     const onSearchQueryChangeCallback = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -208,9 +208,9 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     const onRequestSortCallback = useCallback(
         (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
-            updateTasksList({ sort, sortBy });
+            fetchTaskAndUpdateState({ sort, sortBy });
         },
-        [updateTasksList],
+        [fetchTaskAndUpdateState],
     );
 
     function onDialogOpen() {

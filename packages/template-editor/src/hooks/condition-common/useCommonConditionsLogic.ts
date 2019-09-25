@@ -37,7 +37,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     (id: string) => void,
     (id: string, update: T) => void,
     (onAddConditionImpl: (last: T) => Partial<T>) => void,
-    () => void,
+    (event: MouseEvent) => void,
 ] {
     const [virtualCondition, setVirtualCondition] = useState<T | null>(
         service.getVirtualCondition(),
@@ -211,15 +211,22 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         [service, virtualCondition],
     );
 
-    const onConditionsBlur = useCallback(() => {
-        if (disabled) {
-            return;
-        }
-        if (service.filterConditions(virtualCondition).length > 0) {
-            setVirtualCondition(null);
-        }
-        service.onConditionsChange(virtualCondition);
-    }, [disabled, service, virtualCondition]);
+    const onConditionsBlur = useCallback(
+        (event: MouseEvent) => {
+            if (disabled) {
+                return;
+            }
+            const target = event.target as HTMLElement;
+            if (target.classList.contains(`select__sentinel__${puzzle.id}`)) {
+                return;
+            }
+            if (service.filterConditions(virtualCondition).length > 0) {
+                setVirtualCondition(null);
+            }
+            service.onConditionsChange(virtualCondition);
+        },
+        [disabled, puzzle.id, service, virtualCondition],
+    );
 
     return [
         questions,

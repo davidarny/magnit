@@ -24,6 +24,7 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface IValidationProps {
+    puzzleId: string;
     index: number;
     noDeleteButton: boolean;
     validation: IValidation;
@@ -42,6 +43,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 
 export const Validation: React.FC<IValidationProps> = props => {
     const {
+        puzzleId,
         validation,
         index,
         questions,
@@ -110,7 +112,7 @@ export const Validation: React.FC<IValidationProps> = props => {
         getOperatorVariants,
         getRightHandPuzzle,
         getValidationVariants,
-    ] = useValidation(validation, value, index, validation.conditionType);
+    ] = useValidation(validation, value, index, validation.conditionType, puzzleId);
 
     const isFirstRow = index === 0;
 
@@ -174,14 +176,17 @@ export const Validation: React.FC<IValidationProps> = props => {
             {isFirstRow && (
                 <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id="left-hand-puzzle"
                         fullWidth
                         value={currentQuestionId}
                         placeholder="Выберите вопрос"
                         disabled
                         displayEmpty={false}
                     >
-                        <MenuItem key={currentQuestionId} value={currentQuestionId}>
+                        <MenuItem
+                            className={`select__sentinel__${puzzleId}`}
+                            key={currentQuestionId}
+                            value={currentQuestionId}
+                        >
                             {currentQuestionTitle}
                         </MenuItem>
                     </SelectField>
@@ -190,9 +195,8 @@ export const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.leftHandPuzzle && (
                     <SelectField
-                        id="operator-type"
                         fullWidth
-                        value={validation.operatorType || ""}
+                        value={validation.operatorType}
                         onChange={onOperatorTypeChangeCallback}
                         placeholder="Выберите значение"
                     >
@@ -203,9 +207,8 @@ export const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.operatorType && (
                     <SelectField
-                        id="validation-type"
                         fullWidth
-                        value={validation.validationType || ""}
+                        value={validation.validationType}
                         onChange={onValidationTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

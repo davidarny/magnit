@@ -36,7 +36,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     ] = useConditions(puzzle, puzzles, disabled, onTemplateChange, parent);
 
     const container = useRef<HTMLDivElement | null>(null);
-    useOutsideListener(container, onConditionsBlur);
+    useOutsideListener(container, focused ? onConditionsBlur : _.noop);
 
     return (
         <Grid
@@ -50,6 +50,7 @@ export const Conditions: React.FC<IConditionsProps> = props => {
                 .filter<ICondition>((condition): condition is ICondition => !_.isNil(condition))
                 .map((condition, index) => (
                     <Condition
+                        puzzleId={puzzle.id}
                         key={condition.id}
                         answers={answers}
                         condition={condition}

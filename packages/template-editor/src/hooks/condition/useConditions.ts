@@ -17,7 +17,7 @@ export function useConditions(
     (id: string) => void,
     (id: string, nextCondition: ICondition) => void,
     () => void,
-    () => void,
+    (event: MouseEvent) => void,
 ] {
     const useConditionService = useMemo<IUseConditionsService<ICondition>>(
         () => ({

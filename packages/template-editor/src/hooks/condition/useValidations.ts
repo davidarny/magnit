@@ -24,7 +24,7 @@ export function useValidations(
     () => void,
     (event: TSelectChangeEvent) => void,
     () => void,
-    () => void,
+    (event: MouseEvent) => void,
 ] {
     const [errorMessage, setErrorMessage] = useState<string>(
         _.get(_.first(puzzle.validations), "errorMessage", ""),

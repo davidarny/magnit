@@ -199,8 +199,13 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         taskId,
     ]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => fetchTaskAndUpdateState(), []);
+    const prevTaskId = useRef<number | null>(null);
+    useEffect(() => {
+        if (prevTaskId.current !== taskId) {
+            prevTaskId.current = taskId;
+            fetchTaskAndUpdateState();
+        }
+    }, [fetchTaskAndUpdateState, taskId]);
 
     useEffect(() => {
         // only draft mode contains marketplace selects
