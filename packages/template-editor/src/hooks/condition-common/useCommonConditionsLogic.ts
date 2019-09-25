@@ -97,53 +97,41 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
 
     // hook for invalidating conditions if
     // dependent question has changed
-    const prevConditions = useRef(_.cloneDeep(service.getConditions()));
     const prevDependents = useRef(_.cloneDeep(questions));
     useEffect(() => {
         if (!service.getConditions().length) {
             return;
         }
-        const ignored: number[] = [];
-        service.getConditions().forEach((condition, index) => {
-            let changed = false;
+        let changed = false;
+        service.getConditions().forEach(condition => {
             const dependent = prevDependents.current.find(
                 question => question.id === service.getRightPuzzle(condition),
             );
             if (!dependent) {
                 return;
             }
-            puzzles.forEach(puzzle => {
+            for (const pair of puzzles) {
+                if (changed) {
+                    break;
+                }
+                const puzzle = pair[1];
                 // find dependent question in template
                 if (puzzle.puzzleType !== EPuzzleType.QUESTION || puzzle.id !== dependent.id) {
-                    return;
+                    continue;
                 }
                 // check if dependent question has changed
                 changed = service.checkDependentQuestionChanged(dependent, puzzle);
-            });
-            if (changed) {
-                ignored.push(index);
             }
         });
         prevDependents.current = _.cloneDeep(questions);
-        if (!ignored.length) {
+        if (!changed) {
             return;
         }
-        const nextConditions = service
-            .getConditions()
-            .filter((_value, index) => !ignored.includes(index));
-        if (
-            !_.isEqual(prevConditions.current, nextConditions) ||
-            (!prevConditions.current.length && !nextConditions.length)
-        ) {
-            if (nextConditions.length === 0) {
-                const first = _.first(service.getConditions())!;
-                service.resetConditions(first);
-                nextConditions.push(first);
-            }
-            prevConditions.current = _.cloneDeep(nextConditions);
-            service.setConditions(nextConditions);
-            onTemplateChange();
-        }
+        const first = _.first(service.getConditions())!;
+        service.resetConditions(first);
+        setVirtualCondition(first);
+        service.setConditions([]);
+        onTemplateChange();
     }, [onTemplateChange, puzzles, questions, service]);
 
     const onConditionDeleteCallback = useCallback(

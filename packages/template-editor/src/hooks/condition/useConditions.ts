@@ -1,4 +1,4 @@
-import { EConditionType, ICondition, IPuzzle, ISection } from "@magnit/entities";
+import { EActionType, EConditionType, ICondition, IPuzzle, ISection } from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
 import { useCallback, useMemo } from "react";
@@ -66,7 +66,8 @@ export function useConditions(
                             condition.actionType &&
                             condition.conditionType &&
                             condition.questionPuzzle &&
-                            (condition.value || condition.answerPuzzle)
+                            (condition.actionType === EActionType.GIVEN_ANSWER ||
+                                (condition.value || condition.answerPuzzle))
                         ),
                 );
             },
