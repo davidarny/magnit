@@ -33,12 +33,4 @@ describe("Auth Controller", () => {
     it("should be defined", () => {
         expect(controller).toBeDefined();
     });
-
-    it("register user", async () => {
-        const expected = { success: 1, user: {} };
-        console.log(controller);
-
-        // let res = await controller.register(userInfo);
-        // console.log(res);
-    });
 });

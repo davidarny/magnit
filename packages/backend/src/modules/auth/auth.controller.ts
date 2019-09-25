@@ -11,9 +11,7 @@ import { ValidationPipe } from "../../shared/pipes/validation.pipe";
 @ApiUseTags("auth")
 @Controller("auth")
 export class AuthController {
-    constructor(@Inject(AuthService) private readonly authService: AuthService) {
-        console.log(authService);
-    }
+    constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
     @Post("/register")
     @ApiImplicitBody({ name: "user", type: CreateUserDTO, description: "User info" })

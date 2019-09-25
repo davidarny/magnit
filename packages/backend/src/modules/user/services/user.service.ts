@@ -30,6 +30,7 @@ export class UserService {
     }
 
     async create(user: User) {
+        console.log(user);
         const savedUser = await this.userRepository.save(user);
         return savedUser;
     }
