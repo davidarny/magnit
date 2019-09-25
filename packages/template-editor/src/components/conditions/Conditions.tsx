@@ -9,7 +9,7 @@ import { useConditions } from "hooks/condition";
 import { useOutsideListener } from "hooks/shared";
 import _ from "lodash";
 import * as React from "react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Condition } from "./Condition";
 
 interface IConditionsProps {
@@ -37,6 +37,14 @@ export const Conditions: React.FC<IConditionsProps> = props => {
 
     const container = useRef<HTMLDivElement | null>(null);
     useOutsideListener(container, focused ? onConditionsBlur : _.noop);
+
+    const prevFocused = useRef(focused);
+    useEffect(() => {
+        if (prevFocused.current && !focused) {
+            prevFocused.current = focused;
+            onConditionsBlur();
+        }
+    }, [focused, onConditionsBlur]);
 
     return (
         <Grid ref={container} container spacing={2} css={{ marginBottom: 0 }} alignItems="center">

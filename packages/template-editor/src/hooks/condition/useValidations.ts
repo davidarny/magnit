@@ -24,7 +24,7 @@ export function useValidations(
     () => void,
     (event: TSelectChangeEvent) => void,
     () => void,
-    (event: MouseEvent) => void,
+    (event?: MouseEvent) => void,
 ] {
     const [errorMessage, setErrorMessage] = useState<string>(
         _.get(_.first(puzzle.validations), "errorMessage", ""),
@@ -110,7 +110,6 @@ export function useValidations(
         onAddValidation,
         onValidationsBlur,
     ] = useCommonConditionsLogic<IValidation>(
-        disabled,
         puzzle,
         puzzles,
         parent,

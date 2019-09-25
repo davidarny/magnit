@@ -17,7 +17,7 @@ export function useConditions(
     (id: string) => void,
     (id: string, nextCondition: ICondition) => void,
     () => void,
-    (event: MouseEvent) => void,
+    (event?: MouseEvent) => void,
 ] {
     const useConditionService = useMemo<IUseConditionsService<ICondition>>(
         () => ({
@@ -93,7 +93,6 @@ export function useConditions(
         onAddCondition,
         onConditionsBlur,
     ] = useCommonConditionsLogic<ICondition>(
-        disabled,
         puzzle,
         puzzles,
         parent,

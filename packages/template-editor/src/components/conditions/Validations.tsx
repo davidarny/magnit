@@ -8,6 +8,7 @@ import { Grid, Typography } from "@material-ui/core";
 import { useValidations } from "hooks/condition";
 import { useOutsideListener } from "hooks/shared";
 import _ from "lodash";
+import { useEffect } from "react";
 import * as React from "react";
 import { useRef } from "react";
 import { Validation } from "./Validation";
@@ -39,6 +40,14 @@ export const Validations: React.FC<IValidationsProps> = props => {
 
     const container = useRef<HTMLDivElement | null>(null);
     useOutsideListener(container, focused ? onValidationsBlur : _.noop);
+
+    const prevFocused = useRef(focused);
+    useEffect(() => {
+        if (prevFocused.current && !focused) {
+            prevFocused.current = focused;
+            onValidationsBlur();
+        }
+    }, [focused, onValidationsBlur]);
 
     return (
         <Grid container ref={container} spacing={2} css={{ marginBottom: 0 }} alignItems="center">
