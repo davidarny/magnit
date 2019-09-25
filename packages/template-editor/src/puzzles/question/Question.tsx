@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, IFocusedPuzzleProps, IPuzzle } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -19,12 +19,7 @@ import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "uuid/v4";
 
-interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
-    title: string;
-    puzzle: IPuzzle;
-
-    onTemplateChange(): void;
-}
+interface IQuestionPuzzleProps extends IFocusedPuzzleProps {}
 
 const answerMenuItems = [
     { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER, icon: TextFieldIcon },
@@ -43,10 +38,10 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index, title, focused, onTemplateChange, puzzle } = props;
+    const { index, focused, onTemplateChange, puzzle } = props;
 
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
-    const [questionTitle, setQuestionTitle] = useState(title);
+    const [questionTitle, setQuestionTitle] = useState(puzzle.title);
 
     const prevAnswerType = useRef("");
     useEffect(() => {
@@ -110,7 +105,9 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                 });
             }
             setAnswersType(answersType);
-            onTemplateChange();
+            if (onTemplateChange) {
+                onTemplateChange();
+            }
         },
         [onTemplateChange, puzzle.conditions, puzzle.puzzles, puzzle.validations],
     );

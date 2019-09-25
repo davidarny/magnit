@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { Fab } from "@magnit/components";
 import { IFocusedPuzzleProps } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
@@ -25,10 +25,7 @@ export const UploadFilesAnswer: React.FC<IFocusedPuzzleProps> = ({ focused }) =>
                 justify="center"
                 alignItems="center"
                 direction="column"
-                css={css`
-                    width: 100%;
-                    height: 100%;
-                `}
+                css={{ width: "100%", height: "100%" }}
             >
                 <Fab
                     css={theme => ({

@@ -8,7 +8,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { RadioAnswer } from "./RadioAnswer";
 
 export class RadioAnswerFactory implements IPuzzleFactory {
-    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create(props: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
@@ -16,9 +16,6 @@ export class RadioAnswerFactory implements IPuzzleFactory {
 
         return (
             <RadioAnswer
-                id={puzzle.id}
-                title={puzzle.title}
-                focused={focused}
                 onAddRadioButton={onAddAnswerPuzzle}
                 onDeleteRadioButton={onDeleteAnswerPuzzle}
                 addRadioButton={addRadioButton}

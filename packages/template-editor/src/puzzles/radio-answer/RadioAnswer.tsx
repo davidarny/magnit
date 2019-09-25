@@ -2,64 +2,53 @@
 
 import { css, jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { IFocusedPuzzleProps } from "@magnit/entities";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
-import { traverse } from "services/json";
+import { useCallback, useState } from "react";
 
 interface IRadioAnswerPuzzleProps extends IFocusedPuzzleProps {
-    title: string;
-    template: ITemplate;
     // flag indication this radio should render
     // button which adds new radio when clicked
     addRadioButton: boolean;
-
-    onTemplateChange(template: ITemplate): void;
 
     onAddRadioButton(id: string): void;
 
     onDeleteRadioButton(id: string): void;
 }
 
-type TSelectChangeEvent = React.ChangeEvent<{
-    name?: string;
-    value: unknown;
-}>;
-
 export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
-    const { addRadioButton, id, index, title, template, focused } = props;
-    const { onTemplateChange, onAddRadioButton, onDeleteRadioButton } = props;
+    const {
+        puzzle,
+        addRadioButton,
+        index,
+        focused,
+        onTemplateChange,
+        onAddRadioButton,
+        onDeleteRadioButton,
+    } = props;
 
-    const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
+    const [label, setLabel] = useState(puzzle.title || `Вариант ${index + 1}`);
 
-    const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id") || puzzle.id !== id) {
-                return;
-            }
-            puzzle.title = label;
-            return true;
-        });
-        onTemplateChange(template);
-    }, [label, id, template, onTemplateChange]);
+    const onAddRadioButtonCallback = useCallback(() => {
+        onAddRadioButton(puzzle.id);
+    }, [puzzle.id, onAddRadioButton]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => onTemplateChangeCallback(), [focused]);
+    const onDeleteRadioButtonCallback = useCallback(() => {
+        onDeleteRadioButton(puzzle.id);
+    }, [onDeleteRadioButton, puzzle.id]);
 
-    function onLabelChange(event: TSelectChangeEvent): void {
+    function onLabelChange(event: React.ChangeEvent<HTMLInputElement>): void {
         setLabel(event.target.value as string);
     }
 
-    const onAddRadioButtonCallback = useCallback(() => {
-        onAddRadioButton(id);
-    }, [id, onAddRadioButton]);
-
-    const onDeleteRadioButtonCallback = useCallback(() => {
-        onDeleteRadioButton(id);
-    }, [onDeleteRadioButton, id]);
+    const onLabelBlurCallback = useCallback(() => {
+        puzzle.title = label;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [label, onTemplateChange, puzzle.title]);
 
     if (!focused) {
         return (
@@ -105,7 +94,7 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onTemplateChangeCallback}
+                        onBlur={onLabelBlurCallback}
                     />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>

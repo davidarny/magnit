@@ -8,7 +8,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { CheckboxAnswer } from "./CheckboxAnswer";
 
 export class CheckboxAnswerFactory implements IPuzzleFactory {
-    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create(props: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
@@ -16,9 +16,6 @@ export class CheckboxAnswerFactory implements IPuzzleFactory {
 
         return (
             <CheckboxAnswer
-                id={puzzle.id}
-                title={puzzle.title}
-                focused={focused}
                 onAddCheckboxButton={onAddAnswerPuzzle}
                 onDeleteCheckboxButton={onDeleteAnswerPuzzle}
                 addCheckboxButton={addCheckboxButton}

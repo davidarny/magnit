@@ -6,7 +6,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { Group } from "./Group";
 
 export class GroupFactory implements IPuzzleFactory {
-    create({ puzzle, ...rest }: IPuzzleFactoryProps): React.ReactNode {
+    create(_props: IPuzzleFactoryProps): React.ReactNode {
         return <Group />;
     }
 }

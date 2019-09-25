@@ -8,7 +8,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { DropdownAnswer } from "./DropdownAnswer";
 
 export class DropdownAnswerFactory implements IPuzzleFactory {
-    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create(props: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
@@ -16,9 +16,6 @@ export class DropdownAnswerFactory implements IPuzzleFactory {
 
         return (
             <DropdownAnswer
-                id={puzzle.id}
-                title={puzzle.title}
-                focused={focused}
                 onAddDropdownButton={onAddAnswerPuzzle}
                 onDeleteDropdownButton={onDeleteAnswerPuzzle}
                 addDropdownButton={addDropdownButton}

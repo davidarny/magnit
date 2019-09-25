@@ -58,6 +58,9 @@ export interface IPuzzle {
 
 export interface ISpecificPuzzleProps {
     index: number;
+    puzzle: IPuzzle;
+
+    onTemplateChange?(): void;
 }
 
 export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {

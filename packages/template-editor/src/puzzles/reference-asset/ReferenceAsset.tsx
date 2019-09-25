@@ -11,8 +11,6 @@ import * as React from "react";
 import { useCallback, useRef } from "react";
 
 interface IReferenceAssetProps extends IFocusedPuzzleProps {
-    title: string;
-    description: string;
     // flag indication this asset should render
     // button which adds new asset when clicked
     addAssetButton: boolean;
@@ -27,8 +25,15 @@ interface IReferenceAssetProps extends IFocusedPuzzleProps {
 }
 
 export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
-    const { focused, id, description, addAssetButton, title } = props;
-    const { onUploadAsset, onAddAsset, onDeleteAsset, onDeleteAssetPuzzle } = props;
+    const {
+        puzzle,
+        focused,
+        addAssetButton,
+        onUploadAsset,
+        onAddAsset,
+        onDeleteAsset,
+        onDeleteAssetPuzzle,
+    } = props;
 
     const input = useRef<HTMLInputElement>(null);
 
@@ -46,7 +51,7 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
             }
             onUploadAsset(file)
                 .then(response => {
-                    onAddAsset(id, {
+                    onAddAsset(puzzle.id, {
                         puzzleType: EPuzzleType.REFERENCE_ASSET,
                         title: _.get(file, "name", ""),
                         description: response.filename,
@@ -54,16 +59,16 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                 })
                 .catch(console.error);
         },
-        [id, onUploadAsset, onAddAsset],
+        [puzzle.id, onUploadAsset, onAddAsset],
     );
 
     const onDeleteAssetCallback = useCallback(() => {
-        const url = description;
+        const url = puzzle.description;
         const filename = url.substring(url.lastIndexOf("/") + 1);
         onDeleteAsset(filename)
             .catch(console.error)
-            .finally(() => onDeleteAssetPuzzle(id));
-    }, [description, id, onDeleteAsset, onDeleteAssetPuzzle]);
+            .finally(() => onDeleteAssetPuzzle(puzzle.id));
+    }, [puzzle.description, puzzle.id, onDeleteAsset, onDeleteAssetPuzzle]);
 
     return (
         <Grid css={() => ({ ...(!focused ? { display: "none" } : {}) })} item xs={2}>
@@ -88,8 +93,8 @@ export const ReferenceAsset: React.FC<IReferenceAssetProps> = props => {
                                 objectFit: "contain",
                                 maxHeight: theme.spacing(20),
                             })}
-                            alt={title}
-                            src={description}
+                            alt={puzzle.title}
+                            src={puzzle.description}
                         />
                         <div
                             onClick={onDeleteAssetCallback}

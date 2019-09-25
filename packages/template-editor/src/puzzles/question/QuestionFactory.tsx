@@ -8,10 +8,9 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { Question } from "./Question";
 
 export class QuestionFactory implements IPuzzleFactory {
-    create({ puzzle, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create(props: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
-        const { template, ...rest } = context;
 
-        return <Question puzzle={puzzle} title={puzzle.title} {...rest} {...props} />;
+        return <Question {...props} {...context} />;
     }
 }

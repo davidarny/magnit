@@ -1,65 +1,54 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { IFocusedPuzzleProps } from "@magnit/entities";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
-import { traverse } from "services/json";
+import { useCallback, useState } from "react";
 
 interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
-    title: string;
-    template: ITemplate;
     // flag indication this checkbox should render
     // button which adds new checkbox when clicked
     addCheckboxButton: boolean;
-
-    onTemplateChange(template: ITemplate): void;
 
     onAddCheckboxButton(id: string): void;
 
     onDeleteCheckboxButton(id: string): void;
 }
 
-type TSelectChangeEvent = React.ChangeEvent<{
-    name?: string;
-    value: unknown;
-}>;
-
 export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
-    const { focused, template, index, addCheckboxButton, id, title } = props;
-    const { onTemplateChange, onAddCheckboxButton, onDeleteCheckboxButton } = props;
+    const {
+        puzzle,
+        focused,
+        index,
+        addCheckboxButton,
+        onTemplateChange,
+        onAddCheckboxButton,
+        onDeleteCheckboxButton,
+    } = props;
 
-    const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
-
-    function onLabelChange(event: TSelectChangeEvent): void {
-        setLabel(event.target.value as string);
-    }
-
-    const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id") || puzzle.id !== id) {
-                return;
-            }
-            puzzle.title = label;
-            return true;
-        });
-        onTemplateChange(template);
-    }, [label, template, onTemplateChange, id]);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => onTemplateChangeCallback(), [focused]);
+    const [label, setLabel] = useState(puzzle.title || `Вариант ${index + 1}`);
 
     const onAddCheckboxButtonCallback = useCallback(() => {
-        onAddCheckboxButton(id);
-    }, [onAddCheckboxButton, id]);
+        onAddCheckboxButton(puzzle.id);
+    }, [onAddCheckboxButton, puzzle.id]);
 
     const onDeleteCheckboxButtonCallback = useCallback(() => {
-        onDeleteCheckboxButton(id);
-    }, [onDeleteCheckboxButton, id]);
+        onDeleteCheckboxButton(puzzle.id);
+    }, [onDeleteCheckboxButton, puzzle.id]);
+
+    function onLabelChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setLabel(event.target.value);
+    }
+
+    const onLabelBlur = useCallback(() => {
+        puzzle.title = label;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [label, onTemplateChange, puzzle.title]);
 
     if (!focused) {
         return (
@@ -94,18 +83,12 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
                 <Grid item>
                     <Checkbox disabled css={theme => ({ marginLeft: `-${theme.spacing()}` })} />
                 </Grid>
-                <Grid
-                    item
-                    xs
-                    css={css`
-                        padding-left: 0 !important;
-                    `}
-                >
+                <Grid item xs css={{ paddingLeft: "0 !important" }}>
                     <InputField
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onTemplateChangeCallback}
+                        onBlur={onLabelBlur}
                     />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>

@@ -8,7 +8,7 @@ import { IPuzzleFactory, IPuzzleFactoryProps } from "services/item";
 import { ReferenceAsset } from "./ReferenceAsset";
 
 export class ReferenceAssetFactory implements IPuzzleFactory {
-    create({ puzzle, focused, ...props }: IPuzzleFactoryProps): React.ReactNode {
+    create(props: IPuzzleFactoryProps): React.ReactNode {
         const context = useContext(EditorContext);
         const { onAddAnswerPuzzle, onDeleteAnswerPuzzle, ...rest } = context;
 
@@ -16,10 +16,6 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
 
         return (
             <ReferenceAsset
-                title={puzzle.title}
-                description={puzzle.description}
-                id={puzzle.id}
-                focused={focused}
                 addAssetButton={addAssetButton}
                 onAddAsset={onAddAnswerPuzzle}
                 onDeleteAssetPuzzle={onDeleteAnswerPuzzle}

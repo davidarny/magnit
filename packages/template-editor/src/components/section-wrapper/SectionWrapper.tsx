@@ -2,25 +2,24 @@
 
 import { jsx } from "@emotion/core";
 import { SelectableBlockWrapper } from "@magnit/components";
-import { EPuzzleType, ISection, ITemplate } from "@magnit/entities";
+import { EPuzzleType, ISection } from "@magnit/entities";
 import { SectionContent } from "components/section-content";
 import { SectionView } from "components/section-view";
 import * as React from "react";
 import { useCallback } from "react";
 
 interface ITemplateSectionProps {
-    template: ITemplate;
     section: ISection;
     index: number;
     focusedPuzzleId?: string;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 
     onPuzzleFocus(id: string, force?: boolean): void;
 }
 
 export const SectionWrapper: React.FC<ITemplateSectionProps> = props => {
-    const { section, focusedPuzzleId, template, index, onTemplateChange, onPuzzleFocus } = props;
+    const { section, focusedPuzzleId, index, onTemplateChange, onPuzzleFocus } = props;
 
     const focused = focusedPuzzleId === section.id;
 
@@ -41,12 +40,9 @@ export const SectionWrapper: React.FC<ITemplateSectionProps> = props => {
             focused={focused}
         >
             <SectionView
-                id={section.id}
-                description={section.description}
-                title={section.title}
+                puzzle={section}
                 index={index}
                 focused={focused}
-                template={template}
                 onTemplateChange={onTemplateChange}
             >
                 {section.puzzles.map((puzzle, index) => {
