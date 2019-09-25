@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthController } from "../auth.controller";
 import { createMockFrom } from "../../../utils/create-mock.util";
-import { UserService } from "../services/user.service";
+import { UserService } from "../../user/services/user.service";
 import { AuthService } from "../services/auth.service";
 import { CreateUserDTO } from "../dto/create-user.dto";
 import { User } from "../entities/user.entity";
@@ -11,12 +11,6 @@ describe("Auth Controller", () => {
     let controller: AuthController;
     const userService = createMockFrom(UserService.prototype);
     const authService = createMockFrom(AuthService.prototype);
-
-    const userInfo: CreateUserDTO = {
-        username: "User1",
-        password: "password",
-        email: "email@do.it",
-    };
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
