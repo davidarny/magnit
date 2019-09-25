@@ -36,8 +36,7 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
                 }
                 throw new InvalidTokenException(message);
             }
-        }
-        if (authorization) {
+        } else if (authorization) {
             const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
             req.user = await this.authService.validateUser(username, password);
             if (!req.user) {
