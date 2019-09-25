@@ -44,13 +44,25 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
-    const initial = useRef(false);
+    const initiated = useRef(false);
+    const prevPuzzlePuzzles = useRef(_.cloneDeep(puzzle.puzzles));
     useEffect(() => {
-        if (service.getConditions().length > 0 && !initial.current) {
-            setVirtualCondition(null);
+        if (initiated.current) {
+            return;
         }
-        initial.current = true;
-    }, [service]);
+        if (
+            !_.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles) ||
+            (!prevPuzzlePuzzles.current.length && !puzzle.puzzles.length)
+        ) {
+            initiated.current = true;
+            prevPuzzlePuzzles.current = _.cloneDeep(puzzle.puzzles);
+            if (service.getConditions().length > 0) {
+                setVirtualCondition(null);
+            } else {
+                setVirtualCondition(service.getVirtualCondition());
+            }
+        }
+    }, [puzzle.puzzles, service]);
 
     const { puzzles: parentPuzzles } = parent || { puzzles: [] };
     const prevQuestions = useRef(_.cloneDeep(questions));
