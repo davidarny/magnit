@@ -6,8 +6,10 @@ import { IPuzzle, ISection, IValidation } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { ClickAwayListener, Grid, Typography } from "@material-ui/core";
 import { useValidations } from "hooks/condition";
+import { useOutsideListener } from "hooks/shared";
 import _ from "lodash";
 import * as React from "react";
+import { useRef } from "react";
 import { Validation } from "./Validation";
 
 interface IValidationsProps {
@@ -35,18 +37,20 @@ export const Validations: React.FC<IValidationsProps> = props => {
         onValidationsBlur,
     ] = useValidations(puzzle, puzzles, disabled, onTemplateChange, parent);
 
-    const { validations } = puzzle;
+    const container = useRef<HTMLDivElement | null>(null);
+    useOutsideListener(container, onValidationsBlur);
 
     return (
-        <ClickAwayListener onClickAway={onValidationsBlur}>
+        <ClickAwayListener onClickAway={focused ? onValidationsBlur : _.noop}>
             <Grid
                 container
+                ref={container}
                 spacing={2}
                 css={{ marginBottom: 0, outline: "none" }}
                 alignItems="center"
                 tabIndex={0}
             >
-                {[...validations, virtualCondition]
+                {[...puzzle.validations, virtualCondition]
                     .filter<IValidation>(
                         (validation): validation is IValidation => !_.isNil(validation),
                     )
