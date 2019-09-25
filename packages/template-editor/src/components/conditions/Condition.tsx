@@ -65,7 +65,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 questionPuzzle: event.target.value as string,
             });
         },
-        [condition.id, conditions.length, onConditionChange],
+        [condition, conditions.length, onConditionChange],
     );
 
     const onActionTypeChangeCallback = useCallback(
@@ -75,7 +75,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 actionType: event.target.value as EActionType,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     const onAnswerPuzzleChangeCallback = useCallback(
@@ -85,7 +85,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 answerPuzzle: event.target.value as string,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     function onValueChange(event: TSelectChangeEvent): void {
@@ -94,7 +94,7 @@ export const Condition: React.FC<IConditionProps> = props => {
 
     const onValueBlurCallback = useCallback(() => {
         onConditionChange(condition.id, { ...condition, value });
-    }, [condition.id, onConditionChange, value]);
+    }, [condition, onConditionChange, value]);
 
     const onConditionTypeChangeCallback = useCallback(
         (event: unknown, value: unknown): void => {
@@ -103,7 +103,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 conditionType: value as EConditionType,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     const onConditionDeleteCallback = useCallback(() => {

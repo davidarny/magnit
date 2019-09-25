@@ -1,6 +1,6 @@
 import { EPuzzleType, ICondition, IPuzzle, ISection, IValidation } from "@magnit/entities";
 import _ from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface IUseConditionsService<T> {
     setConditions(conditions: T[]): void;
@@ -13,9 +13,11 @@ export interface IUseConditionsService<T> {
 
     checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean;
 
-    onConditionsChange(): void;
+    onConditionsChange(virtualCondition: T | null): void;
 
     shouldSetQuestions(puzzle: IPuzzle): boolean;
+
+    getVirtualCondition(): T;
 }
 
 export function useCommonConditionsLogic<T extends ICondition | IValidation>(
@@ -23,13 +25,33 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     puzzles: Map<string, IPuzzle>,
     parent: IPuzzle | ISection,
     service: IUseConditionsService<T>,
-): [IPuzzle[], IPuzzle[]] {
+    onTemplateChange: () => void,
+): [
+    IPuzzle[],
+    IPuzzle[],
+    T | null,
+    (value: T | null) => void,
+    (id: string) => void,
+    (id: string, update: T) => void,
+    (onAddConditionImpl: (last: T) => Partial<T>) => void,
+] {
+    const [virtualCondition, setVirtualCondition] = useState<T | null>(
+        service.getVirtualCondition(),
+    );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
     const isPuzzle = (object: unknown): object is IPuzzle => _.has(object, "puzzleType");
 
     const { puzzleType: parentPuzzleType } = isPuzzle(parent) ? parent : { puzzleType: undefined };
+
+    const initial = useRef(false);
+    useEffect(() => {
+        if (service.getConditions().length > 0 && !initial.current) {
+            setVirtualCondition(null);
+        }
+        initial.current = true;
+    }, [service]);
 
     // hook for invalidating conditions if
     // dependent question has changed
@@ -114,9 +136,80 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         }
         if (!_.isEqual(prevPuzzle.current, puzzle)) {
             prevPuzzle.current = _.cloneDeep(puzzle);
-            service.onConditionsChange();
+            service.onConditionsChange(virtualCondition);
         }
-    }, [answers, parent, parentPuzzleType, parentPuzzles, puzzle, questions, service]);
+    }, [
+        answers,
+        parent,
+        parentPuzzleType,
+        parentPuzzles,
+        puzzle,
+        questions,
+        service,
+        virtualCondition,
+    ]);
 
-    return [questions, answers];
+    const onConditionDeleteCallback = useCallback(
+        (id: string) => {
+            if (virtualCondition && virtualCondition.id === id) {
+                if (puzzle.conditions.length > 0) {
+                    setVirtualCondition(null);
+                } else {
+                    setVirtualCondition(service.getVirtualCondition());
+                }
+            } else {
+                service.setConditions([
+                    ...service.getConditions().filter(condition => condition.id !== id),
+                ]);
+                if (service.getConditions().length === 0) {
+                    setVirtualCondition(service.getVirtualCondition());
+                }
+                onTemplateChange();
+            }
+        },
+        [onTemplateChange, puzzle.conditions.length, service, virtualCondition],
+    );
+
+    const onConditionChangeCallback = useCallback(
+        (id: string, update: T): void => {
+            if (virtualCondition && virtualCondition.id === id) {
+                setVirtualCondition({ ...virtualCondition, ...update });
+            } else {
+                const changedConditionIdx = service
+                    .getConditions()
+                    .findIndex(condition => condition.id === id);
+                service.getConditions()[changedConditionIdx] = {
+                    ...service.getConditions()[changedConditionIdx],
+                    ...update,
+                };
+                service.setConditions([...service.getConditions()]);
+                onTemplateChange();
+            }
+        },
+        [onTemplateChange, service, virtualCondition],
+    );
+
+    const onAddConditionCallback = useCallback(
+        (onAddConditionImpl: (last: T) => Partial<T>): void => {
+            service.onConditionsChange(virtualCondition);
+            const last = _.last(service.getConditions());
+            if (last) {
+                setVirtualCondition({
+                    ...service.getVirtualCondition(),
+                    ...onAddConditionImpl(last),
+                });
+            }
+        },
+        [service, virtualCondition],
+    );
+
+    return [
+        questions,
+        answers,
+        virtualCondition,
+        setVirtualCondition,
+        onConditionDeleteCallback,
+        onConditionChangeCallback,
+        onAddConditionCallback,
+    ];
 }

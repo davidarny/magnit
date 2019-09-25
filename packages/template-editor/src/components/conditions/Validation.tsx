@@ -30,7 +30,7 @@ interface IValidationProps {
     puzzle: IPuzzle;
     questions: IPuzzle[];
 
-    onValidationChange(id: string, update: Partial<IValidation>): void;
+    onValidationChange(id: string, update: IValidation): void;
 
     onDeleteValidation(id: string): void;
 }
@@ -56,19 +56,21 @@ export const Validation: React.FC<IValidationProps> = props => {
     const onOperatorTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 operatorType: event.target.value as EOperatorType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onRightHandPuzzleChange = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 rightHandPuzzle: event.target.value as string,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     function onValueChange(event: TSelectChangeEvent): void {
@@ -76,25 +78,27 @@ export const Validation: React.FC<IValidationProps> = props => {
     }
 
     const onValueBlurCallback = useCallback(() => {
-        onValidationChange(validation.id, { value });
-    }, [onValidationChange, validation.id, value]);
+        onValidationChange(validation.id, { ...validation, value });
+    }, [onValidationChange, validation, value]);
 
     const onValidationTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 validationType: event.target.value as EValidationType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onConditionTypeChangeCallback = useCallback(
         (event: unknown, value: unknown): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 conditionType: value as EConditionType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onDeleteValidationHandlerCallback = useCallback(() => {

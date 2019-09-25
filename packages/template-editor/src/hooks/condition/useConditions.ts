@@ -1,7 +1,7 @@
 import { EConditionType, ICondition, IPuzzle, ISection } from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 import uuid from "uuid/v4";
 
 export function useConditions(
@@ -18,18 +18,20 @@ export function useConditions(
     (id: string, nextCondition: ICondition) => void,
     () => void,
 ] {
-    const [virtualCondition, setVirtualCondition] = useState<ICondition | null>({
-        id: uuid(),
-        answerPuzzle: "",
-        value: "",
-        actionType: "",
-        conditionType: EConditionType.OR,
-        order: 0,
-        questionPuzzle: "",
-    });
-
     const useConditionService: IUseConditionsService<ICondition> = useMemo(
         () => ({
+            getVirtualCondition() {
+                return {
+                    id: uuid(),
+                    answerPuzzle: "",
+                    value: "",
+                    actionType: "",
+                    conditionType: EConditionType.OR,
+                    order: 0,
+                    questionPuzzle: "",
+                } as ICondition;
+            },
+
             checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
                 return !_.isEqual(
                     _.omit(leftQuestion, "conditions"),
@@ -55,7 +57,7 @@ export function useConditions(
                 condition.actionType = "";
             },
 
-            onConditionsChange(): void {
+            onConditionsChange(virtualCondition: ICondition | null): void {
                 puzzle.conditions = [...puzzle.conditions, virtualCondition].filter<ICondition>(
                     (condition): condition is ICondition =>
                         !_.isNil(condition) &&
@@ -73,93 +75,45 @@ export function useConditions(
                 return true;
             },
         }),
-        [puzzle.conditions, onTemplateChange, virtualCondition],
+        [onTemplateChange, puzzle.conditions],
     );
 
-    const [questions, answers] = useCommonConditionsLogic<ICondition>(
+    const [
+        questions,
+        answers,
+        virtualCondition,
+        ,
+        onConditionDelete,
+        onConditionChange,
+        onAddCondition,
+    ] = useCommonConditionsLogic<ICondition>(
         puzzle,
         puzzles,
         parent,
         useConditionService,
+        onTemplateChange,
     );
-
-    const initial = useRef(false);
-    useEffect(() => {
-        if (puzzle.conditions.length > 0 && !initial.current) {
-            setVirtualCondition(null);
-        }
-        initial.current = true;
-    }, [puzzle.conditions.length]);
 
     const onConditionDeleteCallback = useCallback(
         (id: string) => {
-            if (virtualCondition && virtualCondition.id === id) {
-                if (puzzle.conditions.length > 0) {
-                    setVirtualCondition(null);
-                } else {
-                    setVirtualCondition({
-                        id: uuid(),
-                        answerPuzzle: "",
-                        value: "",
-                        actionType: "",
-                        conditionType: EConditionType.OR,
-                        order: 0,
-                        questionPuzzle: "",
-                    });
-                }
-            } else {
-                puzzle.conditions = [...puzzle.conditions.filter(condition => condition.id !== id)];
-                if (puzzle.conditions.length === 0) {
-                    setVirtualCondition({
-                        id: uuid(),
-                        answerPuzzle: "",
-                        value: "",
-                        actionType: "",
-                        conditionType: EConditionType.OR,
-                        order: 0,
-                        questionPuzzle: "",
-                    });
-                }
-                onTemplateChange();
-            }
+            onConditionDelete(id);
         },
-        [puzzle.conditions, onTemplateChange, virtualCondition],
+        [onConditionDelete],
     );
 
     const onConditionChangeCallback = useCallback(
         (id: string, update: ICondition): void => {
-            if (virtualCondition && virtualCondition.id === id) {
-                setVirtualCondition({ ...virtualCondition, ...update });
-            } else {
-                const changedConditionIdx = puzzle.conditions.findIndex(
-                    condition => condition.id === id,
-                );
-                puzzle.conditions[changedConditionIdx] = {
-                    ...puzzle.conditions[changedConditionIdx],
-                    ...update,
-                };
-                puzzle.conditions = [...puzzle.conditions];
-                onTemplateChange();
-            }
+            onConditionChange(id, update);
         },
-        [puzzle.conditions, onTemplateChange, virtualCondition],
+        [onConditionChange],
     );
 
     const onAddConditionCallback = useCallback((): void => {
-        useConditionService.onConditionsChange();
-        const last = _.last(puzzle.conditions);
-        if (last) {
-            setVirtualCondition({
-                id: uuid(),
-                answerPuzzle: "",
-                value: "",
-                actionType: "",
-                conditionType: EConditionType.OR,
-                order: last.order + 1,
-                questionPuzzle: last.questionPuzzle,
-            });
-        }
-    }, [puzzle.conditions, useConditionService]);
+        onAddCondition(last => ({
+            order: last.order + 1,
+            questionPuzzle: last.questionPuzzle,
+        }));
+    }, [onAddCondition]);
 
     return [
         virtualCondition,

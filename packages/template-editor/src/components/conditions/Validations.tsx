@@ -2,10 +2,11 @@
 
 import { jsx } from "@emotion/core";
 import { Button, InputField } from "@magnit/components";
-import { IPuzzle, ISection } from "@magnit/entities";
+import { IPuzzle, ISection, IValidation } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { useValidations } from "hooks/condition";
+import _ from "lodash";
 import * as React from "react";
 import { Validation } from "./Validation";
 
@@ -23,6 +24,7 @@ export const Validations: React.FC<IValidationsProps> = props => {
     const { puzzle, parent, puzzles, disabled = false, focused = true, onTemplateChange } = props;
 
     const [
+        virtualCondition,
         questions,
         errorMessage,
         onDeleteValidationCallback,
@@ -35,19 +37,29 @@ export const Validations: React.FC<IValidationsProps> = props => {
     const { validations } = puzzle;
 
     return (
-        <Grid container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
-            {validations.map((validation, index) => (
-                <Validation
-                    key={validation.id}
-                    validation={validation}
-                    index={index}
-                    puzzle={puzzle}
-                    onDeleteValidation={onDeleteValidationCallback}
-                    onValidationChange={onValidationChangeCallback}
-                    questions={questions}
-                    noDeleteButton={!focused}
-                />
-            ))}
+        <Grid
+            container
+            spacing={2}
+            css={{ marginBottom: 0, outline: "none" }}
+            alignItems="center"
+            tabIndex={0}
+        >
+            {[...validations, virtualCondition]
+                .filter<IValidation>(
+                    (validation): validation is IValidation => !_.isNil(validation),
+                )
+                .map((validation, index) => (
+                    <Validation
+                        key={validation.id}
+                        validation={validation}
+                        index={index}
+                        puzzle={puzzle}
+                        onDeleteValidation={onDeleteValidationCallback}
+                        onValidationChange={onValidationChangeCallback}
+                        questions={questions}
+                        noDeleteButton={!focused}
+                    />
+                ))}
             {focused && (
                 <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(9) })}>
                     <Button
