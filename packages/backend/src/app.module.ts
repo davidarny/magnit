@@ -10,6 +10,7 @@ import { PushTokenModule } from "./modules/push-token/push-token.module";
 import { TaskModule } from "./modules/task/task.module";
 import { TemplateModule } from "./modules/template/template.module";
 import { CustomFileLogger } from "./shared/providers/custom.file.logger";
+import { UserModule } from "./modules/user/user.module";
 
 const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
 
@@ -25,6 +26,7 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
             }),
         }),
         TemplateModule,
+        UserModule,
         TaskModule,
         AssetModule,
         MailModule,
