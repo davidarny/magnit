@@ -39,22 +39,27 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     (event?: MouseEvent) => void,
 ] {
     const [virtualCondition, setVirtualCondition] = useState<T | null>(
-        service.getVirtualCondition(),
+        !service.getConditions().length ? service.getVirtualCondition() : null,
     );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
-    const initiated = useRef(false);
+    const prevVirtualCondition = useRef(_.cloneDeep(virtualCondition));
     const prevPuzzlePuzzles = useRef(_.cloneDeep(puzzle.puzzles));
     useEffect(() => {
-        if (initiated.current) {
+        if (
+            (!_.isEqual(prevVirtualCondition.current, virtualCondition) &&
+                _.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles)) ||
+            (service.getConditions().length > 0 && !_.isNil(virtualCondition))
+        ) {
+            prevVirtualCondition.current = _.cloneDeep(virtualCondition);
             return;
         }
+        prevVirtualCondition.current = _.cloneDeep(virtualCondition);
         if (
             !_.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles) ||
             (!prevPuzzlePuzzles.current.length && !puzzle.puzzles.length)
         ) {
-            initiated.current = true;
             prevPuzzlePuzzles.current = _.cloneDeep(puzzle.puzzles);
             if (service.getConditions().length > 0) {
                 setVirtualCondition(null);
@@ -62,7 +67,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 setVirtualCondition(service.getVirtualCondition());
             }
         }
-    }, [puzzle.puzzles, service]);
+    }, [puzzle.puzzles, service, virtualCondition]);
 
     const { puzzles: parentPuzzles } = parent || { puzzles: [] };
     const prevQuestions = useRef(_.cloneDeep(questions));
