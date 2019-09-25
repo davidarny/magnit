@@ -13,6 +13,8 @@ export interface IUseConditionsService<T> {
 
     checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean;
 
+    filterConditions(virtualCondition: T | null): T[];
+
     onConditionsChange(virtualCondition: T | null): void;
 
     shouldSetQuestions(puzzle: IPuzzle): boolean;
@@ -21,6 +23,7 @@ export interface IUseConditionsService<T> {
 }
 
 export function useCommonConditionsLogic<T extends ICondition | IValidation>(
+    disabled: boolean,
     puzzle: IPuzzle,
     puzzles: Map<string, IPuzzle>,
     parent: IPuzzle | ISection,
@@ -34,6 +37,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     (id: string) => void,
     (id: string, update: T) => void,
     (onAddConditionImpl: (last: T) => Partial<T>) => void,
+    () => void,
 ] {
     const [virtualCondition, setVirtualCondition] = useState<T | null>(
         service.getVirtualCondition(),
@@ -97,6 +101,9 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const prevQuestions = useRef(_.cloneDeep(questions));
     const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
+        if (disabled) {
+            return;
+        }
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
@@ -140,6 +147,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         }
     }, [
         answers,
+        disabled,
         parent,
         parentPuzzleType,
         parentPuzzles,
@@ -203,6 +211,16 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         [service, virtualCondition],
     );
 
+    const onConditionsBlur = useCallback(() => {
+        if (disabled) {
+            return;
+        }
+        if (service.filterConditions(virtualCondition).length > 0) {
+            setVirtualCondition(null);
+        }
+        service.onConditionsChange(virtualCondition);
+    }, [disabled, service, virtualCondition]);
+
     return [
         questions,
         answers,
@@ -211,5 +229,6 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
+        onConditionsBlur,
     ];
 }

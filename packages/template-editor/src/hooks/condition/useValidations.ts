@@ -24,12 +24,13 @@ export function useValidations(
     () => void,
     (event: TSelectChangeEvent) => void,
     () => void,
+    () => void,
 ] {
     const [errorMessage, setErrorMessage] = useState<string>(
         _.get(_.first(puzzle.validations), "errorMessage", ""),
     );
 
-    const useConditionService: IUseConditionsService<IValidation> = useMemo(
+    const useConditionService = useMemo<IUseConditionsService<IValidation>>(
         () => ({
             getVirtualCondition() {
                 return {
@@ -71,8 +72,8 @@ export function useValidations(
                 setErrorMessage("");
             },
 
-            onConditionsChange(virtualCondition: IValidation | null): void {
-                puzzle.validations = [...puzzle.validations, virtualCondition].filter<IValidation>(
+            filterConditions(virtualCondition: IValidation | null): IValidation[] {
+                return [...puzzle.validations, virtualCondition].filter<IValidation>(
                     (validation): validation is IValidation =>
                         !_.isNil(validation) &&
                         !!(
@@ -83,6 +84,10 @@ export function useValidations(
                             (validation.rightHandPuzzle || validation.value)
                         ),
                 );
+            },
+
+            onConditionsChange(virtualCondition: IValidation | null): void {
+                puzzle.validations = this.filterConditions(virtualCondition);
                 onTemplateChange();
             },
 
@@ -102,8 +107,10 @@ export function useValidations(
         ,
         onValidationDelete,
         onValidationChange,
-        onAddCondition,
+        onAddValidation,
+        onValidationsBlur,
     ] = useCommonConditionsLogic<IValidation>(
+        disabled,
         puzzle,
         puzzles,
         parent,
@@ -126,13 +133,13 @@ export function useValidations(
     );
 
     const onAddValidationCallback = useCallback((): void => {
-        onAddCondition(last => ({
+        onAddValidation(last => ({
             id: uuid(),
             errorMessage: last.errorMessage,
             order: last.order + 1,
             leftHandPuzzle: last.leftHandPuzzle,
         }));
-    }, [onAddCondition]);
+    }, [onAddValidation]);
 
     function onErrorMessageChange(event: TSelectChangeEvent) {
         setErrorMessage(event.target.value as string);
@@ -158,5 +165,6 @@ export function useValidations(
         onAddValidationCallback,
         onErrorMessageChange,
         onErrorMessageBlurCallback,
+        onValidationsBlur,
     ];
 }

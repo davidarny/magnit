@@ -17,8 +17,9 @@ export function useConditions(
     (id: string) => void,
     (id: string, nextCondition: ICondition) => void,
     () => void,
+    () => void,
 ] {
-    const useConditionService: IUseConditionsService<ICondition> = useMemo(
+    const useConditionService = useMemo<IUseConditionsService<ICondition>>(
         () => ({
             getVirtualCondition() {
                 return {
@@ -57,8 +58,8 @@ export function useConditions(
                 condition.actionType = "";
             },
 
-            onConditionsChange(virtualCondition: ICondition | null): void {
-                puzzle.conditions = [...puzzle.conditions, virtualCondition].filter<ICondition>(
+            filterConditions(virtualCondition: ICondition | null): ICondition[] {
+                return [...puzzle.conditions, virtualCondition].filter<ICondition>(
                     (condition): condition is ICondition =>
                         !_.isNil(condition) &&
                         !!(
@@ -68,6 +69,10 @@ export function useConditions(
                             (condition.value || condition.answerPuzzle)
                         ),
                 );
+            },
+
+            onConditionsChange(virtualCondition: ICondition | null): void {
+                puzzle.conditions = this.filterConditions(virtualCondition);
                 onTemplateChange();
             },
 
@@ -86,7 +91,9 @@ export function useConditions(
         onConditionDelete,
         onConditionChange,
         onAddCondition,
+        onConditionsBlur,
     ] = useCommonConditionsLogic<ICondition>(
+        disabled,
         puzzle,
         puzzles,
         parent,
@@ -122,5 +129,6 @@ export function useConditions(
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
+        onConditionsBlur,
     ];
 }
