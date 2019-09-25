@@ -19,9 +19,18 @@ export class UserService {
         });
     }
 
+    async findOneByEmail(email: string) {
+        return this.userRepository.findOne({ email: `${email}` });
+    }
+
     async findAll(role?: number) {
         const options: FindManyOptions<User> = {};
         if (typeof role !== "undefined") {
         }
+    }
+
+    async create(user: User) {
+        const savedUser = await this.userRepository.save(user);
+        return savedUser;
     }
 }

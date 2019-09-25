@@ -5,14 +5,16 @@ import { ConstructableDto } from "../../../shared/dto/constructable.dto";
 export class CreateUserDTO<T = CreateUserDTO<object>> extends ConstructableDto<T> {
     @IsString()
     @ApiModelProperty()
-    readonly username: string;
-
-    @IsString()
-    @ApiModelProperty()
     readonly password: string;
 
     @IsString()
     @IsEmail()
     @ApiModelProperty()
     readonly email: string;
+
+    @IsString()
+    readonly firstName: string;
+
+    @IsString()
+    readonly lastName: string;
 }

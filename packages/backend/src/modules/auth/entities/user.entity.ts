@@ -20,10 +20,6 @@ export class User extends BaseEntity<User> {
         this.construct(this, dto);
     }
 
-    @IsString()
-    @Column()
-    username: string;
-
     @Exclude({ toPlainOnly: true })
     @Column()
     password: string;
@@ -58,13 +54,13 @@ export class User extends BaseEntity<User> {
 
     @Index()
     @PrimaryColumn()
-    id_role: number;
+    id_role: number = 0;
 
     @ManyToOne(() => UserRole, role => role.users)
     @JoinColumn({ name: "id_role", referencedColumnName: "id" })
     role: UserRole;
 
     @IsNumber()
-    @Column({ type: "number" })
-    level: number;
+    @Column({ type: "int" })
+    level: number = 1;
 }
