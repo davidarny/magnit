@@ -1,14 +1,11 @@
-import { ITokenManager } from "../interfaces/token.manager.interface";
 import * as crypto from "crypto";
 
-export abstract class TokenManagerImpl<T> implements ITokenManager<T> {
+export abstract class TokenManager<T> {
     // for AES, this is always 16
     private static readonly IV_LENGTH = 16;
 
     // must be 256 bits (32 characters)
     protected readonly secret = process.env.AUTH_SECRET;
-    protected readonly algorithm = process.env.AUTH_ALGORITHM || "HS256";
-    protected readonly expires = process.env.AUTH_EXPIRES_IN || "1h";
 
     constructor() {
         if (process.env.NODE_ENV !== "testing" && !this.secret) {
@@ -17,7 +14,7 @@ export abstract class TokenManagerImpl<T> implements ITokenManager<T> {
     }
 
     protected encrypt(token: string): string {
-        const iv = crypto.randomBytes(TokenManagerImpl.IV_LENGTH);
+        const iv = crypto.randomBytes(TokenManager.IV_LENGTH);
         const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(this.secret), iv);
         let encrypted = cipher.update(token);
         encrypted = Buffer.concat([encrypted, cipher.final()]);

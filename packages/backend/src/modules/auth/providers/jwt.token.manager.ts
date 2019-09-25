@@ -1,9 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { TokenManagerImpl } from "./token.manager.impl";
+import { TokenManager } from "./token.manager";
 import * as jwt from "jsonwebtoken";
 
 @Injectable()
-export class JwtTokenManager<T extends object> extends TokenManagerImpl<T> {
+export class JwtTokenManager<T extends object> extends TokenManager<T> {
+    protected readonly algorithm = process.env.AUTH_ALGORITHM || "HS256";
+    protected readonly expires = process.env.AUTH_EXPIRES_IN || "1h";
+
     decode(token: string): T {
         return jwt.verify(this.decrypt(token), this.secret, { algorithms: [this.algorithm] }) as T;
     }

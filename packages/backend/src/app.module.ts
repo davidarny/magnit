@@ -3,12 +3,12 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { resolve } from "path";
 import { ConnectionOptionsReader } from "typeorm";
 import { AssetModule } from "./modules/asset/asset.module";
-import { AirwatchAuthModule } from "./modules/auth/airwatch.auth.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { MarketplaceModule } from "./modules/marketplace/marketplace.module";
 import { PushTokenModule } from "./modules/push-token/push-token.module";
 import { TaskModule } from "./modules/task/task.module";
 import { TemplateModule } from "./modules/template/template.module";
+import { AuthModule } from "./modules/auth/auth.module";
 import { CustomFileLogger } from "./shared/providers/custom.file.logger";
 import { UserModule } from "./modules/user/user.module";
 
@@ -32,7 +32,8 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         MailModule,
         PushTokenModule,
         MarketplaceModule,
-        ...(process.env.ALLOW_AUTH ? [AirwatchAuthModule] : []),
+        AuthModule,
+        ...(process.env.ALLOW_AUTH ? [] : []),
     ],
 })
 export class AppModule {}
