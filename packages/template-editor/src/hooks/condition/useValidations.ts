@@ -36,7 +36,7 @@ export function useValidations(
                 return {
                     id: uuid(),
                     order: 0,
-                    leftHandPuzzle: "",
+                    leftHandPuzzle: puzzle.id,
                     errorMessage: "",
                     operatorType: "",
                     validationType: "",
@@ -73,7 +73,7 @@ export function useValidations(
             },
 
             filterConditions(virtualCondition: IValidation | null): IValidation[] {
-                return [...puzzle.validations, virtualCondition].filter<IValidation>(
+                return [...puzzle.validations, _.cloneDeep(virtualCondition)].filter<IValidation>(
                     (validation): validation is IValidation =>
                         !_.isNil(validation) &&
                         !!(
@@ -97,14 +97,14 @@ export function useValidations(
                 );
             },
         }),
-        [onTemplateChange, puzzle.validations],
+        [onTemplateChange, puzzle.id, puzzle.validations],
     );
 
     const [
         questions,
         ,
         virtualCondition,
-        ,
+        setVirtualCondition,
         onValidationDelete,
         onValidationChange,
         onAddValidation,
@@ -146,15 +146,16 @@ export function useValidations(
     }
 
     const onErrorMessageBlurCallback = useCallback(() => {
-        const firstValidation = _.first(puzzle.validations);
-        if (firstValidation) {
-            firstValidation.errorMessage = errorMessage;
-        }
         puzzle.validations = [
             ...puzzle.validations.map(validation => ({ ...validation, errorMessage })),
         ];
-        useConditionService.onConditionsChange(virtualCondition);
-    }, [errorMessage, puzzle.validations, useConditionService, virtualCondition]);
+        let nextVirtualCondition = virtualCondition;
+        if (virtualCondition) {
+            nextVirtualCondition = { ...virtualCondition, errorMessage };
+            setVirtualCondition(nextVirtualCondition);
+        }
+        onTemplateChange();
+    }, [errorMessage, onTemplateChange, puzzle.validations, setVirtualCondition, virtualCondition]);
 
     return [
         virtualCondition,

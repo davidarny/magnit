@@ -45,10 +45,6 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
-    const isPuzzle = (object: unknown): object is IPuzzle => _.has(object, "puzzleType");
-
-    const { puzzleType: parentPuzzleType } = isPuzzle(parent) ? parent : { puzzleType: undefined };
-
     const initial = useRef(false);
     useEffect(() => {
         if (service.getConditions().length > 0 && !initial.current) {
@@ -57,53 +53,10 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         initial.current = true;
     }, [service]);
 
-    // hook for invalidating conditions if
-    // dependent question has changed
-    const conditions = service.getConditions();
-    const prevConditions = useRef(conditions);
-    useEffect(() => {
-        const filter: number[] = [];
-        conditions.forEach((condition, index, array) => {
-            let dependentsChanged = false;
-            const dependents = questions.find(
-                question => question.id === service.getRightPuzzle(condition),
-            );
-            if (!dependents) {
-                return;
-            }
-            puzzles.forEach(puzzle => {
-                // find dependent question in template
-                if (puzzle.puzzleType !== EPuzzleType.QUESTION || puzzle.id !== dependents.id) {
-                    return;
-                }
-                // check if dependent question has changed
-                dependentsChanged = service.checkDependentQuestionChanged(dependents, puzzle);
-            });
-            if (dependentsChanged) {
-                service.resetConditions(condition);
-                array[index] = { ...condition };
-                if (index > 0) {
-                    filter.push(index);
-                }
-            }
-        });
-        const nextConditions = service
-            .getConditions()
-            .filter((_value, index) => !filter.includes(index));
-        if (!_.isEqual(prevConditions.current, nextConditions)) {
-            prevConditions.current = _.cloneDeep(nextConditions);
-            service.setConditions(nextConditions);
-        }
-    }, [conditions, puzzles, questions, service]);
-
     const { puzzles: parentPuzzles } = parent || { puzzles: [] };
-    const prevPuzzle = useRef(_.cloneDeep(puzzle));
     const prevQuestions = useRef(_.cloneDeep(questions));
     const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
-        if (disabled) {
-            return;
-        }
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
@@ -141,26 +94,61 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             prevAnswers.current = clonedAnswers;
             setAnswers(clonedAnswers);
         }
-        if (!_.isEqual(prevPuzzle.current, puzzle)) {
-            prevPuzzle.current = _.cloneDeep(puzzle);
-            service.onConditionsChange(virtualCondition);
+    }, [answers, parentPuzzles, puzzle.id, questions, service]);
+
+    // hook for invalidating conditions if
+    // dependent question has changed
+    const prevConditions = useRef(service.getConditions());
+    useEffect(() => {
+        if (!service.getConditions().length) {
+            return;
         }
-    }, [
-        answers,
-        disabled,
-        parent,
-        parentPuzzleType,
-        parentPuzzles,
-        puzzle,
-        questions,
-        service,
-        virtualCondition,
-    ]);
+        const ignored: number[] = [];
+        service.getConditions().forEach((condition, index) => {
+            let changed = false;
+            const dependents = questions.find(
+                question => question.id === service.getRightPuzzle(condition),
+            );
+            if (!dependents) {
+                return;
+            }
+            puzzles.forEach(puzzle => {
+                // find dependent question in template
+                if (puzzle.puzzleType !== EPuzzleType.QUESTION || puzzle.id !== dependents.id) {
+                    return;
+                }
+                // check if dependent question has changed
+                changed = service.checkDependentQuestionChanged(dependents, puzzle);
+            });
+            if (changed) {
+                ignored.push(index);
+            }
+        });
+        if (!ignored.length) {
+            return;
+        }
+        const nextConditions = service
+            .getConditions()
+            .filter((_value, index) => !ignored.includes(index));
+        if (
+            !_.isEqual(prevConditions.current, nextConditions) ||
+            (!prevConditions.current.length && !nextConditions.length)
+        ) {
+            if (nextConditions.length === 0) {
+                const first = _.first(service.getConditions())!;
+                service.resetConditions(first);
+                nextConditions.push(first);
+            }
+            prevConditions.current = _.cloneDeep(nextConditions);
+            service.setConditions(nextConditions);
+            onTemplateChange();
+        }
+    }, [onTemplateChange, puzzles, questions, service]);
 
     const onConditionDeleteCallback = useCallback(
         (id: string) => {
             if (virtualCondition && virtualCondition.id === id) {
-                if (puzzle.conditions.length > 0) {
+                if (service.getConditions().length > 0) {
                     setVirtualCondition(null);
                 } else {
                     setVirtualCondition(service.getVirtualCondition());
@@ -175,7 +163,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 onTemplateChange();
             }
         },
-        [onTemplateChange, puzzle.conditions.length, service, virtualCondition],
+        [onTemplateChange, service, virtualCondition],
     );
 
     const onConditionChangeCallback = useCallback(
@@ -201,7 +189,13 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         (onAddConditionImpl: (last: T) => Partial<T>): void => {
             service.onConditionsChange(virtualCondition);
             const last = _.last(service.getConditions());
-            if (last) {
+            const virtualConditionInserted = (condition: T) =>
+                virtualCondition && condition.id === virtualCondition.id;
+            if (
+                last &&
+                (service.getConditions().some(virtualConditionInserted) ||
+                    _.isNil(virtualCondition))
+            ) {
                 setVirtualCondition({
                     ...service.getVirtualCondition(),
                     ...onAddConditionImpl(last),
@@ -220,10 +214,12 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             if (target.classList.contains(`select__sentinel__${puzzle.id}`)) {
                 return;
             }
-            if (service.filterConditions(virtualCondition).length > 0) {
+            service.onConditionsChange(virtualCondition);
+            const virtualConditionInserted = (condition: T) =>
+                virtualCondition && condition.id === virtualCondition.id;
+            if (service.getConditions().some(virtualConditionInserted)) {
                 setVirtualCondition(null);
             }
-            service.onConditionsChange(virtualCondition);
         },
         [disabled, puzzle.id, service, virtualCondition],
     );

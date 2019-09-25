@@ -24,7 +24,6 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface IValidationProps {
-    puzzleId: string;
     index: number;
     noDeleteButton: boolean;
     validation: IValidation;
@@ -43,7 +42,6 @@ type TSelectChangeEvent = React.ChangeEvent<{
 
 export const Validation: React.FC<IValidationProps> = props => {
     const {
-        puzzleId,
         validation,
         index,
         questions,
@@ -112,7 +110,7 @@ export const Validation: React.FC<IValidationProps> = props => {
         getOperatorVariants,
         getRightHandPuzzle,
         getValidationVariants,
-    ] = useValidation(validation, value, index, validation.conditionType, puzzleId);
+    ] = useValidation(validation, value, index, validation.conditionType, puzzle.id);
 
     const isFirstRow = index === 0;
 
@@ -125,7 +123,7 @@ export const Validation: React.FC<IValidationProps> = props => {
         : "(текущий вопрос)";
 
     return (
-        <React.Fragment key={validation.id}>
+        <React.Fragment>
             {isFirstRow && (
                 <Grid item>
                     <Typography css={theme => ({ color: theme.colors.secondary })}>
@@ -183,7 +181,7 @@ export const Validation: React.FC<IValidationProps> = props => {
                         displayEmpty={false}
                     >
                         <MenuItem
-                            className={`select__sentinel__${puzzleId}`}
+                            className={`select__sentinel__${puzzle.id}`}
                             key={currentQuestionId}
                             value={currentQuestionId}
                         >

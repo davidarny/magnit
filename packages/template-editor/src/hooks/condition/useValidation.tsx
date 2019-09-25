@@ -168,19 +168,24 @@ export function useValidation(
         [puzzleId, validation, value],
     );
 
-    const getValidationVariants = () => {
+    function getValidationVariants() {
         return [
             <MenuItem
+                className={`select__sentinel__${puzzleId}`}
                 key={EValidationType.COMPARE_WITH_ANSWER}
                 value={EValidationType.COMPARE_WITH_ANSWER}
             >
                 {getValidationLiteral(EValidationType.COMPARE_WITH_ANSWER)}
             </MenuItem>,
-            <MenuItem key={EValidationType.SET_VALUE} value={EValidationType.SET_VALUE}>
+            <MenuItem
+                className={`select__sentinel__${puzzleId}`}
+                key={EValidationType.SET_VALUE}
+                value={EValidationType.SET_VALUE}
+            >
                 {getValidationLiteral(EValidationType.SET_VALUE)}
             </MenuItem>,
         ];
-    };
+    }
 
     return [getConditionLiteral, getOperatorVariants, getRightHandPuzzle, getValidationVariants];
 }

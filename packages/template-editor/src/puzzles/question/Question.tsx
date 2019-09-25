@@ -41,7 +41,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
     const { index, focused, onTemplateChange, puzzle } = props;
 
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
-    const [questionTitle, setQuestionTitle] = useState(puzzle.title);
+    const [title, setTitle] = useState(puzzle.title);
 
     const prevAnswerType = useRef("");
     useEffect(() => {
@@ -113,15 +113,23 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
     );
 
     function onQuestionTitleChange(event: TSelectChangeEvent): void {
-        setQuestionTitle(event.target.value as string);
+        setTitle(event.target.value as string);
     }
 
     const onTitleBlurCallback = useCallback(() => {
-        puzzle.title = questionTitle;
+        puzzle.title = title;
         if (onTemplateChange) {
             onTemplateChange();
         }
-    }, [onTemplateChange, puzzle.title, questionTitle]);
+    }, [onTemplateChange, puzzle.title, title]);
+
+    const prevTitle = useRef(title);
+    useEffect(() => {
+        if (!focused && prevTitle.current !== title) {
+            prevTitle.current = title;
+            onTitleBlurCallback();
+        }
+    }, [focused, onTitleBlurCallback, title]);
 
     if (!focused) {
         return (
@@ -147,9 +155,9 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                     <Typography
                         variant="body1"
                         component="span"
-                        css={theme => ({ color: !questionTitle ? theme.colors.gray : "initial" })}
+                        css={theme => ({ color: !title ? theme.colors.gray : "initial" })}
                     >
-                        {questionTitle || "Введите вопрос"}
+                        {title || "Введите вопрос"}
                     </Typography>
                 </Grid>
             </Grid>
@@ -184,7 +192,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                         <InputField
                             fullWidth
                             placeholder="Введите вопрос"
-                            value={questionTitle}
+                            value={title}
                             onChange={onQuestionTitleChange}
                             onBlur={onTitleBlurCallback}
                         />

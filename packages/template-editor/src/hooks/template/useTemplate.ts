@@ -1,18 +1,19 @@
 import { EPuzzleType, IPuzzle, ISection, ITemplate } from "@magnit/entities";
-import { IEditorService } from "@magnit/services";
+import { EEditorType, getEditorService, IEditorService } from "@magnit/services";
 import { ICache } from "context";
 import _ from "lodash";
-import { useCallback, useEffect, useRef } from "react";
+import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react";
 import { traverse } from "services/json";
 import uuid from "uuid/v4";
 
 export function useTemplate(
-    service: IEditorService,
-    focusedPuzzleChain: string[],
-    cache: ICache,
     template: ITemplate,
     onTemplateChange?: (template: ITemplate) => void,
 ): [
+    MutableRefObject<ICache>,
+    MutableRefObject<IEditorService>,
+    number,
+    string[],
     () => void,
     () => void,
     () => void,
@@ -21,11 +22,23 @@ export function useTemplate(
     () => void,
     () => void,
 ] {
+    const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
+    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
+
+    const service = useRef(
+        getEditorService(EEditorType.TEMPLATE, [
+            [focusedPuzzleChain, setFocusedPuzzleChain],
+            [toolbarTopPosition, setToolbarTopPosition],
+        ]),
+    );
+
+    const cache = useRef<ICache>({ sections: new Map(), puzzles: new Map() });
+
     // set toolbar offset top
     const prevFocusedPuzzleChain = useRef(_.cloneDeep(focusedPuzzleChain));
     useEffect(() => {
         if (!_.isEqual(prevFocusedPuzzleChain.current, focusedPuzzleChain)) {
-            service.updateToolbarTopPosition();
+            service.current.updateToolbarTopPosition();
             prevFocusedPuzzleChain.current = _.cloneDeep(focusedPuzzleChain);
         }
     }, [focusedPuzzleChain, service]);
@@ -40,22 +53,22 @@ export function useTemplate(
             const isPuzzle = (object: unknown): object is IPuzzle =>
                 _.has(object, "puzzleType") && _.has(object, "puzzles");
 
-            cache.puzzles.clear();
-            cache.sections.clear();
+            cache.current.puzzles.clear();
+            cache.current.sections.clear();
 
             traverse(template, (element: IPuzzle | ISection) => {
                 if (isSection(element)) {
-                    cache.sections.set(element.id, element);
+                    cache.current.sections.set(element.id, element);
                 }
                 if (isPuzzle(element)) {
-                    cache.puzzles.set(element.id, element);
+                    cache.current.puzzles.set(element.id, element);
                 }
             });
 
             prevTemplate.current = _.cloneDeep(template);
             prevCache.current = _.cloneDeep(cache);
         }
-    }, [cache, cache.puzzles, cache.sections, template]);
+    }, [template]);
 
     const initialFocusThreshold = useRef(0);
     const initialFocusSet = useRef(false);
@@ -68,12 +81,12 @@ export function useTemplate(
         }
         if (!initialFocusSet.current) {
             initialFocusThreshold.current++;
-            service.onPuzzleFocus(template.id.toString(), true);
+            service.current.onPuzzleFocus(template.id.toString(), true);
         }
         if (template.id !== 0) {
             initialFocusSet.current = true;
         }
-    }, [template, focusedPuzzleChain, service]);
+    }, [template.id]);
 
     const onToolbarAddQuestion = useCallback((): void => {
         const id = uuid();
@@ -112,12 +125,11 @@ export function useTemplate(
         }
         // check if adding question to puzzle
         // probably this puzzle is GROUP
-        if (cache.puzzles.has(focusedPuzzleId)) {
-            let puzzle: IPuzzle | ISection = cache.puzzles.get(focusedPuzzleId)!;
-            // if adding to to a group
+        if (cache.current.puzzles.has(focusedPuzzleId)) {
+            let puzzle: IPuzzle | ISection = cache.current.puzzles.get(focusedPuzzleId)!;
             // then trying to find in which section to add
             if (hasPuzzleType(puzzle) && !whitelist.includes(puzzle.puzzleType)) {
-                const puzzles = [...cache.sections.values()];
+                const puzzles = [...cache.current.sections.values()];
                 const parent = puzzles
                     .flatMap(el => [el, ...el.puzzles])
                     .find(el => el.puzzles.some(child => child.id === puzzle.id));
@@ -135,9 +147,9 @@ export function useTemplate(
         } else {
             // initially adding to last section
             // if not focused to any
-            let section = _.last([...cache.sections.values()]) as ISection | undefined;
-            if (cache.sections.has(focusedPuzzleId)) {
-                section = cache.sections.get(focusedPuzzleId);
+            let section = _.last([...cache.current.sections.values()]) as ISection | undefined;
+            if (cache.current.sections.has(focusedPuzzleId)) {
+                section = cache.current.sections.get(focusedPuzzleId);
             }
             if (section) {
                 if (!_.has(section, "puzzles")) {
@@ -146,11 +158,11 @@ export function useTemplate(
                 section.puzzles!.push({ ...puzzleToInsert, order: 0 });
             }
         }
-        service.onPuzzleFocus(id);
+        service.current.onPuzzleFocus(id);
         if (onTemplateChange) {
             onTemplateChange({ ...template });
         }
-    }, [cache.puzzles, cache.sections, focusedPuzzleChain, onTemplateChange, service, template]);
+    }, [focusedPuzzleChain, onTemplateChange, template]);
 
     const onToolbarAddGroup = useCallback((): void => {
         const id = uuid();
@@ -172,7 +184,7 @@ export function useTemplate(
                 puzzleType: EPuzzleType.GROUP,
                 order: (prevPuzzle || { order: -1 }).order + 1,
             });
-            cache.puzzles.set(id, _.last(section.puzzles)!);
+            cache.current.puzzles.set(id, _.last(section.puzzles)!);
         }
         // else adding to section which is in focused puzzle chain
         else {
@@ -191,14 +203,14 @@ export function useTemplate(
                     puzzleType: EPuzzleType.GROUP,
                     order: (prevPuzzle || { order: -1 }).order + 1,
                 });
-                cache.puzzles.set(id, _.last(section.puzzles)!);
+                cache.current.puzzles.set(id, _.last(section.puzzles)!);
             });
         }
-        service.onPuzzleFocus(id);
+        service.current.onPuzzleFocus(id);
         if (onTemplateChange) {
             onTemplateChange({ ...template });
         }
-    }, [cache.puzzles, focusedPuzzleChain, onTemplateChange, service, template]);
+    }, [focusedPuzzleChain, onTemplateChange, service, template]);
 
     const onToolbarAddSection = useCallback((): void => {
         const prevSection = template.sections[template.sections.length - 1];
@@ -210,12 +222,12 @@ export function useTemplate(
             description: "",
             order: (prevSection || { order: -1 }).order + 1,
         });
-        cache.sections.set(id, _.last(template.sections)!);
-        service.onPuzzleFocus(id);
+        cache.current.sections.set(id, _.last(template.sections)!);
+        service.current.onPuzzleFocus(id);
         if (onTemplateChange) {
             onTemplateChange({ ...template });
         }
-    }, [cache.sections, onTemplateChange, service, template]);
+    }, [onTemplateChange, template]);
 
     const onAddAnswerPuzzle = useCallback(
         (id: string, addition: Partial<IPuzzle> = {}): void => {
@@ -332,9 +344,9 @@ export function useTemplate(
                     );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        service.onPuzzleFocus(puzzleToFocusOn.id);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
                     } else {
-                        service.onPuzzleFocus(_.first(template.sections)!.id);
+                        service.current.onPuzzleFocus(_.first(template.sections)!.id);
                     }
                     return true;
                 }
@@ -360,9 +372,9 @@ export function useTemplate(
                     );
                     if (puzzleToFocusOn) {
                         focusedPuzzleChain.unshift(puzzleToFocusOn.id);
-                        service.onPuzzleFocus(puzzleToFocusOn.id);
+                        service.current.onPuzzleFocus(puzzleToFocusOn.id);
                     } else {
-                        service.onPuzzleFocus(template.id.toString());
+                        service.current.onPuzzleFocus(template.id.toString());
                     }
                     return true;
                 }
@@ -371,7 +383,7 @@ export function useTemplate(
         if (onTemplateChange) {
             onTemplateChange({ ...template });
         }
-    }, [focusedPuzzleChain, onTemplateChange, service, template]);
+    }, [focusedPuzzleChain, onTemplateChange, template]);
 
     const onTemplateChangeCallback = useCallback(() => {
         if (onTemplateChange) {
@@ -380,6 +392,10 @@ export function useTemplate(
     }, [onTemplateChange, template]);
 
     return [
+        cache,
+        service,
+        toolbarTopPosition,
+        focusedPuzzleChain,
         onToolbarAddQuestion,
         onToolbarAddGroup,
         onToolbarAddSection,

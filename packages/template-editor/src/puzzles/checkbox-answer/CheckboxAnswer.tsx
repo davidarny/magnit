@@ -6,7 +6,7 @@ import { IFocusedPuzzleProps } from "@magnit/entities";
 import { Checkbox, Grid, IconButton, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ICheckboxAnswerPuzzleProps extends IFocusedPuzzleProps {
     // flag indication this checkbox should render
@@ -29,7 +29,20 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
         onDeleteCheckboxButton,
     } = props;
 
-    const [label, setLabel] = useState(puzzle.title || `Вариант ${index + 1}`);
+    const [label, setLabel] = useState(puzzle.title);
+
+    const prevTitle = useRef(label);
+    useEffect(() => {
+        if (!puzzle.title && (!prevTitle.current || prevTitle.current !== label)) {
+            const nextTitle = puzzle.title || `Вариант ${index + 1}`;
+            setLabel(nextTitle);
+            prevTitle.current = nextTitle;
+            puzzle.title = nextTitle;
+            if (onTemplateChange) {
+                onTemplateChange();
+            }
+        }
+    }, [index, label, onTemplateChange, puzzle.title]);
 
     const onAddCheckboxButtonCallback = useCallback(() => {
         onAddCheckboxButton(puzzle.id);
@@ -43,12 +56,20 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
         setLabel(event.target.value);
     }
 
-    const onLabelBlur = useCallback(() => {
+    const onLabelBlurCallback = useCallback(() => {
         puzzle.title = label;
         if (onTemplateChange) {
             onTemplateChange();
         }
     }, [label, onTemplateChange, puzzle.title]);
+
+    const prevLabel = useRef(label);
+    useEffect(() => {
+        if (!focused && prevLabel.current !== label) {
+            prevLabel.current = label;
+            onLabelBlurCallback();
+        }
+    }, [focused, label, onLabelBlurCallback]);
 
     if (!focused) {
         return (
@@ -88,7 +109,7 @@ export const CheckboxAnswer: React.FC<ICheckboxAnswerPuzzleProps> = props => {
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onLabelBlur}
+                        onBlur={onLabelBlurCallback}
                     />
                 </Grid>
                 <Grid item css={theme => ({ padding: `${theme.spacing(0.25)} !important` })}>

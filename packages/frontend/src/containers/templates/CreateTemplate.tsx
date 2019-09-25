@@ -10,7 +10,6 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
-import _ from "lodash";
 import * as React from "react";
 import { useContext, useState } from "react";
 import { deleteFile, uploadFile } from "services/api/assets";
@@ -32,7 +31,7 @@ export const CreateTemplate: React.FC = () => {
     }); // open/close snackbar
 
     function onTemplateChange(template: ITemplate) {
-        setTemplate(_.cloneDeep(template));
+        setTemplate({ ...template });
     }
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {

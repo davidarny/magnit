@@ -5,6 +5,7 @@ import { InputField } from "@magnit/components";
 import { IFocusedPuzzleProps } from "@magnit/entities";
 import { Grid, IconButton, Radio, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
+import { useEffect, useRef } from "react";
 import * as React from "react";
 import { useCallback, useState } from "react";
 
@@ -29,7 +30,20 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
         onDeleteRadioButton,
     } = props;
 
-    const [label, setLabel] = useState(puzzle.title || `Вариант ${index + 1}`);
+    const [label, setLabel] = useState(puzzle.title);
+
+    const prevTitle = useRef(label);
+    useEffect(() => {
+        if (!puzzle.title && (!prevTitle.current || prevTitle.current !== label)) {
+            const nextTitle = puzzle.title || `Вариант ${index + 1}`;
+            setLabel(nextTitle);
+            prevTitle.current = nextTitle;
+            puzzle.title = nextTitle;
+            if (onTemplateChange) {
+                onTemplateChange();
+            }
+        }
+    }, [index, label, onTemplateChange, puzzle.title]);
 
     const onAddRadioButtonCallback = useCallback(() => {
         onAddRadioButton(puzzle.id);
@@ -49,6 +63,14 @@ export const RadioAnswer: React.FC<IRadioAnswerPuzzleProps> = props => {
             onTemplateChange();
         }
     }, [label, onTemplateChange, puzzle.title]);
+
+    const prevLabel = useRef(label);
+    useEffect(() => {
+        if (!focused && prevLabel.current !== label) {
+            prevLabel.current = label;
+            onLabelBlurCallback();
+        }
+    }, [focused, label, onLabelBlurCallback]);
 
     if (!focused) {
         return (

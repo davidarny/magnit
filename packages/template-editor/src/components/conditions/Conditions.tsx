@@ -39,22 +39,15 @@ export const Conditions: React.FC<IConditionsProps> = props => {
     useOutsideListener(container, focused ? onConditionsBlur : _.noop);
 
     return (
-        <Grid
-            ref={container}
-            container
-            spacing={2}
-            css={{ marginBottom: 0, outline: "none" }}
-            alignItems="center"
-        >
+        <Grid ref={container} container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
             {[...puzzle.conditions, virtualCondition]
                 .filter<ICondition>((condition): condition is ICondition => !_.isNil(condition))
                 .map((condition, index) => (
                     <Condition
-                        puzzleId={puzzle.id}
+                        puzzle={puzzle}
                         key={condition.id}
                         answers={answers}
                         condition={condition}
-                        conditions={puzzle.conditions}
                         index={index}
                         onConditionChange={onConditionChangeCallback}
                         onConditionDelete={onConditionDeleteCallback}

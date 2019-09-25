@@ -4,15 +4,14 @@ import { jsx } from "@emotion/core";
 import { EditorToolbar, SelectableBlockWrapper } from "@magnit/components";
 import { ITemplate } from "@magnit/entities";
 import { GroupIcon, QuestionIcon, SectionIcon, TrashIcon } from "@magnit/icons";
-import { EEditorType, getEditorService } from "@magnit/services";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useMemo } from "react";
 import { SectionHead } from "./components/section-head";
 import { SectionWrapper } from "./components/section-wrapper";
-import { EditorContext, ICache } from "./context";
+import { EditorContext } from "./context";
 import { useTemplate } from "./hooks/template";
 
 interface ITemplateEditorProps {
@@ -29,19 +28,12 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
     const { template, onChange: onTemplateChange, onDeleteAsset, onAddAsset } = props;
 
     const context = useContext(EditorContext);
-    const cache = useRef<ICache>({ sections: new Map(), puzzles: new Map() });
-
-    const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
-    const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
-
-    const service = useRef(
-        getEditorService(EEditorType.TEMPLATE, [
-            [focusedPuzzleChain, setFocusedPuzzleChain],
-            [toolbarTopPosition, setToolbarTopPosition],
-        ]),
-    );
 
     const [
+        cache,
+        service,
+        toolbarTopPosition,
+        focusedPuzzleChain,
         onToolbarAddQuestion,
         onToolbarAddGroup,
         onToolbarAddSection,
@@ -49,7 +41,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
         onDeleteAnswerPuzzle,
         onDeletePuzzle,
         onTemplateChangeCallback,
-    ] = useTemplate(service.current, focusedPuzzleChain, cache.current, template, onTemplateChange);
+    ] = useTemplate(template, onTemplateChange);
 
     const focusedPuzzleId = _.first(focusedPuzzleChain);
     const focusedOnTemplateHead = focusedPuzzleId === template.id.toString();
@@ -128,7 +120,7 @@ export const TemplateEditor: React.FC<ITemplateEditorProps> = props => {
                 <SectionHead
                     template={template}
                     focused={focusedPuzzleId === template.id.toString()}
-                    onTemplateChange={onTemplateChangeCallback}
+                    onTemplateChange={onTemplateChange}
                 />
             </SelectableBlockWrapper>
             {(template.sections || []).map((section, index) => (

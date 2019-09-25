@@ -11,7 +11,7 @@ interface IContentSectionProps {
     template: ITemplate;
     focused: boolean;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange?(template: ITemplate): void;
 }
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -40,6 +40,9 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
 
     const onTemplateTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent, checked: boolean) => {
+            if (!onTemplateChange) {
+                return;
+            }
             if (checked) {
                 onTemplateChange({ ...template, type: ETemplateType.COMPLEX });
             } else {
@@ -54,7 +57,9 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
     }
 
     const onTemplateTitleBlurCallback = useCallback(() => {
-        onTemplateChange({ ...template, title: templateTitle });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template, title: templateTitle });
+        }
     }, [onTemplateChange, template, templateTitle]);
 
     function onTemplateDescriptionChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -62,7 +67,9 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
     }
 
     const onTemplateDescriptionBlurCallback = useCallback(() => {
-        onTemplateChange({ ...template, description: templateDescription });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template, description: templateDescription });
+        }
     }, [onTemplateChange, template, templateDescription]);
 
     return (

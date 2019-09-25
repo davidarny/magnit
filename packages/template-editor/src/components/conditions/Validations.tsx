@@ -41,21 +41,13 @@ export const Validations: React.FC<IValidationsProps> = props => {
     useOutsideListener(container, focused ? onValidationsBlur : _.noop);
 
     return (
-        <Grid
-            container
-            ref={container}
-            spacing={2}
-            css={{ marginBottom: 0, outline: "none" }}
-            alignItems="center"
-            tabIndex={0}
-        >
+        <Grid container ref={container} spacing={2} css={{ marginBottom: 0 }} alignItems="center">
             {[...puzzle.validations, virtualCondition]
                 .filter<IValidation>(
                     (validation): validation is IValidation => !_.isNil(validation),
                 )
                 .map((validation, index) => (
                     <Validation
-                        puzzleId={puzzle.id}
                         key={validation.id}
                         validation={validation}
                         index={index}

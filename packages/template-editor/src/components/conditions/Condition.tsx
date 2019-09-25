@@ -19,11 +19,10 @@ import * as React from "react";
 import { useCallback, useState } from "react";
 
 interface IConditionProps {
-    puzzleId: string;
+    puzzle: IPuzzle;
     index: number;
     noDeleteButton: boolean;
     condition: ICondition;
-    conditions: ICondition[];
     questions: IPuzzle[];
     answers: IPuzzle[];
 
@@ -39,9 +38,8 @@ type TSelectChangeEvent = React.ChangeEvent<{
 
 export const Condition: React.FC<IConditionProps> = props => {
     const {
-        puzzleId,
+        puzzle,
         condition,
-        conditions,
         answers,
         questions,
         index,
@@ -49,13 +47,14 @@ export const Condition: React.FC<IConditionProps> = props => {
         onConditionChange,
         onConditionDelete,
     } = props;
+
     const [value, setValue] = useState<string>(condition.value || "");
 
     const onQuestionPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             // reset conditions length when question changed
-            if (conditions.length > 0) {
-                conditions.length = 1;
+            if (puzzle.conditions.length > 0) {
+                puzzle.conditions.length = 1;
             }
             // reset first condition fields when question changed
             // and change questionPuzzle
@@ -67,7 +66,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 questionPuzzle: event.target.value as string,
             });
         },
-        [condition, conditions.length, onConditionChange],
+        [condition, puzzle.conditions.length, onConditionChange],
     );
 
     const onActionTypeChangeCallback = useCallback(
@@ -129,7 +128,7 @@ export const Condition: React.FC<IConditionProps> = props => {
         value,
         index,
         condition.conditionType,
-        puzzleId,
+        puzzle.id,
     );
 
     const isFirstRow = index === 0;
@@ -193,7 +192,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                     >
                         {questions.map(questionToChoseFrom => (
                             <MenuItem
-                                className={`select__sentinel__${puzzleId}`}
+                                className={`select__sentinel__${puzzle.id}`}
                                 key={questionToChoseFrom.id}
                                 value={questionToChoseFrom.id}
                             >

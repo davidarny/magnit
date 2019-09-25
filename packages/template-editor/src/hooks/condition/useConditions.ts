@@ -30,7 +30,7 @@ export function useConditions(
                     conditionType: EConditionType.OR,
                     order: 0,
                     questionPuzzle: "",
-                } as ICondition;
+                };
             },
 
             checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
@@ -59,7 +59,7 @@ export function useConditions(
             },
 
             filterConditions(virtualCondition: ICondition | null): ICondition[] {
-                return [...puzzle.conditions, virtualCondition].filter<ICondition>(
+                return [...puzzle.conditions, _.cloneDeep(virtualCondition)].filter<ICondition>(
                     (condition): condition is ICondition =>
                         !_.isNil(condition) &&
                         !!(

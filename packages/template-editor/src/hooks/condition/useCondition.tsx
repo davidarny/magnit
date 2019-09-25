@@ -37,7 +37,7 @@ export function useCondition(
 ] {
     const [getConditionLiteral] = useCommonConditionLogic(index, conditionType);
 
-    const getActionLiteral = (actionType: EActionType) => {
+    function getActionLiteral(actionType: EActionType) {
         return {
             [EActionType.CHOSEN_ANSWER]: "Выбран ответ",
             [EActionType.NOT_EQUAL]: "Не равно",
@@ -46,7 +46,7 @@ export function useCondition(
             [EActionType.EQUAL]: "Равно",
             [EActionType.GIVEN_ANSWER]: "Дан ответ",
         }[actionType];
-    };
+    }
 
     const getActionVariants = useCallback(() => {
         switch (puzzleType) {
