@@ -1,4 +1,11 @@
-import { EActionType, EConditionType, ICondition, IPuzzle, ISection } from "@magnit/entities";
+import {
+    EActionType,
+    EConditionType,
+    EPuzzleType,
+    ICondition,
+    IPuzzle,
+    ISection,
+} from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
 import { useCallback, useMemo } from "react";
@@ -76,8 +83,11 @@ export function useConditions(
                 onTemplateChange();
             },
 
-            shouldSetQuestions(_puzzle: IPuzzle): boolean {
-                return true;
+            shouldSetQuestions(puzzle: IPuzzle): boolean {
+                // do not allow to reference question if of type reference
+                return puzzle.puzzles.every(
+                    child => child.puzzleType !== EPuzzleType.REFERENCE_ANSWER,
+                );
             },
         }),
         [onTemplateChange, puzzle.conditions],
