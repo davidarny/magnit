@@ -12,3 +12,4 @@ export * from "./DeleteTaskDocument";
 export * from "./AddComment";
 export * from "./DeleteComment";
 export * from "./GetTasksExtended";
+export * from "./SendReportToEmail";
