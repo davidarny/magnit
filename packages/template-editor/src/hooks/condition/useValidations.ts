@@ -24,7 +24,6 @@ export function useValidations(
     () => void,
     (event: TSelectChangeEvent) => void,
     () => void,
-    (event?: MouseEvent) => void,
 ] {
     const [errorMessage, setErrorMessage] = useState<string>(
         _.get(_.first(puzzle.validations), "errorMessage", ""),
@@ -37,7 +36,7 @@ export function useValidations(
                     id: uuid(),
                     order: 0,
                     leftHandPuzzle: puzzle.id,
-                    errorMessage: "",
+                    errorMessage: errorMessage,
                     operatorType: "",
                     validationType: "",
                     conditionType: EConditionType.OR,
@@ -97,7 +96,7 @@ export function useValidations(
                 );
             },
         }),
-        [onTemplateChange, puzzle.id, puzzle.validations],
+        [errorMessage, onTemplateChange, puzzle.id, puzzle.validations],
     );
 
     const [
@@ -108,7 +107,7 @@ export function useValidations(
         onValidationDelete,
         onValidationChange,
         onAddValidation,
-        onValidationsBlur,
+        tryToCommitCondition,
     ] = useCommonConditionsLogic<IValidation>(
         puzzle,
         puzzles,
@@ -153,8 +152,14 @@ export function useValidations(
             nextVirtualCondition = { ...virtualCondition, errorMessage };
             setVirtualCondition(nextVirtualCondition);
         }
-        onTemplateChange();
-    }, [errorMessage, onTemplateChange, puzzle.validations, setVirtualCondition, virtualCondition]);
+        tryToCommitCondition(nextVirtualCondition);
+    }, [
+        errorMessage,
+        puzzle.validations,
+        setVirtualCondition,
+        tryToCommitCondition,
+        virtualCondition,
+    ]);
 
     return [
         virtualCondition,
@@ -165,6 +170,5 @@ export function useValidations(
         onAddValidationCallback,
         onErrorMessageChange,
         onErrorMessageBlurCallback,
-        onValidationsBlur,
     ];
 }

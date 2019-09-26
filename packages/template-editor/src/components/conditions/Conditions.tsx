@@ -6,10 +6,8 @@ import { ICondition, IPuzzle, ISection } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
 import { useConditions } from "hooks/condition";
-import { useOutsideListener } from "hooks/shared";
 import _ from "lodash";
 import * as React from "react";
-import { useEffect, useRef } from "react";
 import { Condition } from "./Condition";
 
 interface IConditionsProps {
@@ -32,22 +30,10 @@ export const Conditions: React.FC<IConditionsProps> = props => {
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
-        onConditionsBlur,
     ] = useConditions(puzzle, puzzles, disabled, onTemplateChange, parent);
 
-    const container = useRef<HTMLDivElement | null>(null);
-    useOutsideListener(container, focused ? onConditionsBlur : _.noop);
-
-    const prevFocused = useRef(focused);
-    useEffect(() => {
-        if (prevFocused.current && !focused) {
-            prevFocused.current = focused;
-            onConditionsBlur();
-        }
-    }, [focused, onConditionsBlur]);
-
     return (
-        <Grid ref={container} container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
+        <Grid container spacing={2} css={{ marginBottom: 0 }} alignItems="center">
             {[...puzzle.conditions, virtualCondition]
                 .filter<ICondition>((condition): condition is ICondition => !_.isNil(condition))
                 .map((condition, index) => (

@@ -17,7 +17,6 @@ export function useConditions(
     (id: string) => void,
     (id: string, nextCondition: ICondition) => void,
     () => void,
-    (event?: MouseEvent) => void,
 ] {
     const useConditionService = useMemo<IUseConditionsService<ICondition>>(
         () => ({
@@ -92,7 +91,6 @@ export function useConditions(
         onConditionDelete,
         onConditionChange,
         onAddCondition,
-        onConditionsBlur,
     ] = useCommonConditionsLogic<ICondition>(
         puzzle,
         puzzles,
@@ -129,6 +127,5 @@ export function useConditions(
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
-        onConditionsBlur,
     ];
 }

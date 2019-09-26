@@ -36,7 +36,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     (id: string) => void,
     (id: string, update: T) => void,
     (onAddConditionImpl: (last: T) => Partial<T>) => void,
-    (event?: MouseEvent) => void,
+    (nextVirtualCondition?: T | null) => void,
 ] {
     const [virtualCondition, setVirtualCondition] = useState<T | null>(
         !service.getConditions().length ? service.getVirtualCondition() : null,
@@ -172,10 +172,27 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         [onTemplateChange, service, virtualCondition],
     );
 
+    const tryToCommitCondition = useCallback(
+        (nextVirtualCondition?: T | null) => {
+            if (!nextVirtualCondition) {
+                nextVirtualCondition = null;
+            }
+            service.onConditionsChange(nextVirtualCondition);
+            const nextVirtualConditionInserted = (condition: T) =>
+                nextVirtualCondition && condition.id === nextVirtualCondition.id;
+            if (service.getConditions().some(nextVirtualConditionInserted)) {
+                setVirtualCondition(null);
+            }
+        },
+        [service],
+    );
+
     const onConditionChangeCallback = useCallback(
         (id: string, update: T): void => {
+            let nextVirtualCondition: T = { ...update };
             if (virtualCondition && virtualCondition.id === id) {
-                setVirtualCondition({ ...virtualCondition, ...update });
+                nextVirtualCondition = { ...virtualCondition, ...update };
+                setVirtualCondition(nextVirtualCondition);
             } else {
                 const changedConditionIdx = service
                     .getConditions()
@@ -185,10 +202,10 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                     ...update,
                 };
                 service.setConditions([...service.getConditions()]);
-                onTemplateChange();
             }
+            tryToCommitCondition(nextVirtualCondition);
         },
-        [onTemplateChange, service, virtualCondition],
+        [tryToCommitCondition, service, virtualCondition],
     );
 
     const onAddConditionCallback = useCallback(
@@ -211,24 +228,6 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         [service, virtualCondition],
     );
 
-    const onConditionsBlur = useCallback(
-        (event?: MouseEvent) => {
-            if (event) {
-                const target = event.target as HTMLElement;
-                if (target.classList.contains(`select__sentinel__${puzzle.id}`)) {
-                    return;
-                }
-            }
-            service.onConditionsChange(virtualCondition);
-            const virtualConditionInserted = (condition: T) =>
-                virtualCondition && condition.id === virtualCondition.id;
-            if (service.getConditions().some(virtualConditionInserted)) {
-                setVirtualCondition(null);
-            }
-        },
-        [puzzle.id, service, virtualCondition],
-    );
-
     return [
         questions,
         answers,
@@ -237,6 +236,6 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
-        onConditionsBlur,
+        tryToCommitCondition,
     ];
 }
