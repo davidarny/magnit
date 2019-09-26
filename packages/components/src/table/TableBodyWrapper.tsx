@@ -19,8 +19,14 @@ interface ITableBodyWrapperProps {
 }
 
 export const TableBodyWrapper: React.FC<ITableBodyWrapperProps> = props => {
-    const { data, columns, hover = true, selectable = false } = props;
-    const { onRowSelectToggle, onRowClick } = props;
+    const {
+        data,
+        columns,
+        hover = true,
+        selectable = false,
+        onRowSelectToggle,
+        onRowClick,
+    } = props;
 
     return (
         <TableBody>
@@ -53,8 +59,7 @@ interface ITableRowWrapperProps {
 }
 
 const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
-    const { value, columns, hover, selectable } = props;
-    const { onRowClick, onRowSelect } = props;
+    const { value, columns, hover, selectable, onRowClick, onRowSelect } = props;
 
     const onClickCallback = useCallback(() => {
         if (onRowClick) {

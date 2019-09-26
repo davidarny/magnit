@@ -45,6 +45,8 @@ export interface IStage {
     deadline: string; // ISO time format
     finished: boolean;
     editable?: boolean;
+    createdAt: string;
+    updatedAt: string;
     __index?: number; // need for correct rendering
 }
 

@@ -253,7 +253,12 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 return;
             }
             if (task.stages) {
-                task.stages.push({ ...step, finished: false });
+                task.stages.push({
+                    ...step,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    finished: false,
+                });
             }
             if (onTaskChange) {
                 onTaskChange({ ...task });

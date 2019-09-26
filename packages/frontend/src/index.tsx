@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import ReactDOM from "react-dom";
-import { App } from "containers/app";
-import * as ServiceWorker from "./ServiceWorker";
-import { ThemeProvider } from "emotion-theming";
 import { JssProvider } from "components/jss-provider";
+import { App } from "containers/app";
+import { ThemeProvider } from "emotion-theming";
+import ReactDOM from "react-dom";
+import * as ServiceWorker from "./ServiceWorker";
 
 const theme = {
     fontSize: {
@@ -13,6 +13,7 @@ const theme = {
         smaller: "0.75em",
         xsNormal: "0.8em",
         sNormal: "0.85em",
+        mNormal: "0.925em",
         normal: "1em",
         medium: "1.15em",
         larger: "1.25em",

@@ -69,15 +69,29 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     const context = useContext(AppContext);
 
     const [dialogOpen, setDialogOpen] = useState(false);
+
+    // set task on click to redirect ot it
     const [tasks, setTasks] = useState<TTask[]>([]);
+
+    // selection
     const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
+
+    // full text search
     const [searchQuery, setSearchQuery] = useState("");
+
+    // total count of tasks
     const [total, setTotal] = useState(0);
 
+    // choose region + city selects
     const [selectedRegion, setSelectedRegion] = useState<string>("");
     const [selectedCity, setSelectedCity] = useState<string>("");
     const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
     const [regionCities, setRegionCities] = useState<string[]>([]);
+
+    // table
+    const [page, setPage] = useState(0);
+    const [order, setOrder] = useState<"asc" | "desc">("asc");
+    const [orderBy, setOrderBy] = useState("");
 
     const fetchRegionsAndUpdateState = useCallback(() => {
         getAllRegions(context.courier)
@@ -110,7 +124,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [],
     );
 
-    const fetchTaskAndUpdateState = useCallback(
+    const fetchTasksAndUpdateState = useCallback(
         ({ sort, sortBy, title, region, city }: IUpdateTaskListOptions = {}) => {
             clearSelectedTasks();
             // get task by current status
@@ -139,10 +153,16 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     useEffect(() => {
         if (prevTab.current !== tab) {
             prevTab.current = tab;
-            fetchTaskAndUpdateState();
+            // reset table
+            setPage(0);
+            setOrder("asc");
+            setOrderBy("");
+            // fetch tasks
+            fetchTasksAndUpdateState();
+            // fetch marketplaces
             fetchRegionsAndUpdateState();
         }
-    }, [tab, fetchTaskAndUpdateState, fetchRegionsAndUpdateState]);
+    }, [tab, fetchTasksAndUpdateState, fetchRegionsAndUpdateState]);
 
     const prevTaskRegion = useRef(selectedRegion);
     useEffect(() => {
@@ -203,10 +223,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToOnCheck))
-            .then(() => fetchTaskAndUpdateState())
+            .then(() => fetchTasksAndUpdateState())
             .catch(console.error)
             .finally(onDialogClose);
-    }, [selectedTasks, setTaskToOnCheck, fetchTaskAndUpdateState]);
+    }, [selectedTasks, setTaskToOnCheck, fetchTasksAndUpdateState]);
 
     const setTaskToInProgress = useCallback(
         async (task: TTask) =>
@@ -228,10 +248,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToInProgress))
-            .then(() => fetchTaskAndUpdateState())
+            .then(() => fetchTasksAndUpdateState())
             .then(() => clearSelectedTasks())
             .catch(console.error);
-    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, fetchTaskAndUpdateState]);
+    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, fetchTasksAndUpdateState]);
 
     const onSelectToggleCallback = useCallback(
         (selected: boolean) => {
@@ -247,7 +267,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [clearSelectedTasks, selectedTasks, tasks],
     );
 
-    const updateTaskListDebounced = _.debounce(fetchTaskAndUpdateState, 150);
+    const updateTaskListDebounced = _.debounce(fetchTasksAndUpdateState, 150);
 
     const onSearchQueryChangeCallback = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -264,9 +284,11 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     const onRequestSortCallback = useCallback(
         (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
-            fetchTaskAndUpdateState({ sort, sortBy });
+            setOrder(sort);
+            setOrderBy(sortBy);
+            fetchTasksAndUpdateState({ sort, sortBy });
         },
-        [fetchTaskAndUpdateState],
+        [fetchTasksAndUpdateState],
     );
 
     function onDialogOpen() {
@@ -302,6 +324,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         },
         [searchQuery, selectedRegion, updateTaskListDebounced],
     );
+
+    function onChangePage(nextPage: number) {
+        setPage(nextPage);
+    }
 
     const empty = !total;
 
@@ -440,6 +466,9 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                                 marginLeft: theme.spacing(-2),
                                                 width: `calc(100% + ${theme.spacing(4)})`,
                                             })}
+                                            page={page}
+                                            order={order}
+                                            orderBy={orderBy}
                                             selectable
                                             columns={columns}
                                             data={tasks}
@@ -447,6 +476,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                             onRowSelectToggle={onRowSelectToggleCallback}
                                             onSelectToggle={onSelectToggleCallback}
                                             onRequestSort={onRequestSortCallback}
+                                            onChangePage={onChangePage}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
