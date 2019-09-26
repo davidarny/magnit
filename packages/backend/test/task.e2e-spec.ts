@@ -123,7 +123,7 @@ describe("TaskController (e2e)", () => {
     });
 
     it("should create task", async () => {
-        jest.spyOn(taskService, "insert").mockResolvedValue(task);
+        jest.spyOn(taskService, "insert").mockResolvedValue(task.id);
         return request(app.getHttpServer())
             .post("/v1/tasks")
             .send({ task })
@@ -144,7 +144,11 @@ describe("TaskController (e2e)", () => {
 
     it("should get task by id", async () => {
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([]);
+        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
+            ...task,
+            templates: [],
+            stages: [],
+        });
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)
@@ -206,8 +210,12 @@ describe("TaskController (e2e)", () => {
 
     it("should ensure returns updated task", async () => {
         const updated = { ...task, name: "updated task" };
-        jest.spyOn(taskService, "findById").mockResolvedValue(updated);
-        jest.spyOn(templateService, "findTemplateAssignmentByIdExtended").mockResolvedValue([]);
+        jest.spyOn(taskService, "findById").mockResolvedValue(task);
+        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
+            ...updated,
+            templates: [],
+            stages: [],
+        });
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)

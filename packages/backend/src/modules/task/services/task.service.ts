@@ -210,12 +210,9 @@ export class TaskService {
         const task = await this.findById(id, ["stages"]);
         const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
         return {
-            success: 1,
-            task: {
-                ...task,
-                templates: (templates || []).map(template => template.id),
-                stages: (task.stages || []).map(stage => stage.id),
-            },
+            ...task,
+            templates: (templates || []).map(template => template.id),
+            stages: (task.stages || []).map(stage => stage.id),
         };
     }
 
