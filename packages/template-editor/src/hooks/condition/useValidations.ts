@@ -1,4 +1,11 @@
-import { EConditionType, EPuzzleType, IPuzzle, ISection, IValidation } from "@magnit/entities";
+import {
+    EConditionType,
+    EPuzzleType,
+    EValidationType,
+    IPuzzle,
+    ISection,
+    IValidation,
+} from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
 import { default as React, useCallback, useMemo, useState } from "react";
@@ -35,6 +42,7 @@ export function useValidations(
                 return {
                     id: uuid(),
                     order: 0,
+                    value: 0,
                     leftHandPuzzle: puzzle.id,
                     errorMessage: errorMessage,
                     operatorType: "",
@@ -75,13 +83,16 @@ export function useValidations(
                 return [...puzzle.validations, _.cloneDeep(virtualCondition)].filter<IValidation>(
                     (validation): validation is IValidation =>
                         !_.isNil(validation) &&
-                        !!(
-                            validation.validationType &&
-                            validation.conditionType &&
-                            validation.operatorType &&
-                            validation.errorMessage &&
-                            (validation.rightHandPuzzle || validation.value)
-                        ),
+                        !!(validation.validationType &&
+                        validation.conditionType &&
+                        validation.operatorType &&
+                        validation.validationType === EValidationType.COMPARE_WITH_ANSWER
+                            ? validation.rightHandPuzzle
+                            : validation.validationType === EValidationType.SET_VALUE
+                            ? validation.value ||
+                              // can be also 0 which is falsy
+                              (typeof validation.value !== "undefined" && validation.value === 0)
+                            : false),
                 );
             },
 
@@ -95,6 +106,10 @@ export function useValidations(
                     child => child.puzzleType === EPuzzleType.NUMERIC_ANSWER,
                 );
             },
+
+            conditionsEmpty(): boolean {
+                return puzzle.validations.length === 0;
+            },
         }),
         [errorMessage, onTemplateChange, puzzle.id, puzzle.validations],
     );
@@ -107,7 +122,6 @@ export function useValidations(
         onValidationDelete,
         onValidationChange,
         onAddValidation,
-        tryToCommitCondition,
     ] = useCommonConditionsLogic<IValidation>(
         puzzle,
         puzzles,
@@ -144,22 +158,15 @@ export function useValidations(
     }
 
     const onErrorMessageBlurCallback = useCallback(() => {
-        puzzle.validations = [
-            ...puzzle.validations.map(validation => ({ ...validation, errorMessage })),
-        ];
+        const setErrorMessage = (validation: IValidation) => ({ ...validation, errorMessage });
+        puzzle.validations = [...puzzle.validations.map(setErrorMessage)];
         let nextVirtualCondition = virtualCondition;
         if (virtualCondition) {
             nextVirtualCondition = { ...virtualCondition, errorMessage };
             setVirtualCondition(nextVirtualCondition);
         }
-        tryToCommitCondition(nextVirtualCondition);
-    }, [
-        errorMessage,
-        puzzle.validations,
-        setVirtualCondition,
-        tryToCommitCondition,
-        virtualCondition,
-    ]);
+        onTemplateChange();
+    }, [errorMessage, onTemplateChange, puzzle.validations, setVirtualCondition, virtualCondition]);
 
     return [
         virtualCondition,

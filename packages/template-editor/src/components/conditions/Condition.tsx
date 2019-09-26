@@ -48,7 +48,7 @@ export const Condition: React.FC<IConditionProps> = props => {
         onConditionDelete,
     } = props;
 
-    const [value, setValue] = useState<string>(condition.value || "");
+    const [value, setValue] = useState(condition.value || "");
 
     const onQuestionPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {

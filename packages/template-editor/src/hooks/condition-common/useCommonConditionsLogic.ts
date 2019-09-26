@@ -20,6 +20,8 @@ export interface IUseConditionsService<T> {
     shouldSetQuestions(puzzle: IPuzzle): boolean;
 
     getVirtualCondition(): T;
+
+    conditionsEmpty(): boolean;
 }
 
 export function useCommonConditionsLogic<T extends ICondition | IValidation>(
@@ -36,10 +38,9 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     (id: string) => void,
     (id: string, update: T) => void,
     (onAddConditionImpl: (last: T) => Partial<T>) => void,
-    (nextVirtualCondition?: T | null) => void,
 ] {
     const [virtualCondition, setVirtualCondition] = useState<T | null>(
-        !service.getConditions().length ? service.getVirtualCondition() : null,
+        service.conditionsEmpty() ? service.getVirtualCondition() : null,
     );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
@@ -47,21 +48,26 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const prevVirtualCondition = useRef(_.cloneDeep(virtualCondition));
     const prevPuzzlePuzzles = useRef(_.cloneDeep(puzzle.puzzles));
     useEffect(() => {
+        // exit when ...
+        const virtualConditionSame = _.isEqual(prevVirtualCondition.current, virtualCondition);
+        const puzzleChildrenSame = _.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles);
+        const anyConditionsNotEmpty = !service.conditionsEmpty() && !_.isNil(virtualCondition);
         if (
-            (!_.isEqual(prevVirtualCondition.current, virtualCondition) &&
-                _.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles)) ||
-            (service.getConditions().length > 0 && !_.isNil(virtualCondition))
+            // ... either virtual condition hasn't changed whereas puzzle content changed ...
+            (!virtualConditionSame && puzzleChildrenSame) ||
+            // ... or there are any conditions in some store
+            anyConditionsNotEmpty
         ) {
             prevVirtualCondition.current = _.cloneDeep(virtualCondition);
             return;
         }
         prevVirtualCondition.current = _.cloneDeep(virtualCondition);
-        if (
-            !_.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles) ||
-            (!prevPuzzlePuzzles.current.length && !puzzle.puzzles.length)
-        ) {
+        const puzzleChildrenEmpty =
+            !_.isEmpty(prevPuzzlePuzzles.current) && !_.isEmpty(puzzle.puzzles);
+        // enter when puzzle children are different or empty
+        if (!puzzleChildrenSame || puzzleChildrenEmpty) {
             prevPuzzlePuzzles.current = _.cloneDeep(puzzle.puzzles);
-            if (service.getConditions().length > 0) {
+            if (!service.conditionsEmpty()) {
                 setVirtualCondition(null);
             } else {
                 setVirtualCondition(service.getVirtualCondition());
@@ -87,13 +93,14 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             if (
                 childPuzzle.puzzleType === EPuzzleType.QUESTION &&
                 service.shouldSetQuestions(childPuzzle) &&
-                childPuzzle.title.toString().length > 0
+                !_.isEmpty(childPuzzle.title.toString())
             ) {
                 questions.push(childPuzzle);
                 childPuzzle.puzzles.forEach(childOfChildPuzzle => {
                     // if puzzle is one of answers types
                     // then it's allowed to be selected as an answerPuzzle
                     const excludedPuzzleTypes = [EPuzzleType.GROUP, EPuzzleType.QUESTION];
+                    // enter if puzzle is not GROUP or QUESTION
                     if (!excludedPuzzleTypes.includes(childOfChildPuzzle.puzzleType)) {
                         answers.push(childOfChildPuzzle);
                     }
@@ -116,7 +123,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     // dependent question has changed
     const prevDependents = useRef(_.cloneDeep(questions));
     useEffect(() => {
-        if (!service.getConditions().length) {
+        if (service.conditionsEmpty()) {
             return;
         }
         let changed = false;
@@ -154,16 +161,16 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
     const onConditionDeleteCallback = useCallback(
         (id: string) => {
             if (virtualCondition && virtualCondition.id === id) {
-                if (service.getConditions().length > 0) {
+                if (!service.conditionsEmpty()) {
                     setVirtualCondition(null);
                 } else {
                     setVirtualCondition(service.getVirtualCondition());
                 }
             } else {
-                service.setConditions([
-                    ...service.getConditions().filter(condition => condition.id !== id),
-                ]);
-                if (service.getConditions().length === 0) {
+                const isCurrentCondition = (condition: T) => condition.id !== id;
+                const nextConditions = [...service.getConditions().filter(isCurrentCondition)];
+                service.setConditions(nextConditions);
+                if (service.conditionsEmpty()) {
                     setVirtualCondition(service.getVirtualCondition());
                 }
                 onTemplateChange();
@@ -178,10 +185,16 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 nextVirtualCondition = null;
             }
             service.onConditionsChange(nextVirtualCondition);
-            const nextVirtualConditionInserted = (condition: T) =>
+            const containsVirtualCondition = (condition: T) =>
                 nextVirtualCondition && condition.id === nextVirtualCondition.id;
-            if (service.getConditions().some(nextVirtualConditionInserted)) {
+            const virtualConditionInserted = service.getConditions().some(containsVirtualCondition);
+            if (virtualConditionInserted) {
                 setVirtualCondition(null);
+            }
+            // handle case when both conditions & virtual condition are empty
+            const allConditionsEmpty = service.conditionsEmpty() && _.isNil(nextVirtualCondition);
+            if (allConditionsEmpty) {
+                setVirtualCondition(service.getVirtualCondition());
             }
         },
         [service],
@@ -194,9 +207,8 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
                 nextVirtualCondition = { ...virtualCondition, ...update };
                 setVirtualCondition(nextVirtualCondition);
             } else {
-                const changedConditionIdx = service
-                    .getConditions()
-                    .findIndex(condition => condition.id === id);
+                const isCurrentCondition = (condition: T) => condition.id === id;
+                const changedConditionIdx = service.getConditions().findIndex(isCurrentCondition);
                 service.getConditions()[changedConditionIdx] = {
                     ...service.getConditions()[changedConditionIdx],
                     ...update,
@@ -212,13 +224,12 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         (onAddConditionImpl: (last: T) => Partial<T>): void => {
             service.onConditionsChange(virtualCondition);
             const last = _.last(service.getConditions());
-            const virtualConditionInserted = (condition: T) =>
+            const containsVirtualCondition = (condition: T) =>
                 virtualCondition && condition.id === virtualCondition.id;
-            if (
-                last &&
-                (service.getConditions().some(virtualConditionInserted) ||
-                    _.isNil(virtualCondition))
-            ) {
+            const virtualConditionInserted = service.getConditions().some(containsVirtualCondition);
+            // enter when there is any condition in puzzle
+            // and either virtual condition inserted or it's null
+            if (last && (virtualConditionInserted || _.isNil(virtualCondition))) {
                 setVirtualCondition({
                     ...service.getVirtualCondition(),
                     ...onAddConditionImpl(last),
@@ -236,6 +247,5 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
         onConditionDeleteCallback,
         onConditionChangeCallback,
         onAddConditionCallback,
-        tryToCommitCondition,
     ];
 }

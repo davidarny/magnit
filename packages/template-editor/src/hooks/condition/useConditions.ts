@@ -30,12 +30,10 @@ export function useConditions(
             getVirtualCondition() {
                 return {
                     id: uuid(),
-                    answerPuzzle: "",
-                    value: "",
-                    actionType: "",
-                    conditionType: EConditionType.OR,
                     order: 0,
+                    actionType: "",
                     questionPuzzle: "",
+                    conditionType: EConditionType.OR,
                 };
             },
 
@@ -73,7 +71,14 @@ export function useConditions(
                             condition.conditionType &&
                             condition.questionPuzzle &&
                             (condition.actionType === EActionType.GIVEN_ANSWER ||
-                                (condition.value || condition.answerPuzzle))
+                                (condition.actionType === EActionType.CHOSEN_ANSWER
+                                    ? condition.answerPuzzle
+                                    : condition.actionType === EActionType.EQUAL ||
+                                      condition.actionType === EActionType.LESS_THAN ||
+                                      condition.actionType === EActionType.MORE_THAN ||
+                                      condition.actionType === EActionType.NOT_EQUAL
+                                    ? condition.value
+                                    : false))
                         ),
                 );
             },
@@ -88,6 +93,10 @@ export function useConditions(
                 return puzzle.puzzles.every(
                     child => child.puzzleType !== EPuzzleType.REFERENCE_ANSWER,
                 );
+            },
+
+            conditionsEmpty(): boolean {
+                return puzzle.conditions.length === 0;
             },
         }),
         [onTemplateChange, puzzle.conditions],
