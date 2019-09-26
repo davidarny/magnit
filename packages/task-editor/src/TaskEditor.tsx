@@ -16,7 +16,7 @@ import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
 import { EEditorType, getEditorService } from "@magnit/services";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import uuid from "uuid/v4";
 import { CreateTask } from "./components/create-task";
 import { ViewTask } from "./components/view-task";
@@ -315,7 +315,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         }
     }, [documents, focusedPuzzleId, isCreateMode, task, updateTaskTemplates]);
 
-    function onAddCommentClick() {
+    const onAddCommentClick = useCallback(() => {
         // allow to add if 0 pending comments
         if (pendingComments.length) {
             return;
@@ -334,7 +334,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             updatedAt: new Date().toISOString(),
         };
         setPendingComments([...pendingComments, comment]);
-    }
+    }, [documents, focusedPuzzleId, pendingComments]);
 
     const onPendingCommentDeleteCallback = useCallback(
         (commentId: number) => {
@@ -366,33 +366,44 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         [onDeleteComment],
     );
 
-    const editorToolbarItems = [
-        {
-            label: "Добавить шаблон",
-            icon: <QuestionIcon />,
-            action: onAddDocumentCallback,
-        },
-        // show comments button if focused on template
-        ...(documents.some(document => document.__uuid === focusedPuzzleId)
-            ? [
-                  {
-                      label: "Оставить комментарий",
-                      icon: <CommentsIcon />,
-                      action: onAddCommentClick,
-                  },
-              ]
-            : []),
-        // show trash button if not focused on head
-        ...(!focusedOnTaskHead
-            ? [
-                  {
-                      label: "Удалить шаблон",
-                      icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
-                      action: onDeleteDocumentCallback,
-                  },
-              ]
-            : []),
-    ];
+    const focusedOnDocument = documents.some(document => document.__uuid === focusedPuzzleId);
+
+    const editorToolbarItems = useMemo(
+        () => [
+            {
+                label: "Добавить шаблон",
+                icon: <QuestionIcon />,
+                action: onAddDocumentCallback,
+            },
+            // show comments button if focused on template
+            ...(focusedOnDocument
+                ? [
+                      {
+                          label: "Оставить комментарий",
+                          icon: <CommentsIcon />,
+                          action: onAddCommentClick,
+                      },
+                  ]
+                : []),
+            // show trash button if not focused on head or on document
+            ...(!focusedOnTaskHead && !focusedOnDocument
+                ? [
+                      {
+                          label: "Удалить шаблон",
+                          icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
+                          action: onDeleteDocumentCallback,
+                      },
+                  ]
+                : []),
+        ],
+        [
+            focusedOnDocument,
+            focusedOnTaskHead,
+            onAddCommentClick,
+            onAddDocumentCallback,
+            onDeleteDocumentCallback,
+        ],
+    );
 
     return (
         <React.Fragment>
