@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { resolve } from "path";
 import { ConnectionOptionsReader } from "typeorm";
+import { APP_PIPE } from "@nestjs/core";
 import { AssetModule } from "./modules/asset/asset.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { MarketplaceModule } from "./modules/marketplace/marketplace.module";
@@ -11,6 +12,7 @@ import { TemplateModule } from "./modules/template/template.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { CustomFileLogger } from "./shared/providers/custom.file.logger";
 import { UserModule } from "./modules/user/user.module";
+import { ValidationPipe } from "./shared/pipes/validation.pipe";
 
 const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
 
@@ -34,6 +36,12 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         MarketplaceModule,
         AuthModule,
         ...(process.env.ALLOW_AUTH ? [] : []),
+    ],
+    providers: [
+        {
+            provide: APP_PIPE,
+            useClass: ValidationPipe,
+        },
     ],
 })
 export class AppModule {}

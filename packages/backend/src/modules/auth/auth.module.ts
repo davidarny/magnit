@@ -1,19 +1,38 @@
-import { Module } from "@nestjs/common";
+import { HttpModule, MiddlewareConsumer, Module, RequestMethod } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./services/auth.service";
 import { UserService } from "../user/services/user.service";
-import { JwtTokenManager } from "./providers/jwt.token.manager";
+import { JWTTokenManager } from "./providers/jwt.token.manager";
 import { PasswordManager } from "./providers/password.manager";
 import { User } from "./entities/user.entity";
 import { UserRole } from "./entities/user.role.entity";
 import { UserModule } from "../user/user.module";
+import { PushTokenModule } from "../push-token/push-token.module";
+import { AuthMiddleware } from "./middleware/auth.middleware";
+import { UserByEmailPipe } from "./pipes/user-by-email.pipes";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, UserRole]), UserModule],
+    imports: [
+        TypeOrmModule.forFeature([User, UserRole]),
+        UserModule,
+        PushTokenModule,
+        HttpModule.register({
+            timeout: Number(process.env.HTTP_TIMEOUT),
+            maxRedirects: Number(process.env.HTTP_MAX_REDIRECTS),
+        }),
+    ],
     controllers: [AuthController],
-    providers: [AuthService, JwtTokenManager, PasswordManager],
+    providers: [AuthService, JWTTokenManager, PasswordManager],
 })
 export class AuthModule {
     constructor(private readonly userService: UserService) {}
+    configure(consumer: MiddlewareConsumer) {
+        if (process.env.ALLOW_AUTH || process.env.NODE_ENV !== "testing") {
+            consumer
+                .apply(AuthMiddleware)
+                .exclude({ path: "/auth", method: RequestMethod.ALL })
+                .forRoutes({ path: "*", method: RequestMethod.ALL });
+        }
+    }
 }

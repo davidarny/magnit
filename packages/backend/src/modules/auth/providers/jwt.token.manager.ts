@@ -3,7 +3,7 @@ import { TokenManager } from "./token.manager";
 import * as jwt from "jsonwebtoken";
 
 @Injectable()
-export class JwtTokenManager<T extends object> extends TokenManager<T> {
+export class JWTTokenManager<T extends object> extends TokenManager<T> {
     protected readonly algorithm = process.env.AUTH_ALGORITHM || "HS256";
     protected readonly expires = process.env.AUTH_EXPIRES_IN || "1h";
 
