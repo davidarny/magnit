@@ -1,10 +1,10 @@
 import { HttpService, Injectable } from "@nestjs/common";
 import { TransformClassToPlain } from "class-transformer";
+import * as _ from "lodash";
 import { Validate } from "../../../shared/decorators/validate.decorator";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { User } from "../entities/user.entity";
 import { IUserService } from "../interfaces/user.service.interface";
-import _ = require("lodash");
 
 interface IAirWatchUser {
     UserName?: string;

@@ -30,7 +30,11 @@ interface IEditableTemplate extends ITemplate {
 
 export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
+
+    // all templates
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+
+    // task state
     const [task, setTask] = useState<ITask>({
         id: 0,
         title: "",
@@ -44,11 +48,16 @@ export const CreateTask: React.FC = () => {
         },
         status: ETaskStatus.DRAFT,
     });
+
+    // snackbar
+    // deprecated, should be used within context
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
     }); // open/close snackbar
+
+    // marketplace
     const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
     const [regionCities, setRegionCities] = useState<string[]>([]);
     const [cityFormats, setCityFormats] = useState<string[]>([]);
@@ -140,16 +149,13 @@ export const CreateTask: React.FC = () => {
 
     function onTaskSave(): void {
         createTask(context.courier, task)
-            .then(async response => {
-                if (!response.taskId) {
-                    return;
-                }
-                await addTemplateAssignment(
+            .then(async response =>
+                addTemplateAssignment(
                     context.courier,
                     Number(response.taskId),
                     (task.templates || []).map(_.toNumber),
-                );
-            })
+                ),
+            )
             .then(() => setSnackbar({ open: true, message: "Задание успешно сохранено!" }))
             .catch(() => {
                 setSnackbar({ open: true, message: "Ошибка сохранения задания!" });

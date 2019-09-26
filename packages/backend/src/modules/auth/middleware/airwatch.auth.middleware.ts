@@ -1,6 +1,7 @@
 import { Inject, NestMiddleware } from "@nestjs/common";
 import { Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
+import * as _ from "lodash";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
@@ -10,7 +11,6 @@ import { IAuthService } from "../interfaces/auth.service.interface";
 import { ITokenManager } from "../interfaces/token.manager.interface";
 import { JwtTokenManager } from "../providers/jwt.token.manager";
 import { AirwatchAuthService } from "../services/airwatch-auth.service";
-import _ = require("lodash");
 
 export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
     constructor(
