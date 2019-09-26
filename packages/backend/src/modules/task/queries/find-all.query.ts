@@ -3,11 +3,11 @@ import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus } from "../entities/task.entity";
 
 export class FindAllQuery {
-    @ApiModelPropertyOptional({ default: 0, minimum: 0 }) readonly offset: number = 0;
-    @ApiModelPropertyOptional({ default: 10, minimum: 0 }) readonly limit: number = 10;
+    @ApiModelPropertyOptional({ default: 0, minimum: 0 }) readonly offset?: number = 0;
+    @ApiModelPropertyOptional({ default: 10, minimum: 0 }) readonly limit?: number = 10;
     @ApiModelPropertyOptional({ description: "TaskDto keys", default: "title", type: String })
-    readonly sortBy: keyof TaskDto = "title";
-    @ApiModelPropertyOptional({ default: "ASC", enum: ["ASC", "DESC"] }) readonly sort:
+    readonly sortBy?: keyof TaskDto = "title";
+    @ApiModelPropertyOptional({ default: "ASC", enum: ["ASC", "DESC"] }) readonly sort?:
         | "ASC"
         | "DESC" = "ASC";
     @ApiModelPropertyOptional({

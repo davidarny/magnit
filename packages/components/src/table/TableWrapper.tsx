@@ -76,10 +76,11 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
     const onRequestSortCallback = useCallback(
         (event: React.MouseEvent<unknown>, property: string) => {
             const isDesc = orderBy === property && order === "desc";
-            setOrder(isDesc ? "asc" : "desc");
+            const nextOrder = isDesc ? "asc" : "desc";
+            setOrder(nextOrder);
             setOrderBy(property);
             if (onRequestSort) {
-                onRequestSort(order, orderBy);
+                onRequestSort(nextOrder, property);
             }
         },
         [onRequestSort, order, orderBy],

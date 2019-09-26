@@ -11,3 +11,4 @@ export * from "./AddTaskDocument";
 export * from "./DeleteTaskDocument";
 export * from "./AddComment";
 export * from "./DeleteComment";
+export * from "./GetTasksExtended";

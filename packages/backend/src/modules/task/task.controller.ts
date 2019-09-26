@@ -53,12 +53,14 @@ import { DocumentByIdPipe } from "./pipes/document-by-id.pipe";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TaskExpiredPipe } from "./pipes/task-expired.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
+import { FindAllQueryExtended } from "./queries/find-all-extended.query";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTaskResponse } from "./responses/create-task.response";
 import { GetReportResponse } from "./responses/get-report.response";
 import { GetStagesWithFullHistoryResponse } from "./responses/get-stages-with-full-history.response";
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { GetTaskResponse } from "./responses/get-task.response";
+import { GetTasksExtendedResponse } from "./responses/get-tasks-extended.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { TaskService } from "./services/task.service";
 
@@ -97,6 +99,40 @@ export class TaskController {
             status,
             statuses,
             title,
+        );
+        return { success: 1, total: tasks.length, tasks };
+    }
+
+    @Get("/extended")
+    @UsePipes(TaskExpiredPipe)
+    @ApiOkResponse({
+        type: GetTasksExtendedResponse,
+        description: "Get Tasks with Marketplace & last Stage",
+    })
+    @ApiBadRequestResponse({ description: "Found non compatible props" })
+    async findAllExtended(
+        @Query(
+            new NonCompatiblePropsPipe<FindAllQueryExtended>(["status", "statuses"]),
+            new SplitPropPipe<FindAllQueryExtended>("statuses"),
+        )
+        query?: FindAllQueryExtended,
+    ) {
+        const { offset, limit, sortBy, sort, statuses, status, title, city, region } = {
+            // need this to correctly handle default values
+            // not sure if nest creates them on given query
+            ...new FindAllQueryExtended(),
+            ...query,
+        };
+        const tasks = await this.taskService.findAllExtended(
+            offset,
+            limit,
+            sortBy,
+            sort,
+            status,
+            statuses,
+            title,
+            region,
+            city,
         );
         return { success: 1, total: tasks.length, tasks };
     }

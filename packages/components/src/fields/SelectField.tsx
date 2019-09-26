@@ -1,11 +1,24 @@
 /** @jsx jsx */
 
-import * as React from "react";
 import { jsx } from "@emotion/core";
 import { FormControl, Input, MenuItem, Select } from "@material-ui/core";
+import * as React from "react";
 
-export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props => {
-    const { children, placeholder = "", value = "", displayEmpty = true, ...rest } = props;
+export interface ISelectFieldProps {
+    placeholderDisabled?: boolean;
+}
+
+export const SelectField: React.FC<
+    ISelectFieldProps & React.ComponentProps<typeof Select>
+> = props => {
+    const {
+        children,
+        placeholder = "",
+        value = "",
+        displayEmpty = true,
+        placeholderDisabled = true,
+        ...rest
+    } = props;
 
     return (
         <FormControl
@@ -69,7 +82,7 @@ export const SelectField: React.FC<React.ComponentProps<typeof Select>> = props 
             >
                 {placeholder && (
                     <MenuItem
-                        disabled
+                        disabled={placeholderDisabled}
                         value=""
                         css={theme => ({
                             color: theme.colors.secondary,
