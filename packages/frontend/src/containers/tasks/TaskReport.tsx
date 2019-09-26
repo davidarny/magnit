@@ -10,8 +10,13 @@ import { ReportHeader, ReportStage, SendReportForm } from "components/task-repor
 import { VerticalStepper } from "components/vertical-stepper";
 import { AppContext } from "context";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTaskReport, IReportResponse, sendReportToEmail } from "services/api/tasks";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+    downloadReportFile,
+    getTaskReport,
+    IReportResponse,
+    sendReportToEmail,
+} from "services/api/tasks";
 
 interface ITaskReportProps {
     taskId: number;
@@ -41,23 +46,38 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         onMenuClose();
         setReportModalOpen(true);
     }
-    function onSubmitSendReport(email: string) {
-        setReportModalOpen(false);
-        sendReportToEmail(context.courier, taskId, email)
-            .then(() =>
-                context.setSnackbarState({
-                    open: true,
-                    message: `Отчёт отправлен на ${email}`,
-                }),
-            )
-            .catch(() => {
-                context.setSnackbarError(true);
-                context.setSnackbarState({
-                    open: true,
-                    message: `Не удалось отправить отчёт на ${email}`,
+
+    const onSubmitSendReportCallback = useCallback(
+        (email: string) => {
+            setReportModalOpen(false);
+            sendReportToEmail(context.courier, taskId, email)
+                .then(() =>
+                    context.setSnackbarState({
+                        open: true,
+                        message: `Отчёт отправлен на ${email}`,
+                    }),
+                )
+                .catch(() => {
+                    context.setSnackbarError(true);
+                    context.setSnackbarState({
+                        open: true,
+                        message: `Не удалось отправить отчёт на ${email}`,
+                    });
                 });
+        },
+        [context, taskId],
+    );
+
+    const onDownloadFileReportCallback = useCallback(() => {
+        onMenuClose();
+        downloadReportFile(context.courier, taskId).catch(() => {
+            context.setSnackbarError(true);
+            context.setSnackbarState({
+                open: true,
+                message: `Не удалось загрузить отчёт`,
             });
-    }
+        });
+    }, [context, taskId]);
 
     function onPopupClose() {
         setReportModalOpen(false);
@@ -66,7 +86,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     return (
         <SectionLayout>
             <SimpleModal width={370} open={reportModalOpen} onClose={onPopupClose}>
-                <SendReportForm onSubmit={onSubmitSendReport} />
+                <SendReportForm onSubmit={onSubmitSendReportCallback} />
             </SimpleModal>
             <SectionTitle title="Отчет по заданию">
                 <Grid item>
@@ -80,7 +100,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     anchorEl={menuAnchorElement}
                     onClose={onMenuClose}
                 >
-                    <MenuItem onClick={onMenuClose}>Скачать отчет (.xls)</MenuItem>
+                    <MenuItem onClick={onDownloadFileReportCallback}>Скачать отчет (.xls)</MenuItem>
                     <MenuItem onClick={onOpenSendReportMenuItem}>Отправить на email</MenuItem>
                 </Menu>
             </SectionTitle>

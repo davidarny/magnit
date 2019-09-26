@@ -13,3 +13,4 @@ export * from "./AddComment";
 export * from "./DeleteComment";
 export * from "./GetTasksExtended";
 export * from "./SendReportToEmail";
+export * from "./DownloadReportFile";

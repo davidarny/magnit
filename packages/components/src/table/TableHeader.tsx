@@ -36,6 +36,7 @@ export const TableHeader: React.FC<ITableHeaderProps> = props => {
             <TableRow>
                 {headers.map((header, index) => (
                     <TableHeaderCell
+                        key={header.key}
                         index={index}
                         header={header}
                         selectable={selectable}
