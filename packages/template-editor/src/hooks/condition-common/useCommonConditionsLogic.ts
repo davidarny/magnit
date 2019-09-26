@@ -189,7 +189,7 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
 
     const onConditionChangeCallback = useCallback(
         (id: string, update: T): void => {
-            let nextVirtualCondition: T = { ...update };
+            let nextVirtualCondition: T | null = null;
             if (virtualCondition && virtualCondition.id === id) {
                 nextVirtualCondition = { ...virtualCondition, ...update };
                 setVirtualCondition(nextVirtualCondition);
