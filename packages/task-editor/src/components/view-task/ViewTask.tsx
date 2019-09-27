@@ -11,11 +11,12 @@ import {
 import {
     ETaskStatus,
     IComment,
-    IDocument,
     IExtendedDocument,
     IExtendedTask,
     IStageStep,
-    IVirtualDocument,
+    ITemplate,
+    ITemplateDocument,
+    IVirtualTemplateDocument,
 } from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
 import { IEditorService } from "@magnit/services";
@@ -39,11 +40,11 @@ type TSelectChangeEvent = React.ChangeEvent<{
 interface IViewTaskProps {
     task: Partial<IExtendedTask>;
     service: IEditorService;
-    documents: IVirtualDocument[];
-    templates: Array<IDocument & IExtendedDocument>;
+    documents: IVirtualTemplateDocument[];
+    templates: Array<ITemplateDocument & IExtendedDocument>;
     pendingComments: IComment[];
     focusedPuzzleId?: string;
-    templateSnapshots: Map<string, object>;
+    templateSnapshots: Map<string, ITemplate>;
     editable?: boolean;
     regions?: string[];
     cities?: string[];

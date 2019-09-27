@@ -5,11 +5,11 @@ import { Button } from "@magnit/components";
 import {
     ETaskStatus,
     IComment,
-    IDocument,
     IExtendedDocument,
     IExtendedTask,
     IStage,
     ITemplate,
+    ITemplateDocument,
 } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
@@ -55,7 +55,7 @@ interface IEditableTemplate extends ITemplate {
     editable: boolean;
 }
 
-type TDocumentWithAnswers = IDocument & IExtendedDocument;
+type TDocumentWithAnswers = ITemplateDocument & IExtendedDocument;
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);

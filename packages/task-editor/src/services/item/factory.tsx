@@ -1,8 +1,13 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType } from "@magnit/entities";
-import { CheckboxAnswerFactory, DropdownAnswerFactory, RadioAnswerFactory } from "puzzles";
+import { EPuzzleType, IAnswer, IPuzzle } from "@magnit/entities";
+import {
+    CheckboxAnswerFactory,
+    DropdownAnswerFactory,
+    RadioAnswerFactory,
+    TextAnswerFactory,
+} from "puzzles";
 import * as React from "react";
 
 export interface IPuzzleFactory {
@@ -11,7 +16,8 @@ export interface IPuzzleFactory {
 
 export interface IPuzzleProps {
     index: number;
-    puzzle: object;
+    answer?: IAnswer;
+    puzzle: IPuzzle;
 }
 
 class DefaultFactory implements IPuzzleFactory {
@@ -28,6 +34,8 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             return new RadioAnswerFactory();
         case EPuzzleType.DROPDOWN_ANSWER:
             return new DropdownAnswerFactory();
+        case EPuzzleType.TEXT_ANSWER:
+            return new TextAnswerFactory();
         default:
             return new DefaultFactory();
     }

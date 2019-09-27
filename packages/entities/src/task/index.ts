@@ -1,4 +1,5 @@
-import { ETaskStatus } from "enums";
+import { EPuzzleType, ETaskStatus } from "../enums";
+import { ITemplate } from "../template";
 
 export interface IStageStep {
     id: number;
@@ -25,17 +26,15 @@ export interface ITask extends IBaseTask {
     marketplace: IMarketPlace;
 }
 
-export interface IDocument {
-    id: number;
-    title: string;
+export interface ITemplateDocument extends ITemplate {
     editable: boolean;
 }
 
-export interface IRenderDocument extends IDocument {
+export interface IRenderTemplateDocument extends ITemplateDocument {
     __uuid: string; // need for correct rendering
 }
 
-export interface IVirtualDocument extends IRenderDocument {
+export interface IVirtualTemplateDocument extends IRenderTemplateDocument {
     virtual?: boolean;
 }
 
@@ -52,10 +51,10 @@ export interface IStage {
 
 export interface IAnswer {
     answer: string;
-    answerType: "string" | "number";
+    answerType: EPuzzleType;
     comment?: string;
     id: number;
-    idPuzzle: number;
+    idPuzzle: string;
     idTask: number;
     idTemplate: number;
     createdAt: string;
@@ -91,7 +90,7 @@ export interface ITaskDocument {
 
 export interface IExtendedTask extends IBaseTask {
     id: number;
-    templates: Array<IDocument & IExtendedDocument>;
+    templates: Array<ITemplateDocument & IExtendedDocument>;
     stages: IStage[];
     documents: ITaskDocument[];
     marketplace: IMarketPlace;

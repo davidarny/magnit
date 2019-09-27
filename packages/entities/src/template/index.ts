@@ -5,7 +5,7 @@ import {
     EPuzzleType,
     ETemplateType,
     EValidationType,
-} from "enums";
+} from "../enums";
 
 export interface ICondition {
     id: string;

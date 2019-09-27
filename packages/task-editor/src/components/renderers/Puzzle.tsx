@@ -1,15 +1,14 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { EPuzzleType, IAnswer } from "@magnit/entities";
+import { EPuzzleType, IAnswer, IPuzzle } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
-import _ from "lodash";
 import * as React from "react";
 import { getPuzzleFactory } from "services/item";
 
 interface IPuzzleRendererProps {
-    puzzle: object;
+    puzzle: IPuzzle;
     last?: boolean;
     answer?: IAnswer;
 }
@@ -62,27 +61,45 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
                                 color: theme.colors.secondary,
                             })}
                         >
-                            {_.get(puzzle, "title")}
+                            {puzzle.title}
                         </Typography>
                     </Grid>
                 </Grid>
             </Grid>
             <Grid item css={theme => ({ marginLeft: theme.spacing(5) })}>
                 <Grid container direction="column" spacing={1}>
-                    {_.get(puzzle, "puzzles", [])
-                        .filter((puzzle: object) =>
+                    {(puzzle.puzzles || [])
+                        .filter(puzzle =>
+                            // when answer exists ...
                             answer
-                                ? answer.answer === _.get(puzzle, "title") ||
-                                  answer.answer === _.get(puzzle, "id")
-                                : true,
+                                ? // ... filter only those which have answer ...
+                                  answer.answerType === EPuzzleType.RADIO_ANSWER ||
+                                  answer.answerType === EPuzzleType.CHECKBOX_ANSWER ||
+                                  answer.answerType === EPuzzleType.DROPDOWN_ANSWER
+                                    ? answer.answer === puzzle.id
+                                    : true
+                                : // ... or just render
+                                  true,
                         )
-                        .map((puzzle: object, index: number) => {
-                            const puzzleType = _.get(puzzle, "puzzleType") as EPuzzleType;
-                            const factory = getPuzzleFactory(puzzleType);
-                            return factory.create({ index, puzzle });
-                        })}
+                        .map((puzzle, index) => {
+                            let answerType: EPuzzleType | null = null;
+                            if (answer) {
+                                answerType = answer.answerType;
+                            } else {
+                                answerType = puzzle.puzzleType;
+                            }
+                            console.log("answer", answer, puzzle, answerType);
+                            if (!answerType) {
+                                return null;
+                            }
+                            const factory = getPuzzleFactory(answerType);
+                            return factory.create({ index, puzzle, answer });
+                        })
+                        .filter(Boolean)}
                 </Grid>
             </Grid>
         </Grid>
     );
 };
+
+PuzzleRenderer.displayName = "PuzzleRenderer";

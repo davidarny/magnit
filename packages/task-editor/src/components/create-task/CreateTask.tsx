@@ -8,7 +8,7 @@ import {
     SelectableBlockWrapper,
     SelectField,
 } from "@magnit/components";
-import { IDocument, IRenderDocument, ITask } from "@magnit/entities";
+import { IRenderTemplateDocument, ITask, ITemplate, ITemplateDocument } from "@magnit/entities";
 import { IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
@@ -27,9 +27,9 @@ type TSelectChangeEvent = React.ChangeEvent<{
 interface ICreateTaskProps {
     task: Partial<ITask>;
     service: IEditorService;
-    templates: IDocument[];
-    documents: IRenderDocument[];
-    templateSnapshots: Map<string, object>;
+    templates: ITemplateDocument[];
+    documents: IRenderTemplateDocument[];
+    templateSnapshots: Map<string, ITemplate>;
     focusedPuzzleId?: string;
     regions?: string[];
     cities?: string[];
@@ -311,10 +311,10 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
 CreateTask.displayName = "CreateTask";
 
 interface ITaskDocumentProps {
-    templates: IDocument[];
+    templates: ITemplateDocument[];
     service: IEditorService;
-    templateSnapshots: Map<string, object>;
-    document: IRenderDocument;
+    templateSnapshots: Map<string, ITemplate>;
+    document: IRenderTemplateDocument;
     focusedPuzzleId?: string;
 
     onTemplatesChange(uuid: string, event: TSelectChangeEvent): void;
