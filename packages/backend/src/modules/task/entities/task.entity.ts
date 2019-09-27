@@ -50,7 +50,7 @@ export class Task extends PrimaryBaseEntity<Task> {
     @JoinColumn({ name: "id_marketplace", referencedColumnName: "id" })
     marketplace: Marketplace;
 
-    @OneToMany(() => TemplateAssignment, assignment => assignment.task, { cascade: true })
+    @OneToMany(() => TemplateAssignment, assignment => assignment.task)
     assignments: TemplateAssignment[];
 
     @OneToMany(() => TemplateAnswer, answer => answer.task)
