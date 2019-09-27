@@ -20,9 +20,9 @@ export class AuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
     ) {}
 
     async use(req: IAuthRequest, res: Response, next: () => void) {
-        const authorization = req.header("Authorization");
         const token = req.header("X-Access-Token");
         const originalUrl = req.originalUrl;
+        const authorization = req.header("Authorization");
 
         if (originalUrl.indexOf("auth") !== -1) {
             return next();
@@ -42,20 +42,19 @@ export class AuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
                 }
                 throw new InvalidTokenException(message);
             }
-        }
-        if (authorization) {
-            const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
-            req.user = await this.authService.validateUser(username, password);
+        } else if (authorization) {
+            const [email, password] = this.getCredentialsFromAuthorizationString(authorization);
+
+            req.user = await this.authService.validateUser(email, password);
             if (!req.user) {
                 throw new UserUnauthorizedException("Cannot authorize user");
             }
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
             res.header("Access-Control-Expose-Headers", "X-Access-Token");
             // try to get push tokens
-            await this.setPushTokenIfExists(req.user);
+            // await this.setPushTokenIfExists(req.user);
             return next();
         }
-        res.set("WWW-Authenticate", "Basic");
         throw new UserUnauthorizedException("User unauthorized");
     }
 

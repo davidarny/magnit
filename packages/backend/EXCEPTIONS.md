@@ -18,3 +18,4 @@
 | 12         | 400              | Cannot save Answers partially              |                                                      |
 | 13         | 400              | Location not found in body                 |                                                      |
 | 14         | 400              | Cannot parse location JSON                 |                                                      |
+| 15         | 409              | User already exist                         |                                                      |

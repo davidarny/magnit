@@ -25,7 +25,7 @@ export class User extends BaseEntity<User> {
     password: string;
 
     @IsString()
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: string;
 
     @IsEmail()
