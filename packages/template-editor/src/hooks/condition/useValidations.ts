@@ -1,8 +1,14 @@
-import { EConditionType, EPuzzleType, IPuzzle, ITemplate, IValidation } from "@magnit/entities";
+import {
+    EConditionType,
+    EPuzzleType,
+    EValidationType,
+    IPuzzle,
+    ISection,
+    IValidation,
+} from "@magnit/entities";
 import { IUseConditionsService, useCommonConditionsLogic } from "hooks/condition-common";
 import _ from "lodash";
-import { default as React, useCallback, useEffect, useRef, useState } from "react";
-import { traverse } from "services/json";
+import { default as React, useCallback, useMemo, useState } from "react";
 import uuid from "uuid/v4";
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -11,171 +17,160 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export function useValidations(
-    template: ITemplate,
+    puzzle: IPuzzle,
+    puzzles: Map<string, IPuzzle>,
     disabled: boolean,
-    puzzleId: string,
-    onTemplateChange: (template: ITemplate) => void,
-    initialState?: IValidation[],
+    onTemplateChange: () => void,
+    parent: IPuzzle | ISection,
 ): [
-    IValidation[],
+    IValidation | null,
     IPuzzle[],
-    IPuzzle | null,
     string,
     (id: string) => void,
-    (id: string, nextValidation: Partial<IValidation>) => void,
+    (id: string, update: IValidation) => void,
     () => void,
     (event: TSelectChangeEvent) => void,
     () => void,
 ] {
-    const defaultState = useRef({
-        id: uuid(),
-        order: 0,
-        leftHandPuzzle: "",
-        errorMessage: "",
-        operatorType: "",
-        validationType: "",
-        conditionType: EConditionType.OR,
-    });
-    const [validations, setValidations] = useState<IValidation[]>(
-        _.isArray(initialState) && !_.isEmpty(initialState) ? initialState : [defaultState.current],
-    );
     const [errorMessage, setErrorMessage] = useState<string>(
-        _.get(_.first(validations), "errorMessage", ""),
+        _.get(_.first(puzzle.validations), "errorMessage", ""),
     );
-    const [currentQuestion, setCurrentQuestion] = useState<IPuzzle | null>(null);
 
-    const useConditionService: IUseConditionsService<IValidation> = {
-        checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
-            return !_.isEqual(
-                _.omit(leftQuestion, "conditions"),
-                _.omit(rightQuestion, "conditions"),
-            );
-        },
+    const useConditionService = useMemo<IUseConditionsService<IValidation>>(
+        () => ({
+            getVirtualCondition() {
+                return {
+                    id: uuid(),
+                    order: 0,
+                    value: 0,
+                    leftHandPuzzle: puzzle.id,
+                    errorMessage: errorMessage,
+                    operatorType: "",
+                    validationType: "",
+                    conditionType: EConditionType.OR,
+                };
+            },
 
-        getConditionObjects(): IValidation[] {
-            return validations;
-        },
+            checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean {
+                return !_.isEqual(
+                    _.omit(leftQuestion, "validations"),
+                    _.omit(rightQuestion, "validations"),
+                );
+            },
 
-        getRightPuzzle(validation: IValidation): string {
-            return validation.rightHandPuzzle!;
-        },
+            setConditions(conditions: IValidation[]) {
+                puzzle.validations = [...conditions];
+            },
 
-        resetConditionObject(validation: IValidation): void {
-            validation.rightHandPuzzle = undefined;
-            validation.value = undefined;
-            validation.operatorType = "";
-            validation.validationType = "";
-        },
+            getConditions(): IValidation[] {
+                return puzzle.validations;
+            },
 
-        setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void {
-            puzzle.puzzles[index].validations = [...validations].filter(
-                validation =>
-                    !!(
-                        validation.validationType &&
+            getRightPuzzle(validation: IValidation): string {
+                return validation.rightHandPuzzle!;
+            },
+
+            resetConditions(validation: IValidation): void {
+                validation.rightHandPuzzle = undefined;
+                validation.value = undefined;
+                validation.operatorType = "";
+                validation.validationType = "";
+                validation.errorMessage = "";
+                setErrorMessage("");
+            },
+
+            filterConditions(virtualCondition: IValidation | null): IValidation[] {
+                return [...puzzle.validations, _.cloneDeep(virtualCondition)].filter<IValidation>(
+                    (validation): validation is IValidation =>
+                        !_.isNil(validation) &&
+                        !!(validation.validationType &&
                         validation.conditionType &&
                         validation.operatorType &&
-                        validation.errorMessage &&
-                        (validation.rightHandPuzzle || validation.value)
-                    ),
-            );
-        },
+                        validation.validationType === EValidationType.COMPARE_WITH_ANSWER
+                            ? validation.rightHandPuzzle
+                            : validation.validationType === EValidationType.SET_VALUE
+                            ? validation.value ||
+                              // can be also 0 which is falsy
+                              (typeof validation.value !== "undefined" && validation.value === 0)
+                            : false),
+                );
+            },
 
-        shouldSetQuestions(puzzle: IPuzzle): boolean {
-            return (puzzle.puzzles || []).every(
-                child => child.puzzleType === EPuzzleType.NUMERIC_ANSWER,
-            );
-        },
-    };
+            onConditionsChange(virtualCondition: IValidation | null): void {
+                puzzle.validations = this.filterConditions(virtualCondition);
+                onTemplateChange();
+            },
 
-    const [questions] = useCommonConditionsLogic<IValidation>(
-        template,
-        disabled,
-        puzzleId,
+            shouldSetQuestions(puzzle: IPuzzle): boolean {
+                return (puzzle.puzzles || []).every(
+                    child => child.puzzleType === EPuzzleType.NUMERIC_ANSWER,
+                );
+            },
+
+            conditionsEmpty(): boolean {
+                return puzzle.validations.length === 0;
+            },
+        }),
+        [errorMessage, onTemplateChange, puzzle.id, puzzle.validations],
+    );
+
+    const [
+        questions,
+        ,
+        virtualCondition,
+        setVirtualCondition,
+        onValidationDelete,
+        onValidationChange,
+        onAddValidation,
+    ] = useCommonConditionsLogic<IValidation>(
+        puzzle,
+        puzzles,
+        parent,
         useConditionService,
         onTemplateChange,
     );
 
-    // get current question
-    const prevValidations = useRef(_.cloneDeep(validations));
-    useEffect(() => {
-        if (disabled) {
-            return;
-        }
-        traverse(template, (value: IPuzzle) => {
-            if (!_.has(value, "puzzles")) {
-                return;
-            }
-            if (!_.has(value, "id") || value.id !== puzzleId) {
-                return;
-            }
-            setCurrentQuestion(value);
-            const nextValidations = validations.map(validation => ({
-                ...validation,
-                leftHandPuzzle: value.id,
-            }));
-            if (!_.isEqual(prevValidations.current, nextValidations)) {
-                prevValidations.current = _.cloneDeep(nextValidations);
-                setValidations([...nextValidations]);
-            }
-        });
-    }, [template, disabled, puzzleId, validations]);
-
     const onDeleteValidationCallback = useCallback(
         (id: string) => {
-            // do not allow to delete if only one validation present
-            if (validations.length === 1) {
-                setValidations([defaultState.current]);
-                return;
-            }
-            setValidations([...validations.filter(validation => validation.id !== id)]);
+            onValidationDelete(id);
         },
-        [defaultState, validations],
+        [onValidationDelete],
     );
 
     const onValidationChangeCallback = useCallback(
-        (id: string, nextValidation: Partial<IValidation>): void => {
-            const changedValidationIdx = validations.findIndex(validation => validation.id === id);
-            validations[changedValidationIdx] = {
-                ...validations[changedValidationIdx],
-                ...nextValidation,
-            };
-            setValidations([...validations]);
+        (id: string, update: IValidation): void => {
+            onValidationChange(id, update);
         },
-        [validations],
+        [onValidationChange],
     );
 
     const onAddValidationCallback = useCallback((): void => {
-        if (
-            validations.length !== 0 &&
-            !validations.some(validation => !!validation.leftHandPuzzle)
-        ) {
-            return;
-        }
-        validations.push({
-            ...defaultState.current,
+        onAddValidation(last => ({
             id: uuid(),
-            order: validations.length - 1,
-            leftHandPuzzle: (currentQuestion && currentQuestion.id) || "",
-        });
-        setValidations([...validations]);
-    }, [currentQuestion, validations]);
+            errorMessage: last.errorMessage,
+            order: last.order + 1,
+            leftHandPuzzle: last.leftHandPuzzle,
+        }));
+    }, [onAddValidation]);
 
     function onErrorMessageChange(event: TSelectChangeEvent) {
         setErrorMessage(event.target.value as string);
     }
 
     const onErrorMessageBlurCallback = useCallback(() => {
-        const firstValidation = _.first(validations);
-        if (firstValidation) {
-            firstValidation.errorMessage = errorMessage;
+        const setErrorMessage = (validation: IValidation) => ({ ...validation, errorMessage });
+        puzzle.validations = [...puzzle.validations.map(setErrorMessage)];
+        let nextVirtualCondition = virtualCondition;
+        if (virtualCondition) {
+            nextVirtualCondition = { ...virtualCondition, errorMessage };
+            setVirtualCondition(nextVirtualCondition);
         }
-        setValidations([...validations.map(validation => ({ ...validation, errorMessage }))]);
-    }, [errorMessage, validations]);
+        onTemplateChange();
+    }, [errorMessage, onTemplateChange, puzzle.validations, setVirtualCondition, virtualCondition]);
 
     return [
-        validations,
+        virtualCondition,
         questions,
-        currentQuestion,
         errorMessage,
         onDeleteValidationCallback,
         onValidationChangeCallback,

@@ -7,35 +7,9 @@ import {
     EValidationType,
 } from "enums";
 
-interface ITitled {
-    title: string;
-}
-
-interface IOrdered {
-    order: number;
-}
-
-interface IWithId {
+export interface ICondition {
     id: string;
-}
-
-interface IWithPuzzles<T> {
-    puzzles: T[];
-}
-
-interface IWithConditions<T> {
-    conditions: T[];
-}
-
-interface IWithValidation<T> {
-    validations: T[];
-}
-
-interface IWithDescription {
-    description: string;
-}
-
-export interface ICondition extends IOrdered, IWithId {
+    order: number;
     questionPuzzle: IPuzzle["id"];
     answerPuzzle?: IPuzzle["id"];
     value?: string;
@@ -43,7 +17,9 @@ export interface ICondition extends IOrdered, IWithId {
     conditionType: EConditionType;
 }
 
-export interface IValidation extends IOrdered, IWithId {
+export interface IValidation {
+    id: string;
+    order: number;
     leftHandPuzzle: IPuzzle["id"];
     rightHandPuzzle?: IPuzzle["id"];
     value?: number;
@@ -53,33 +29,38 @@ export interface IValidation extends IOrdered, IWithId {
     errorMessage: string;
 }
 
-export interface ITemplate extends ITitled, IWithDescription {
+export interface ITemplate {
     id: number;
+    title: string;
+    description: string;
     sections: ISection[];
     type: ETemplateType;
 }
 
-export interface ISection
-    extends IOrdered,
-        ITitled,
-        IWithPuzzles<IPuzzle>,
-        IWithId,
-        IWithDescription {}
+export interface ISection {
+    id: string;
+    order: number;
+    title: string;
+    puzzles: IPuzzle[];
+    description: string;
+}
 
-export interface IPuzzle
-    extends IOrdered,
-        ITitled,
-        IWithPuzzles<IPuzzle>,
-        IWithId,
-        IWithConditions<ICondition>,
-        IWithValidation<IValidation>,
-        IWithDescription {
+export interface IPuzzle {
+    id: string;
+    puzzles: IPuzzle[];
+    description: string;
+    title: string;
+    order: number;
     puzzleType: EPuzzleType;
+    conditions: ICondition[];
+    validations: IValidation[];
 }
 
 export interface ISpecificPuzzleProps {
-    id: string;
     index: number;
+    puzzle: IPuzzle;
+
+    onTemplateChange?(): void;
 }
 
 export interface IFocusedPuzzleProps extends ISpecificPuzzleProps {

@@ -13,20 +13,20 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import _ from "lodash";
-import { useCallback, useState } from "react";
-import * as React from "react";
 import { useCondition } from "hooks/condition";
+import _ from "lodash";
+import * as React from "react";
+import { useCallback, useState } from "react";
 
 interface IConditionProps {
+    puzzle: IPuzzle;
     index: number;
     noDeleteButton: boolean;
     condition: ICondition;
-    conditions: ICondition[];
     questions: IPuzzle[];
     answers: IPuzzle[];
 
-    onConditionChange(id: string, update: Partial<ICondition>): void;
+    onConditionChange(id: string, update: ICondition): void;
 
     onConditionDelete(id: string): void;
 }
@@ -37,42 +37,56 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Condition: React.FC<IConditionProps> = props => {
-    const { condition, conditions, answers, questions, index, noDeleteButton = false } = props;
-    const { onConditionChange, onConditionDelete } = props;
-    const [value, setValue] = useState<string>(condition.value || "");
+    const {
+        puzzle,
+        condition,
+        answers,
+        questions,
+        index,
+        noDeleteButton = false,
+        onConditionChange,
+        onConditionDelete,
+    } = props;
+
+    const [value, setValue] = useState(condition.value || "");
 
     const onQuestionPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             // reset conditions length when question changed
-            conditions.length = 1;
+            if (puzzle.conditions.length > 0) {
+                puzzle.conditions.length = 1;
+            }
             // reset first condition fields when question changed
             // and change questionPuzzle
             onConditionChange(condition.id, {
+                ...condition,
                 answerPuzzle: "",
                 value: "",
                 actionType: "",
                 questionPuzzle: event.target.value as string,
             });
         },
-        [condition.id, conditions.length, onConditionChange],
+        [condition, puzzle.conditions.length, onConditionChange],
     );
 
     const onActionTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 actionType: event.target.value as EActionType,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     const onAnswerPuzzleChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 answerPuzzle: event.target.value as string,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     function onValueChange(event: TSelectChangeEvent): void {
@@ -80,16 +94,17 @@ export const Condition: React.FC<IConditionProps> = props => {
     }
 
     const onValueBlurCallback = useCallback(() => {
-        onConditionChange(condition.id, { value });
-    }, [condition.id, onConditionChange, value]);
+        onConditionChange(condition.id, { ...condition, value });
+    }, [condition, onConditionChange, value]);
 
     const onConditionTypeChangeCallback = useCallback(
         (event: unknown, value: unknown): void => {
             onConditionChange(condition.id, {
+                ...condition,
                 conditionType: value as EConditionType,
             });
         },
-        [condition.id, onConditionChange],
+        [condition, onConditionChange],
     );
 
     const onConditionDeleteCallback = useCallback(() => {
@@ -113,6 +128,7 @@ export const Condition: React.FC<IConditionProps> = props => {
         value,
         index,
         condition.conditionType,
+        puzzle.id,
     );
 
     const isFirstRow = index === 0;
@@ -169,14 +185,17 @@ export const Condition: React.FC<IConditionProps> = props => {
             {isFirstRow && (
                 <Grid item xs={4} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id="question-puzzle"
-                        fullWidth={true}
-                        value={condition.questionPuzzle || ""}
+                        fullWidth
+                        value={condition.questionPuzzle}
                         onChange={onQuestionPuzzleChangeCallback}
                         placeholder="Выберите вопрос"
                     >
                         {questions.map(questionToChoseFrom => (
-                            <MenuItem key={questionToChoseFrom.id} value={questionToChoseFrom.id}>
+                            <MenuItem
+                                className={`select__sentinel__${puzzle.id}`}
+                                key={questionToChoseFrom.id}
+                                value={questionToChoseFrom.id}
+                            >
                                 {questionToChoseFrom.title}
                             </MenuItem>
                         ))}
@@ -186,9 +205,8 @@ export const Condition: React.FC<IConditionProps> = props => {
             <Grid item xs={2}>
                 {!!condition.questionPuzzle && (
                     <SelectField
-                        id="action-type"
-                        fullWidth={true}
-                        value={condition.actionType || ""}
+                        fullWidth
+                        value={condition.actionType}
                         onChange={onActionTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

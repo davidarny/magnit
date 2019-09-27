@@ -11,10 +11,10 @@ import {
     TableWrapper,
     TabsWrapper,
 } from "@magnit/components";
-import { ETaskStatus, IBaseTask } from "@magnit/entities";
+import { ETaskStatus } from "@magnit/entities";
 import { AddIcon, ReturnIcon, SendIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
@@ -22,8 +22,15 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { getTasks, IGetTasksResponse, updateTask } from "services/api";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+    getAllRegions,
+    getCitiesForRegion,
+    getTasks,
+    getTasksExtended,
+    IExtendedTask,
+    updateTask,
+} from "services/api";
 
 const tabs: ITab[] = [
     { value: ETaskStatus.IN_PROGRESS.replace("_", "-"), label: "В работе" },
@@ -35,71 +42,139 @@ const tabs: ITab[] = [
 
 const columns: IColumn[] = [
     { key: "title", label: "Название задания", sortable: true },
-    { key: "description", label: "Описание задания", sortable: true },
-    { key: "createdAt", label: "Дата создания", sortable: true },
-    { key: "updatedAt", label: "Дата последнего обновления", sortable: true },
+    { key: "region", label: "Регион", sortable: true },
+    { key: "city", label: "Филиал", sortable: true },
+    { key: "format", label: "Формат", sortable: true },
+    { key: "stageTitle", label: "Этап", sortable: true },
+    { key: "deadline", label: "Срок выполнения", sortable: true },
 ];
 
 type TRouteProps = { "*": string };
 
-type TTask = IGetTasksResponse["tasks"][0] & { selected: boolean };
+type TTask = IExtendedTask & { selected: boolean };
 
 interface IUpdateTaskListOptions {
     sort?: "asc" | "desc";
     sortBy?: keyof Omit<TTask, "selected">;
     title?: string;
+    region?: string;
+    city?: string;
 }
 
+type TSelectChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
+
 export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
-    const tab = props["*"];
+    const tab = props["*"]!;
 
     const context = useContext(AppContext);
 
     const [dialogOpen, setDialogOpen] = useState(false);
+
+    // set task on click to redirect ot it
     const [tasks, setTasks] = useState<TTask[]>([]);
+
+    // selection
     const [selectedTasks, setSelectedTasks] = useState<Map<number, TTask>>(new Map());
+
+    // full text search
     const [searchQuery, setSearchQuery] = useState("");
+
+    // total count of tasks
     const [total, setTotal] = useState(0);
+
+    // choose region + city selects
+    const [selectedRegion, setSelectedRegion] = useState<string>("");
+    const [selectedCity, setSelectedCity] = useState<string>("");
+    const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
+    const [regionCities, setRegionCities] = useState<string[]>([]);
+
+    // table
+    const [page, setPage] = useState(0);
+    const [order, setOrder] = useState<"asc" | "desc">("asc");
+    const [orderBy, setOrderBy] = useState("");
+
+    const fetchRegionsAndUpdateState = useCallback(() => {
+        getAllRegions(context.courier)
+            .then(response => setMarketplaceRegions(response.regions))
+            .catch(console.error);
+    }, [context.courier]);
+
+    const fetchCitiesAndUpdateState = useCallback(
+        (region: string) => {
+            getCitiesForRegion(context.courier, region)
+                .then(response => setRegionCities(response.cities))
+                .catch(console.error);
+        },
+        [context.courier],
+    );
 
     const clearSelectedTasks = useCallback(() => {
         selectedTasks.clear();
         setSelectedTasks(new Map(selectedTasks));
     }, [selectedTasks]);
 
-    const normalizeTask = useCallback(
-        (task: IBaseTask) => ({
+    const transformTaskDateToFriendly = useCallback(
+        (task: IExtendedTask) => ({
             ...task,
             selected: false,
             createdAt: getFriendlyDate(new Date(task.createdAt!), true),
             updatedAt: getFriendlyDate(new Date(task.updatedAt!), true),
+            deadline: getFriendlyDate(new Date(task.updatedAt!), true),
         }),
         [],
     );
 
-    const updateTasksList = useCallback(
-        ({ sort, sortBy, title }: IUpdateTaskListOptions = {}) => {
+    const fetchTasksAndUpdateState = useCallback(
+        ({ sort, sortBy, title, region, city }: IUpdateTaskListOptions = {}) => {
             clearSelectedTasks();
             // get task by current status
             // also apply queries
-            getTasks(
+            const upperCaseSort = (sort || "ASC").toUpperCase() as "ASC" | "DESC";
+            getTasksExtended(
                 context.courier,
                 getTaskStatusByTab(tab),
-                (sort || "").toUpperCase() as "ASC" | "DESC",
+                upperCaseSort,
                 sortBy,
                 title,
+                region,
+                city,
             )
-                .then(response => setTasks(response.tasks.map(normalizeTask)))
+                .then(response => setTasks(response.tasks.map(transformTaskDateToFriendly)))
                 .catch(console.error);
             // get total count of all tasks
             getTasks(context.courier)
                 .then(response => setTotal(response.tasks.length))
                 .catch(console.error);
         },
-        [clearSelectedTasks, context.courier, normalizeTask, tab],
+        [clearSelectedTasks, context.courier, transformTaskDateToFriendly, tab],
     );
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => updateTasksList(), [context.courier, tab]);
+    const prevTab = useRef<string | null>(null);
+    useEffect(() => {
+        if (prevTab.current !== tab) {
+            prevTab.current = tab;
+            // reset table
+            setPage(0);
+            setOrder("asc");
+            setOrderBy("");
+            // reset search query
+            setSearchQuery("");
+            setSelectedRegion("");
+            setSelectedCity("");
+            // fetch tasks
+            fetchTasksAndUpdateState();
+            // fetch marketplaces
+            fetchRegionsAndUpdateState();
+        }
+    }, [tab, fetchTasksAndUpdateState, fetchRegionsAndUpdateState]);
+
+    const prevTaskRegion = useRef(selectedRegion);
+    useEffect(() => {
+        if (!(selectedRegion && prevTaskRegion.current !== selectedRegion)) {
+            return;
+        }
+        fetchCitiesAndUpdateState(selectedRegion);
+    }, [fetchCitiesAndUpdateState, selectedRegion]);
 
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
@@ -152,10 +227,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToOnCheck))
-            .then(() => updateTasksList())
+            .then(() => fetchTasksAndUpdateState())
             .catch(console.error)
             .finally(onDialogClose);
-    }, [selectedTasks, setTaskToOnCheck, updateTasksList]);
+    }, [selectedTasks, setTaskToOnCheck, fetchTasksAndUpdateState]);
 
     const setTaskToInProgress = useCallback(
         async (task: TTask) =>
@@ -177,10 +252,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         // TODO: perform one request
         // https://github.com/DavidArutiunian/magnit/issues/88
         Promise.all(tasksToUpdate.map(setTaskToInProgress))
-            .then(() => updateTasksList())
+            .then(() => fetchTasksAndUpdateState())
             .then(() => clearSelectedTasks())
             .catch(console.error);
-    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, updateTasksList]);
+    }, [clearSelectedTasks, selectedTasks, setTaskToInProgress, fetchTasksAndUpdateState]);
 
     const onSelectToggleCallback = useCallback(
         (selected: boolean) => {
@@ -196,21 +271,28 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
         [clearSelectedTasks, selectedTasks, tasks],
     );
 
-    const updateTaskListDebounced = _.debounce(updateTasksList, 150);
+    const updateTaskListDebounced = _.debounce(fetchTasksAndUpdateState, 150);
 
     const onSearchQueryChangeCallback = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
-            setSearchQuery(event.target.value);
-            updateTaskListDebounced({ title: event.target.value });
+            const value = event.target.value;
+            setSearchQuery(value);
+            updateTaskListDebounced({
+                title: value,
+                region: selectedRegion,
+                city: selectedCity,
+            });
         },
-        [updateTaskListDebounced],
+        [selectedCity, selectedRegion, updateTaskListDebounced],
     );
 
     const onRequestSortCallback = useCallback(
         (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
-            updateTasksList({ sort, sortBy });
+            setOrder(sort);
+            setOrderBy(sortBy);
+            fetchTasksAndUpdateState({ sort, sortBy });
         },
-        [updateTasksList],
+        [fetchTasksAndUpdateState],
     );
 
     function onDialogOpen() {
@@ -219,6 +301,36 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
 
     function onDialogClose() {
         setDialogOpen(false);
+    }
+
+    const onRegionChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            const value = event.target.value as string;
+            setSelectedRegion(value);
+            setSelectedCity("");
+            updateTaskListDebounced({
+                title: searchQuery,
+                region: value,
+            });
+        },
+        [searchQuery, updateTaskListDebounced],
+    );
+
+    const onCityChangeCallback = useCallback(
+        (event: TSelectChangeEvent) => {
+            const value = event.target.value as string;
+            setSelectedCity(value);
+            updateTaskListDebounced({
+                title: searchQuery,
+                region: selectedRegion,
+                city: value,
+            });
+        },
+        [searchQuery, selectedRegion, updateTaskListDebounced],
+    );
+
+    function onChangePage(nextPage: number) {
+        setPage(nextPage);
     }
 
     const empty = !total;
@@ -314,15 +426,33 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                             </Grid>
                                             <Grid item xs={2}>
                                                 <SelectField
+                                                    placeholderDisabled={false}
+                                                    value={selectedRegion}
                                                     placeholder="Выберите регион"
                                                     fullWidth
-                                                />
+                                                    onChange={onRegionChangeCallback}
+                                                >
+                                                    {(marketplaceRegions || []).map(region => (
+                                                        <MenuItem key={region} value={region}>
+                                                            {region}
+                                                        </MenuItem>
+                                                    ))}
+                                                </SelectField>
                                             </Grid>
                                             <Grid item xs={2}>
                                                 <SelectField
+                                                    placeholderDisabled={false}
+                                                    value={selectedCity}
                                                     placeholder="Выберите филиал"
                                                     fullWidth
-                                                />
+                                                    onChange={onCityChangeCallback}
+                                                >
+                                                    {(regionCities || []).map(city => (
+                                                        <MenuItem key={city} value={city}>
+                                                            {city}
+                                                        </MenuItem>
+                                                    ))}
+                                                </SelectField>
                                             </Grid>
                                         </Grid>
                                     </Grid>
@@ -340,6 +470,9 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                                 marginLeft: theme.spacing(-2),
                                                 width: `calc(100% + ${theme.spacing(4)})`,
                                             })}
+                                            page={page}
+                                            order={order}
+                                            orderBy={orderBy}
                                             selectable
                                             columns={columns}
                                             data={tasks}
@@ -347,6 +480,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                             onRowSelectToggle={onRowSelectToggleCallback}
                                             onSelectToggle={onSelectToggleCallback}
                                             onRequestSort={onRequestSortCallback}
+                                            onChangePage={onChangePage}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>

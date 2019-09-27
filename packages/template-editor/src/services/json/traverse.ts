@@ -1,20 +1,45 @@
+import _ from "lodash";
+
+type TPrimitives = string | number | boolean | symbol;
+type TIndexObject = { [key: string]: TPrimitives | TIndexObject | TIndexObject[] };
+type TTraverseArg = TIndexObject | TIndexObject[] | TPrimitives;
+
 type TCallback = (...args: any[]) => void | boolean;
 
-export function traverse(object: any | any[], callback?: TCallback, parent?: any | any[]): void {
+export function traverse(object: any | any[], callback?: TCallback) {
+    const cache: TTraverseArg[] = [];
+    _traverse(object, callback, undefined, cache);
+}
+
+function _traverse(
+    object: TTraverseArg,
+    callback?: TCallback,
+    parent?: TTraverseArg,
+    cache?: TTraverseArg[],
+): void {
+    if (cache && cache.indexOf(object) !== -1) {
+        return;
+    }
+    if (cache) {
+        cache.push(object);
+    }
     if (isArray(object)) {
         const result = callback && callback(object, parent);
         if (result) {
             return;
         }
-        object.forEach(prop => traverse(prop, callback, parent));
+        object.forEach(prop => _traverse(prop, callback, parent));
     } else if (isObject(object)) {
         const result = callback && callback(object, parent);
         if (result) {
             return;
         }
         for (const key in object) {
+            if (key === "parent") {
+                continue;
+            }
             if (object.hasOwnProperty(key)) {
-                traverse(object[key], callback, object);
+                _traverse(object[key], callback, object);
             }
         }
     } else {
@@ -22,10 +47,10 @@ export function traverse(object: any | any[], callback?: TCallback, parent?: any
     }
 }
 
-function isArray(value: any): value is any[] {
-    return Object.prototype.toString.call(value) === "[object Array]";
+function isArray(value: any): value is TIndexObject[] {
+    return _.isArray(value);
 }
 
-function isObject(value: any): value is any {
-    return typeof value === "object" && value !== null;
+function isObject(value: any): value is TIndexObject {
+    return _.isObject(value);
 }

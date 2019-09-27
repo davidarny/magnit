@@ -24,7 +24,12 @@ const columns: IColumn[] = [
 
 export const TemplateList: React.FC = () => {
     const context = useContext(AppContext);
+
+    // table
     const [rows, setRows] = useState<object[]>([]);
+    const [page, setPage] = useState(0);
+
+    // redirect to row
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
     useEffect(() => {
@@ -47,6 +52,10 @@ export const TemplateList: React.FC = () => {
             return;
         }
         setRedirect({ redirect: true, to: _.get(row, "id") });
+    }
+
+    function onChangePage(nextPage: number) {
+        setPage(nextPage);
     }
 
     const empty = !rows.length;
@@ -122,9 +131,11 @@ export const TemplateList: React.FC = () => {
                             </Grid>
                             <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                 <TableWrapper
+                                    page={page}
                                     columns={columns}
                                     data={rows}
                                     onRowClick={onRowClick}
+                                    onChangePage={onChangePage}
                                 />
                             </Grid>
                         </Grid>

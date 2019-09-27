@@ -2,67 +2,75 @@
 
 import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
-import { IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { IFocusedPuzzleProps } from "@magnit/entities";
 import { Grid, IconButton, Typography } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import _ from "lodash";
+import { useEffect, useRef } from "react";
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
-import { traverse } from "services/json";
+import { useCallback, useState } from "react";
 
 interface IDropdownAnswerPuzzleProps extends IFocusedPuzzleProps {
-    title: string;
-    template: ITemplate;
     // flag indication this dropdown should render
     // button which adds new dropdown when clicked
     addDropdownButton: boolean;
-
-    onTemplateChange(template: ITemplate): void;
 
     onAddDropdownButton(id: string): void;
 
     onDeleteDropdownButton(id: string): void;
 }
 
-type TSelectChangeEvent = React.ChangeEvent<{
-    name?: string;
-    value: unknown;
-}>;
-
 export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
-    const { focused, template, addDropdownButton, index, id, title } = props;
-    const { onAddDropdownButton, onTemplateChange, onDeleteDropdownButton } = props;
+    const {
+        puzzle,
+        focused,
+        addDropdownButton,
+        index,
+        onAddDropdownButton,
+        onTemplateChange,
+        onDeleteDropdownButton,
+    } = props;
 
-    const [label, setLabel] = useState(title || `Вариант ${index + 1}`);
+    const [label, setLabel] = useState(puzzle.title);
 
-    const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (puzzle: IPuzzle) => {
-            if (!_.has(puzzle, "id")) {
-                return;
+    const prevTitle = useRef(label);
+    useEffect(() => {
+        if (!puzzle.title && (!prevTitle.current || prevTitle.current !== label)) {
+            const nextTitle = puzzle.title || `Вариант ${index + 1}`;
+            setLabel(nextTitle);
+            prevTitle.current = nextTitle;
+            puzzle.title = nextTitle;
+            if (onTemplateChange) {
+                onTemplateChange();
             }
-            if (puzzle.id !== id) {
-                return;
-            }
-            puzzle.title = label;
-            return true;
-        });
-        onTemplateChange(template);
-    }, [label, template, id, onTemplateChange]);
+        }
+    }, [index, label, onTemplateChange, puzzle.title]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => onTemplateChangeCallback(), [focused]);
+    const onAddDropdownButtonCallback = useCallback(() => {
+        onAddDropdownButton(puzzle.id);
+    }, [onAddDropdownButton, puzzle.id]);
 
-    function onLabelChange(event: TSelectChangeEvent): void {
+    const onDeleteDropdownButtonCallback = useCallback(() => {
+        onDeleteDropdownButton(puzzle.id);
+    }, [onDeleteDropdownButton, puzzle.id]);
+
+    function onLabelChange(event: React.ChangeEvent<HTMLInputElement>): void {
         setLabel(event.target.value as string);
     }
 
-    const onAddDropdownButtonCallback = useCallback(() => {
-        onAddDropdownButton(id);
-    }, [onAddDropdownButton, id]);
+    const onLabelBlurCallback = useCallback(() => {
+        puzzle.title = label;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [label, onTemplateChange, puzzle.title]);
 
-    const onDeleteDropdownButtonCallback = useCallback(() => {
-        onDeleteDropdownButton(id);
-    }, [onDeleteDropdownButton, id]);
+    const prevLabel = useRef(label);
+    useEffect(() => {
+        if (!focused && prevLabel.current !== label) {
+            prevLabel.current = label;
+            onLabelBlurCallback();
+        }
+    }, [focused, label, onLabelBlurCallback]);
 
     if (!focused) {
         return (
@@ -109,7 +117,7 @@ export const DropdownAnswer: React.FC<IDropdownAnswerPuzzleProps> = props => {
                         fullWidth
                         value={label}
                         onChange={onLabelChange}
-                        onBlur={onTemplateChangeCallback}
+                        onBlur={onLabelBlurCallback}
                     />
                 </Grid>
                 <Grid item>

@@ -2,64 +2,42 @@
 
 import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
-import { ISpecificPuzzleProps, ITemplate } from "@magnit/entities";
+import { IFocusedPuzzleProps, ISection } from "@magnit/entities";
 import { Grid, Typography } from "@material-ui/core";
 import * as React from "react";
 import { useCallback, useState } from "react";
 
-interface ISectionPuzzleProps extends ISpecificPuzzleProps {
-    id: string;
-    title: string;
-    description: string;
-    focused: boolean;
-    template: ITemplate;
-
-    onTemplateChange(template: ITemplate): void;
+interface ISectionPuzzleProps extends Omit<IFocusedPuzzleProps, "puzzle"> {
+    puzzle: ISection;
 }
 
 export const SectionView: React.FC<ISectionPuzzleProps> = props => {
-    const { id, title, index, focused, children, description, template } = props;
-    const { onTemplateChange } = props;
-    const [sectionTitle, setSectionTitle] = useState(title);
-    const [sectionDescription, setSectionDescription] = useState(description);
+    const { puzzle, index, focused, children, onTemplateChange } = props;
+
+    const [title, setTitle] = useState(puzzle.title);
+    const [description, setDescription] = useState(puzzle.description);
 
     function onSectionTitleChange(event: React.ChangeEvent<HTMLInputElement>): void {
-        setSectionTitle(event.target.value);
+        setTitle(event.target.value);
     }
 
     const onSectionTitleBlurCallback = useCallback(() => {
-        onTemplateChange({
-            ...template,
-            sections: template.sections.map(section => {
-                if (section.id === id) {
-                    return {
-                        ...section,
-                        title: sectionTitle,
-                    };
-                }
-                return section;
-            }),
-        });
-    }, [id, onTemplateChange, sectionTitle, template]);
+        puzzle.title = title;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [onTemplateChange, puzzle.title, title]);
 
     function onSectionDescriptionChange(event: React.ChangeEvent<HTMLInputElement>): void {
-        setSectionDescription(event.target.value);
+        setDescription(event.target.value);
     }
 
     const onSectionDescriptionBlurCallback = useCallback(() => {
-        onTemplateChange({
-            ...template,
-            sections: template.sections.map(section => {
-                if (section.id === id) {
-                    return {
-                        ...section,
-                        description: sectionDescription,
-                    };
-                }
-                return section;
-            }),
-        });
-    }, [id, onTemplateChange, sectionDescription, template]);
+        puzzle.description = description;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [onTemplateChange, puzzle.description, description]);
 
     return (
         <React.Fragment>
@@ -96,7 +74,7 @@ export const SectionView: React.FC<ISectionPuzzleProps> = props => {
                         <InputField
                             fullWidth={true}
                             placeholder="Название раздела"
-                            defaultValue={title}
+                            value={title}
                             simple={!focused}
                             css={theme => ({
                                 input: {

@@ -59,9 +59,17 @@ type TDocumentWithAnswers = IDocument & IExtendedDocument;
 
 export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
     const context = useContext(AppContext);
+
+    // dot menu
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
+
+    // all templates
     const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+
+    // modal
     const [messageModalOpen, setMessageModalOpen] = useState(false);
+
+    // task state
     const [task, setTask] = useState<IExtendedTask>({
         id: 0,
         title: "",
@@ -76,10 +84,14 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         },
         status: ETaskStatus.DRAFT,
     });
+
+    // redirects
     const [redirect, setRedirect] = useState({
         trigger: false,
         to: "",
     });
+
+    // marketplace
     const [marketplaceRegions, setMarketplaceRegions] = useState<string[]>([]);
     const [regionCities, setRegionCities] = useState<string[]>([]);
     const [cityFormats, setCityFormats] = useState<string[]>([]);
@@ -199,8 +211,13 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         taskId,
     ]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => fetchTaskAndUpdateState(), []);
+    const prevTaskId = useRef<number | null>(null);
+    useEffect(() => {
+        if (prevTaskId.current !== taskId) {
+            prevTaskId.current = taskId;
+            fetchTaskAndUpdateState();
+        }
+    }, [fetchTaskAndUpdateState, taskId]);
 
     useEffect(() => {
         // only draft mode contains marketplace selects
@@ -557,5 +574,5 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
 };
 
 function getTaskPayload(task: IExtendedTask) {
-    return _.omit(task, ["id", "templates", "stages"]);
+    return _.omit(task, ["id", "templates", "stages", "documents"]);
 }

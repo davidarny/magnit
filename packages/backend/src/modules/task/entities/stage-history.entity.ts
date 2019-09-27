@@ -14,8 +14,8 @@ export class StageHistory extends PrimaryBaseEntity<
     }
 
     @Index()
-    @ManyToOne(() => TaskStage, stage => stage.history)
-    @JoinColumn({ name: "id_stage", referencedColumnName: "id" })
+    @ManyToOne(() => TaskStage, stage => stage.history, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_stage" })
     stage: TaskStage;
 
     @Column({ type: "text", nullable: true })

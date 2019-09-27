@@ -47,3 +47,5 @@ export const InputField: React.FC<IInputField & React.ComponentProps<typeof Text
         />
     );
 };
+
+InputField.displayName = "InputField";

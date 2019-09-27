@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import * as _ from "lodash";
 import { FindManyOptions, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
@@ -8,7 +9,6 @@ import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-f
 import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
-import _ = require("lodash");
 
 @Injectable()
 export class TemplateService {

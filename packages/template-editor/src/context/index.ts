@@ -10,7 +10,7 @@ export interface IEditorContext {
     template: ITemplate;
     cache: ICache;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange(): void;
 
     onAddAnswerPuzzle(id: string, addition?: Partial<IPuzzle>): void;
 
@@ -38,7 +38,7 @@ export const EditorContext = React.createContext<IEditorContext>(
             throw new Error("Not implemented");
         }
 
-        onTemplateChange(template: ITemplate): void {
+        onTemplateChange(): void {
             throw new Error("Not implemented");
         }
 

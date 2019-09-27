@@ -19,18 +19,18 @@ import {
     Typography,
 } from "@material-ui/core";
 import { Close as DeleteIcon } from "@material-ui/icons";
-import { useCallback, useState } from "react";
-import * as React from "react";
 import { useValidation } from "hooks/condition";
+import * as React from "react";
+import { useCallback, useState } from "react";
 
 interface IValidationProps {
     index: number;
     noDeleteButton: boolean;
     validation: IValidation;
-    currentQuestion: IPuzzle | null;
+    puzzle: IPuzzle;
     questions: IPuzzle[];
 
-    onValidationChange(id: string, update: Partial<IValidation>): void;
+    onValidationChange(id: string, update: IValidation): void;
 
     onDeleteValidation(id: string): void;
 }
@@ -41,26 +41,36 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Validation: React.FC<IValidationProps> = props => {
-    const { validation, index, questions, currentQuestion, noDeleteButton = false } = props;
-    const { onValidationChange, onDeleteValidation } = props;
+    const {
+        validation,
+        index,
+        questions,
+        puzzle,
+        noDeleteButton = false,
+        onValidationChange,
+        onDeleteValidation,
+    } = props;
+
     const [value, setValue] = useState(validation.value || 0);
 
     const onOperatorTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 operatorType: event.target.value as EOperatorType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onRightHandPuzzleChange = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 rightHandPuzzle: event.target.value as string,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     function onValueChange(event: TSelectChangeEvent): void {
@@ -68,25 +78,27 @@ export const Validation: React.FC<IValidationProps> = props => {
     }
 
     const onValueBlurCallback = useCallback(() => {
-        onValidationChange(validation.id, { value });
-    }, [onValidationChange, validation.id, value]);
+        onValidationChange(validation.id, { ...validation, value });
+    }, [onValidationChange, validation, value]);
 
     const onValidationTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 validationType: event.target.value as EValidationType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onConditionTypeChangeCallback = useCallback(
         (event: unknown, value: unknown): void => {
             onValidationChange(validation.id, {
+                ...validation,
                 conditionType: value as EConditionType,
             });
         },
-        [onValidationChange, validation.id],
+        [onValidationChange, validation],
     );
 
     const onDeleteValidationHandlerCallback = useCallback(() => {
@@ -98,20 +110,20 @@ export const Validation: React.FC<IValidationProps> = props => {
         getOperatorVariants,
         getRightHandPuzzle,
         getValidationVariants,
-    ] = useValidation(validation, value, index, validation.conditionType);
+    ] = useValidation(validation, value, index, validation.conditionType, puzzle.id);
 
     const isFirstRow = index === 0;
 
-    const currentQuestionId = currentQuestion ? currentQuestion.id : "";
+    const currentQuestionId = puzzle ? puzzle.id : "";
 
-    const currentQuestionTitle = currentQuestion
-        ? currentQuestion.title
-            ? currentQuestion.title
+    const currentQuestionTitle = puzzle
+        ? puzzle.title
+            ? puzzle.title
             : "(текущий вопрос)"
         : "(текущий вопрос)";
 
     return (
-        <React.Fragment key={validation.id}>
+        <React.Fragment>
             {isFirstRow && (
                 <Grid item>
                     <Typography css={theme => ({ color: theme.colors.secondary })}>
@@ -162,14 +174,17 @@ export const Validation: React.FC<IValidationProps> = props => {
             {isFirstRow && (
                 <Grid item xs={3} css={theme => ({ marginLeft: theme.spacing(2) })}>
                     <SelectField
-                        id="left-hand-puzzle"
                         fullWidth
                         value={currentQuestionId}
                         placeholder="Выберите вопрос"
                         disabled
                         displayEmpty={false}
                     >
-                        <MenuItem key={currentQuestionId} value={currentQuestionId}>
+                        <MenuItem
+                            className={`select__sentinel__${puzzle.id}`}
+                            key={currentQuestionId}
+                            value={currentQuestionId}
+                        >
                             {currentQuestionTitle}
                         </MenuItem>
                     </SelectField>
@@ -178,9 +193,8 @@ export const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.leftHandPuzzle && (
                     <SelectField
-                        id="operator-type"
                         fullWidth
-                        value={validation.operatorType || ""}
+                        value={validation.operatorType}
                         onChange={onOperatorTypeChangeCallback}
                         placeholder="Выберите значение"
                     >
@@ -191,9 +205,8 @@ export const Validation: React.FC<IValidationProps> = props => {
             <Grid item xs={2}>
                 {!!validation.operatorType && (
                     <SelectField
-                        id="validation-type"
                         fullWidth
-                        value={validation.validationType || ""}
+                        value={validation.validationType}
                         onChange={onValidationTypeChangeCallback}
                         placeholder="Тип сравнения"
                     >

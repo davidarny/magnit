@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { InputField, SelectField } from "@magnit/components";
-import { EPuzzleType, IFocusedPuzzleProps, IPuzzle, ITemplate } from "@magnit/entities";
+import { EPuzzleType, IFocusedPuzzleProps } from "@magnit/entities";
 import {
     CalendarIcon,
     CheckboxIcon,
@@ -17,15 +17,9 @@ import { Grid, MenuItem, Typography } from "@material-ui/core";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { traverse } from "services/json";
 import uuid from "uuid/v4";
 
-interface IQuestionPuzzleProps extends IFocusedPuzzleProps {
-    template: ITemplate;
-    title: string;
-
-    onTemplateChange(template: ITemplate): void;
-}
+interface IQuestionPuzzleProps extends IFocusedPuzzleProps {}
 
 const answerMenuItems = [
     { label: "Текстовое поле", type: EPuzzleType.TEXT_ANSWER, icon: TextFieldIcon },
@@ -44,59 +38,47 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const Question: React.FC<IQuestionPuzzleProps> = props => {
-    const { index: index1, title, template, id, focused } = props;
-    const { onTemplateChange } = props;
+    const { index, focused, onTemplateChange, puzzle } = props;
+
     const [answersType, setAnswersType] = useState<EPuzzleType | "">("");
-    const [questionTitle, setQuestionTitle] = useState(title);
+    const [title, setTitle] = useState(puzzle.title);
 
-    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
-    const answerTypeSnapshot = useRef<EPuzzleType | "">("");
+    const prevAnswerType = useRef("");
+    useEffect(() => {
+        if (!focused) {
+            return;
+        }
+        const childrenHeadPuzzle = _.first(puzzle.puzzles) || { puzzleType: "" };
+        const answersType = childrenHeadPuzzle.puzzleType;
+        if (answersType && prevAnswerType.current !== answersType) {
+            prevAnswerType.current = answersType;
+            setAnswersType(answersType);
+        }
+    }, [focused, puzzle.puzzles]);
 
-    const onTemplateChangeCallback = useCallback(() => {
-        traverse(template, (puzzle: IPuzzle) => {
-            if (!_.isObject(puzzle) || !("puzzles" in puzzle)) {
-                return;
-            }
-            if (!("id" in puzzle) || puzzle.id !== id) {
-                return;
-            }
-            // set initial answerType based on
-            // first element of question children
-            let nextAnswerType = answersType;
-            if (!nextAnswerType) {
-                const childrenHeadPuzzle = _.head(puzzle.puzzles) || { puzzleType: "" };
-                setAnswersType(childrenHeadPuzzle.puzzleType);
-                nextAnswerType = childrenHeadPuzzle.puzzleType;
-            }
+    const onAnswerTypeChangeCallback = useCallback(
+        (event: TSelectChangeEvent): void => {
+            const answersType = event.target.value as EPuzzleType;
             if (!puzzle.puzzles.length) {
                 return;
             }
-            // set changed puzzle type of question children
-            // and strip it's length to 1 only after initial render
-            if (answersType !== answerTypeSnapshot.current) {
-                puzzle.puzzles.length = 1;
-            }
+            puzzle.validations = [];
+            puzzle.conditions = [];
+            puzzle.puzzles.length = 1;
             puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                 return {
                     ...childPuzzle,
-                    puzzleType: nextAnswerType,
-                    title: answersType === answerTypeSnapshot.current ? childPuzzle.title : "",
+                    puzzleType: answersType,
+                    title: "",
                 };
             });
-            // reset conditions and validations
-            puzzle.validations = [];
-            puzzle.conditions = [];
-            // check if there are nested children of answer
-            // if there aren't any, we proceed with adding stub ones
             const hasChildrenOfPuzzles = puzzle.puzzles.reduce((prev, curr) => {
                 if (prev) {
                     return prev;
                 }
                 return !!(curr.puzzles || []).length;
             }, false);
-            // REFERENCE_ANSWER needs specific handling as it's nested answer
-            // so we have to add it's children when choosing this type
-            if (nextAnswerType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
+            if (answersType === EPuzzleType.REFERENCE_ANSWER && !hasChildrenOfPuzzles) {
                 puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                     return {
                         ...childPuzzle,
@@ -114,7 +96,7 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                         ],
                     };
                 });
-            } else if (nextAnswerType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
+            } else if (answersType !== EPuzzleType.REFERENCE_ANSWER && hasChildrenOfPuzzles) {
                 puzzle.puzzles = puzzle.puzzles.map(childPuzzle => {
                     return {
                         ...childPuzzle,
@@ -122,30 +104,32 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                     };
                 });
             }
-            puzzle.title = questionTitle;
-            answerTypeSnapshot.current = nextAnswerType;
-            return true;
-        });
-        // trigger template update if snapshot changed
-        // also cloneDeep in order to track changes above in isEqual
-        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = _.cloneDeep(template);
-            return;
-        }
-        templateSnapshot.current = _.cloneDeep(template);
-        onTemplateChange(templateSnapshot.current);
-    }, [answersType, questionTitle, template, id, onTemplateChange]);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => onTemplateChangeCallback(), [answersType, focused]);
-
-    function onAnswerTypeChange(event: TSelectChangeEvent): void {
-        setAnswersType(event.target.value as EPuzzleType);
-    }
+            setAnswersType(answersType);
+            if (onTemplateChange) {
+                onTemplateChange();
+            }
+        },
+        [onTemplateChange, puzzle.conditions, puzzle.puzzles, puzzle.validations],
+    );
 
     function onQuestionTitleChange(event: TSelectChangeEvent): void {
-        setQuestionTitle(event.target.value as string);
+        setTitle(event.target.value as string);
     }
+
+    const onTitleBlurCallback = useCallback(() => {
+        puzzle.title = title;
+        if (onTemplateChange) {
+            onTemplateChange();
+        }
+    }, [onTemplateChange, puzzle.title, title]);
+
+    const prevTitle = useRef(title);
+    useEffect(() => {
+        if (!focused && prevTitle.current !== title) {
+            prevTitle.current = title;
+            onTitleBlurCallback();
+        }
+    }, [focused, onTitleBlurCallback, title]);
 
     if (!focused) {
         return (
@@ -164,16 +148,16 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                         variant="body1"
                         css={theme => ({ paddingRight: theme.spacing() })}
                     >
-                        {index1 + 1}.
+                        {index + 1}.
                     </Typography>
                 </Grid>
                 <Grid item>
                     <Typography
                         variant="body1"
                         component="span"
-                        css={theme => ({ color: !questionTitle ? theme.colors.gray : "initial" })}
+                        css={theme => ({ color: !title ? theme.colors.gray : "initial" })}
                     >
-                        {questionTitle || "Введите вопрос"}
+                        {title || "Введите вопрос"}
                     </Typography>
                 </Grid>
             </Grid>
@@ -201,30 +185,23 @@ export const Question: React.FC<IQuestionPuzzleProps> = props => {
                                 marginBottom: theme.spacing(0.25),
                             })}
                         >
-                            {index1 + 1}.
+                            {index + 1}.
                         </Typography>
                     </Grid>
-                    <Grid
-                        item
-                        xs
-                        css={css`
-                            padding-left: 0;
-                        `}
-                    >
+                    <Grid item xs css={{ paddingLeft: 0 }}>
                         <InputField
                             fullWidth
                             placeholder="Введите вопрос"
-                            value={questionTitle}
+                            value={title}
                             onChange={onQuestionTitleChange}
-                            onBlur={onTemplateChangeCallback}
+                            onBlur={onTitleBlurCallback}
                         />
                     </Grid>
                     <Grid item xs={3}>
                         <SelectField
-                            id="question-puzzle-type"
-                            fullWidth={true}
-                            value={answersType || ""}
-                            onChange={onAnswerTypeChange}
+                            fullWidth
+                            value={answersType}
+                            onChange={onAnswerTypeChangeCallback}
                         >
                             {answerMenuItems.map(({ label, type, icon: Icon }, index) => (
                                 <MenuItem value={type} key={index}>

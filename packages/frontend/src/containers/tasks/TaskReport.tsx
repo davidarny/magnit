@@ -7,22 +7,28 @@ import { SimpleModal } from "components/modal";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { ReportHeader, ReportStage, SendReportForm } from "components/task-report";
+import { VerticalStepper } from "components/vertical-stepper";
 import { AppContext } from "context";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTaskReport, IReportResponse } from "services/api/tasks";
-import { VerticalStepper } from "../../components/vertical-stepper";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+    downloadReportFile,
+    getTaskReport,
+    IReportResponse,
+    sendReportToEmail,
+} from "services/api/tasks";
 
 interface ITaskReportProps {
     taskId: number;
 }
 
 export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
+    const context = useContext(AppContext);
+
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [reportModalOpen, setReportModalOpen] = useState(false);
     const [report, setReport] = useState<IReportResponse | null>(null);
-    const context = useContext(AppContext);
 
     useEffect(() => {
         getTaskReport(context.courier, taskId)
@@ -40,9 +46,38 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         onMenuClose();
         setReportModalOpen(true);
     }
-    function onSubmitSendReport(email: string) {
-        setReportModalOpen(false);
-    }
+
+    const onSubmitSendReportCallback = useCallback(
+        (email: string) => {
+            setReportModalOpen(false);
+            sendReportToEmail(context.courier, taskId, email)
+                .then(() =>
+                    context.setSnackbarState({
+                        open: true,
+                        message: `Отчёт отправлен на ${email}`,
+                    }),
+                )
+                .catch(() => {
+                    context.setSnackbarError(true);
+                    context.setSnackbarState({
+                        open: true,
+                        message: `Не удалось отправить отчёт на ${email}`,
+                    });
+                });
+        },
+        [context, taskId],
+    );
+
+    const onDownloadFileReportCallback = useCallback(() => {
+        onMenuClose();
+        downloadReportFile(context.courier, taskId).catch(() => {
+            context.setSnackbarError(true);
+            context.setSnackbarState({
+                open: true,
+                message: `Не удалось загрузить отчёт`,
+            });
+        });
+    }, [context, taskId]);
 
     function onPopupClose() {
         setReportModalOpen(false);
@@ -50,12 +85,9 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
 
     return (
         <SectionLayout>
-            {/* send report popup */}
             <SimpleModal width={370} open={reportModalOpen} onClose={onPopupClose}>
-                <SendReportForm onSubmit={onSubmitSendReport} />
+                <SendReportForm onSubmit={onSubmitSendReportCallback} />
             </SimpleModal>
-
-            {/* top bar */}
             <SectionTitle title="Отчет по заданию">
                 <Grid item>
                     <IconButton onClick={onMenuClick}>
@@ -68,11 +100,10 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     anchorEl={menuAnchorElement}
                     onClose={onMenuClose}
                 >
-                    <MenuItem onClick={onMenuClose}>Скачать отчет (.xls)</MenuItem>
+                    <MenuItem onClick={onDownloadFileReportCallback}>Скачать отчет (.xls)</MenuItem>
                     <MenuItem onClick={onOpenSendReportMenuItem}>Отправить на email</MenuItem>
                 </Menu>
             </SectionTitle>
-
             <Grid
                 css={theme => ({
                     maxWidth: theme.maxTemplateWidth,
@@ -80,9 +111,7 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                     position: "relative",
                 })}
             >
-                {/* report headers */}
                 {report && <ReportHeader title={report.title} report={report} />}
-
                 {report && report.stages.length > 0 && (
                     <Typography
                         css={({ spacing, fontSize, colors }) => ({
@@ -94,8 +123,6 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
                         Этапы работы
                     </Typography>
                 )}
-
-                {/* report stages */}
                 {report &&
                     report.stages.map((stage, index) => {
                         function onMouseDown() {

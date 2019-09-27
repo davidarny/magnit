@@ -37,7 +37,6 @@ import { ErrorResponse } from "../../shared/responses/error.response";
 import { AmqpService } from "../amqp/services/amqp.service";
 import { IMailMessage } from "../mail/interfaces/mail-message.interface";
 import { IScheduleMessage } from "../mail/interfaces/schedule-message.interface";
-import { Template } from "../template/entities/template.entity";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
 import { TemplateService } from "../template/services/template.service";
 import { AddTemplatesDto } from "./dto/add-templates.dto";
@@ -45,20 +44,20 @@ import { TaskStageDto } from "./dto/task-stage.dto";
 import { TaskDto } from "./dto/task.dto";
 import { TemplateAssignmentDto } from "./dto/template-assignment.dto";
 import { TaskDocument } from "./entities/task-document.entity";
-import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
-import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
 import { CommentByIdPipe } from "./pipes/comment-by-id.pipe";
 import { DocumentByIdPipe } from "./pipes/document-by-id.pipe";
 import { TaskByIdPipe } from "./pipes/task-by-id.pipe";
 import { TaskExpiredPipe } from "./pipes/task-expired.pipe";
 import { TemplatesByIdsPipe } from "./pipes/templates-by-ids.pipe";
+import { FindAllQueryExtended } from "./queries/find-all-extended.query";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTaskResponse } from "./responses/create-task.response";
 import { GetReportResponse } from "./responses/get-report.response";
 import { GetStagesWithFullHistoryResponse } from "./responses/get-stages-with-full-history.response";
 import { GetTaskExtendedResponse } from "./responses/get-task-extended.response";
 import { GetTaskResponse } from "./responses/get-task.response";
+import { GetTasksExtendedResponse } from "./responses/get-tasks-extended.response";
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { TaskService } from "./services/task.service";
 
@@ -101,13 +100,47 @@ export class TaskController {
         return { success: 1, total: tasks.length, tasks };
     }
 
+    @Get("/extended")
+    @UsePipes(TaskExpiredPipe)
+    @ApiOkResponse({
+        type: GetTasksExtendedResponse,
+        description: "Get Tasks with Marketplace & last Stage",
+    })
+    @ApiBadRequestResponse({ description: "Found non compatible props" })
+    async findAllExtended(
+        @Query(
+            new NonCompatiblePropsPipe<FindAllQueryExtended>(["status", "statuses"]),
+            new SplitPropPipe<FindAllQueryExtended>("statuses"),
+        )
+        query?: FindAllQueryExtended,
+    ) {
+        const { offset, limit, sortBy, sort, statuses, status, title, city, region } = {
+            // need this to correctly handle default values
+            // not sure if nest creates them on given query
+            ...new FindAllQueryExtended(),
+            ...query,
+        };
+        const tasks = await this.taskService.findAllExtended(
+            offset,
+            limit,
+            sortBy,
+            sort,
+            status,
+            statuses,
+            title,
+            region,
+            city,
+        );
+        return { success: 1, total: tasks.length, tasks };
+    }
+
     @Post("/")
     @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
     @ApiCreatedResponse({ type: CreateTaskResponse, description: "ID of created Task" })
     async create(@Body("task") taskDto: TaskDto) {
         const task = new Task(taskDto);
-        const saved = await this.taskService.insert(task);
-        return { success: 1, task_id: saved.id };
+        const id = await this.taskService.insert(task);
+        return { success: 1, task_id: id };
     }
 
     @Put("/:id")
@@ -126,16 +159,8 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findById(@Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number) {
-        const task = await this.taskService.findById(id, ["stages"]);
-        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
-        return {
-            success: 1,
-            task: {
-                ...task,
-                templates: (templates || []).map(template => template.id),
-                stages: (task.stages || []).map(stage => stage.id),
-            },
-        };
+        const task = await this.taskService.findByIdWithTemplatesAndStages(id);
+        return { success: 1, task };
     }
 
     @Post("/:id/templates")
@@ -148,17 +173,10 @@ export class TaskController {
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async setTemplateAssignments(
-        @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
+        @Param("id", NumericIdPipe, TaskByIdPipe) taskId: number,
         @Body("templates", NumericIdPipe, TemplatesByIdsPipe) templateIds: number[],
     ) {
-        const templates: Template[] = [];
-        for (const templateId of templateIds) {
-            const template = await this.templateService.findById(templateId);
-            templates.push(template);
-        }
-        const task = await this.taskService.findById(id, ["assignments"]);
-        task.assignments = templates.map(template => new TemplateAssignment({ task, template }));
-        await this.taskService.update(id, task);
+        await this.taskService.setTemplateAssignments(taskId, templateIds);
         return { success: 1 };
     }
 
@@ -171,15 +189,7 @@ export class TaskController {
         @Param("template_id", NumericIdPipe, TemplateByIdPipe) templateId: number,
         @Body() templateAssignmentDto: TemplateAssignmentDto,
     ) {
-        const task = await this.taskService.findById(taskId, ["assignments"]);
-        task.assignments
-            // filter to assignments that relate to
-            // current template
-            .filter(assignment => assignment.id_template === templateId)
-            .forEach((assignment, index) => {
-                task.assignments[index] = { ...assignment, ...templateAssignmentDto };
-            });
-        await this.taskService.update(taskId, task);
+        await this.taskService.updateTemplateAssignment(taskId, templateId, templateAssignmentDto);
         return { success: 1 };
     }
 
@@ -191,13 +201,7 @@ export class TaskController {
         @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
         @Body("stages") stageDtoArray: TaskStageDto[],
     ) {
-        const task = await this.taskService.findById(id, ["stages"]);
-        task.stages = [
-            ...task.stages,
-            // create stages from dto array
-            ...stageDtoArray.map(taskStageDto => new TaskStage({ ...taskStageDto })),
-        ];
-        await this.taskService.update(id, task);
+        await this.taskService.addTaskStages(id, stageDtoArray);
         return { success: 1 };
     }
 

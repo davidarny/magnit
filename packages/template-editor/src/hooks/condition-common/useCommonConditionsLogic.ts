@@ -1,137 +1,111 @@
-import { EPuzzleType, ICondition, IPuzzle, ITemplate, IValidation } from "@magnit/entities";
+import { EPuzzleType, ICondition, IPuzzle, ISection, IValidation } from "@magnit/entities";
 import _ from "lodash";
-import { useEffect, useRef, useState } from "react";
-import { traverse } from "services/json";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface IUseConditionsService<T> {
-    getConditionObjects(): T[];
+    setConditions(conditions: T[]): void;
+
+    getConditions(): T[];
 
     getRightPuzzle(condition: T): string;
 
-    resetConditionObject(condition: T): void;
+    resetConditions(condition: T): void;
 
     checkDependentQuestionChanged(leftQuestion: IPuzzle, rightQuestion: IPuzzle): boolean;
 
-    setPuzzleConditionObjects(puzzle: IPuzzle, index: number): void;
+    filterConditions(virtualCondition: T | null): T[];
+
+    onConditionsChange(virtualCondition: T | null): void;
 
     shouldSetQuestions(puzzle: IPuzzle): boolean;
+
+    getVirtualCondition(): T;
+
+    conditionsEmpty(): boolean;
 }
 
 export function useCommonConditionsLogic<T extends ICondition | IValidation>(
-    template: ITemplate,
-    disabled: boolean,
-    puzzleId: string,
+    puzzle: IPuzzle,
+    puzzles: Map<string, IPuzzle>,
+    parent: IPuzzle | ISection,
     service: IUseConditionsService<T>,
-    onTemplateChange: (template: ITemplate) => void,
-): [IPuzzle[], IPuzzle[]] {
+    onTemplateChange: () => void,
+): [
+    IPuzzle[],
+    IPuzzle[],
+    T | null,
+    (value: T | null) => void,
+    (id: string) => void,
+    (id: string, update: T) => void,
+    (onAddConditionImpl: (last: T) => Partial<T>) => void,
+] {
+    const [virtualCondition, setVirtualCondition] = useState<T | null>(
+        service.conditionsEmpty() ? service.getVirtualCondition() : null,
+    );
     const [questions, setQuestions] = useState<IPuzzle[]>([]);
     const [answers, setAnswers] = useState<IPuzzle[]>([]);
 
-    const templateSnapshot = useRef<ITemplate>({} as ITemplate);
-    const isParentPuzzleGroup = useRef(false);
-
+    const prevVirtualCondition = useRef(_.cloneDeep(virtualCondition));
+    const prevPuzzlePuzzles = useRef(_.cloneDeep(puzzle.puzzles));
     useEffect(() => {
-        if (disabled) {
+        // exit when ...
+        const virtualConditionSame = _.isEqual(prevVirtualCondition.current, virtualCondition);
+        const puzzleChildrenSame = _.isEqual(prevPuzzlePuzzles.current, puzzle.puzzles);
+        const anyConditionsNotEmpty = !service.conditionsEmpty() && !_.isNil(virtualCondition);
+        if (
+            // ... either virtual condition hasn't changed whereas puzzle content changed ...
+            (!virtualConditionSame && puzzleChildrenSame) ||
+            // ... or there are any conditions in some store
+            anyConditionsNotEmpty
+        ) {
+            prevVirtualCondition.current = _.cloneDeep(virtualCondition);
             return;
         }
-        traverse(template, (value: IPuzzle, parent: IPuzzle) => {
-            if (!_.has(value, "puzzles") || !_.has(parent, "puzzles")) {
-                return;
+        prevVirtualCondition.current = _.cloneDeep(virtualCondition);
+        const puzzleChildrenEmpty =
+            !_.isEmpty(prevPuzzlePuzzles.current) && !_.isEmpty(puzzle.puzzles);
+        // enter when puzzle children are different or empty
+        if (!puzzleChildrenSame || puzzleChildrenEmpty) {
+            prevPuzzlePuzzles.current = _.cloneDeep(puzzle.puzzles);
+            if (!service.conditionsEmpty()) {
+                setVirtualCondition(null);
+            } else {
+                setVirtualCondition(service.getVirtualCondition());
             }
-            const isGroupParent = parent.puzzleType === EPuzzleType.GROUP;
-            isParentPuzzleGroup.current = value.id === puzzleId && isGroupParent;
-        });
-    }, [template, disabled, puzzleId]);
+        }
+    }, [puzzle.puzzles, service, virtualCondition]);
 
+    const { puzzles: parentPuzzles } = parent || { puzzles: [] };
     const prevQuestions = useRef(_.cloneDeep(questions));
     const prevAnswers = useRef(_.cloneDeep(answers));
     useEffect(() => {
-        if (disabled) {
-            return;
-        }
-        // track if template is changed
-        // outside of this component
-        if (!_.isEqual(template, templateSnapshot.current)) {
-            service.getConditionObjects().forEach((condition, index, array) => {
-                let hasDependentQuestionChanged = false;
-                const dependentQuestion = questions.find(
-                    question => question.id === service.getRightPuzzle(condition),
-                );
-                if (dependentQuestion) {
-                    traverse(template, (value: IPuzzle) => {
-                        if (!_.has(value, "puzzles")) {
-                            return;
-                        }
-                        // find dependent question in template
-                        if (
-                            value.puzzleType !== EPuzzleType.QUESTION ||
-                            value.id !== dependentQuestion.id
-                        ) {
-                            return;
-                        }
-                        // check if dependent question has changed
-                        hasDependentQuestionChanged = service.checkDependentQuestionChanged(
-                            dependentQuestion,
-                            value,
-                        );
-                    });
-                    if (hasDependentQuestionChanged) {
-                        service.resetConditionObject(condition);
-                        array[index] = { ...condition };
-                    }
-                }
-            });
-        }
         // fill questions and answers initially
         // by traversing whole template tree
         questions.length = 0;
         answers.length = 0;
-        traverse(template, (value: any) => {
-            if (!_.has(value, "puzzles")) {
-                return;
-            }
-            const puzzle = value as IPuzzle;
-            if (!puzzle.puzzles.some(child => child.id === puzzleId)) {
-                return;
-            }
-            // find index of current puzzle in a tree
-            const index = puzzle.puzzles.findIndex(item => item.id === puzzleId);
-            // traverse all children of parent puzzle
-            // in order to find all possible siblings above
-            // so that scope of questionPuzzle is always all puzzles above the current
-            _.range(0, index).forEach(i => {
-                traverse(puzzle.puzzles[i], (childValue: IPuzzle, childParent: IPuzzle) => {
-                    if (!_.has(childValue, "puzzleType") || !_.has(childValue, "puzzles")) {
-                        return;
-                    }
-                    // check if parent of current item is GROUP puzzle
-                    const isGroupParent =
-                        childParent &&
-                        childParent.puzzleType === EPuzzleType.GROUP &&
-                        !isParentPuzzleGroup.current;
-                    // if puzzle is question and has non-empty title
-                    // then it's allowed to be selected as a questionPuzzle
-                    // disallow referencing to questions in GROUPS
-                    if (
-                        childValue.puzzleType === EPuzzleType.QUESTION &&
-                        service.shouldSetQuestions(childValue) &&
-                        childValue.title.toString().length > 0 &&
-                        !isGroupParent
-                    ) {
-                        questions.push(childValue);
-                        return;
-                    }
+        // find index of current puzzle in a tree
+        const index = parentPuzzles.findIndex(item => item.id === puzzle.id);
+        if (index === -1) {
+            return;
+        }
+        _.range(0, index).forEach(i => {
+            const childPuzzle = parentPuzzles[i];
+            if (
+                childPuzzle.puzzleType === EPuzzleType.QUESTION &&
+                service.shouldSetQuestions(childPuzzle) &&
+                !_.isEmpty(childPuzzle.title.toString())
+            ) {
+                questions.push(childPuzzle);
+                childPuzzle.puzzles.forEach(childOfChildPuzzle => {
                     // if puzzle is one of answers types
                     // then it's allowed to be selected as an answerPuzzle
                     const excludedPuzzleTypes = [EPuzzleType.GROUP, EPuzzleType.QUESTION];
-                    if (!excludedPuzzleTypes.includes(childValue.puzzleType)) {
-                        answers.push(childValue);
-                        return;
+                    // enter if puzzle is not GROUP or QUESTION
+                    if (!excludedPuzzleTypes.includes(childOfChildPuzzle.puzzleType)) {
+                        answers.push(childOfChildPuzzle);
                     }
                 });
-            });
-            // set conditions of current puzzle
-            service.setPuzzleConditionObjects(puzzle, index);
+            }
         });
         if (!_.isEqual(prevQuestions.current, questions)) {
             const clonedQuestions = _.cloneDeep(questions);
@@ -143,16 +117,135 @@ export function useCommonConditionsLogic<T extends ICondition | IValidation>(
             prevAnswers.current = clonedAnswers;
             setAnswers(clonedAnswers);
         }
-        // trigger template update if snapshot changed
-        // also cloneDeep in order to track changes above in isEqual
-        const clonedTemplate = _.cloneDeep(template);
-        if (_.isEqual(template, templateSnapshot.current) || _.isEmpty(templateSnapshot.current)) {
-            templateSnapshot.current = clonedTemplate;
+    }, [answers, parentPuzzles, puzzle.id, questions, service]);
+
+    // hook for invalidating conditions if
+    // dependent question has changed
+    const prevDependents = useRef(_.cloneDeep(questions));
+    useEffect(() => {
+        if (service.conditionsEmpty()) {
             return;
         }
-        templateSnapshot.current = clonedTemplate;
-        onTemplateChange(templateSnapshot.current);
-    }, [template, disabled, questions, answers, onTemplateChange, puzzleId, service]);
+        let changed = false;
+        service.getConditions().forEach(condition => {
+            const dependent = prevDependents.current.find(
+                question => question.id === service.getRightPuzzle(condition),
+            );
+            if (!dependent) {
+                return;
+            }
+            for (const pair of puzzles) {
+                if (changed) {
+                    break;
+                }
+                const puzzle = pair[1];
+                // find dependent question in template
+                if (puzzle.puzzleType !== EPuzzleType.QUESTION || puzzle.id !== dependent.id) {
+                    continue;
+                }
+                // check if dependent question has changed
+                changed = service.checkDependentQuestionChanged(dependent, puzzle);
+            }
+        });
+        prevDependents.current = _.cloneDeep(questions);
+        if (!changed) {
+            return;
+        }
+        const first = _.first(service.getConditions())!;
+        service.resetConditions(first);
+        setVirtualCondition(first);
+        service.setConditions([]);
+        onTemplateChange();
+    }, [onTemplateChange, puzzles, questions, service]);
 
-    return [questions, answers];
+    const onConditionDeleteCallback = useCallback(
+        (id: string) => {
+            if (virtualCondition && virtualCondition.id === id) {
+                if (!service.conditionsEmpty()) {
+                    setVirtualCondition(null);
+                } else {
+                    setVirtualCondition(service.getVirtualCondition());
+                }
+            } else {
+                const isCurrentCondition = (condition: T) => condition.id !== id;
+                const nextConditions = [...service.getConditions().filter(isCurrentCondition)];
+                service.setConditions(nextConditions);
+                if (service.conditionsEmpty()) {
+                    setVirtualCondition(service.getVirtualCondition());
+                }
+                onTemplateChange();
+            }
+        },
+        [onTemplateChange, service, virtualCondition],
+    );
+
+    const tryToCommitCondition = useCallback(
+        (nextVirtualCondition?: T | null) => {
+            if (!nextVirtualCondition) {
+                nextVirtualCondition = null;
+            }
+            service.onConditionsChange(nextVirtualCondition);
+            const containsVirtualCondition = (condition: T) =>
+                nextVirtualCondition && condition.id === nextVirtualCondition.id;
+            const virtualConditionInserted = service.getConditions().some(containsVirtualCondition);
+            if (virtualConditionInserted) {
+                setVirtualCondition(null);
+            }
+            // handle case when both conditions & virtual condition are empty
+            const allConditionsEmpty = service.conditionsEmpty() && _.isNil(nextVirtualCondition);
+            if (allConditionsEmpty) {
+                setVirtualCondition(service.getVirtualCondition());
+            }
+        },
+        [service],
+    );
+
+    const onConditionChangeCallback = useCallback(
+        (id: string, update: T): void => {
+            let nextVirtualCondition: T | null = null;
+            if (virtualCondition && virtualCondition.id === id) {
+                nextVirtualCondition = { ...virtualCondition, ...update };
+                setVirtualCondition(nextVirtualCondition);
+            } else {
+                const isCurrentCondition = (condition: T) => condition.id === id;
+                const changedConditionIdx = service.getConditions().findIndex(isCurrentCondition);
+                service.getConditions()[changedConditionIdx] = {
+                    ...service.getConditions()[changedConditionIdx],
+                    ...update,
+                };
+                service.setConditions([...service.getConditions()]);
+            }
+            tryToCommitCondition(nextVirtualCondition);
+        },
+        [tryToCommitCondition, service, virtualCondition],
+    );
+
+    const onAddConditionCallback = useCallback(
+        (onAddConditionImpl: (last: T) => Partial<T>): void => {
+            service.onConditionsChange(virtualCondition);
+            const last = _.last(service.getConditions());
+            const containsVirtualCondition = (condition: T) =>
+                virtualCondition && condition.id === virtualCondition.id;
+            const virtualConditionInserted = service.getConditions().some(containsVirtualCondition);
+            // enter when there is any condition in puzzle
+            // and either virtual condition inserted or it's null
+            if (last && (virtualConditionInserted || _.isNil(virtualCondition))) {
+                setVirtualCondition({
+                    ...service.getVirtualCondition(),
+                    ...onAddConditionImpl(last),
+                });
+            }
+        },
+        [service, virtualCondition],
+    );
+
+    return [
+        questions,
+        answers,
+        virtualCondition,
+        setVirtualCondition,
+        onConditionDeleteCallback,
+        onConditionChangeCallback,
+        onAddConditionCallback,
+    ];
 }

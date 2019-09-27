@@ -29,6 +29,7 @@ export function useCondition(
     value: string,
     index: number,
     conditionType: EConditionType,
+    puzzleId: string,
 ): [
     () => string,
     () => React.ReactNode,
@@ -36,7 +37,7 @@ export function useCondition(
 ] {
     const [getConditionLiteral] = useCommonConditionLogic(index, conditionType);
 
-    const getActionLiteral = (actionType: EActionType) => {
+    function getActionLiteral(actionType: EActionType) {
         return {
             [EActionType.CHOSEN_ANSWER]: "Выбран ответ",
             [EActionType.NOT_EQUAL]: "Не равно",
@@ -45,7 +46,7 @@ export function useCondition(
             [EActionType.EQUAL]: "Равно",
             [EActionType.GIVEN_ANSWER]: "Дан ответ",
         }[actionType];
-    };
+    }
 
     const getActionVariants = useCallback(() => {
         switch (puzzleType) {
@@ -53,19 +54,39 @@ export function useCondition(
             case EPuzzleType.NUMERIC_ANSWER:
             case EPuzzleType.DATE_ANSWER:
                 return [
-                    <MenuItem key={EActionType.EQUAL} value={EActionType.EQUAL}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.EQUAL}
+                        value={EActionType.EQUAL}
+                    >
                         {getActionLiteral(EActionType.EQUAL)}
                     </MenuItem>,
-                    <MenuItem key={EActionType.LESS_THAN} value={EActionType.LESS_THAN}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.LESS_THAN}
+                        value={EActionType.LESS_THAN}
+                    >
                         {getActionLiteral(EActionType.LESS_THAN)}
                     </MenuItem>,
-                    <MenuItem key={EActionType.MORE_THAN} value={EActionType.MORE_THAN}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.MORE_THAN}
+                        value={EActionType.MORE_THAN}
+                    >
                         {getActionLiteral(EActionType.MORE_THAN)}
                     </MenuItem>,
-                    <MenuItem key={EActionType.NOT_EQUAL} value={EActionType.NOT_EQUAL}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.NOT_EQUAL}
+                        value={EActionType.NOT_EQUAL}
+                    >
                         {getActionLiteral(EActionType.NOT_EQUAL)}
                     </MenuItem>,
-                    <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.GIVEN_ANSWER}
+                        value={EActionType.GIVEN_ANSWER}
+                    >
                         {getActionLiteral(EActionType.GIVEN_ANSWER)}
                     </MenuItem>,
                 ];
@@ -73,21 +94,33 @@ export function useCondition(
             case EPuzzleType.RADIO_ANSWER:
             case EPuzzleType.CHECKBOX_ANSWER:
                 return [
-                    <MenuItem key={EActionType.CHOSEN_ANSWER} value={EActionType.CHOSEN_ANSWER}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.CHOSEN_ANSWER}
+                        value={EActionType.CHOSEN_ANSWER}
+                    >
                         {getActionLiteral(EActionType.CHOSEN_ANSWER)}
                     </MenuItem>,
-                    <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.GIVEN_ANSWER}
+                        value={EActionType.GIVEN_ANSWER}
+                    >
                         {getActionLiteral(EActionType.GIVEN_ANSWER)}
                     </MenuItem>,
                 ];
             default:
                 return [
-                    <MenuItem key={EActionType.GIVEN_ANSWER} value={EActionType.GIVEN_ANSWER}>
+                    <MenuItem
+                        className={`select__sentinel__${puzzleId}`}
+                        key={EActionType.GIVEN_ANSWER}
+                        value={EActionType.GIVEN_ANSWER}
+                    >
                         {getActionLiteral(EActionType.GIVEN_ANSWER)}
                     </MenuItem>,
                 ];
         }
-    }, [puzzleType]);
+    }, [puzzleId, puzzleType]);
 
     const getAnswerPuzzle = useCallback(
         (answers: IPuzzle[], questions: IPuzzle[]): NarrowCallside<IAnswerPuzzleBuilder> => {
@@ -105,7 +138,7 @@ export function useCondition(
                                     fullWidth
                                     placeholder="Выберите ответ"
                                     onChange={this.onAnswerPuzzleChange}
-                                    value={answerPuzzle || ""}
+                                    value={answerPuzzle}
                                 >
                                     {answers.length !== 0 &&
                                         answers
@@ -127,7 +160,11 @@ export function useCondition(
                                             })
                                             .map(answer => {
                                                 return (
-                                                    <MenuItem key={answer.id} value={answer.id}>
+                                                    <MenuItem
+                                                        className={`select__sentinel__${puzzleId}`}
+                                                        key={answer.id}
+                                                        value={answer.id}
+                                                    >
                                                         {answer.title}
                                                     </MenuItem>
                                                 );
@@ -141,7 +178,7 @@ export function useCondition(
                             return (
                                 <InputField
                                     fullWidth
-                                    value={value || ""}
+                                    value={value}
                                     onChange={this.onValueChange}
                                     onBlur={this.onValueBlur}
                                     css={theme => ({ marginTop: theme.spacing(-2) })}
@@ -170,7 +207,7 @@ export function useCondition(
                 }
             })();
         },
-        [condition, value],
+        [condition, puzzleId, value],
     );
     return [getConditionLiteral, getActionVariants, getAnswerPuzzle];
 }

@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ITemplate } from "@magnit/entities";
+import { ETemplateType, ITemplate } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -10,7 +10,6 @@ import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
-import _ from "lodash";
 import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
@@ -21,7 +20,13 @@ interface IEditTemplateProps {
 
 export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     const context = useContext(AppContext);
-    const [template, setTemplate] = useState<object>({});
+    const [template, setTemplate] = useState<ITemplate>({
+        id: 0,
+        sections: [],
+        title: "",
+        description: "",
+        type: ETemplateType.LIGHT,
+    });
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -34,8 +39,8 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
             .catch(console.error);
     }, [context.courier, templateId]);
 
-    function onTemplateChange(template: object) {
-        setTemplate(_.cloneDeep(template));
+    function onTemplateChange(template: ITemplate) {
+        setTemplate({ ...template });
     }
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
@@ -90,15 +95,13 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
                     transition: "opacity 0.3s ease-in-out",
                 })}
             >
-                {!_.isEmpty(template) && (
-                    <TemplateEditor
-                        template={(template as unknown) as ITemplate}
-                        css={theme => ({ background: theme.colors.main })}
-                        onChange={onTemplateChange}
-                        onAddAsset={onAddAsset}
-                        onDeleteAsset={onDeleteAsset}
-                    />
-                )}
+                <TemplateEditor
+                    template={template}
+                    css={theme => ({ background: theme.colors.main })}
+                    onChange={onTemplateChange}
+                    onAddAsset={onAddAsset}
+                    onDeleteAsset={onDeleteAsset}
+                />
             </Grid>
             <Snackbar
                 open={snackbar.open}

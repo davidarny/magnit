@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { css, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import {
     Grid,
     IconButton,
@@ -13,7 +13,7 @@ import {
 } from "@material-ui/icons";
 import * as _ from "lodash";
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { TableBodyWrapper } from "./TableBodyWrapper";
 import { TableHeader } from "./TableHeader";
 
@@ -31,7 +31,9 @@ export interface IColumn {
 interface ITableWrapperProps {
     columns: IColumn[];
     data: ITableDataItem[];
-    initialPage?: number;
+    page?: number;
+    order?: "asc" | "desc";
+    orderBy?: string;
     rowsPerPage?: number;
     pagination?: boolean;
     hover?: boolean;
@@ -45,13 +47,17 @@ interface ITableWrapperProps {
     onRequestSort?(sort: "asc" | "desc", sortBy: string): void;
 
     onRowSelectToggle?(row: ITableDataItem, selected: boolean): void;
+
+    onChangePage?(nextPage: number): void;
 }
 
 export const TableWrapper: React.FC<ITableWrapperProps> = props => {
     const {
         columns,
         data,
-        initialPage = 0,
+        page = 0,
+        order = "asc",
+        orderBy = "",
         rowsPerPage = 10,
         pagination = true,
         hover = true,
@@ -61,36 +67,30 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
         onRowSelectToggle,
         onSelectToggle,
         onRequestSort,
+        onChangePage,
         ...rest
     } = props;
 
-    const [page, setPage] = useState(initialPage);
-    const [order, setOrder] = useState<"asc" | "desc">("asc");
-    const [orderBy, setOrderBy] = useState("");
-
-    // reset pagination on data change
-    useEffect(() => {
-        setPage(0);
-    }, [data]);
-
     const onRequestSortCallback = useCallback(
-        (event: React.MouseEvent<unknown>, property: string) => {
-            const isDesc = orderBy === property && order === "desc";
-            setOrder(isDesc ? "asc" : "desc");
-            setOrderBy(property);
+        (event: unknown, nextOrderBy: string) => {
+            const isDesc = orderBy === nextOrderBy && order === "desc";
+            const nextOrder = isDesc ? "asc" : "desc";
             if (onRequestSort) {
-                onRequestSort(order, orderBy);
+                onRequestSort(nextOrder, nextOrderBy);
             }
         },
         [onRequestSort, order, orderBy],
     );
 
-    function onChangePage(
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
-        newPage: number,
-    ) {
-        setPage(newPage);
-    }
+    const onChangePageCallback = useCallback(
+        (event: unknown, nextPage: number) => {
+            if (onChangePage) {
+                onChangePage(nextPage);
+            }
+        },
+        [onChangePage],
+    );
+
     return (
         <React.Fragment>
             <Table {...rest}>
@@ -106,6 +106,8 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
                 />
                 <TableBodyWrapper
                     data={
+                        // currently pagination work only in client side
+                        // need to implement server side in future
                         pagination
                             ? sort
                                 ? getSortedData(data, getSortingNumber(order, orderBy)).slice(
@@ -130,10 +132,12 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
                     rowsPerPage={rowsPerPage}
                     labelDisplayedRows={PaginationLabel}
                     ActionsComponent={TablePagination}
+                    // disable default labels
                     labelRowsPerPage=""
                     SelectProps={{ style: { display: "none" } }}
-                    onChangePage={onChangePage}
-                    // TODO: refactor
+                    onChangePage={onChangePageCallback}
+                    // this css seems to be very complex
+                    // would be nice to refactor
                     css={theme => ({
                         width: "100%",
                         marginTop: theme.spacing(2),
@@ -203,6 +207,8 @@ interface ITablePaginationProps {
 const TablePagination: React.FC<ITablePaginationProps> = props => {
     const { count, page, rowsPerPage, onChangePage } = props;
 
+    // some stuff to correctly calculate
+    // left & right offsets when changing page
     const range = {
         offsets: {
             start: 1,
@@ -243,13 +249,13 @@ const TablePagination: React.FC<ITablePaginationProps> = props => {
         <Grid
             container
             alignItems="center"
-            css={css`
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                right: 0;
-                width: auto;
-            `}
+            css={{
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-50%)",
+                right: 0,
+                width: "auto",
+            }}
         >
             <Grid item>
                 <IconButton
@@ -325,6 +331,9 @@ const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count, to }) =
 
 PaginationLabel.displayName = "PaginationLabel";
 
+// these function can be used
+// if server side sorting is not available
+
 function desc<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
         return -1;
@@ -345,7 +354,7 @@ function getSortedData<T>(array: T[], cmp: (a: T, b: T) => number) {
     return stabilized.map(el => el[0]);
 }
 
-function getSortingNumber<K extends string | number | symbol>(
+function getSortingNumber<K extends string>(
     order: "asc" | "desc",
     orderBy: K,
 ): (a: { [key in K]: number | string }, b: { [key in K]: number | string }) => number {

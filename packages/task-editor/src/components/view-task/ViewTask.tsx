@@ -287,9 +287,15 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const documentsBlockId = useRef(uuid());
 
-    const deleteAssetVisible =
+    const isEditableMode =
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
+    const deleteAssetVisible = isEditableMode;
+
+    const isViewOnlyMode =
+        task.status === ETaskStatus.IN_PROGRESS || task.status === ETaskStatus.COMPLETED;
+
+    const taskHasDocuments = task.documents && task.documents.length > 0;
     return (
         <React.Fragment>
             <Menu
@@ -525,119 +531,131 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     </Grid>
                 </SelectableBlockWrapper>
             )}
-            <SelectableBlockWrapper
-                css={theme => ({
-                    padding: theme.spacing(3),
-                    zIndex: focusedPuzzleId === documentsBlockId.current ? 1300 : "initial",
-                })}
-                onFocus={service.onPuzzleFocus.bind(service, documentsBlockId.current, false)}
-                onMouseDown={service.onPuzzleFocus.bind(service, documentsBlockId.current, false)}
-                focused={focusedPuzzleId === documentsBlockId.current}
-                id={documentsBlockId.current}
-            >
-                <Grid container spacing={2} css={theme => ({ padding: `0 ${theme.spacing(4)}` })}>
-                    <Grid item xs={12}>
-                        <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
-                            Документы
-                        </Typography>
-                    </Grid>
-                    {(task.documents || []).map(document => (
-                        <Grid item xs={2} key={document.id}>
-                            <Grid
-                                container
-                                justify="center"
-                                alignItems="center"
-                                direction="column"
-                                css={theme => ({
-                                    height: "100%",
-                                    border: `1px solid ${theme.colors.lightGray}`,
-                                    borderRadius: theme.radius(0.5),
-                                    minHeight: theme.spacing(20),
-                                    position: "relative",
-                                })}
-                            >
-                                <img
-                                    css={theme => ({
-                                        width: "100%",
-                                        objectFit: "contain",
-                                        maxHeight: theme.spacing(20),
-                                    })}
-                                    alt={document.originalName}
-                                    src={document.filename}
-                                />
-                                {deleteAssetVisible && (
-                                    <div
-                                        onClick={() => onDeleteAssetCallback(document.id)}
-                                        css={theme => ({
-                                            padding: theme.spacing(0.5),
-                                            borderRadius: "50%",
-                                            background: theme.colors.gray,
-                                            color: theme.colors.white,
-                                            position: "absolute",
-                                            top: "-12px", // TODO: dynamic calculation
-                                            right: "-12px", // TODO: dynamic calculation
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                        })}
-                                    >
-                                        <CloseIcon
-                                            css={theme => ({ fontSize: theme.fontSize.normal })}
-                                        />
-                                    </div>
-                                )}
-                            </Grid>
-                        </Grid>
-                    ))}
-                    {editable && (
-                        <Grid item xs={2}>
-                            <Grid
-                                container
-                                justify="center"
-                                alignItems="center"
-                                direction="column"
-                                css={theme => ({
-                                    height: "100%",
-                                    border: `1px solid ${theme.colors.lightGray}`,
-                                    borderRadius: theme.radius(0.5),
-                                    minHeight: theme.spacing(20),
-                                    position: "relative",
-                                })}
-                            >
-                                <input
-                                    ref={input}
-                                    accept="image/*,.pdf,.doc,.xls,.xlsx"
-                                    type="file"
-                                    hidden
-                                    onChange={onFileChangeCallback}
-                                />
-                                <Fab
-                                    css={theme => ({
-                                        width: theme.spacing(4),
-                                        height: theme.spacing(4),
-                                        minHeight: theme.spacing(4),
-                                        marginBottom: theme.spacing(),
-                                    })}
-                                    onClick={onAddAssetTrigger}
-                                >
-                                    <AddIcon />
-                                </Fab>
-                                <Typography
-                                    css={theme => ({
-                                        userSelect: "none",
-                                        fontSize: theme.fontSize.sNormal,
-                                        color: theme.colors.secondary,
-                                    })}
-                                    align="center"
-                                >
-                                    Добавить файл
-                                </Typography>
-                            </Grid>
-                        </Grid>
+            {((isViewOnlyMode && taskHasDocuments) || isEditableMode) && (
+                <SelectableBlockWrapper
+                    css={theme => ({
+                        padding: theme.spacing(3),
+                        zIndex: focusedPuzzleId === documentsBlockId.current ? 1300 : "initial",
+                    })}
+                    onFocus={service.onPuzzleFocus.bind(service, documentsBlockId.current, false)}
+                    onMouseDown={service.onPuzzleFocus.bind(
+                        service,
+                        documentsBlockId.current,
+                        false,
                     )}
-                </Grid>
-            </SelectableBlockWrapper>
+                    focused={focusedPuzzleId === documentsBlockId.current}
+                    id={documentsBlockId.current}
+                >
+                    <Grid
+                        container
+                        spacing={2}
+                        css={theme => ({ padding: `0 ${theme.spacing(4)}` })}
+                    >
+                        <Grid item xs={12}>
+                            <Typography css={theme => ({ fontSize: theme.fontSize.large })}>
+                                Документы
+                            </Typography>
+                        </Grid>
+                        {(task.documents || []).map(document => (
+                            <Grid item xs={2} key={document.id}>
+                                <Grid
+                                    container
+                                    justify="center"
+                                    alignItems="center"
+                                    direction="column"
+                                    css={theme => ({
+                                        height: "100%",
+                                        border: `1px solid ${theme.colors.lightGray}`,
+                                        borderRadius: theme.radius(0.5),
+                                        minHeight: theme.spacing(20),
+                                        position: "relative",
+                                    })}
+                                >
+                                    <img
+                                        css={theme => ({
+                                            width: "100%",
+                                            objectFit: "contain",
+                                            maxHeight: theme.spacing(20),
+                                        })}
+                                        alt={document.originalName}
+                                        src={document.filename}
+                                    />
+                                    {deleteAssetVisible && (
+                                        <div
+                                            onClick={() => onDeleteAssetCallback(document.id)}
+                                            css={theme => ({
+                                                padding: theme.spacing(0.5),
+                                                borderRadius: "50%",
+                                                background: theme.colors.gray,
+                                                color: theme.colors.white,
+                                                position: "absolute",
+                                                top: "-12px", // TODO: dynamic calculation
+                                                right: "-12px", // TODO: dynamic calculation
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                cursor: "pointer",
+                                            })}
+                                        >
+                                            <CloseIcon
+                                                css={theme => ({
+                                                    fontSize: theme.fontSize.normal,
+                                                })}
+                                            />
+                                        </div>
+                                    )}
+                                </Grid>
+                            </Grid>
+                        ))}
+                        {editable && (
+                            <Grid item xs={2}>
+                                <Grid
+                                    container
+                                    justify="center"
+                                    alignItems="center"
+                                    direction="column"
+                                    css={theme => ({
+                                        height: "100%",
+                                        border: `1px solid ${theme.colors.lightGray}`,
+                                        borderRadius: theme.radius(0.5),
+                                        minHeight: theme.spacing(20),
+                                        position: "relative",
+                                    })}
+                                >
+                                    <input
+                                        ref={input}
+                                        accept="image/*,.pdf,.doc,.xls,.xlsx"
+                                        type="file"
+                                        hidden
+                                        onChange={onFileChangeCallback}
+                                    />
+                                    <Fab
+                                        css={theme => ({
+                                            width: theme.spacing(4),
+                                            height: theme.spacing(4),
+                                            minHeight: theme.spacing(4),
+                                            marginBottom: theme.spacing(),
+                                        })}
+                                        onClick={onAddAssetTrigger}
+                                    >
+                                        <AddIcon />
+                                    </Fab>
+                                    <Typography
+                                        css={theme => ({
+                                            userSelect: "none",
+                                            fontSize: theme.fontSize.sNormal,
+                                            color: theme.colors.secondary,
+                                        })}
+                                        align="center"
+                                    >
+                                        Добавить файл
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        )}
+                    </Grid>
+                </SelectableBlockWrapper>
+            )}
             {documents.map(document => {
                 const documentPendingComments = pendingComments.filter(
                     comment => comment.idAssignment === document.id,

@@ -30,6 +30,10 @@ export class FetchCourier implements ICourier {
         return this.send(path, "DELETE", body);
     }
 
+    async file(path: string): Promise<Response> {
+        return this.fetch(path, "GET");
+    }
+
     private async send<T>(path: string, method: TMethod, body?: any) {
         try {
             if (this.middlewares && !(body instanceof FormData)) {

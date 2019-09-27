@@ -19,7 +19,7 @@ export class Comment extends PrimaryBaseEntity<Comment> {
     @Column()
     id_assignment: number;
 
-    @ManyToOne(() => TemplateAssignment, assignment => assignment.comments)
-    @JoinColumn({ name: "id_assignment", referencedColumnName: "id" })
+    @ManyToOne(() => TemplateAssignment, assignment => assignment.comments, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_assignment" })
     assignment: TemplateAssignment;
 }

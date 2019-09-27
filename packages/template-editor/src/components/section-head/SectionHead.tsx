@@ -5,13 +5,13 @@ import { Checkbox, InputField } from "@magnit/components";
 import { ETemplateType, ITemplate } from "@magnit/entities";
 import { FormControl, FormControlLabel, Grid } from "@material-ui/core";
 import * as React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface IContentSectionProps {
     template: ITemplate;
     focused: boolean;
 
-    onTemplateChange(template: ITemplate): void;
+    onTemplateChange?(template: ITemplate): void;
 }
 
 type TSelectChangeEvent = React.ChangeEvent<{
@@ -20,13 +20,29 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 export const SectionHead: React.FC<IContentSectionProps> = props => {
-    const { template, focused, onTemplateChange } = props;
+    const { template, focused, children, onTemplateChange } = props;
 
     const [templateTitle, setTemplateTitle] = useState(template.title);
     const [templateDescription, setTemplateDescription] = useState(template.description);
 
+    const prevTemplateTitle = useRef(templateTitle);
+    const prevTemplateDescription = useRef(templateDescription);
+    useEffect(() => {
+        if (prevTemplateTitle.current !== template.title) {
+            setTemplateTitle(template.title);
+            prevTemplateTitle.current = template.title;
+        }
+        if (prevTemplateDescription.current !== template.description) {
+            setTemplateDescription(template.description);
+            prevTemplateDescription.current = template.description;
+        }
+    }, [template.description, template.title]);
+
     const onTemplateTypeChangeCallback = useCallback(
         (event: TSelectChangeEvent, checked: boolean) => {
+            if (!onTemplateChange) {
+                return;
+            }
             if (checked) {
                 onTemplateChange({ ...template, type: ETemplateType.COMPLEX });
             } else {
@@ -41,7 +57,9 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
     }
 
     const onTemplateTitleBlurCallback = useCallback(() => {
-        onTemplateChange({ ...template, title: templateTitle });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template, title: templateTitle });
+        }
     }, [onTemplateChange, template, templateTitle]);
 
     function onTemplateDescriptionChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -49,7 +67,9 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
     }
 
     const onTemplateDescriptionBlurCallback = useCallback(() => {
-        onTemplateChange({ ...template, description: templateDescription });
+        if (onTemplateChange) {
+            onTemplateChange({ ...template, description: templateDescription });
+        }
     }, [onTemplateChange, template, templateDescription]);
 
     return (
@@ -67,7 +87,7 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
                         <InputField
                             fullWidth={true}
                             placeholder="Название шаблона"
-                            defaultValue={template.title}
+                            value={templateTitle}
                             simple={!focused}
                             css={theme => ({
                                 input: {
@@ -110,7 +130,7 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
                 <InputField
                     fullWidth={true}
                     placeholder="Описание (необязательно)"
-                    defaultValue={template.description}
+                    value={templateDescription}
                     simple={!focused}
                     css={theme => ({
                         input: {
@@ -123,8 +143,10 @@ export const SectionHead: React.FC<IContentSectionProps> = props => {
                 />
             </Grid>
             <Grid item xs={12}>
-                {props.children}
+                {children}
             </Grid>
         </Grid>
     );
 };
+
+SectionHead.displayName = "SectionHead";

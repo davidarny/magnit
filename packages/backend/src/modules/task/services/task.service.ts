@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { existsSync, unlinkSync } from "fs";
+import * as _ from "lodash";
 import { DeepPartial, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
@@ -19,13 +20,15 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
+import { TaskStageDto } from "../dto/task-stage.dto";
 import { TaskDto } from "../dto/task.dto";
+import { TemplateAssignmentDto } from "../dto/template-assignment.dto";
 import { Comment } from "../entities/comment.entity";
 import { TaskDocument } from "../entities/task-document.entity";
 import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
-import _ = require("lodash");
+import { TaskExtendedDto } from "../responses/get-tasks-extended.response";
 
 export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStage };
 
@@ -109,17 +112,109 @@ export class TaskService {
         return this.taskRepository.query(sql, params);
     }
 
+    async findAllExtended(
+        offset?: number,
+        limit?: number,
+        sortBy?: keyof TaskExtendedDto,
+        sort?: "ASC" | "DESC",
+        status?: ETaskStatus,
+        statuses?: ETaskStatus[],
+        title?: string,
+        region?: string,
+        city?: string,
+    ) {
+        let sql = `
+            SELECT t.*,
+                   m.address,
+                   m.format,
+                   m.city,
+                   m.region,
+                   ts.title AS stage_title,
+                   ts.deadline
+            FROM task t
+                     LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                     LEFT JOIN
+                     (
+                        SELECT *
+                        FROM task_stage
+                        WHERE finished = false
+                        ORDER BY created_at DESC
+                        LIMIT 1
+                     ) ts ON t.id = ts.id_task
+            WHERE 1 = 1
+        `;
+        const params: Array<string | number> = [];
+        if (!_.isNil(status)) {
+            params.push(status);
+            sql += ` AND t.status = $${params.length} `;
+        }
+        if (!_.isNil(statuses)) {
+            params.push(`(${statuses.join(",")})`);
+            sql += ` AND t.status IN $${params.length} `;
+        }
+        if (!_.isNil(title)) {
+            params.push(`%${title.toLowerCase()}%`);
+            sql += ` AND lower(t.title) LIKE $${params.length} `;
+        }
+        if (!_.isNil(region)) {
+            params.push(`%${region.toLowerCase()}%`);
+            sql += ` AND lower(m.region) LIKE $${params.length} `;
+        }
+        if (!_.isNil(city)) {
+            params.push(`%${city.toLowerCase()}%`);
+            sql += ` AND lower(m.city) LIKE $${params.length} `;
+        }
+        sql += "GROUP BY t.id, m.address, m.format, m.city, m.region, ts.title, ts.deadline";
+        if (!_.isNil(sort)) {
+            const stage = ["stage_title", "deadline"];
+            const marketplace = ["address", "city", "format", "region"];
+            let prefix = "t";
+            if (stage.includes(sortBy)) {
+                // cannot use alias
+                // so it'll be ts.title
+                if (sortBy === "stage_title") {
+                    sortBy = "title";
+                }
+                prefix = "ts";
+            } else if (marketplace.includes(sortBy)) {
+                prefix = "m";
+            }
+            sql += ` ORDER BY ${prefix}.${sortBy || "title"} ${sort} `;
+        }
+        if (!_.isNil(limit)) {
+            params.push(limit);
+            sql += ` LIMIT $${params.length} `;
+        }
+        if (!_.isNil(offset)) {
+            params.push(offset);
+            sql += ` OFFSET $${params.length} `;
+        }
+        return this.taskRepository.query(sql, params);
+    }
+
     @Transactional()
     async insert(task: Task) {
         // in case if insert() is called with existing task
         // semantics of this methods is about creating new one
-        delete task.id;
         await this.appendMarketplaceIfExists(task);
-        return this.taskRepository.save(task);
+        const response = await this.taskRepository.insert(task);
+        const ids = response.identifiers;
+        return _.first(ids).id;
     }
 
     async findById(id: number, relations: string[] = []) {
         return this.taskRepository.findOne({ where: { id }, relations });
+    }
+
+    @Transactional()
+    async findByIdWithTemplatesAndStages(id: number) {
+        const task = await this.findById(id, ["stages"]);
+        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
+        return {
+            ...task,
+            templates: (templates || []).map(template => template.id),
+            stages: (task.stages || []).map(stage => stage.id),
+        };
     }
 
     @Transactional()
@@ -175,6 +270,31 @@ export class TaskService {
     async update(id: number, task: DeepPartial<Task>): Promise<void> {
         await this.appendMarketplaceIfExists(task);
         await this.taskRepository.save({ id, ...task });
+    }
+
+    @Transactional()
+    async setTemplateAssignments(taskId: number, templateIds: number[]): Promise<void> {
+        // remove previous assignments
+        const prevAssignments = await this.templateAssignmentRepository.find({
+            where: { id_task: taskId },
+        });
+        await this.templateAssignmentRepository.remove(prevAssignments);
+        // write new assignments
+        const entities = templateIds.map(
+            templateId => new TemplateAssignment({ id_task: taskId, id_template: templateId }),
+        );
+        await this.templateAssignmentRepository.save(entities);
+    }
+
+    async updateTemplateAssignment(
+        taskId: number,
+        templateId: number,
+        templateAssignmentDto: TemplateAssignmentDto,
+    ): Promise<void> {
+        await this.templateAssignmentRepository.update(
+            { id_task: taskId, id_template: templateId },
+            templateAssignmentDto,
+        );
     }
 
     private async appendMarketplaceIfExists(task: DeepPartial<Task>) {
@@ -373,6 +493,17 @@ export class TaskService {
             throw new AssetNotFoundException(`File "${document.filename}" Not Found`);
         }
         unlinkSync(pathToFile);
+    }
+
+    async addTaskStages(taskId: number, stageDtoArray: TaskStageDto[]) {
+        const stages = stageDtoArray.map(
+            taskStageDto =>
+                new TaskStage({
+                    ...taskStageDto,
+                    id_task: taskId,
+                }),
+        );
+        await this.taskStageRepository.save(stages);
     }
 
     getReportBuffer(report: TaskReportDto): Buffer {

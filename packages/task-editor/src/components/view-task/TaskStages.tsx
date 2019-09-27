@@ -41,34 +41,34 @@ export const TaskStages: React.FC<ITaskStepperProps> = props => {
                   [stages[stages.length - 1]]
                 : // last step + new editable
                   [stages[stages.length - 2], stages[stages.length - 1]]
-            ).map(stage => {
-                if (!stage) {
-                    return;
-                }
+            )
+                .filter(Boolean)
+                .map(stage => {
+                    const deadline = stage.deadline || "";
+                    const title = stage.title || "";
 
-                const deadline = stage.deadline || "";
-                const date = !stage.editable
-                    ? !_.isNaN(Date.parse(deadline))
-                        ? getFriendlyDate(new Date(deadline))
-                        : deadline
-                    : deadline;
-                const title = stage.title || "";
-
-                return (
-                    <TaskStage
-                        key={stage.id}
-                        id={stage.id}
-                        editable={!!stage.editable}
-                        completed={stage.finished}
-                        title={title}
-                        deadline={date}
-                        index={stage.__index}
-                        onChangeTitle={onChangeStageTitle}
-                        onChangeDeadline={onChangeStageDeadline}
-                        onDelete={onDeleteStage}
-                    />
-                );
-            })}
+                    return (
+                        <TaskStage
+                            key={stage.id}
+                            id={stage.id}
+                            editable={!!stage.editable}
+                            completed={stage.finished}
+                            createdAt={getFriendlyDate(new Date(stage.createdAt))}
+                            title={title}
+                            deadline={
+                                !stage.editable
+                                    ? !_.isNaN(Date.parse(deadline))
+                                        ? getFriendlyDate(new Date(deadline))
+                                        : deadline
+                                    : deadline
+                            }
+                            index={stage.__index}
+                            onChangeTitle={onChangeStageTitle}
+                            onChangeDeadline={onChangeStageDeadline}
+                            onDelete={onDeleteStage}
+                        />
+                    );
+                })}
         </Stepper>
     );
 };
@@ -79,6 +79,7 @@ export interface ITaskStageProps {
     id: number;
     title: string;
     deadline: string;
+    createdAt: string;
     completed: boolean;
     editable: boolean;
     index?: number;
@@ -101,6 +102,7 @@ export const TaskStage: React.FC<ITaskStageProps> = props => {
         onChangeDeadline,
         id,
         onDelete,
+        createdAt,
         ...rest
     } = props;
 
@@ -182,12 +184,23 @@ export const TaskStage: React.FC<ITaskStageProps> = props => {
                 )}
             </StepLabel>
             <StepContent>
-                <DateField
-                    value={stageDeadline}
-                    disabled={!editable}
-                    onChange={onChangeStageDeadline}
-                    onBlur={onBlurStageDeadlineCallback}
-                />
+                {!editable && (
+                    <Typography
+                        css={({ colors, fontSize }) => ({
+                            color: colors.gray,
+                            fontSize: fontSize.secondary,
+                        })}
+                    >
+                        {createdAt} - {deadline}
+                    </Typography>
+                )}
+                {editable && (
+                    <DateField
+                        value={stageDeadline}
+                        onChange={onChangeStageDeadline}
+                        onBlur={onBlurStageDeadlineCallback}
+                    />
+                )}
             </StepContent>
         </Step>
     );
