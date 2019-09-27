@@ -31,7 +31,7 @@ export function useConditions(
                 return {
                     id: uuid(),
                     order: 0,
-                    actionType: "",
+                    actionType: "" as EActionType,
                     questionPuzzle: "",
                     conditionType: EConditionType.OR,
                 };
@@ -59,7 +59,7 @@ export function useConditions(
             resetConditions(condition: ICondition): void {
                 condition.answerPuzzle = "";
                 condition.value = "";
-                condition.actionType = "";
+                condition.actionType = "" as EActionType;
             },
 
             filterConditions(virtualCondition: ICondition | null): ICondition[] {
