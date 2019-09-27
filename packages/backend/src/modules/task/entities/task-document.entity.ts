@@ -13,8 +13,8 @@ export class TaskDocument extends PrimaryBaseEntity<TaskDocument> {
     @Column()
     id_task: number;
 
-    @ManyToOne(() => Task, task => task.stages)
-    @JoinColumn({ name: "id_task", referencedColumnName: "id" })
+    @ManyToOne(() => Task, task => task.stages, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_task" })
     task: Task;
 
     @Column("varchar")

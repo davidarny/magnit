@@ -15,8 +15,8 @@ export class TaskStage extends PrimaryBaseEntity<TaskStage> {
     @Column()
     id_task: number;
 
-    @ManyToOne(() => Task, task => task.stages)
-    @JoinColumn({ name: "id_task", referencedColumnName: "id" })
+    @ManyToOne(() => Task, task => task.stages, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_task" })
     task: Task;
 
     @OneToMany(() => StageHistory, history => history.stage)

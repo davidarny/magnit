@@ -28,20 +28,20 @@ export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
     @PrimaryColumn()
     id_template: number;
 
-    @ManyToOne(() => Template, template => template.answers)
-    @JoinColumn({ name: "id_template", referencedColumnName: "id" })
+    @ManyToOne(() => Template, template => template.answers, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_template" })
     template: Template;
 
     @Index()
     @PrimaryColumn()
     id_task: number;
 
-    @ManyToOne(() => Task, task => task.answers)
-    @JoinColumn({ name: "id_task", referencedColumnName: "id" })
+    @ManyToOne(() => Task, task => task.answers, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_task" })
     task: Task;
 
-    @ManyToOne(() => TemplateAnswerLocation)
-    @JoinColumn({ name: "id_location", referencedColumnName: "id" })
+    @ManyToOne(() => TemplateAnswerLocation, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_location" })
     location: TemplateAnswerLocation;
 
     @Index()
