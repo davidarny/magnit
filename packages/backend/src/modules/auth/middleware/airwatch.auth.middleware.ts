@@ -22,7 +22,18 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
     async use(req: IAuthRequest, res: Response, next: () => void): Promise<void> {
         const authorization = req.header("Authorization");
         const token = req.header("X-Access-Token");
-        if (token) {
+        if (authorization) {
+            const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
+            req.user = await this.authService.validateUser(username, password);
+            if (!req.user) {
+                throw new UserUnauthorizedException("Cannot authorize user");
+            }
+            res.header("X-Access-Token", this.tokenManager.encode(req.user));
+            res.header("Access-Control-Expose-Headers", "X-Access-Token");
+            // try to get push tokens
+            await this.setPushTokenIfExists(req.user);
+            return next();
+        } else if (token) {
             try {
                 req.user = this.tokenManager.decode(token);
                 res.set("X-Access-Token", token);
@@ -36,17 +47,6 @@ export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Resp
                 }
                 throw new InvalidTokenException(message);
             }
-        } else if (authorization) {
-            const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
-            req.user = await this.authService.validateUser(username, password);
-            if (!req.user) {
-                throw new UserUnauthorizedException("Cannot authorize user");
-            }
-            res.header("X-Access-Token", this.tokenManager.encode(req.user));
-            res.header("Access-Control-Expose-Headers", "X-Access-Token");
-            // try to get push tokens
-            await this.setPushTokenIfExists(req.user);
-            return next();
         }
         res.set("WWW-Authenticate", "Basic");
         throw new UserUnauthorizedException("User unauthorized");
