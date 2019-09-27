@@ -44,7 +44,6 @@ import { TaskStageDto } from "./dto/task-stage.dto";
 import { TaskDto } from "./dto/task.dto";
 import { TemplateAssignmentDto } from "./dto/template-assignment.dto";
 import { TaskDocument } from "./entities/task-document.entity";
-import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
 import { CommentByIdPipe } from "./pipes/comment-by-id.pipe";
 import { DocumentByIdPipe } from "./pipes/document-by-id.pipe";
@@ -202,13 +201,7 @@ export class TaskController {
         @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
         @Body("stages") stageDtoArray: TaskStageDto[],
     ) {
-        const task = await this.taskService.findById(id, ["stages"]);
-        task.stages = [
-            ...task.stages,
-            // create stages from dto array
-            ...stageDtoArray.map(taskStageDto => new TaskStage({ ...taskStageDto })),
-        ];
-        await this.taskService.update(id, task);
+        await this.taskService.addTaskStages(id, stageDtoArray);
         return { success: 1 };
     }
 

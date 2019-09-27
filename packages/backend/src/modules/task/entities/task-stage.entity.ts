@@ -13,7 +13,7 @@ export class TaskStage extends PrimaryBaseEntity<TaskStage> {
 
     @Index()
     @Column()
-    id_task: string;
+    id_task: number;
 
     @ManyToOne(() => Task, task => task.stages)
     @JoinColumn({ name: "id_task", referencedColumnName: "id" })

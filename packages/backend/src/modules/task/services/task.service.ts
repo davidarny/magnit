@@ -20,6 +20,7 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { IPuzzle } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
+import { TaskStageDto } from "../dto/task-stage.dto";
 import { TaskDto } from "../dto/task.dto";
 import { TemplateAssignmentDto } from "../dto/template-assignment.dto";
 import { Comment } from "../entities/comment.entity";
@@ -492,6 +493,17 @@ export class TaskService {
             throw new AssetNotFoundException(`File "${document.filename}" Not Found`);
         }
         unlinkSync(pathToFile);
+    }
+
+    async addTaskStages(taskId: number, stageDtoArray: TaskStageDto[]) {
+        const stages = stageDtoArray.map(
+            taskStageDto =>
+                new TaskStage({
+                    ...taskStageDto,
+                    id_task: taskId,
+                }),
+        );
+        await this.taskStageRepository.save(stages);
     }
 
     getReportBuffer(report: TaskReportDto): Buffer {

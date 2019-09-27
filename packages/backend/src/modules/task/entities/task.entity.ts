@@ -56,7 +56,7 @@ export class Task extends PrimaryBaseEntity<Task> {
     @OneToMany(() => TemplateAnswer, answer => answer.task)
     answers: TemplateAnswer[];
 
-    @OneToMany(() => TaskStage, stage => stage.task, { cascade: true })
+    @OneToMany(() => TaskStage, stage => stage.task)
     stages: TaskStage[];
 
     @OneToMany(() => TaskDocument, document => document.task)
