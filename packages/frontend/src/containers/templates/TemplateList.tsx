@@ -1,19 +1,18 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Button, IColumn, InputField, TableWrapper } from "@magnit/components";
+import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect } from "@reach/router";
 import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
-import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTemplates } from "services/api/templates";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { deleteTemplate, getTemplates, ITemplateResponse } from "services/api/templates";
 
 const columns: IColumn[] = [
     { key: "title", label: "Название шаблона", sortable: true },
@@ -26,13 +25,13 @@ export const TemplateList: React.FC = () => {
     const context = useContext(AppContext);
 
     // table
-    const [rows, setRows] = useState<object[]>([]);
+    const [rows, setRows] = useState<ITemplateResponse[]>([]);
     const [page, setPage] = useState(0);
 
     // redirect to row
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
-    useEffect(() => {
+    const fetchTemplatesAndSetState = useCallback(() => {
         getTemplates(context.courier)
             .then(response => {
                 response.templates = response.templates.map(template => {
@@ -47,16 +46,50 @@ export const TemplateList: React.FC = () => {
             .catch(console.error);
     }, [context.courier]);
 
-    function onRowClick(row?: object) {
-        if (!_.isObject(row) || !_.has(row, "id")) {
+    useEffect(() => fetchTemplatesAndSetState(), [context.courier, fetchTemplatesAndSetState]);
+
+    function onRowClick(row?: ITableDataItem) {
+        if (!row) {
             return;
         }
-        setRedirect({ redirect: true, to: _.get(row, "id") });
+        setRedirect({ redirect: true, to: row.id });
     }
 
     function onChangePage(nextPage: number) {
         setPage(nextPage);
     }
+
+    const onDeleteTemplateCallback = useCallback(
+        (id: number) => {
+            deleteTemplate(context.courier, id)
+                .then(() => {
+                    fetchTemplatesAndSetState();
+                    context.setSnackbarState({ open: true, message: "Шаблон успешно удалён" });
+                })
+                .catch(() => {
+                    context.setSnackbarError(true);
+                    context.setSnackbarState({ open: true, message: "Не удалось удалить шаблон" });
+                });
+        },
+        [context, fetchTemplatesAndSetState],
+    );
+
+    const renderMenuItems = useCallback(
+        (row: ITableDataItem, onMenuClose: () => void) => {
+            function onDeleteClick(event: React.MouseEvent<HTMLLIElement>) {
+                event.stopPropagation();
+                onDeleteTemplateCallback(row.id);
+                onMenuClose();
+            }
+
+            return [
+                <MenuItem key={row.id} onClick={onDeleteClick}>
+                    Удалить
+                </MenuItem>,
+            ];
+        },
+        [onDeleteTemplateCallback],
+    );
 
     const empty = !rows.length;
 
@@ -133,6 +166,7 @@ export const TemplateList: React.FC = () => {
                                 <TableWrapper
                                     page={page}
                                     columns={columns}
+                                    renderMenuItems={renderMenuItems}
                                     data={rows}
                                     onRowClick={onRowClick}
                                     onChangePage={onChangePage}
