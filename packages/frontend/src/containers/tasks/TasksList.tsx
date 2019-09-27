@@ -157,6 +157,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             setPage(0);
             setOrder("asc");
             setOrderBy("");
+            // reset search query
+            setSearchQuery("");
+            setSelectedRegion("");
+            setSelectedCity("");
             // fetch tasks
             fetchTasksAndUpdateState();
             // fetch marketplaces
