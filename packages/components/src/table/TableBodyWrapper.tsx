@@ -5,7 +5,7 @@ import { IconButton, Menu, TableBody, TableCell, TableRow, Typography } from "@m
 import { MoreVert as MoreVertIcon } from "@material-ui/icons";
 import { Checkbox } from "checkbox";
 import * as _ from "lodash";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { IColumn, ITableDataItem } from "./TableWrapper";
 
 interface ITableBodyWrapperProps {
@@ -71,11 +71,20 @@ const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
     // dot menu
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
 
-    const onClickCallback = useCallback(() => {
-        if (onRowClick) {
-            onRowClick(value);
-        }
-    }, [value, onRowClick]);
+    const row = useRef<HTMLTableRowElement | null>(null);
+
+    const onClickCallback = useCallback(
+        (event: React.MouseEvent<HTMLTableRowElement>) => {
+            const target = event.target as Node;
+            if (!row.current || !row.current.contains(target)) {
+                return;
+            }
+            if (onRowClick) {
+                onRowClick(value);
+            }
+        },
+        [value, onRowClick],
+    );
 
     const onSelectedChange = useCallback(
         (event: unknown, checked: boolean) => {
@@ -97,7 +106,7 @@ const TableRowWrapper: React.FC<ITableRowWrapperProps> = props => {
 
     return (
         <React.Fragment>
-            <TableRow hover={hover} onClick={onClickCallback}>
+            <TableRow ref={row} hover={hover} onClick={onClickCallback}>
                 {columns.map((column: IColumn, index) => {
                     let label = _.get(value, column.key, null);
 
