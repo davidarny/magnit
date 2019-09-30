@@ -7,11 +7,13 @@ export interface IGetTasksResponse extends IResponse {
     tasks: IBaseTask[];
 }
 
+export type TTaskSortKeys = keyof IBaseTask | "";
+
 export async function getTasks(
     courier: ICourier,
     status?: ETaskStatus,
     sort?: "ASC" | "DESC",
-    sortBy?: keyof IBaseTask,
+    sortBy?: TTaskSortKeys,
     title?: string,
 ) {
     const query = {

@@ -2,6 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magnit/components";
+import { ITemplate } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
@@ -10,9 +11,15 @@ import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
+import _ from "lodash";
 import * as React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { deleteTemplate, getTemplates, ITemplateResponse } from "services/api/templates";
+import {
+    deleteTemplate,
+    getTemplates,
+    ITemplateResponse,
+    TTemplateSortKeys,
+} from "services/api/templates";
 
 const columns: IColumn[] = [
     { key: "title", label: "Название шаблона", sortable: true },
@@ -21,32 +28,61 @@ const columns: IColumn[] = [
     { key: "updatedAt", label: "Дата редактирования", sortable: true },
 ];
 
+interface IUpdateTemplateListOptions {
+    sort?: "asc" | "desc";
+    sortBy?: TTemplateSortKeys;
+    title?: string;
+}
+
 export const TemplateList: React.FC = () => {
     const context = useContext(AppContext);
 
+    // full text search
+    const [searchQuery, setSearchQuery] = useState("");
+
     // table
+    const [total, setTotal] = useState(0);
     const [rows, setRows] = useState<ITemplateResponse[]>([]);
     const [page, setPage] = useState(0);
+    const [order, setOrder] = useState<"asc" | "desc">("asc");
+    const [orderBy, setOrderBy] = useState<TTemplateSortKeys>("");
 
     // redirect to row
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
-    const fetchTemplatesAndSetState = useCallback(() => {
-        getTemplates(context.courier)
-            .then(response => {
-                response.templates = response.templates.map(template => {
-                    return {
-                        ...template,
-                        createdAt: getFriendlyDate(new Date(template.createdAt!), true),
-                        updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
-                    };
-                });
-                setRows(response.templates);
-            })
-            .catch(console.error);
-    }, [context.courier]);
+    const fetchTemplatesAndSetState = useCallback(
+        ({ title, sort, sortBy }: IUpdateTemplateListOptions = {}) => {
+            // filtered
+            const upperCaseSort = (sort || "ASC").toUpperCase() as "ASC" | "DESC";
+            getTemplates(context.courier, title, upperCaseSort, sortBy)
+                .then(response =>
+                    setRows(
+                        response.templates.map(template => ({
+                            ...template,
+                            createdAt: getFriendlyDate(new Date(template.createdAt!), true),
+                            updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
+                        })),
+                    ),
+                )
+                .catch(console.error);
+            // all
+            getTemplates(context.courier)
+                .then(response => setTotal(response.templates.length))
+                .catch(console.error);
+        },
+        [context.courier],
+    );
 
-    useEffect(() => fetchTemplatesAndSetState(), [context.courier, fetchTemplatesAndSetState]);
+    useEffect(() => {
+        // reset table
+        setPage(0);
+        setOrder("asc");
+        setOrderBy("");
+        // reset search query
+        setSearchQuery("");
+        // fetch templates
+        fetchTemplatesAndSetState();
+    }, [context.courier, fetchTemplatesAndSetState]);
 
     function onRowClick(row?: ITableDataItem) {
         if (!row) {
@@ -91,7 +127,31 @@ export const TemplateList: React.FC = () => {
         [onDeleteTemplateCallback],
     );
 
-    const empty = !rows.length;
+    const updateTemplateListDebounced = _.debounce(fetchTemplatesAndSetState, 150);
+
+    const onSearchQueryChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setSearchQuery(value);
+            updateTemplateListDebounced({
+                title: value,
+                sort: order,
+                sortBy: orderBy,
+            });
+        },
+        [order, orderBy, updateTemplateListDebounced],
+    );
+
+    const onRequestSortCallback = useCallback(
+        (sort: "asc" | "desc", sortBy: keyof ITemplate) => {
+            setOrder(sort);
+            setOrderBy(sortBy);
+            fetchTemplatesAndSetState({ title: searchQuery, sort, sortBy });
+        },
+        [fetchTemplatesAndSetState, searchQuery],
+    );
+
+    const empty = !total;
 
     return (
         <SectionLayout>
@@ -143,8 +203,10 @@ export const TemplateList: React.FC = () => {
                                     css={theme => ({ padding: `0 ${theme.spacing(6)} !important` })}
                                 >
                                     <InputField
+                                        value={searchQuery}
                                         placeholder="Поиск ..."
                                         fullWidth
+                                        onChange={onSearchQueryChangeCallback}
                                         css={({ colors, radius, spacing }) => ({
                                             borderRadius: radius(5),
                                             background: colors.white,
@@ -165,6 +227,9 @@ export const TemplateList: React.FC = () => {
                             <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                 <TableWrapper
                                     page={page}
+                                    order={order}
+                                    orderBy={orderBy}
+                                    onRequestSort={onRequestSortCallback}
                                     columns={columns}
                                     renderMenuItems={renderMenuItems}
                                     data={rows}

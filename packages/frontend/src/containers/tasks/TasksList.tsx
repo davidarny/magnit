@@ -29,6 +29,7 @@ import {
     getTasks,
     getTasksExtended,
     IExtendedTask,
+    TExtendedTaskSortKeys,
     updateTask,
 } from "services/api";
 
@@ -55,7 +56,7 @@ type TTask = IExtendedTask & { selected: boolean };
 
 interface IUpdateTaskListOptions {
     sort?: "asc" | "desc";
-    sortBy?: keyof Omit<TTask, "selected">;
+    sortBy?: TExtendedTaskSortKeys;
     title?: string;
     region?: string;
     city?: string;
@@ -91,7 +92,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
     // table
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
-    const [orderBy, setOrderBy] = useState("");
+    const [orderBy, setOrderBy] = useState<TExtendedTaskSortKeys>("");
 
     const fetchRegionsAndUpdateState = useCallback(() => {
         getAllRegions(context.courier)
@@ -159,6 +160,7 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             setOrderBy("");
             // reset search query
             setSearchQuery("");
+            // reset selected state
             setSelectedRegion("");
             setSelectedCity("");
             // fetch tasks
@@ -281,18 +283,26 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                 title: value,
                 region: selectedRegion,
                 city: selectedCity,
+                sortBy: orderBy,
+                sort: order,
             });
         },
-        [selectedCity, selectedRegion, updateTaskListDebounced],
+        [order, orderBy, selectedCity, selectedRegion, updateTaskListDebounced],
     );
 
     const onRequestSortCallback = useCallback(
-        (sort: "asc" | "desc", sortBy: keyof Omit<TTask, "selected">) => {
+        (sort: "asc" | "desc", sortBy: TExtendedTaskSortKeys) => {
             setOrder(sort);
             setOrderBy(sortBy);
-            fetchTasksAndUpdateState({ sort, sortBy });
+            fetchTasksAndUpdateState({
+                title: searchQuery,
+                region: selectedRegion,
+                city: selectedCity,
+                sortBy,
+                sort,
+            });
         },
-        [fetchTasksAndUpdateState],
+        [fetchTasksAndUpdateState, searchQuery, selectedCity, selectedRegion],
     );
 
     function onDialogOpen() {
@@ -311,9 +321,11 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             updateTaskListDebounced({
                 title: searchQuery,
                 region: value,
+                sort: order,
+                sortBy: orderBy,
             });
         },
-        [searchQuery, updateTaskListDebounced],
+        [order, orderBy, searchQuery, updateTaskListDebounced],
     );
 
     const onCityChangeCallback = useCallback(
@@ -324,9 +336,11 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                 title: searchQuery,
                 region: selectedRegion,
                 city: value,
+                sort: order,
+                sortBy: orderBy,
             });
         },
-        [searchQuery, selectedRegion, updateTaskListDebounced],
+        [order, orderBy, searchQuery, selectedRegion, updateTaskListDebounced],
     );
 
     function onChangePage(nextPage: number) {

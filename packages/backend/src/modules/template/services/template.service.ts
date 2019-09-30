@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as _ from "lodash";
-import { FindManyOptions, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { CannotInsertTemplateException } from "../../../shared/exceptions/cannot-insert-template.exception";
 import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-found.exception";
+import { TemplateDto } from "../dto/template.dto";
 import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
@@ -27,25 +28,43 @@ export class TemplateService {
         });
     }
 
-    async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
-        // TODO: probably need to introduce FindOptionsBuilder
-        const options: FindManyOptions<Template> = {};
-        if (typeof offset !== "undefined") {
-            options.skip = offset;
+    async findAll(
+        offset?: number,
+        limit?: number,
+        sortBy?: keyof TemplateDto,
+        sort?: "ASC" | "DESC",
+        title?: string,
+    ) {
+        let sql = `
+            SELECT
+                t.id,
+                t.title,
+                t.description,
+                t.sections,
+                t.type,
+                t.version,
+                t.created_at,
+                t.updated_at
+            FROM template t
+            WHERE 1 = 1
+        `;
+        const params: Array<string | number> = [];
+        if (!_.isNil(title)) {
+            params.push(`%${title.toLowerCase()}%`);
+            sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (typeof limit !== "undefined") {
-            options.take = limit;
+        if (!_.isNil(sort)) {
+            sql += ` ORDER BY t.${sortBy || "title"} ${sort} `;
         }
-        if (sort) {
-            options.order = { title: sort };
+        if (!_.isNil(limit)) {
+            params.push(limit);
+            sql += ` LIMIT $${params.length} `;
         }
-        if (title) {
-            if (!options.where) {
-                options.where = {};
-            }
-            Object.assign(options.where, { title });
+        if (!_.isNil(offset)) {
+            params.push(offset);
+            sql += ` OFFSET $${params.length} `;
         }
-        return this.templateRepository.find(options);
+        return this.templateRepository.query(sql, params);
     }
 
     // TODO: remove this one and handle 404 more accurately

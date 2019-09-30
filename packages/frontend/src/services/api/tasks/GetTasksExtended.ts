@@ -18,11 +18,13 @@ export interface IGetTasksExtendedResponse extends IResponse {
     tasks: IExtendedTask[];
 }
 
+export type TExtendedTaskSortKeys = keyof IExtendedTask | "";
+
 export async function getTasksExtended(
     courier: ICourier,
     status?: ETaskStatus,
     sort?: "ASC" | "DESC",
-    sortBy?: keyof IExtendedTask,
+    sortBy?: TExtendedTaskSortKeys,
     title?: string,
     region?: string,
     city?: string,
