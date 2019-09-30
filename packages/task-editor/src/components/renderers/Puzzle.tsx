@@ -10,11 +10,11 @@ import { getPuzzleFactory } from "services/item";
 interface IPuzzleRendererProps {
     puzzle: IPuzzle;
     last?: boolean;
-    answer?: IAnswer;
+    answers: IAnswer[];
 }
 
 export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
-    const { puzzle, last = false, answer } = props;
+    const { puzzle, last = false, answers } = props;
 
     return (
         <Grid
@@ -47,11 +47,13 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
                                 border: `2px solid ${theme.colors.primary}`,
                                 zIndex: 2,
                                 position: "relative",
-                                background: answer ? theme.colors.primary : theme.colors.white,
-                                color: answer ? theme.colors.white : "initial",
+                                background: answers.length
+                                    ? theme.colors.primary
+                                    : theme.colors.white,
+                                color: answers.length ? theme.colors.white : "initial",
                             })}
                         >
-                            {answer && <CheckIcon />}
+                            {!!answers.length && <CheckIcon />}
                         </div>
                     </Grid>
                     <Grid item>
@@ -68,32 +70,28 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
             </Grid>
             <Grid item css={theme => ({ marginLeft: theme.spacing(5) })}>
                 <Grid container direction="column" spacing={1}>
-                    {(puzzle.puzzles || [])
-                        .filter(puzzle =>
-                            // when answer exists ...
-                            answer
-                                ? // ... filter only those which have answer ...
-                                  answer.answerType === EPuzzleType.RADIO_ANSWER ||
-                                  answer.answerType === EPuzzleType.CHECKBOX_ANSWER ||
-                                  answer.answerType === EPuzzleType.DROPDOWN_ANSWER
-                                    ? answer.answer === puzzle.id
-                                    : true
-                                : // ... or just render
-                                  true,
-                        )
-                        .map((puzzle, index) => {
-                            let answerType: EPuzzleType | null = null;
-                            if (answer) {
-                                answerType = answer.answerType;
-                            } else {
-                                answerType = puzzle.puzzleType;
-                            }
-                            console.log("answer", answer, puzzle, answerType);
-                            if (!answerType) {
+                    {answers
+                        .map((answer, index) => {
+                            const isAnswerPuzzle = (puzzle: IPuzzle) => {
+                                switch (answer.answerType) {
+                                    case EPuzzleType.CHECKBOX_ANSWER:
+                                    case EPuzzleType.DROPDOWN_ANSWER:
+                                    case EPuzzleType.RADIO_ANSWER:
+                                        return answer.answer === puzzle.id;
+                                    default:
+                                        return true;
+                                }
+                            };
+                            const answerPuzzle = puzzle.puzzles.find(isAnswerPuzzle);
+                            if (!answerPuzzle) {
                                 return null;
                             }
-                            const factory = getPuzzleFactory(answerType);
-                            return factory.create({ index, puzzle, answer });
+                            const factory = getPuzzleFactory(answer.answerType);
+                            return factory.create({
+                                index,
+                                puzzle: answerPuzzle,
+                                answer,
+                            });
                         })
                         .filter(Boolean)}
                 </Grid>

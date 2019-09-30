@@ -5,7 +5,6 @@ import { EPuzzleType, IAnswer, IPuzzle } from "@magnit/entities";
 import {
     CheckboxAnswerFactory,
     DropdownAnswerFactory,
-    NumericAnswerFactory,
     RadioAnswerFactory,
     TextAnswerFactory,
 } from "puzzles";
@@ -36,9 +35,9 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
         case EPuzzleType.DROPDOWN_ANSWER:
             return new DropdownAnswerFactory();
         case EPuzzleType.TEXT_ANSWER:
-            return new TextAnswerFactory();
         case EPuzzleType.NUMERIC_ANSWER:
-            return new NumericAnswerFactory();
+        case EPuzzleType.DATE_ANSWER:
+            return new TextAnswerFactory();
         default:
             return new DefaultFactory();
     }

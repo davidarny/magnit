@@ -71,12 +71,11 @@ export const SectionRenderer: React.FC<ISectionRendererProps> = ({ index, sectio
                         }, [])
                         .map((puzzle, index, array) => {
                             const last = index === array.length - 1;
-                            const answer = (answers || []).find(
-                                answer => answer.idPuzzle === puzzle.id,
-                            );
+                            const isAnswerOfPuzzle = (answer: IAnswer) =>
+                                answer.idPuzzle === puzzle.id;
                             return (
                                 <PuzzleRenderer
-                                    answer={answer}
+                                    answers={(answers || []).filter(isAnswerOfPuzzle)}
                                     key={puzzle.id}
                                     puzzle={puzzle}
                                     last={last}
