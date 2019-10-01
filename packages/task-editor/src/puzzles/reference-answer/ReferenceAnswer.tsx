@@ -27,13 +27,12 @@ export const ReferenceAnswer: React.FC<IPuzzleProps> = props => {
                 <Grid
                     item
                     xs={12}
-                    css={theme => ({
-                        marginBottom: theme.spacing(),
+                    css={{
                         div: {
                             ":before": { content: "none" },
                             ":after": { content: "none" },
                         },
-                    })}
+                    }}
                 >
                     {text && (
                         <TextField
@@ -49,7 +48,7 @@ export const ReferenceAnswer: React.FC<IPuzzleProps> = props => {
                         css={theme => ({ fontSize: theme.fontSize.normal })}
                         onClick={onOpenClick}
                     >
-                        {assets.length} файла
+                        {assets.length} файл(a)
                         <ArrowDropDown
                             css={theme => ({
                                 transform: open ? "rotate(-180deg)" : "none",

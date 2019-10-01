@@ -8,6 +8,7 @@ import {
     RadioAnswerFactory,
     ReferenceAnswerFactory,
     TextAnswerFactory,
+    UploadFilesFactory,
 } from "puzzles";
 import * as React from "react";
 
@@ -41,6 +42,8 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
             return new TextAnswerFactory();
         case EPuzzleType.REFERENCE_ANSWER:
             return new ReferenceAnswerFactory();
+        case EPuzzleType.UPLOAD_FILES:
+            return new UploadFilesFactory();
         default:
             return new DefaultFactory();
     }
