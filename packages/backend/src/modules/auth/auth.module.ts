@@ -13,15 +13,7 @@ import { AuthMiddleware } from "./middleware/auth.middleware";
 import { UserByEmailPipe } from "./pipes/user-by-email.pipes";
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([User, UserRole]),
-        UserModule,
-        PushTokenModule,
-        HttpModule.register({
-            timeout: Number(process.env.HTTP_TIMEOUT),
-            maxRedirects: Number(process.env.HTTP_MAX_REDIRECTS),
-        }),
-    ],
+    imports: [TypeOrmModule.forFeature([User, UserRole]), UserModule, PushTokenModule],
     controllers: [AuthController],
     providers: [AuthService, JWTTokenManager, PasswordManager],
 })

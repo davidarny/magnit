@@ -4,7 +4,7 @@ import { AuthController } from "../auth.controller";
 import { createMockFrom } from "../../../utils/create-mock.util";
 import { UserService } from "../../user/services/user.service";
 import { AuthService } from "../services/auth.service";
-import { CreateUserDTO } from "../dto/create-user.dto";
+import { CreateUserDto } from "../dto/create-user.dto";
 import { User } from "../entities/user.entity";
 
 describe("Auth Controller", () => {

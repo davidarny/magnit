@@ -1,12 +1,11 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { Controller, Body, Post, Request, Inject, UsePipes } from "@nestjs/common";
-import { CreateUserDTO } from "./dto/create-user.dto";
-import { LoginUserDTO } from "./dto/login-user.dto";
-import { User } from "./entities/user.entity";
+import { Controller, Body, Post, Inject, UsePipes } from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { LoginUserDto } from "./dto/login-user.dto";
 import { AuthService } from "./services/auth.service";
-import { ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { ValidationPipe } from "../../shared/pipes/validation.pipe";
 import { AuthResponse } from "./responses/user-register.response";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 // import { try } from "bluebird";
 
 @ApiUseTags("auth")
@@ -15,21 +14,17 @@ export class AuthController {
     constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
     @Post("/register")
-    @ApiImplicitBody({ name: "user", type: CreateUserDTO, description: "User info" })
+    @Transactional()
+    @UsePipes(ValidationPipe)
     @ApiOkResponse({ type: AuthResponse, description: "Register user" })
-    async register(@Body(new ValidationPipe()) userInfo: CreateUserDTO) {
-        let user = new User(userInfo);
-        const savedUser = await this.authService.createUser(user);
-        const token = this.authService.getTokenFor(savedUser);
-        return { success: 1, token: token, id: savedUser.id };
+    async register(@Body() userInfo: CreateUserDto) {
+        return this.authService.register(userInfo);
     }
 
     @Post("/login")
-    @UsePipes(ValidationPipe)
-    @ApiOkResponse({ type: AuthResponse, description: "Register user" })
-    async login(@Body() loginUserDTO: LoginUserDTO) {
-        const user = await this.authService.validateUser(loginUserDTO.email, loginUserDTO.password);
-        const token = this.authService.getTokenFor(user);
-        return { success: 1, token: token, id: user.id };
+    @Transactional()
+    @ApiOkResponse({ type: AuthResponse, description: "Login user" })
+    async login(@Body() loginUserDto: LoginUserDto) {
+        return this.authService.login(loginUserDto);
     }
 }

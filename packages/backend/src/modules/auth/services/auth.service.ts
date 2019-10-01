@@ -1,6 +1,8 @@
 import { Injectable, Inject } from "@nestjs/common";
 
 import { User } from "../entities/user.entity";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { LoginUserDto } from "../dto/login-user.dto";
 import { UserService } from "../../user/services/user.service";
 import { PasswordManager } from "../providers/password.manager";
 import { JWTTokenManager } from "../providers/jwt.token.manager";
@@ -29,7 +31,20 @@ export class AuthService {
         throw new UserUnauthorizedException("Cannot authorize user");
     }
 
-    async createUser(user: User) {
+    async register(userDTO: CreateUserDto) {
+        const user = new User(userDTO);
+        const token = this.getTokenFor(user);
+        const savedUser = await this.createUser(user);
+        return { success: 1, id: savedUser.id, token: token };
+    }
+
+    async login(loginUserDto: LoginUserDto) {
+        const user = await this.validateUser(loginUserDto.email, loginUserDto.password);
+        const token = this.getTokenFor(user);
+        return { success: 1, id: user.id, token: token };
+    }
+
+    private async createUser(user: User) {
         const crypthPassword = this.passwordManager.encode(user.password);
         const existUser = await this.userService.findOneByEmail(user.email);
 
@@ -41,10 +56,11 @@ export class AuthService {
         return this.userService.create(user);
     }
 
-    getTokenFor(user: User): string {
+    private getTokenFor(user: User): string {
         const payload = {
             email: user.email,
             id: user.id,
+            id_role: user.id_role,
         };
         return this.tokenManager.encode(payload);
     }
