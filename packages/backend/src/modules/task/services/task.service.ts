@@ -292,10 +292,12 @@ export class TaskService {
         const prevAssignments = await this.templateAssignmentRepository.find({
             where: { id_task: taskId },
         });
-        const prevComments = await this.commentRepository.find({
-            where: { id_assignment: In(prevAssignments.map(assignment => assignment.id)) },
-            relations: ["assignment"],
-        });
+        const prevComments = prevAssignments.length
+            ? await this.commentRepository.find({
+                  where: { id_assignment: In(prevAssignments.map(assignment => assignment.id)) },
+                  relations: ["assignment"],
+              })
+            : [];
         const nextAssignments = templateIds.map(
             templateId => new TemplateAssignment({ id_task: taskId, id_template: templateId }),
         );
