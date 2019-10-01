@@ -201,23 +201,39 @@ export class TaskService {
         return _.first(ids).id;
     }
 
-    async findById(id: number, relations: string[] = []) {
-        return this.taskRepository.findOne({ where: { id }, relations });
+    async findById(id: number) {
+        const tasks = await this.taskRepository.query(
+            `
+                SELECT t.*,
+                       to_json(m.*) AS marketplace,
+                       to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages
+                FROM task t
+                LEFT JOIN task_stage ts ON ts.id_task = t.id AND ts.id_task = $1
+                LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                WHERE t.id = $1
+                GROUP BY t.id, m.*;
+        `,
+            [id],
+        );
+        const task = _.first<Task>(tasks);
+        if (!task) {
+            throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
+        }
+        return { ...task };
     }
 
     @Transactional()
     async findByIdWithTemplatesAndStages(id: number) {
-        const task = await this.findById(id, ["stages"]);
+        const task = await this.findById(id);
         const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
         return {
             ...task,
             templates: (templates || []).map(template => template.id),
-            stages: (task.stages || []).map(stage => stage.id),
         };
     }
 
     @Transactional()
-    async getTaskExtended(id: number) {
+    async findByIdExtended(id: number) {
         const tasks = await this.taskRepository.query(
             `
                 SELECT t.*,

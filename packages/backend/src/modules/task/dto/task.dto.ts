@@ -21,11 +21,9 @@ export class TaskDto<T = TaskDto<object>> extends PrimaryBaseDto<T> {
 
 export class FullTaskDto extends TaskDto<FullTaskDto> {
     @ApiModelProperty({ type: [Number] }) readonly templates: number[];
-    @ApiModelProperty({ type: [Number] }) readonly stages: number[];
     @ApiModelProperty({ type: [Number] }) readonly documents: number[];
-    @ApiModelPropertyOptional({ description: "Marketplace ID" }) readonly marketplace:
-        | number
-        | null;
+    @ApiModelProperty({ type: [TaskStageDto] }) readonly stages: TaskStageDto[];
+    @ApiModelPropertyOptional({ type: MarketplaceDto }) readonly marketplace: MarketplaceDto | null;
 }
 
 class ExtendedTemplateDto extends TemplateDto<ExtendedTemplateDto> {

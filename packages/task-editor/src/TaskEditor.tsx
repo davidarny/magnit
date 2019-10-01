@@ -393,7 +393,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                   ]
                 : []),
             // show trash button if not focused on head or on document
-            ...(!focusedOnTaskHead && !focusedOnDocument
+            ...(!focusedOnTaskHead && (editable || !focusedOnDocument)
                 ? [
                       {
                           label: "Удалить шаблон",
@@ -404,6 +404,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 : []),
         ],
         [
+            editable,
             focusedOnDocument,
             focusedOnTaskHead,
             onAddCommentClick,

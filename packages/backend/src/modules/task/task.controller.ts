@@ -217,7 +217,7 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findByIdExtended(@Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number) {
-        const task = await this.taskService.getTaskExtended(id);
+        const task = await this.taskService.findByIdExtended(id);
         return { success: 1, task };
     }
 
