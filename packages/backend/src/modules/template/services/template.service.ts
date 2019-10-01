@@ -193,17 +193,6 @@ export class TemplateService {
         return result;
     }
 
-    async findAllQuestions(template: Template): Promise<IPuzzle[]> {
-        const puzzles: IPuzzle[] = [];
-        await this.traverse(template.sections as object[], value => {
-            if (this.isPuzzle(value) && value.puzzle_type === "question") {
-                puzzles.push(value);
-            }
-            return false;
-        });
-        return puzzles;
-    }
-
     private isPuzzle(value: object): value is IPuzzle {
         return _.has(value, "id") && _.has(value, "puzzles");
     }

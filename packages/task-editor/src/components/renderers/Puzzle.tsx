@@ -2,8 +2,9 @@
 
 import { jsx } from "@emotion/core";
 import { EPuzzleType, IAnswer, IPuzzle } from "@magnit/entities";
-import { CheckIcon } from "@magnit/icons";
+import { CheckIcon, InfoIcon } from "@magnit/icons";
 import { Grid, Typography } from "@material-ui/core";
+import _ from "lodash";
 import * as React from "react";
 import { getPuzzleFactory } from "services/item";
 
@@ -15,6 +16,10 @@ interface IPuzzleRendererProps {
 
 export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
     const { puzzle, last = false, answers } = props;
+
+    const isReferenceAnswer = puzzle.puzzles.some(
+        child => child.puzzleType === EPuzzleType.REFERENCE_ANSWER,
+    );
 
     return (
         <Grid
@@ -50,10 +55,15 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
                                 background: answers.length
                                     ? theme.colors.primary
                                     : theme.colors.white,
-                                color: answers.length ? theme.colors.white : "initial",
+                                color: isReferenceAnswer
+                                    ? theme.colors.primary
+                                    : answers.length
+                                    ? theme.colors.white
+                                    : "initial",
                             })}
                         >
                             {!!answers.length && <CheckIcon />}
+                            {isReferenceAnswer && <InfoIcon />}
                         </div>
                     </Grid>
                     <Grid item>
@@ -70,13 +80,31 @@ export const PuzzleRenderer: React.FC<IPuzzleRendererProps> = props => {
             </Grid>
             <Grid item css={theme => ({ marginLeft: theme.spacing(5) })}>
                 <Grid container direction="column" spacing={1}>
-                    {answers
+                    {[
+                        ...answers,
+                        // stub answer needed for REFERENCE_ANSWER rendering
+                        ...(isReferenceAnswer
+                            ? [
+                                  {
+                                      id: 0,
+                                      idTask: 0,
+                                      idTemplate: 0,
+                                      idPuzzle: puzzle.id,
+                                      answer: _.first(puzzle.puzzles)!.id,
+                                      answerType: EPuzzleType.REFERENCE_ANSWER,
+                                      createdAt: new Date().toISOString(),
+                                      updatedAt: new Date().toISOString(),
+                                  },
+                              ]
+                            : []),
+                    ]
                         .map((answer, index) => {
                             const isAnswerPuzzle = (puzzle: IPuzzle) => {
                                 switch (answer.answerType) {
                                     case EPuzzleType.CHECKBOX_ANSWER:
                                     case EPuzzleType.DROPDOWN_ANSWER:
                                     case EPuzzleType.RADIO_ANSWER:
+                                    case EPuzzleType.REFERENCE_ANSWER:
                                         return answer.answer === puzzle.id;
                                     default:
                                         return true;

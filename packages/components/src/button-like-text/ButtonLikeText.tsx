@@ -1,9 +1,9 @@
 /** @jsx jsx */
 
-import { Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import * as React from "react";
+import { Typography } from "@material-ui/core";
 import { Link } from "@reach/router";
+import * as React from "react";
 
 interface IButtonLikeTextProps {
     component?: React.ReactNode;
@@ -20,6 +20,7 @@ export const ButtonLikeText: React.FC<TButtonLikeTextProps> = ({ children, ...pr
         <Typography
             component={props.component || "span"}
             css={theme => ({
+                userSelect: "none",
                 display: "inline-block",
                 color: theme.colors.primary,
                 fontSize: theme.fontSize.sNormal,

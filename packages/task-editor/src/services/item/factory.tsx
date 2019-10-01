@@ -6,6 +6,7 @@ import {
     CheckboxAnswerFactory,
     DropdownAnswerFactory,
     RadioAnswerFactory,
+    ReferenceAnswerFactory,
     TextAnswerFactory,
 } from "puzzles";
 import * as React from "react";
@@ -38,6 +39,8 @@ export function getPuzzleFactory(type: EPuzzleType): IPuzzleFactory {
         case EPuzzleType.NUMERIC_ANSWER:
         case EPuzzleType.DATE_ANSWER:
             return new TextAnswerFactory();
+        case EPuzzleType.REFERENCE_ANSWER:
+            return new ReferenceAnswerFactory();
         default:
             return new DefaultFactory();
     }

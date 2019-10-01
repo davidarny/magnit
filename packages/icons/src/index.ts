@@ -22,3 +22,4 @@ export * from "./ReferenceFieldIcon";
 export * from "./TextFieldIcon";
 export * from "./UploadFilesIcon";
 export * from "./ReturnIcon";
+export * from "./InfoIcon";

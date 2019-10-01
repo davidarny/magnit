@@ -2,14 +2,13 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { existsSync, unlinkSync } from "fs";
 import * as _ from "lodash";
-import { DeepPartial, Repository } from "typeorm";
+import { DeepPartial, In, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import * as XLSX from "xlsx";
 import { AssetNotFoundException } from "../../../shared/exceptions/asset-not-found.exception";
 import { CannotParseLocationException } from "../../../shared/exceptions/cannot-prase-location.location";
 import { CannotSaveAnswersException } from "../../../shared/exceptions/cannot-save-answers.exception";
 import { CannotSaveDuplicateAnswerException } from "../../../shared/exceptions/cannot-save-duplicate-answer.exception";
-import { CannotSavePartialAnswersException } from "../../../shared/exceptions/cannot-save.partial-answers.exception";
 import { InvalidTaskStatusException } from "../../../shared/exceptions/invalid-task-status.exception";
 import { LocationNotFoundInBodyException } from "../../../shared/exceptions/location-not-found-in-body.exception";
 import { TemplateNotFoundException } from "../../../shared/exceptions/template-not-found.exception";
@@ -274,16 +273,39 @@ export class TaskService {
 
     @Transactional()
     async setTemplateAssignments(taskId: number, templateIds: number[]): Promise<void> {
-        // remove previous assignments
         const prevAssignments = await this.templateAssignmentRepository.find({
             where: { id_task: taskId },
         });
-        await this.templateAssignmentRepository.remove(prevAssignments);
-        // write new assignments
-        const entities = templateIds.map(
+        const prevComments = await this.commentRepository.find({
+            where: { id_assignment: In(prevAssignments.map(assignment => assignment.id)) },
+            relations: ["assignment"],
+        });
+        const nextAssignments = templateIds.map(
             templateId => new TemplateAssignment({ id_task: taskId, id_template: templateId }),
         );
-        await this.templateAssignmentRepository.save(entities);
+        await this.templateAssignmentRepository.save(nextAssignments);
+        const nextComments = prevComments
+            .filter(comment =>
+                nextAssignments.some(
+                    assignment =>
+                        assignment.id_task === comment.assignment.id_task &&
+                        assignment.id_template === comment.assignment.id_template,
+                ),
+            )
+            .map(comment => {
+                const commentAssignment = nextAssignments.find(
+                    assignment =>
+                        assignment.id_task === comment.assignment.id_task &&
+                        assignment.id_template === comment.assignment.id_template,
+                );
+                return new Comment({
+                    id_user: comment.id_user,
+                    id_assignment: commentAssignment.id,
+                    text: comment.text,
+                });
+            });
+        await this.commentRepository.save(nextComments);
+        await this.templateAssignmentRepository.remove(prevAssignments);
     }
 
     async updateTemplateAssignment(
@@ -295,21 +317,6 @@ export class TaskService {
             { id_task: taskId, id_template: templateId },
             templateAssignmentDto,
         );
-    }
-
-    private async appendMarketplaceIfExists(task: DeepPartial<Task>) {
-        if (task.marketplace) {
-            const { city, region, address, format } = task.marketplace;
-            const marketplace = await this.marketplaceService.findByPrimaries(
-                region,
-                city,
-                format,
-                address,
-            );
-            if (marketplace) {
-                task.marketplace = marketplace;
-            }
-        }
     }
 
     @Transactional()
@@ -364,15 +371,6 @@ export class TaskService {
                         template,
                         puzzleIds,
                     );
-                    // TODO: correctly handle questions check
-                    if (false) {
-                        const allPuzzles = await this.templateService.findAllQuestions(template);
-                        if (allPuzzles.length !== puzzleIds.length) {
-                            throw new CannotSavePartialAnswersException(
-                                "Cannot save answers partially",
-                            );
-                        }
-                    }
                     // collect answers
                     const answers = templatePuzzleIds
                         .map(templatePuzzleId => {
@@ -527,6 +525,62 @@ export class TaskService {
         return XLSX.write(wb, { type: "buffer" });
     }
 
+    async setAllAssignmentsNonEditable(id: number): Promise<void> {
+        const assignments = await this.templateAssignmentRepository.find({
+            where: { id_task: id },
+        });
+        assignments.forEach(assignment => (assignment.editable = false));
+        await this.templateAssignmentRepository.save(assignments);
+    }
+
+    async findActiveStage(id: number): Promise<TaskStage | undefined> {
+        return this.taskStageRepository.findOne({
+            where: { id_task: id, finished: false },
+            order: { created_at: "ASC" },
+        });
+    }
+
+    @Transactional()
+    async addCommentToAssignment(
+        taskId: number,
+        templateId: number,
+        userId: string,
+        text: string,
+    ): Promise<void> {
+        const assignment = await this.templateAssignmentRepository.findOne({
+            where: { id_task: taskId, id_template: templateId },
+        });
+        const comment = new Comment({
+            assignment,
+            id_user: userId,
+            text,
+        });
+        await this.commentRepository.save(comment);
+    }
+
+    async removeAssignmentComment(commentId: number): Promise<void> {
+        await this.commentRepository.delete(commentId);
+    }
+
+    async commentExists(commentId: number): Promise<boolean> {
+        return !!(await this.commentRepository.findOne(commentId));
+    }
+
+    private async appendMarketplaceIfExists(task: DeepPartial<Task>) {
+        if (task.marketplace) {
+            const { city, region, address, format } = task.marketplace;
+            const marketplace = await this.marketplaceService.findByPrimaries(
+                region,
+                city,
+                format,
+                address,
+            );
+            if (marketplace) {
+                task.marketplace = marketplace;
+            }
+        }
+    }
+
     private getFileName(
         files?: Express.Multer.File[],
         templatePuzzleId?: string,
@@ -587,46 +641,5 @@ export class TaskService {
             }
             return [...prev, predicate(curr)];
         }, []);
-    }
-
-    async setAllAssignmentsNonEditable(id: number): Promise<void> {
-        const assignments = await this.templateAssignmentRepository.find({
-            where: { id_task: id },
-        });
-        assignments.forEach(assignment => (assignment.editable = false));
-        await this.templateAssignmentRepository.save(assignments);
-    }
-
-    async findActiveStage(id: number): Promise<TaskStage | undefined> {
-        return this.taskStageRepository.findOne({
-            where: { id_task: id, finished: false },
-            order: { created_at: "ASC" },
-        });
-    }
-
-    @Transactional()
-    async addCommentToAssignment(
-        taskId: number,
-        templateId: number,
-        userId: string,
-        text: string,
-    ): Promise<void> {
-        const assignment = await this.templateAssignmentRepository.findOne({
-            where: { id_task: taskId, id_template: templateId },
-        });
-        const comment = new Comment({
-            assignment,
-            id_user: userId,
-            text,
-        });
-        await this.commentRepository.save(comment);
-    }
-
-    async removeAssignmentComment(commentId: number): Promise<void> {
-        await this.commentRepository.delete(commentId);
-    }
-
-    async commentExists(commentId: number): Promise<boolean> {
-        return !!(await this.commentRepository.findOne(commentId));
     }
 }
