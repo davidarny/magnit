@@ -2,6 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Grid } from "@material-ui/core";
+import _ from "lodash";
 import React from "react";
 import { IPuzzleProps } from "services/item";
 
@@ -11,6 +12,10 @@ export const UploadFiles: React.FC<IPuzzleProps> = props => {
     if (!answer) {
         return null;
     }
+
+    const splitted = answer.answer.split("?originalname=");
+    const src = _.first(splitted)!;
+    const filename = _.last(splitted)!;
 
     return (
         <Grid item xs={2}>
@@ -33,8 +38,8 @@ export const UploadFiles: React.FC<IPuzzleProps> = props => {
                         objectFit: "contain",
                         maxHeight: theme.spacing(20),
                     })}
-                    alt={answer.answer}
-                    src={answer.answer}
+                    alt={filename}
+                    src={src}
                 />
             </Grid>
         </Grid>

@@ -369,11 +369,11 @@ export class TaskService {
                             if (puzzle) {
                                 // trying to get puzzle_type
                                 const type = this.getPuzzleType(puzzle);
-                                let filename = this.getFileName(files, templatePuzzleId);
-                                if (filename) {
-                                    filename = `${process.env.BACKEND_HOST}/${filename}`;
+                                const file = this.getFileByTemplateId(files, templatePuzzleId);
+                                if (file) {
+                                    file.filename = `${process.env.BACKEND_HOST}/${file.filename}?originalname=${file.originalname}`;
                                 }
-                                const answer = filename || body[templatePuzzleId];
+                                const answer = file || body[templatePuzzleId];
                                 const comment = body[`${templateId}_${puzzleId}_comment`];
                                 if (_.isString(answer)) {
                                     return new TemplateAnswer({
@@ -571,18 +571,14 @@ export class TaskService {
         }
     }
 
-    private getFileName(
+    private getFileByTemplateId(
         files?: Express.Multer.File[],
         templatePuzzleId?: string,
-    ): string | undefined {
+    ): Express.Multer.File | undefined {
         if (!files || !templatePuzzleId) {
             return;
         }
-        return (
-            files.find(file => file.fieldname === templatePuzzleId) || {
-                filename: undefined,
-            }
-        ).filename;
+        return files.find(file => file.fieldname === templatePuzzleId);
     }
 
     private getPuzzleType(puzzle: IPuzzle): string | null {
