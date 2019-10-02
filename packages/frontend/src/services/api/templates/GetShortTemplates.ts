@@ -2,19 +2,21 @@ import { ITemplate } from "@magnit/entities";
 import { ICourier, IResponse } from "services/api";
 import { toSnakeCase } from "services/string";
 
-export interface IGetTemplatesResponse extends IResponse {
-    all: number;
+export type TShortTemplate = Omit<ITemplate, "sections">;
+
+export interface IGetShortTemplatesResponse extends IResponse {
     total: number;
-    templates: ITemplate[];
+    all: number;
+    templates: TShortTemplate[];
 }
 
-export type TTemplateSortKeys = keyof ITemplate | "";
+export type TShortTemplateSortKeys = keyof TShortTemplate | "";
 
-export async function getTemplates(
+export async function getShortTemplates(
     courier: ICourier,
     title?: string,
     sort?: "ASC" | "DESC",
-    sortBy?: TTemplateSortKeys,
+    sortBy?: TShortTemplateSortKeys,
 ) {
     const query = {
         limit: `?limit=${Number.MAX_SAFE_INTEGER}`,
@@ -22,7 +24,7 @@ export async function getTemplates(
         sort: `${sort ? `&sort=${sort}` : ""}`,
         sortBy: `${sortBy ? `&sortBy=${toSnakeCase(sortBy)}` : ""}`,
     };
-    return courier.get<IGetTemplatesResponse>(
-        `templates/extended${query.limit}${query.title}${query.sortBy}${query.sort}`,
+    return courier.get<IGetShortTemplatesResponse>(
+        `templates${query.limit}${query.title}${query.sortBy}${query.sort}`,
     );
 }

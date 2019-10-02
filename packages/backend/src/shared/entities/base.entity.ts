@@ -1,7 +1,7 @@
-import { BeforeUpdate, CreateDateColumn, DeepPartial, UpdateDateColumn } from "typeorm";
+import { BeforeUpdate, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { ConstructableEntity } from "./constructable.entity";
 
-export abstract class BaseEntity<E, T = DeepPartial<E>> extends ConstructableEntity<E, T> {
+export abstract class BaseEntity extends ConstructableEntity {
     @CreateDateColumn({ type: "timestamptz" })
     created_at: string;
 

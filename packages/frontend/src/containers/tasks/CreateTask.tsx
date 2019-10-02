@@ -20,19 +20,14 @@ import {
     getAllRegions,
     getCitiesForRegion,
     getFormatsForCity,
-    getTemplate,
     getTemplates,
 } from "services/api";
-
-interface IEditableTemplate extends ITemplate {
-    editable: boolean;
-}
 
 export const CreateTask: React.FC = () => {
     const context = useContext(AppContext);
 
     // all templates
-    const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+    const [templates, setTemplates] = useState<ITemplate[]>([]);
 
     // task state
     const [task, setTask] = useState<ITask>({
@@ -65,22 +60,7 @@ export const CreateTask: React.FC = () => {
 
     useEffect(() => {
         getTemplates(context.courier)
-            .then(response => {
-                return response.templates.map(template => ({
-                    ...template,
-                    id: template.id.toString(),
-                }));
-            })
-            .then(templates => {
-                return Promise.all(
-                    templates.map(template => getTemplate(context.courier, Number(template.id))),
-                );
-            })
-            .then(responses => {
-                const buffer: any[] = [];
-                responses.forEach(response => buffer.push(response.template));
-                setTemplates([...buffer]);
-            })
+            .then(response => setTemplates([...response.templates]))
             .catch(console.error);
     }, [context.courier]);
 

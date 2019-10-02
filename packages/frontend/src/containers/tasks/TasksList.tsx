@@ -26,7 +26,6 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
     getAllRegions,
     getCitiesForRegion,
-    getTasks,
     getTasksExtended,
     IExtendedTask,
     TExtendedTaskSortKeys,
@@ -140,11 +139,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                 region,
                 city,
             )
-                .then(response => setTasks(response.tasks.map(transformTaskDateToFriendly)))
-                .catch(console.error);
-            // get total count of all tasks
-            getTasks(context.courier)
-                .then(response => setTotal(response.tasks.length))
+                .then(response => {
+                    setTasks(response.tasks.map(transformTaskDateToFriendly));
+                    setTotal(response.all);
+                })
                 .catch(console.error);
         },
         [clearSelectedTasks, context.courier, transformTaskDateToFriendly, tab],

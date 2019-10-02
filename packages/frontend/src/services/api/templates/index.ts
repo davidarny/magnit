@@ -3,3 +3,4 @@ export * from "./GetTemplate";
 export * from "./GetTemplates";
 export * from "./UpdateTemplate";
 export * from "./DeleteTemplate";
+export * from "./GetShortTemplates";

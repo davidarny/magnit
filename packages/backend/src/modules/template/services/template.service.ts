@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as _ from "lodash";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { CannotInsertTemplateException } from "../../../shared/exceptions/cannot-insert-template.exception";
 import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-found.exception";
-import { TemplateDto } from "../dto/template.dto";
 import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
+import { FindAllQuery } from "../queries/find-all.query";
 
 @Injectable()
 export class TemplateService {
@@ -28,43 +28,39 @@ export class TemplateService {
         });
     }
 
-    async findAll(
-        offset?: number,
-        limit?: number,
-        sortBy?: keyof TemplateDto,
-        sort?: "ASC" | "DESC",
-        title?: string,
-    ) {
+    async findAll(query: DeepPartial<FindAllQuery> = {}, extended: boolean = false) {
         let sql = `
             SELECT
                 t.id,
                 t.title,
                 t.description,
-                t.sections,
                 t.type,
                 t.version,
                 t.created_at,
                 t.updated_at
+                ${extended ? ", t.sections" : ""}
             FROM template t
             WHERE 1 = 1
         `;
         const params: Array<string | number> = [];
-        if (!_.isNil(title)) {
-            params.push(`%${title.toLowerCase()}%`);
+        if (!_.isNil(query.title)) {
+            params.push(`%${query.title.toLowerCase()}%`);
             sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (!_.isNil(sort)) {
-            sql += ` ORDER BY t.${sortBy || "title"} ${sort} `;
+        if (!_.isNil(query.sort)) {
+            sql += ` ORDER BY t.${query.sortBy || "title"} ${query.sort} `;
         }
-        if (!_.isNil(limit)) {
-            params.push(limit);
+        if (!_.isNil(query.limit)) {
+            params.push(query.limit);
             sql += ` LIMIT $${params.length} `;
         }
-        if (!_.isNil(offset)) {
-            params.push(offset);
+        if (!_.isNil(query.offset)) {
+            params.push(query.offset);
             sql += ` OFFSET $${params.length} `;
         }
-        return this.templateRepository.query(sql, params);
+        const templates = await this.templateRepository.query(sql, params);
+        const all = await this.templateRepository.count();
+        return [templates, all];
     }
 
     // TODO: remove this one and handle 404 more accurately

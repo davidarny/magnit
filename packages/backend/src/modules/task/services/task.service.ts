@@ -20,14 +20,14 @@ import { IPuzzle } from "../../template/entities/template.entity";
 import { TemplateService } from "../../template/services/template.service";
 import { ReportStageDto, ReportTemplateDto, TaskReportDto } from "../dto/task-report.dto";
 import { TaskStageDto } from "../dto/task-stage.dto";
-import { TaskDto } from "../dto/task.dto";
 import { TemplateAssignmentDto } from "../dto/template-assignment.dto";
 import { Comment } from "../entities/comment.entity";
 import { TaskDocument } from "../entities/task-document.entity";
 import { TaskStage } from "../entities/task-stage.entity";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
-import { TaskExtendedDto } from "../responses/get-tasks-extended.response";
+import { FindAllQueryExtended } from "../queries/find-all-extended.query";
+import { FindAllQuery } from "../queries/find-all.query";
 
 export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStage };
 
@@ -61,67 +61,47 @@ export class TaskService {
         `);
     }
 
-    async findAll(
-        offset?: number,
-        limit?: number,
-        sortBy?: keyof TaskDto,
-        sort?: "ASC" | "DESC",
-        status?: ETaskStatus,
-        statuses?: ETaskStatus[],
-        title?: string,
-    ) {
+    async findAll(query: DeepPartial<FindAllQuery> = {}) {
         let sql = `
-            SELECT
-                t.id,
-                t.title,
-                t.description,
-                t.status,
-                t.id_owner,
-                t.id_assignee,
-                t.notify_before,
-                t.created_at,
-                t.updated_at
+            SELECT t.*,
+                   to_json(m) AS marketplace,
+                   to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages
             FROM task t
+                     LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                     LEFT JOIN task_stage ts ON t.id = ts.id_task
             WHERE 1 = 1
         `;
         const params: Array<string | number> = [];
-        if (!_.isNil(status)) {
-            params.push(status);
+        if (!_.isNil(query.status)) {
+            params.push(query.status);
             sql += ` AND t.status = $${params.length} `;
         }
-        if (!_.isNil(statuses)) {
-            params.push(`(${statuses.join(",")})`);
+        if (!_.isNil(query.statuses)) {
+            params.push(`(${query.statuses.join(",")})`);
             sql += ` AND t.status IN $${params.length} `;
         }
-        if (!_.isNil(title)) {
-            params.push(`%${title.toLowerCase()}%`);
+        if (!_.isNil(query.title)) {
+            params.push(`%${query.title.toLowerCase()}%`);
             sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (!_.isNil(sort)) {
-            sql += ` ORDER BY t.${sortBy || "title"} ${sort} `;
+        sql += "GROUP BY t.id, m.*";
+        if (!_.isNil(query.sort)) {
+            sql += ` ORDER BY t.${query.sortBy || "title"} ${query.sort} `;
         }
-        if (!_.isNil(limit)) {
-            params.push(limit);
+        if (!_.isNil(query.limit)) {
+            params.push(query.limit);
             sql += ` LIMIT $${params.length} `;
         }
-        if (!_.isNil(offset)) {
-            params.push(offset);
+        if (!_.isNil(query.offset)) {
+            params.push(query.offset);
             sql += ` OFFSET $${params.length} `;
         }
-        return this.taskRepository.query(sql, params);
+        const tasks = await this.taskRepository.query(sql, params);
+        const all = await this.taskRepository.count();
+        return [tasks, all];
     }
 
-    async findAllExtended(
-        offset?: number,
-        limit?: number,
-        sortBy?: keyof TaskExtendedDto,
-        sort?: "ASC" | "DESC",
-        status?: ETaskStatus,
-        statuses?: ETaskStatus[],
-        title?: string,
-        region?: string,
-        city?: string,
-    ) {
+    async findAllExtended(query: DeepWriteable<DeepPartial<FindAllQueryExtended>> = {}) {
         let sql = `
             SELECT t.*,
                    m.address,
@@ -143,52 +123,54 @@ export class TaskService {
             WHERE 1 = 1
         `;
         const params: Array<string | number> = [];
-        if (!_.isNil(status)) {
-            params.push(status);
+        if (!_.isNil(query.status)) {
+            params.push(query.status);
             sql += ` AND t.status = $${params.length} `;
         }
-        if (!_.isNil(statuses)) {
-            params.push(`(${statuses.join(",")})`);
+        if (!_.isNil(query.statuses)) {
+            params.push(`(${query.statuses.join(",")})`);
             sql += ` AND t.status IN $${params.length} `;
         }
-        if (!_.isNil(title)) {
-            params.push(`%${title.toLowerCase()}%`);
+        if (!_.isNil(query.title)) {
+            params.push(`%${query.title.toLowerCase()}%`);
             sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (!_.isNil(region)) {
-            params.push(`%${region.toLowerCase()}%`);
+        if (!_.isNil(query.region)) {
+            params.push(`%${query.region.toLowerCase()}%`);
             sql += ` AND lower(m.region) LIKE $${params.length} `;
         }
-        if (!_.isNil(city)) {
-            params.push(`%${city.toLowerCase()}%`);
+        if (!_.isNil(query.city)) {
+            params.push(`%${query.city.toLowerCase()}%`);
             sql += ` AND lower(m.city) LIKE $${params.length} `;
         }
         sql += "GROUP BY t.id, m.address, m.format, m.city, m.region, ts.title, ts.deadline";
-        if (!_.isNil(sort)) {
+        if (!_.isNil(query.sort)) {
             const stage = ["stage_title", "deadline"];
             const marketplace = ["address", "city", "format", "region"];
             let prefix = "t";
-            if (stage.includes(sortBy)) {
+            if (stage.includes(query.sortBy)) {
                 // cannot use alias
                 // so it'll be ts.title
-                if (sortBy === "stage_title") {
-                    sortBy = "title";
+                if (query.sortBy === "stage_title") {
+                    query.sortBy = "title";
                 }
                 prefix = "ts";
-            } else if (marketplace.includes(sortBy)) {
+            } else if (marketplace.includes(query.sortBy)) {
                 prefix = "m";
             }
-            sql += ` ORDER BY ${prefix}.${sortBy || "title"} ${sort} `;
+            sql += ` ORDER BY ${prefix}.${query.sortBy || "title"} ${query.sort} `;
         }
-        if (!_.isNil(limit)) {
-            params.push(limit);
+        if (!_.isNil(query.limit)) {
+            params.push(query.limit);
             sql += ` LIMIT $${params.length} `;
         }
-        if (!_.isNil(offset)) {
-            params.push(offset);
+        if (!_.isNil(query.offset)) {
+            params.push(query.offset);
             sql += ` OFFSET $${params.length} `;
         }
-        return this.taskRepository.query(sql, params);
+        const tasks = await this.taskRepository.query(sql, params);
+        const all = await this.taskRepository.count();
+        return [tasks, all];
     }
 
     @Transactional()
@@ -220,16 +202,6 @@ export class TaskService {
             throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
         }
         return { ...task };
-    }
-
-    @Transactional()
-    async findByIdWithTemplatesAndStages(id: number) {
-        const task = await this.findById(id);
-        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
-        return {
-            ...task,
-            templates: (templates || []).map(template => template.id),
-        };
     }
 
     @Transactional()

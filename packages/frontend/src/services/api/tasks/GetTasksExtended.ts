@@ -15,6 +15,7 @@ export interface IExtendedTask extends IBaseTask {
 
 export interface IGetTasksExtendedResponse extends IResponse {
     total: number;
+    all: number;
     tasks: IExtendedTask[];
 }
 

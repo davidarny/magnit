@@ -37,10 +37,8 @@ import {
     getCitiesForRegion,
     getFormatsForCity,
     getTaskExtended,
-    getTemplate,
     getTemplates,
     IGetTaskExtendedResponse,
-    IGetTemplate,
     IGetTemplatesResponse,
     sendPushToken,
     updateTask,
@@ -120,17 +118,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         }
     }, []);
 
-    const fetchFullTemplate = useCallback(
-        (response: IGetTemplatesResponse) => {
-            return Promise.all(
-                response.templates.map(template =>
-                    getTemplate(context.courier, Number(template.id)),
-                ),
-            );
-        },
-        [context.courier],
-    );
-
     const fetchFormatsAndUpdateState = useCallback(
         (region: string, city: string) => {
             getFormatsForCity(context.courier, region, city)
@@ -164,9 +151,9 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         [context.courier],
     );
 
-    function setTemplateState(responses: IGetTemplate[], nextTask: IExtendedTask) {
+    function setTemplateState(response: IGetTemplatesResponse, nextTask: IExtendedTask) {
         const buffer: any[] = [];
-        responses.forEach(response => buffer.push(response.template));
+        response.templates.forEach(template => buffer.push(template));
         buffer.forEach((data, index, array) => {
             const template = nextTask.templates.find(template => template.id === data.id);
             if (template) {
@@ -183,11 +170,9 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 if (!nextTask || !isTaskEditable(nextTask)) {
                     return;
                 }
+                const response = await getTemplates(context.courier);
 
-                const templates = await getTemplates(context.courier);
-                const fullTemplates = await fetchFullTemplate(templates);
-
-                setTemplateState(fullTemplates, nextTask);
+                setTemplateState(response, nextTask);
 
                 if (nextTask.marketplace) {
                     const { city, region, format } = nextTask.marketplace;
@@ -205,7 +190,6 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         fetchAddressesAndUpdateState,
         fetchCitiesAndUpdateState,
         fetchFormatsAndUpdateState,
-        fetchFullTemplate,
         fetchRegionsAndUpdateState,
         setTaskState,
         taskId,

@@ -42,11 +42,11 @@ describe("TemplateController (e2e)", () => {
     afterEach(async () => await app.close());
 
     it("should get empty template list", async () => {
-        jest.spyOn(templateService, "findAll").mockResolvedValue([]);
+        jest.spyOn(templateService, "findAll").mockResolvedValue([[], 0]);
         return request(app.getHttpServer())
             .get("/v1/templates")
             .expect(200)
-            .expect({ success: 1, total: 0, templates: [] });
+            .expect({ success: 1, total: 0, templates: [], all: 0 });
     });
 
     it("should create template", async () => {

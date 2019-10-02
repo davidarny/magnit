@@ -3,7 +3,7 @@ import { IsEmail, IsString } from "class-validator";
 import { DeepPartial } from "typeorm";
 import { ConstructableEntity } from "../../../shared/entities/constructable.entity";
 
-export class User extends ConstructableEntity<User> {
+export class User extends ConstructableEntity {
     constructor(dto?: DeepPartial<User>) {
         super();
         this.construct(this, dto);

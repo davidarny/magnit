@@ -19,7 +19,7 @@ export interface IPuzzle {
 }
 
 @Entity()
-export class Template extends PrimaryBaseEntity<Template> {
+export class Template extends PrimaryBaseEntity {
     constructor(dto?: DeepPartial<Template>) {
         super();
         this.construct(this, dto);

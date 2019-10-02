@@ -2,7 +2,6 @@
 
 import { jsx } from "@emotion/core";
 import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magnit/components";
-import { ITemplate } from "@magnit/entities";
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
@@ -16,9 +15,9 @@ import * as React from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import {
     deleteTemplate,
-    getTemplates,
-    ITemplateResponse,
-    TTemplateSortKeys,
+    getShortTemplates,
+    TShortTemplate,
+    TShortTemplateSortKeys,
 } from "services/api/templates";
 
 const columns: IColumn[] = [
@@ -30,7 +29,7 @@ const columns: IColumn[] = [
 
 interface IUpdateTemplateListOptions {
     sort?: "asc" | "desc";
-    sortBy?: TTemplateSortKeys;
+    sortBy?: TShortTemplateSortKeys;
     title?: string;
 }
 
@@ -42,10 +41,10 @@ export const TemplateList: React.FC = () => {
 
     // table
     const [total, setTotal] = useState(0);
-    const [rows, setRows] = useState<ITemplateResponse[]>([]);
+    const [rows, setRows] = useState<TShortTemplate[]>([]);
     const [page, setPage] = useState(0);
     const [order, setOrder] = useState<"asc" | "desc">("asc");
-    const [orderBy, setOrderBy] = useState<TTemplateSortKeys>("");
+    const [orderBy, setOrderBy] = useState<TShortTemplateSortKeys>("");
 
     // redirect to row
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
@@ -54,20 +53,17 @@ export const TemplateList: React.FC = () => {
         ({ title, sort, sortBy }: IUpdateTemplateListOptions = {}) => {
             // filtered
             const upperCaseSort = (sort || "ASC").toUpperCase() as "ASC" | "DESC";
-            getTemplates(context.courier, title, upperCaseSort, sortBy)
-                .then(response =>
+            getShortTemplates(context.courier, title, upperCaseSort, sortBy)
+                .then(response => {
                     setRows(
                         response.templates.map(template => ({
                             ...template,
                             createdAt: getFriendlyDate(new Date(template.createdAt!), true),
                             updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
                         })),
-                    ),
-                )
-                .catch(console.error);
-            // all
-            getTemplates(context.courier)
-                .then(response => setTotal(response.templates.length))
+                    );
+                    setTotal(response.all);
+                })
                 .catch(console.error);
         },
         [context.courier],
@@ -143,7 +139,7 @@ export const TemplateList: React.FC = () => {
     );
 
     const onRequestSortCallback = useCallback(
-        (sort: "asc" | "desc", sortBy: keyof ITemplate) => {
+        (sort: "asc" | "desc", sortBy: keyof TShortTemplate) => {
             setOrder(sort);
             setOrderBy(sortBy);
             fetchTemplatesAndSetState({ title: searchQuery, sort, sortBy });

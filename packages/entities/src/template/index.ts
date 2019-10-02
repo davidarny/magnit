@@ -35,6 +35,8 @@ export interface ITemplate {
     description: string;
     sections: ISection[];
     type: ETemplateType;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface ISection {

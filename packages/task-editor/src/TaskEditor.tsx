@@ -80,7 +80,6 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const [pendingComments, setPendingComments] = useState<IComment[]>([]);
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
-    const focusedOnTaskHead = focusedPuzzleId === task.id.toString();
     const editable =
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
@@ -393,20 +392,19 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                   ]
                 : []),
             // show trash button if not focused on head or on document
-            ...(!focusedOnTaskHead && (editable || !focusedOnDocument)
-                ? [
+            ...(editable && !focusedOnDocument
+                ? []
+                : [
                       {
                           label: "Удалить шаблон",
                           icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
                           action: onDeleteDocumentCallback,
                       },
-                  ]
-                : []),
+                  ]),
         ],
         [
             editable,
             focusedOnDocument,
-            focusedOnTaskHead,
             onAddCommentClick,
             onAddDocumentCallback,
             onDeleteDocumentCallback,

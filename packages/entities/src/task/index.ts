@@ -19,15 +19,8 @@ export interface IBaseTask {
     createdAt?: string;
 }
 
-export interface ITask extends IBaseTask {
-    id: number;
-    templates: number[];
-    stages: number[];
-    marketplace: IMarketPlace;
-}
-
 export interface ITemplateDocument extends ITemplate {
-    editable: boolean;
+    editable?: boolean;
 }
 
 export interface IRenderTemplateDocument extends ITemplateDocument {
@@ -47,6 +40,13 @@ export interface IStage {
     createdAt: string;
     updatedAt: string;
     __index?: number; // need for correct rendering
+}
+
+export interface ITask extends IBaseTask {
+    id: number;
+    stages: IStage[];
+    templates: ITemplate[];
+    marketplace: IMarketPlace;
 }
 
 export interface IAnswer {
