@@ -14,3 +14,5 @@ export const DropdownAnswer: React.FC<IPuzzleProps> = ({ puzzle, index }) => {
         </Grid>
     );
 };
+
+DropdownAnswer.displayName = "DropdownAnswer";

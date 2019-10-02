@@ -1,8 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { ButtonLikeText } from "@magnit/components";
-
+import { AssetPreview, ButtonLikeText } from "@magnit/components";
 import { EPuzzleType } from "@magnit/entities";
 import { Grid, TextField } from "@material-ui/core";
 import { ArrowDropDown } from "@material-ui/icons";
@@ -62,32 +61,16 @@ export const ReferenceAnswer: React.FC<IPuzzleProps> = props => {
                     open &&
                     assets.map(asset => (
                         <Grid item xs={2}>
-                            <Grid
-                                container
-                                justify="center"
-                                alignItems="center"
-                                direction="column"
-                                css={theme => ({
-                                    height: "100%",
-                                    border: `1px solid ${theme.colors.lightGray}`,
-                                    borderRadius: theme.radius(0.5),
-                                    minHeight: theme.spacing(20),
-                                    position: "relative",
-                                })}
-                            >
-                                <img
-                                    css={theme => ({
-                                        width: "100%",
-                                        objectFit: "contain",
-                                        maxHeight: theme.spacing(20),
-                                    })}
-                                    alt={asset.title}
-                                    src={asset.description}
-                                />
-                            </Grid>
+                            <AssetPreview
+                                filename={asset.title}
+                                src={asset.description}
+                                ext={asset.description.split(".").pop()}
+                            />
                         </Grid>
                     ))}
             </Grid>
         </Grid>
     );
 };
+
+ReferenceAnswer.displayName = "ReferenceAnswer";

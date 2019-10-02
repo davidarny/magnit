@@ -14,3 +14,5 @@ export const CheckboxAnswer: React.FC<IPuzzleProps> = ({ puzzle }) => {
         </Grid>
     );
 };
+
+CheckboxAnswer.displayName = "CheckboxAnswer";

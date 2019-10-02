@@ -23,3 +23,6 @@ export * from "./TextFieldIcon";
 export * from "./UploadFilesIcon";
 export * from "./ReturnIcon";
 export * from "./InfoIcon";
+export * from "./PdfIcon";
+export * from "./DocIcon";
+export * from "./XlsIcon";
