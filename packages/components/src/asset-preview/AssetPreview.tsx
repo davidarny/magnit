@@ -23,6 +23,7 @@ export const AssetPreview: React.FC<IAssetPreviewProps> = props => {
 
     return (
         <Grid
+            title={filename}
             container
             justify="center"
             alignItems="center"
