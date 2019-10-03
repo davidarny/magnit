@@ -29,7 +29,7 @@ import { TemplateAssignment } from "../entities/tempalte-assignment.entity";
 import { FindAllQueryExtended } from "../queries/find-all-extended.query";
 import { FindAllQuery } from "../queries/find-all.query";
 
-export type TTaskWithLastStageAndToken = Task & { token: string; stage: TaskStage };
+export type TTaskWithLastStageAndToken = Task & { tokens: string[]; stage: TaskStage };
 
 @Injectable()
 export class TaskService {
@@ -49,15 +49,15 @@ export class TaskService {
         return await this.taskRepository.query(`
             SELECT
                 t.*,
-                json_agg(ts.*) ->> json_array_length(json_agg(ts.*)) - 1  as stage,
-                json_agg(pt.token) ->> json_array_length(json_agg(pt.token)) - 1 as token
+                json_agg(ts.*) ->> json_array_length(json_agg(ts.*)) - 1  AS stage,
+                to_json(array_remove(array_agg(pt.token), NULL)) AS tokens
             FROM task_stage ts
             LEFT JOIN task t ON ts.id_task = t.id
             LEFT JOIN push_token pt ON t.id_assignee = pt.id_user
             WHERE EXTRACT(day FROM ts.deadline - date(now())) <= t.notify_before
             AND NOT(ts.finished)
-            GROUP BY t.id, t.created_at, ts.created_at, pt.created_at
-            ORDER BY t.created_at, ts.created_at, pt.created_at
+            GROUP BY t.id, t.created_at, ts.created_at
+            ORDER BY t.created_at, ts.created_at
         `);
     }
 

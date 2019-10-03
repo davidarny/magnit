@@ -16,7 +16,7 @@ import { TaskDocument } from "./entities/task-document.entity";
 import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
 import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
-import { TaskService } from "./services/task.service";
+import { TaskService, TTaskWithLastStageAndToken } from "./services/task.service";
 import { TaskStageSubscriber } from "./subscribers/task-stage.subscriber";
 import { TaskSubscriber } from "./subscribers/task.subscriber";
 import { TaskController } from "./task.controller";
@@ -43,11 +43,11 @@ import { TaskController } from "./task.controller";
     exports: [TaskService],
 })
 export class TaskModule {
-    private readonly logger = new Logger(TaskModule.name);
-
     private static NOTIFICATION_CHECK_JOB = "notification_check";
     // every 15 minutes
-    private static NOTIFICATION_CHECK_CRON = "*/5 * * * *";
+    private static NOTIFICATION_CHECK_CRON = "*/1 * * * *";
+
+    private readonly logger = new Logger(TaskModule.name);
 
     constructor(
         private readonly scheduleService: ScheduleService,
@@ -64,43 +64,38 @@ export class TaskModule {
     private async notifyAboutExpiringTasks(): Promise<boolean> {
         const tasks = await this.taskService.findTasksWithExpiringStages();
         if (tasks.length) {
-            await Promise.all(
-                tasks
-                    .map(async task => {
-                        if (!task.token) {
-                            this.logger.warn(
-                                `Cannot send notification to "${task.title}" without token`,
-                            );
-                            return;
-                        }
-                        if (!task.stage) {
-                            this.logger.warn(
-                                `Cannot send notification to "${task.title}" without stage`,
-                            );
-                            return;
-                        }
-                        const channel = await this.amqpService.getAssertedChannelFor(
-                            AmqpService.PUSH_NOTIFICATION,
-                        );
-                        const friendlyDate = getFriendlyDate(new Date(task.stage.deadline));
-                        const pushMessage: IPushMessage = {
-                            token: task.token,
-                            message: {
-                                body: `Задание "${task.title}" заканчивается ${friendlyDate}`,
-                            },
-                        };
-                        await channel.sendToQueue(
-                            AmqpService.PUSH_NOTIFICATION,
-                            Buffer.from(JSON.stringify(pushMessage)),
-                        );
-                        this.logger.debug(
-                            `Successfully sent push to task "${task.title} with stage:"`,
-                        );
-                        this.logger.debug(task.stage);
-                    })
-                    .filter(Boolean),
-            );
+            await Promise.all(tasks.map(this.sendPushToTask.bind(this)).filter(Boolean));
         }
-        return true;
+        return false;
+    }
+
+    private async sendPushToTask(task: TTaskWithLastStageAndToken) {
+        if (!task.tokens.length) {
+            this.logger.warn(`Cannot send notification to "${task.title}" without tokens`);
+            return;
+        }
+        if (!task.stage) {
+            this.logger.warn(`Cannot send notification to "${task.title}" without stage`);
+            return;
+        }
+        const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
+        const friendlyDate = getFriendlyDate(new Date(task.stage.deadline));
+        await Promise.all(
+            task.tokens.map(token => {
+                const pushMessage: IPushMessage = {
+                    token,
+                    message: {
+                        body: `Задание "${task.title}" заканчивается ${friendlyDate}`,
+                    },
+                };
+                return channel.sendToQueue(
+                    AmqpService.PUSH_NOTIFICATION,
+                    Buffer.from(JSON.stringify(pushMessage)),
+                );
+            }),
+        );
+        this.logger.debug(
+            `Successfully sent push to task "${task.title}" with stage "${task.stage.title} ${task.stage.deadline}"`,
+        );
     }
 }
