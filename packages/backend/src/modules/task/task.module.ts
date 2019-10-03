@@ -49,6 +49,9 @@ export class TaskModule {
 
     private readonly logger = new Logger(TaskModule.name);
 
+    // local cache
+    private readonly cache = new Map<string, [Buffer, number]>();
+
     constructor(
         private readonly scheduleService: ScheduleService,
         private readonly taskService: TaskService,
@@ -88,10 +91,22 @@ export class TaskModule {
                         body: `Задание "${task.title}" заканчивается ${friendlyDate}`,
                     },
                 };
-                return channel.sendToQueue(
-                    AmqpService.PUSH_NOTIFICATION,
-                    Buffer.from(JSON.stringify(pushMessage)),
-                );
+                const content = Buffer.from(JSON.stringify(pushMessage));
+                // set expiration date to tomorrow
+                const expiration = Date.now() + 1000 * 60 * 60 * 24;
+                const key = `${task.id}::${token}`;
+                if (!this.cache.has(key)) {
+                    this.cache.set(key, [content, expiration]);
+                    return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
+                }
+                const [buffer, date] = this.cache.get(key);
+                const expired = date <= Date.now();
+                if (buffer.compare(content) !== 0) {
+                    this.cache.set(key, [content, expiration]);
+                    return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
+                } else if (expired) {
+                    this.cache.delete(key);
+                }
             }),
         );
         this.logger.debug(
