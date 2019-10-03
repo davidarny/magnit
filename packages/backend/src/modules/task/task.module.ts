@@ -47,7 +47,7 @@ export class TaskModule {
 
     private static NOTIFICATION_CHECK_JOB = "notification_check";
     // every 15 minutes
-    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
+    private static NOTIFICATION_CHECK_CRON = "*/5 * * * *";
 
     constructor(
         private readonly scheduleService: ScheduleService,
@@ -63,7 +63,7 @@ export class TaskModule {
 
     private async notifyAboutExpiringTasks(): Promise<boolean> {
         const tasks = await this.taskService.findTasksWithExpiringStages();
-        if (tasks && Array.isArray(tasks)) {
+        if (tasks.length) {
             await Promise.all(
                 tasks
                     .map(async task => {
@@ -93,6 +93,10 @@ export class TaskModule {
                             AmqpService.PUSH_NOTIFICATION,
                             Buffer.from(JSON.stringify(pushMessage)),
                         );
+                        this.logger.debug(
+                            `Successfully sent push to task "${task.title} with stage:"`,
+                        );
+                        this.logger.debug(task.stage);
                     })
                     .filter(Boolean),
             );
