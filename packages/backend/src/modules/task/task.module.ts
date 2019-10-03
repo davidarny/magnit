@@ -107,7 +107,7 @@ export class TaskModule {
                 if (buffer.compare(actual) !== 0) {
                     this.logger.debug(`Found cache with different content, sending push to ${log}`);
                     const content = Buffer.from(JSON.stringify(message));
-                    this.cache.set(key, [content, tomorrow]);
+                    this.cache.set(key, [actual, tomorrow]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
                 // push expired
