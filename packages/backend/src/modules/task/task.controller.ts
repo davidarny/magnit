@@ -109,8 +109,13 @@ export class TaskController {
     @Post("/")
     @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
     @ApiCreatedResponse({ type: CreateTaskResponse, description: "ID of created Task" })
-    async create(@Body("task") taskDto: TaskDto) {
-        const id = await this.taskService.insert(new Task(taskDto));
+    async create(@Body("task") taskDto: TaskDto, @Req() req: IAuthRequest) {
+        const id = await this.taskService.insert(
+            new Task({
+                ...taskDto,
+                id_assignee: req.user.id,
+            }),
+        );
         return { success: 1, task_id: id };
     }
 
