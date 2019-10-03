@@ -113,7 +113,7 @@ export class TaskController {
         const id = await this.taskService.insert(
             new Task({
                 ...taskDto,
-                id_assignee: req.user.id,
+                id_assignee: _.get(req, "user.id", null),
             }),
         );
         return { success: 1, task_id: id };

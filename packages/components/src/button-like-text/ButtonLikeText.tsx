@@ -2,18 +2,19 @@
 
 import { jsx } from "@emotion/core";
 import { Typography } from "@material-ui/core";
-import { Link } from "@reach/router";
+import { LinkProps } from "@reach/router";
 import * as React from "react";
 
 interface IButtonLikeTextProps {
-    component?: React.ReactNode;
+    // TODO: infer type
+    component?: any;
 
     onClick?(event: React.MouseEvent<HTMLElement, MouseEvent>): void;
 }
 
-type TButtonLikeTextProps = IButtonLikeTextProps &
-    React.ComponentProps<typeof Typography> &
-    React.ComponentProps<typeof Link>;
+type TButtonLikeTextProps = Omit<React.ComponentProps<typeof Typography>, "component"> &
+    Partial<LinkProps<{}>> &
+    IButtonLikeTextProps;
 
 export const ButtonLikeText: React.FC<TButtonLikeTextProps> = ({ children, ...props }) => {
     return (

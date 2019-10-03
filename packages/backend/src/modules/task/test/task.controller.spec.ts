@@ -78,7 +78,7 @@ describe("TaskController", () => {
     it("should create task", async () => {
         const expected = { success: 1, task_id: 0 };
         jest.spyOn(taskService, "insert").mockResolvedValue(task.id);
-        expect(await taskController.create(new TaskDto(task))).toStrictEqual(expected);
+        expect(await taskController.create(new TaskDto(task), null)).toStrictEqual(expected);
     });
 
     it("should get task by id", async () => {

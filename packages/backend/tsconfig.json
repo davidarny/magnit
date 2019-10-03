@@ -10,7 +10,8 @@
         "outDir": "./dist",
         "baseUrl": "./",
         "incremental": true,
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "skipLibCheck": true
     },
     "exclude": ["node_modules", "dist", "public", "docs", "logs"]
 }
