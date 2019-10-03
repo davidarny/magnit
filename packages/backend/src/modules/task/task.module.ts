@@ -92,38 +92,32 @@ export class TaskModule {
                     },
                 };
                 const content = Buffer.from(JSON.stringify(pushMessage));
+                const message = `task "${task.title}" for stage "${task.stage.title}" expiring at "${date}"`;
                 // set expiration date to tomorrow
-                const nextExpiration = Date.now() + 1000 * 60 * 60 * 24;
+                const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
                 const key = `${task.id}::${token}`;
                 if (!this.cache.has(key)) {
-                    this.logger.debug(
-                        `Cache not found, sending push to "${task.title}" expiring at "${date}"`,
-                    );
-                    this.cache.set(key, [content, nextExpiration]);
+                    this.logger.debug(`Cache not found, sending push to ${message}`);
+                    this.cache.set(key, [content, tomorrow]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
                 const [buffer, expiration] = this.cache.get(key);
                 // push content is different
                 if (buffer.compare(content) !== 0) {
                     this.logger.debug(
-                        `Found cache with different content, sending push to "${task.title}" expiring at "${date}"`,
+                        `Found cache with different content, sending push to ${message}`,
                     );
-                    this.cache.set(key, [content, nextExpiration]);
+                    this.cache.set(key, [content, tomorrow]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
                 // push expired
                 if (expiration <= Date.now()) {
-                    this.logger.debug(
-                        `Found expired cache for "${task.title}" expiring at "${date}"`,
-                    );
+                    this.logger.debug(`Found expired cache for ${message}`);
                     this.cache.delete(key);
                 } else {
-                    this.logger.debug(`Found cache for "${task.title}" expiring at "${date}"`);
+                    this.logger.debug(`Found cache for ${message}`);
                 }
             }),
-        );
-        this.logger.debug(
-            `Sending push to "${task.title}" for stage "${task.stage.title}" expiring at "${date}"`,
         );
     }
 }
