@@ -26,3 +26,4 @@ export * from "./InfoIcon";
 export * from "./PdfIcon";
 export * from "./DocIcon";
 export * from "./XlsIcon";
+export * from "./CommentIcon";

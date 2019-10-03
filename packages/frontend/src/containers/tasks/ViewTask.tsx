@@ -510,7 +510,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                                         Посмотреть отчет
                                     </MenuItem>
                                     <MenuItem onClick={onTaskHistoryClick}>
-                                        Посмотреть истоию
+                                        Посмотреть историю
                                     </MenuItem>
                                     {task.status === ETaskStatus.IN_PROGRESS && (
                                         <MenuItem onClick={onTaskWithdrawClick}>
