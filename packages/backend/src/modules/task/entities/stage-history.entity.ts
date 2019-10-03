@@ -4,10 +4,7 @@ import { FullStageHistoryDto } from "../dto/stage-history.dto";
 import { TaskStage } from "./task-stage.entity";
 
 @Entity({ name: "stage_history" })
-export class StageHistory extends PrimaryBaseEntity<
-    StageHistory,
-    DeepPartial<FullStageHistoryDto>
-> {
+export class StageHistory extends PrimaryBaseEntity {
     constructor(dto?: DeepPartial<FullStageHistoryDto>) {
         super();
         this.construct(this, dto);

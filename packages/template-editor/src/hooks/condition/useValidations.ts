@@ -1,5 +1,6 @@
 import {
     EConditionType,
+    EOperatorType,
     EPuzzleType,
     EValidationType,
     IPuzzle,
@@ -45,8 +46,8 @@ export function useValidations(
                     value: 0,
                     leftHandPuzzle: puzzle.id,
                     errorMessage: errorMessage,
-                    operatorType: "",
-                    validationType: "",
+                    operatorType: "" as EOperatorType,
+                    validationType: "" as EValidationType,
                     conditionType: EConditionType.OR,
                 };
             },
@@ -73,8 +74,8 @@ export function useValidations(
             resetConditions(validation: IValidation): void {
                 validation.rightHandPuzzle = undefined;
                 validation.value = undefined;
-                validation.operatorType = "";
-                validation.validationType = "";
+                validation.operatorType = "" as EOperatorType;
+                validation.validationType = "" as EValidationType;
                 validation.errorMessage = "";
                 setErrorMessage("");
             },

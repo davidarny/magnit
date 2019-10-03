@@ -14,7 +14,7 @@ import { BaseEntity } from "../../../shared/entities/base.entity";
 import { UserRole } from "./user.role.entity";
 
 @Entity()
-export class User extends BaseEntity<User> {
+export class User extends BaseEntity {
     constructor(dto?: DeepPartial<User>) {
         super();
         this.construct(this, dto);

@@ -5,7 +5,7 @@ import { Task } from "./task.entity";
 
 @Entity("task_stage")
 @Index((stage: TaskStage) => [stage.id_task, stage.created_at, stage.finished, stage.deadline])
-export class TaskStage extends PrimaryBaseEntity<TaskStage> {
+export class TaskStage extends PrimaryBaseEntity {
     constructor(dto?: DeepPartial<TaskStage>) {
         super();
         this.construct(this, dto);

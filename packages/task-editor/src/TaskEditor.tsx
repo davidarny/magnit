@@ -4,13 +4,15 @@ import { jsx } from "@emotion/core";
 import { EditorToolbar } from "@magnit/components";
 import {
     ETaskStatus,
+    ETemplateType,
     IComment,
-    IDocument,
     IExtendedDocument,
     IExtendedTask,
     IStageStep,
     ITask,
-    IVirtualDocument,
+    ITemplate,
+    ITemplateDocument,
+    IVirtualTemplateDocument,
 } from "@magnit/entities";
 import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
 import { EEditorType, getEditorService } from "@magnit/services";
@@ -23,11 +25,11 @@ import { ViewTask } from "./components/view-task";
 
 type TAnyTask = ITask | IExtendedTask;
 
-type TDocumentWithAnswers = IDocument & IExtendedDocument;
+type TDocumentWithAnswers = ITemplateDocument & IExtendedDocument;
 
 interface ITaskEditorProps<T extends TAnyTask> {
     task: T;
-    templates: T extends IExtendedTask ? TDocumentWithAnswers[] : IDocument[];
+    templates: T extends IExtendedTask ? TDocumentWithAnswers[] : ITemplateDocument[];
     variant: "create" | "view";
     regions?: string[];
     cities?: string[];
@@ -69,16 +71,15 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const [title, setTitle] = useState("");
     // not task documents
     // contains short template records mainly needed for rendering
-    const [documents, setDocuments] = useState<IVirtualDocument[]>([]);
+    const [documents, setDocuments] = useState<IVirtualTemplateDocument[]>([]);
     const [toolbarTopPosition, setToolbarTopPosition] = useState(0);
     // full templates mainly needed for rendering
-    const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, object>>(new Map());
+    const [templateSnapshots, setTemplateSnapshots] = useState<Map<string, ITemplate>>(new Map());
     const [focusedPuzzleChain, setFocusedPuzzleChain] = useState<string[]>([]);
     // local comments storage
     const [pendingComments, setPendingComments] = useState<IComment[]>([]);
 
     const focusedPuzzleId = _.head(focusedPuzzleChain);
-    const focusedOnTaskHead = focusedPuzzleId === task.id.toString();
     const editable =
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
 
@@ -112,6 +113,9 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                     id: -1,
                     title: "",
                     editable: false,
+                    sections: [],
+                    type: ETemplateType.LIGHT,
+                    description: "",
                     __uuid: uuid(),
                 },
             ]);
@@ -126,9 +130,8 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                 const document = documents.find(document => template.id === document.id);
                 templateSnapshots.set(template.id.toString(), template);
                 return {
-                    id: _.get(template, "id"),
-                    title: _.get(template, "title"),
-                    editable: _.get(template, "editable", false),
+                    editable: false,
+                    ...template,
                     __uuid: (document && document.__uuid) || uuid(),
                 };
             });
@@ -159,7 +162,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     }, [task, focusedPuzzleChain, isCreateMode]);
 
     const updateTaskTemplates = useCallback(
-        (documents: IVirtualDocument[]) => {
+        (documents: IVirtualTemplateDocument[]) => {
             if (onTaskChange) {
                 const nextTemplates = documents
                     .filter(document => document.id !== -1)
@@ -198,7 +201,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     );
 
     const updateTemplateAssignmentEditable = useCallback(
-        (documents: IDocument[]) => {
+        (documents: ITemplateDocument[]) => {
             if (!isViewMode(task)) {
                 return;
             }
@@ -234,11 +237,14 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
         if (documents.some(document => document.id === -1)) {
             return;
         }
-        const nextDocument: IVirtualDocument = {
+        const nextDocument: IVirtualTemplateDocument = {
             id: -1,
-            __uuid: uuid(),
             title: "",
+            description: "",
+            sections: [],
+            type: ETemplateType.LIGHT,
             editable: true,
+            __uuid: uuid(),
         };
         if (isViewMode(task)) {
             nextDocument.virtual = true;
@@ -386,19 +392,19 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
                   ]
                 : []),
             // show trash button if not focused on head or on document
-            ...(!focusedOnTaskHead && !focusedOnDocument
-                ? [
+            ...(editable && !focusedOnDocument
+                ? []
+                : [
                       {
                           label: "Удалить шаблон",
                           icon: <TrashIcon css={theme => ({ color: theme.colors.gray })} />,
                           action: onDeleteDocumentCallback,
                       },
-                  ]
-                : []),
+                  ]),
         ],
         [
+            editable,
             focusedOnDocument,
-            focusedOnTaskHead,
             onAddCommentClick,
             onAddDocumentCallback,
             onDeleteDocumentCallback,

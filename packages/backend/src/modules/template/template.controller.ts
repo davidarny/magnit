@@ -16,7 +16,10 @@ import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
 import { FindAllQuery } from "./queries/find-all.query";
 import { CreateTemplateResponse } from "./responses/create-template.response";
 import { GetTemplateResponse } from "./responses/get-template.response";
-import { GetTemplatesResponse } from "./responses/get-templates.response";
+import {
+    GetTemplatesExtendedResponse,
+    GetTemplatesResponse,
+} from "./responses/get-templates.response";
 import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { TemplateService } from "./services/template.service";
 
@@ -29,17 +32,25 @@ export class TemplateController {
     @Get("/")
     @ApiOkResponse({ type: GetTemplatesResponse, description: "Get all Templates" })
     async findAll(@Query() query?: FindAllQuery) {
-        const { offset, limit, sort, title } = { ...new FindAllQuery(), ...query };
-        const templates = await this.templateService.findAll(offset, limit, sort, title);
-        return { success: 1, total: templates.length, templates };
+        const [templates, all] = await this.templateService.findAll(new FindAllQuery(query));
+        return { success: 1, total: templates.length, templates, all };
+    }
+
+    @Get("/extended")
+    @ApiOkResponse({
+        type: GetTemplatesExtendedResponse,
+        description: "Get all Templates with Section",
+    })
+    async findAllExtended(@Query() query?: FindAllQuery) {
+        const [templates, all] = await this.templateService.findAll(new FindAllQuery(query), true);
+        return { success: 1, total: templates.length, templates, all };
     }
 
     @Post("/")
     @ApiImplicitBody({ name: "template", type: TemplateDto, description: "Template JSON" })
     @ApiCreatedResponse({ type: CreateTemplateResponse, description: "ID of created Template" })
     async create(@Body("template") templateDto: TemplateDto) {
-        const template = new Template(templateDto);
-        const saved = await this.templateService.insert(template);
+        const saved = await this.templateService.insert(new Template(templateDto));
         return { success: 1, template_id: saved.id };
     }
 
@@ -51,8 +62,7 @@ export class TemplateController {
         @Param("id", NumericIdPipe, TemplateByIdPipe) id: number,
         @Body("template") templateDto: TemplateDto,
     ) {
-        const template = new Template(templateDto);
-        const saved = await this.templateService.update(id, template);
+        const saved = await this.templateService.update(id, new Template(templateDto));
         return { success: 1, template_id: saved.id };
     }
 

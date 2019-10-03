@@ -14,7 +14,7 @@ import { TemplateAnswerLocation } from "./template-answer-location.entity";
 import { Template } from "./template.entity";
 
 @Entity("template_answer")
-export class TemplateAnswer extends BaseEntity<TemplateAnswer> {
+export class TemplateAnswer extends BaseEntity {
     constructor(dto?: DeepPartial<TemplateAnswer>) {
         super();
         this.construct(this, dto);

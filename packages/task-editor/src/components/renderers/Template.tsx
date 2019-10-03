@@ -1,15 +1,14 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IAnswer } from "@magnit/entities";
+import { IAnswer, ITemplate } from "@magnit/entities";
 import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary } from "@material-ui/core";
 import { ExpandMore as ExpandMoreIcon } from "@material-ui/icons";
-import _ from "lodash";
 import * as React from "react";
 import { SectionRenderer } from "./Section";
 
 interface ITemplateRendererProps {
-    template?: object;
+    template?: ITemplate;
     answers?: IAnswer[];
 }
 
@@ -19,10 +18,10 @@ export const TemplateRenderer: React.FC<ITemplateRendererProps> = ({ template, a
     }
     return (
         <React.Fragment>
-            {_.get(template, "sections", []).map((section: object, index: number) => (
+            {(template.sections || []).map((section, index) => (
                 <SectionRenderer
+                    key={section.id}
                     answers={answers}
-                    key={_.get(section, "id")}
                     index={index}
                     section={section}
                 />
@@ -40,3 +39,5 @@ export const TemplateRenderer: React.FC<ITemplateRendererProps> = ({ template, a
         </React.Fragment>
     );
 };
+
+TemplateRenderer.displayName = "TemplateRenderer";

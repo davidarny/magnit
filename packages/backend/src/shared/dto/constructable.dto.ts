@@ -1,9 +1,7 @@
-import { DeepPartial } from "typeorm";
-
-export abstract class ConstructableDto<T = ConstructableDto<object>> {
-    constructor(dto?: DeepPartial<T>) {
-        if (dto) {
-            Object.assign(this, dto);
+export abstract class ConstructableDto {
+    protected construct(self?: unknown, dto?: unknown) {
+        if (self && dto) {
+            Object.assign(self, dto);
         }
     }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as _ from "lodash";
-import { FindManyOptions, Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { CannotInsertTemplateException } from "../../../shared/exceptions/cannot-insert-template.exception";
@@ -9,6 +9,7 @@ import { PuzzleNotFoundException } from "../../../shared/exceptions/puzzle-not-f
 import { TemplateAnswerLocation } from "../entities/template-answer-location.entity";
 import { TemplateAnswer } from "../entities/template-answer.entity";
 import { IPuzzle, Template } from "../entities/template.entity";
+import { FindAllQuery } from "../queries/find-all.query";
 
 @Injectable()
 export class TemplateService {
@@ -27,25 +28,39 @@ export class TemplateService {
         });
     }
 
-    async findAll(offset?: number, limit?: number, sort?: "ASC" | "DESC", title?: string) {
-        // TODO: probably need to introduce FindOptionsBuilder
-        const options: FindManyOptions<Template> = {};
-        if (typeof offset !== "undefined") {
-            options.skip = offset;
+    async findAll(query: DeepPartial<FindAllQuery> = {}, extended: boolean = false) {
+        let sql = `
+            SELECT
+                t.id,
+                t.title,
+                t.description,
+                t.type,
+                t.version,
+                t.created_at,
+                t.updated_at
+                ${extended ? ", t.sections" : ""}
+            FROM template t
+            WHERE 1 = 1
+        `;
+        const params: Array<string | number> = [];
+        if (!_.isNil(query.title)) {
+            params.push(`%${query.title.toLowerCase()}%`);
+            sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
-        if (typeof limit !== "undefined") {
-            options.take = limit;
+        if (!_.isNil(query.sort)) {
+            sql += ` ORDER BY t.${query.sortBy || "title"} ${query.sort} `;
         }
-        if (sort) {
-            options.order = { title: sort };
+        if (!_.isNil(query.limit)) {
+            params.push(query.limit);
+            sql += ` LIMIT $${params.length} `;
         }
-        if (title) {
-            if (!options.where) {
-                options.where = {};
-            }
-            Object.assign(options.where, { title });
+        if (!_.isNil(query.offset)) {
+            params.push(query.offset);
+            sql += ` OFFSET $${params.length} `;
         }
-        return this.templateRepository.find(options);
+        const templates = await this.templateRepository.query(sql, params);
+        const all = await this.templateRepository.count();
+        return [templates, all];
     }
 
     // TODO: remove this one and handle 404 more accurately
@@ -172,17 +187,6 @@ export class TemplateService {
             throw new PuzzleNotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
         }
         return result;
-    }
-
-    async findAllQuestions(template: Template): Promise<IPuzzle[]> {
-        const puzzles: IPuzzle[] = [];
-        await this.traverse(template.sections as object[], value => {
-            if (this.isPuzzle(value) && value.puzzle_type === "question") {
-                puzzles.push(value);
-            }
-            return false;
-        });
-        return puzzles;
     }
 
     private isPuzzle(value: object): value is IPuzzle {

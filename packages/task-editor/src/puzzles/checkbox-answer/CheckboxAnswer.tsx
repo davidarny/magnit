@@ -1,23 +1,18 @@
 /** @jsx jsx */
 
-import * as React from "react";
-import { css, jsx } from "@emotion/core";
-import _ from "lodash";
-import { Checkbox, Grid } from "@material-ui/core";
+import { jsx } from "@emotion/core";
 import { InputField } from "@magnit/components";
+import { Checkbox, Grid } from "@material-ui/core";
+import * as React from "react";
 import { IPuzzleProps } from "services/item";
 
-export const CheckboxAnswer: React.FC<IPuzzleProps> = ({ puzzle, index }) => {
+export const CheckboxAnswer: React.FC<IPuzzleProps> = ({ puzzle }) => {
     return (
-        <Grid
-            item
-            css={css`
-                display: flex;
-                align-items: center;
-            `}
-        >
+        <Grid item css={{ display: "flex", alignItems: "center" }}>
             <Checkbox disabled />
-            <InputField disabled simple value={_.get(puzzle, "title", `Вариант ${index + 1}`)} />
+            <InputField disabled simple value={puzzle.title} />
         </Grid>
     );
 };
+
+CheckboxAnswer.displayName = "CheckboxAnswer";

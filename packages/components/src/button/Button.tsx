@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button as MaterialButton } from "@material-ui/core";
-import { Link } from "@reach/router";
+import { LinkProps } from "@reach/router";
 import _ from "lodash";
 import * as React from "react";
 
@@ -52,9 +52,10 @@ const variants = {
 };
 
 export interface IButtonProps {
+    // TODO: infer type
+    component?: any;
     title?: string;
     scheme?: keyof Omit<typeof variants, "main">;
-    component?: React.ReactNode;
     icon?: React.ReactNode;
 
     onClick?(): void;
@@ -62,7 +63,7 @@ export interface IButtonProps {
 
 type TButtonProps = IButtonProps &
     React.ComponentProps<typeof MaterialButton> &
-    React.ComponentProps<typeof Link>;
+    Partial<LinkProps<{}>>;
 
 export const Button: React.FC<TButtonProps> = props => {
     const { scheme = "blue", children, ...rest } = props;

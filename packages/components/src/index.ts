@@ -9,3 +9,5 @@ export * from "./button-like-text";
 export * from "./fab";
 export * from "./checkbox";
 export * from "./dialog";
+export * from "./file-or-icon";
+export * from "./asset-preview";

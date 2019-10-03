@@ -1,8 +1,14 @@
 import { ApiModelPropertyOptional } from "@nestjs/swagger";
+import { DeepPartial } from "typeorm";
 import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
 import { ENoLocationReason } from "../entities/template-answer-location.entity";
 
-export class TemplateAnswerLocationDto extends PrimaryBaseDto<TemplateAnswerLocationDto> {
+export class TemplateAnswerLocationDto extends PrimaryBaseDto {
+    constructor(dto?: DeepPartial<TemplateAnswerLocationDto>) {
+        super();
+        this.construct(this, dto);
+    }
+
     @ApiModelPropertyOptional({ example: "gps" }) readonly provider: string | null;
     @ApiModelPropertyOptional() readonly latitude: number | null;
     @ApiModelPropertyOptional() readonly longitude: number | null;

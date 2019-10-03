@@ -2,6 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import {
+    AssetPreview,
     Button,
     ButtonLikeText,
     Fab,
@@ -11,16 +12,16 @@ import {
 import {
     ETaskStatus,
     IComment,
-    IDocument,
     IExtendedDocument,
     IExtendedTask,
     IStageStep,
-    IVirtualDocument,
+    ITemplate,
+    ITemplateDocument,
+    IVirtualTemplateDocument,
 } from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
 import { IEditorService } from "@magnit/services";
 import { Dialog, Grid, Menu, MenuItem, Typography } from "@material-ui/core";
-import { Close as CloseIcon } from "@material-ui/icons";
 import _ from "lodash";
 import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -39,11 +40,11 @@ type TSelectChangeEvent = React.ChangeEvent<{
 interface IViewTaskProps {
     task: Partial<IExtendedTask>;
     service: IEditorService;
-    documents: IVirtualDocument[];
-    templates: Array<IDocument & IExtendedDocument>;
+    documents: IVirtualTemplateDocument[];
+    templates: Array<ITemplateDocument & IExtendedDocument>;
     pendingComments: IComment[];
     focusedPuzzleId?: string;
-    templateSnapshots: Map<string, object>;
+    templateSnapshots: Map<string, ITemplate>;
     editable?: boolean;
     regions?: string[];
     cities?: string[];
@@ -289,8 +290,6 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
 
     const isEditableMode =
         task.status !== ETaskStatus.IN_PROGRESS && task.status !== ETaskStatus.COMPLETED;
-
-    const deleteAssetVisible = isEditableMode;
 
     const isViewOnlyMode =
         task.status === ETaskStatus.IN_PROGRESS || task.status === ETaskStatus.COMPLETED;
@@ -558,53 +557,13 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Grid>
                         {(task.documents || []).map(document => (
                             <Grid item xs={2} key={document.id}>
-                                <Grid
-                                    container
-                                    justify="center"
-                                    alignItems="center"
-                                    direction="column"
-                                    css={theme => ({
-                                        height: "100%",
-                                        border: `1px solid ${theme.colors.lightGray}`,
-                                        borderRadius: theme.radius(0.5),
-                                        minHeight: theme.spacing(20),
-                                        position: "relative",
-                                    })}
-                                >
-                                    <img
-                                        css={theme => ({
-                                            width: "100%",
-                                            objectFit: "contain",
-                                            maxHeight: theme.spacing(20),
-                                        })}
-                                        alt={document.originalName}
-                                        src={document.filename}
-                                    />
-                                    {deleteAssetVisible && (
-                                        <div
-                                            onClick={() => onDeleteAssetCallback(document.id)}
-                                            css={theme => ({
-                                                padding: theme.spacing(0.5),
-                                                borderRadius: "50%",
-                                                background: theme.colors.gray,
-                                                color: theme.colors.white,
-                                                position: "absolute",
-                                                top: "-12px", // TODO: dynamic calculation
-                                                right: "-12px", // TODO: dynamic calculation
-                                                display: "flex",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                cursor: "pointer",
-                                            })}
-                                        >
-                                            <CloseIcon
-                                                css={theme => ({
-                                                    fontSize: theme.fontSize.normal,
-                                                })}
-                                            />
-                                        </div>
-                                    )}
-                                </Grid>
+                                <AssetPreview
+                                    src={document.filename}
+                                    filename={document.originalName}
+                                    ext={document.filename.split(".").pop()}
+                                    deletable={isEditableMode}
+                                    onDelete={() => onDeleteAssetCallback(document.id)}
+                                />
                             </Grid>
                         ))}
                         {editable && (

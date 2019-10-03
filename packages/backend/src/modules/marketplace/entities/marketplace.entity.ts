@@ -2,7 +2,7 @@ import { Column, DeepPartial, Entity, Generated, Index, PrimaryColumn } from "ty
 import { BaseEntity } from "../../../shared/entities/base.entity";
 
 @Entity()
-export class Marketplace extends BaseEntity<Marketplace> {
+export class Marketplace extends BaseEntity {
     constructor(dto?: DeepPartial<Marketplace>) {
         super();
         this.construct(this, dto);

@@ -10,7 +10,7 @@ export enum ENoLocationReason {
 }
 
 @Entity("template_answer_location")
-export class TemplateAnswerLocation extends PrimaryBaseEntity<TemplateAnswerLocation> {
+export class TemplateAnswerLocation extends PrimaryBaseEntity {
     constructor(dto?: DeepPartial<TemplateAnswerLocation>) {
         super();
         this.construct(this, dto);

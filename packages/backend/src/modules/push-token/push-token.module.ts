@@ -43,7 +43,7 @@ export class PushTokenModule {
                         body.token.slice(0, 8) +
                         "..." +
                         body.token.slice(body.token.length - 8 - 1, body.token.length - 1);
-                    this.logger.log(`Push notification to "${safeToLogToken}" successfully sent`);
+                    this.logger.debug(`Push notification to "${safeToLogToken}" successfully sent`);
                 } catch (error) {
                     this.logger.error(`Cannot send push to "${body.token}": ${error.message}`);
                 }

@@ -62,7 +62,7 @@ export const Condition: React.FC<IConditionProps> = props => {
                 ...condition,
                 answerPuzzle: "",
                 value: "",
-                actionType: "",
+                actionType: "" as EActionType,
                 questionPuzzle: event.target.value as string,
             });
         },

@@ -3,7 +3,7 @@ import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity"
 import { User } from "./user.entity";
 
 @Entity()
-export class UserRole extends PrimaryBaseEntity<UserRole> {
+export class UserRole extends PrimaryBaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

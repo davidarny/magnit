@@ -1,7 +1,7 @@
-import { DeepPartial, PrimaryGeneratedColumn } from "typeorm";
+import { PrimaryGeneratedColumn } from "typeorm";
 import { BaseEntity } from "./base.entity";
 
-export abstract class PrimaryBaseEntity<E, T = DeepPartial<E>> extends BaseEntity<E, T> {
+export abstract class PrimaryBaseEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 }

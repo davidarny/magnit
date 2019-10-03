@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Button, IColumn, InputField, TableWrapper } from "@magnit/components";
+import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
 import { Link, Redirect } from "@reach/router";
 import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
@@ -12,8 +12,13 @@ import { SectionTitle } from "components/section-title";
 import { AppContext } from "context";
 import _ from "lodash";
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import { getTemplates } from "services/api/templates";
+import { useCallback, useContext, useEffect, useState } from "react";
+import {
+    deleteTemplate,
+    getShortTemplates,
+    TShortTemplate,
+    TShortTemplateSortKeys,
+} from "services/api/templates";
 
 const columns: IColumn[] = [
     { key: "title", label: "Название шаблона", sortable: true },
@@ -22,43 +27,127 @@ const columns: IColumn[] = [
     { key: "updatedAt", label: "Дата редактирования", sortable: true },
 ];
 
+interface IUpdateTemplateListOptions {
+    sort?: "asc" | "desc";
+    sortBy?: TShortTemplateSortKeys;
+    title?: string;
+}
+
 export const TemplateList: React.FC = () => {
     const context = useContext(AppContext);
 
+    // full text search
+    const [searchQuery, setSearchQuery] = useState("");
+
     // table
-    const [rows, setRows] = useState<object[]>([]);
+    const [total, setTotal] = useState(0);
+    const [rows, setRows] = useState<TShortTemplate[]>([]);
     const [page, setPage] = useState(0);
+    const [order, setOrder] = useState<"asc" | "desc">("asc");
+    const [orderBy, setOrderBy] = useState<TShortTemplateSortKeys>("");
 
     // redirect to row
     const [redirect, setRedirect] = useState({ redirect: false, to: "" });
 
-    useEffect(() => {
-        getTemplates(context.courier)
-            .then(response => {
-                response.templates = response.templates.map(template => {
-                    return {
-                        ...template,
-                        createdAt: getFriendlyDate(new Date(template.createdAt!), true),
-                        updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
-                    };
-                });
-                setRows(response.templates);
-            })
-            .catch(console.error);
-    }, [context.courier]);
+    const fetchTemplatesAndSetState = useCallback(
+        ({ title, sort, sortBy }: IUpdateTemplateListOptions = {}) => {
+            // filtered
+            const upperCaseSort = (sort || "ASC").toUpperCase() as "ASC" | "DESC";
+            getShortTemplates(context.courier, title, upperCaseSort, sortBy)
+                .then(response => {
+                    setRows(
+                        response.templates.map(template => ({
+                            ...template,
+                            createdAt: getFriendlyDate(new Date(template.createdAt!), true),
+                            updatedAt: getFriendlyDate(new Date(template.updatedAt!), true),
+                        })),
+                    );
+                    setTotal(response.all);
+                })
+                .catch(console.error);
+        },
+        [context.courier],
+    );
 
-    function onRowClick(row?: object) {
-        if (!_.isObject(row) || !_.has(row, "id")) {
+    useEffect(() => {
+        // reset table
+        setPage(0);
+        setOrder("asc");
+        setOrderBy("");
+        // reset search query
+        setSearchQuery("");
+        // fetch templates
+        fetchTemplatesAndSetState();
+    }, [context.courier, fetchTemplatesAndSetState]);
+
+    function onRowClick(row?: ITableDataItem) {
+        if (!row) {
             return;
         }
-        setRedirect({ redirect: true, to: _.get(row, "id") });
+        setRedirect({ redirect: true, to: row.id });
     }
 
     function onChangePage(nextPage: number) {
         setPage(nextPage);
     }
 
-    const empty = !rows.length;
+    const onDeleteTemplateCallback = useCallback(
+        (id: number) => {
+            deleteTemplate(context.courier, id)
+                .then(() => {
+                    fetchTemplatesAndSetState();
+                    context.setSnackbarState({ open: true, message: "Шаблон успешно удалён" });
+                })
+                .catch(() => {
+                    context.setSnackbarError(true);
+                    context.setSnackbarState({ open: true, message: "Не удалось удалить шаблон" });
+                });
+        },
+        [context, fetchTemplatesAndSetState],
+    );
+
+    const renderMenuItems = useCallback(
+        (row: ITableDataItem, onMenuClose: () => void) => {
+            function onDeleteClick(event: React.MouseEvent<HTMLLIElement>) {
+                event.stopPropagation();
+                onDeleteTemplateCallback(row.id);
+                onMenuClose();
+            }
+
+            return [
+                <MenuItem key={row.id} onClick={onDeleteClick}>
+                    Удалить
+                </MenuItem>,
+            ];
+        },
+        [onDeleteTemplateCallback],
+    );
+
+    const updateTemplateListDebounced = _.debounce(fetchTemplatesAndSetState, 150);
+
+    const onSearchQueryChangeCallback = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const value = event.target.value;
+            setSearchQuery(value);
+            updateTemplateListDebounced({
+                title: value,
+                sort: order,
+                sortBy: orderBy,
+            });
+        },
+        [order, orderBy, updateTemplateListDebounced],
+    );
+
+    const onRequestSortCallback = useCallback(
+        (sort: "asc" | "desc", sortBy: keyof TShortTemplate) => {
+            setOrder(sort);
+            setOrderBy(sortBy);
+            fetchTemplatesAndSetState({ title: searchQuery, sort, sortBy });
+        },
+        [fetchTemplatesAndSetState, searchQuery],
+    );
+
+    const empty = !total;
 
     return (
         <SectionLayout>
@@ -110,8 +199,10 @@ export const TemplateList: React.FC = () => {
                                     css={theme => ({ padding: `0 ${theme.spacing(6)} !important` })}
                                 >
                                     <InputField
+                                        value={searchQuery}
                                         placeholder="Поиск ..."
                                         fullWidth
+                                        onChange={onSearchQueryChangeCallback}
                                         css={({ colors, radius, spacing }) => ({
                                             borderRadius: radius(5),
                                             background: colors.white,
@@ -132,7 +223,11 @@ export const TemplateList: React.FC = () => {
                             <Grid item css={theme => ({ padding: theme.spacing(3) })}>
                                 <TableWrapper
                                     page={page}
+                                    order={order}
+                                    orderBy={orderBy}
+                                    onRequestSort={onRequestSortCallback}
                                     columns={columns}
+                                    renderMenuItems={renderMenuItems}
                                     data={rows}
                                     onRowClick={onRowClick}
                                     onChangePage={onChangePage}

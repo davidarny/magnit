@@ -5,7 +5,7 @@ import {
     EPuzzleType,
     ETemplateType,
     EValidationType,
-} from "enums";
+} from "../enums";
 
 export interface ICondition {
     id: string;
@@ -35,6 +35,8 @@ export interface ITemplate {
     description: string;
     sections: ISection[];
     type: ETemplateType;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface ISection {

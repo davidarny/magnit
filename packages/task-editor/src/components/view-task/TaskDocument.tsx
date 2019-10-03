@@ -2,7 +2,13 @@
 
 import { jsx } from "@emotion/core";
 import { Checkbox, SelectableBlockWrapper, SelectField } from "@magnit/components";
-import { IComment, IDocument, IExtendedDocument, IVirtualDocument } from "@magnit/entities";
+import {
+    IComment,
+    IExtendedDocument,
+    ITemplate,
+    ITemplateDocument,
+    IVirtualTemplateDocument,
+} from "@magnit/entities";
 import { IEditorService } from "@magnit/services";
 import {
     Divider,
@@ -25,12 +31,12 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 interface ITaskDocumentProps {
-    documents: IVirtualDocument[];
-    document: IVirtualDocument;
+    documents: IVirtualTemplateDocument[];
+    document: IVirtualTemplateDocument;
     service: IEditorService;
     focusedPuzzleId?: string;
-    templateSnapshots: Map<string, object>;
-    templates: Array<IDocument & IExtendedDocument>;
+    templateSnapshots: Map<string, ITemplate>;
+    templates: Array<ITemplateDocument & IExtendedDocument>;
     editable: boolean;
     pendingComments: IComment[];
     comments: IComment[];

@@ -82,22 +82,8 @@ export class TaskController {
         )
         query?: FindAllQuery,
     ) {
-        const { offset, limit, sortBy, sort, statuses, status, title } = {
-            // need this to correctly handle default values
-            // not sure if nest creates them on given query
-            ...new FindAllQuery(),
-            ...query,
-        };
-        const tasks = await this.taskService.findAll(
-            offset,
-            limit,
-            sortBy,
-            sort,
-            status,
-            statuses,
-            title,
-        );
-        return { success: 1, total: tasks.length, tasks };
+        const [tasks, all] = await this.taskService.findAll(new FindAllQuery(query));
+        return { success: 1, total: tasks.length, all, tasks };
     }
 
     @Get("/extended")
@@ -114,32 +100,22 @@ export class TaskController {
         )
         query?: FindAllQueryExtended,
     ) {
-        const { offset, limit, sortBy, sort, statuses, status, title, city, region } = {
-            // need this to correctly handle default values
-            // not sure if nest creates them on given query
-            ...new FindAllQueryExtended(),
-            ...query,
-        };
-        const tasks = await this.taskService.findAllExtended(
-            offset,
-            limit,
-            sortBy,
-            sort,
-            status,
-            statuses,
-            title,
-            region,
-            city,
+        const [tasks, all] = await this.taskService.findAllExtended(
+            new FindAllQueryExtended(query),
         );
-        return { success: 1, total: tasks.length, tasks };
+        return { success: 1, total: tasks.length, tasks, all };
     }
 
     @Post("/")
     @ApiImplicitBody({ name: "task", type: TaskDto, description: "Task JSON" })
     @ApiCreatedResponse({ type: CreateTaskResponse, description: "ID of created Task" })
-    async create(@Body("task") taskDto: TaskDto) {
-        const task = new Task(taskDto);
-        const id = await this.taskService.insert(task);
+    async create(@Body("task") taskDto: TaskDto, @Req() req: IAuthRequest) {
+        const id = await this.taskService.insert(
+            new Task({
+                ...taskDto,
+                id_assignee: _.get(req, "user.id", null),
+            }),
+        );
         return { success: 1, task_id: id };
     }
 
@@ -159,7 +135,7 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskResponse, description: "Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findById(@Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number) {
-        const task = await this.taskService.findByIdWithTemplatesAndStages(id);
+        const task = await this.taskService.findById(id);
         return { success: 1, task };
     }
 
@@ -217,7 +193,7 @@ export class TaskController {
     @ApiOkResponse({ type: GetTaskExtendedResponse, description: "Extended Task JSON" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async findByIdExtended(@Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number) {
-        const task = await this.taskService.getTaskExtended(id);
+        const task = await this.taskService.findByIdExtended(id);
         return { success: 1, task };
     }
 

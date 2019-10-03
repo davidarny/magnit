@@ -4,6 +4,7 @@ import { AmqpService } from "../../amqp/services/amqp.service";
 import { ScheduleService } from "../../schedule/services/schedule.service";
 import { TemplateService } from "../../template/services/template.service";
 import { TaskReportDto } from "../dto/task-report.dto";
+import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskService } from "../services/task.service";
 import { TaskController } from "../task.controller";
@@ -69,31 +70,26 @@ describe("TaskController", () => {
     });
 
     it("should return empty list of tasks", async () => {
-        const expected = { success: 1, total: 0, tasks: [] };
-        jest.spyOn(taskService, "findAll").mockResolvedValue([]);
+        const expected = { success: 1, total: 0, tasks: [], all: 0 };
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[], 0]);
         expect(await taskController.findAll()).toStrictEqual(expected);
     });
 
     it("should create task", async () => {
         const expected = { success: 1, task_id: 0 };
         jest.spyOn(taskService, "insert").mockResolvedValue(task.id);
-        expect(await taskController.create(task)).toStrictEqual(expected);
+        expect(await taskController.create(new TaskDto(task), null)).toStrictEqual(expected);
     });
 
     it("should get task by id", async () => {
-        const expected = { success: 1, task: { ...task, templates: [] } };
+        const expected = { success: 1, task };
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
-            ...task,
-            templates: [],
-            stages: [],
-        });
         expect(await taskController.findById(0)).toStrictEqual(expected);
     });
 
     it("should return list of task with created task", async () => {
-        const expected = { success: 1, total: 1, tasks: [task] };
-        jest.spyOn(taskService, "findAll").mockResolvedValue([task]);
+        const expected = { success: 1, total: 1, tasks: [task], all: 1 };
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[task], 1]);
         expect(await taskController.findAll()).toStrictEqual(expected);
     });
 
@@ -103,27 +99,16 @@ describe("TaskController", () => {
         expect(await taskController.setTemplateAssignments(0, [0])).toStrictEqual(expected);
     });
 
-    it("should ensure task was added to tasks", async () => {
-        const expected = { success: 1, task: { ...task, templates: [0] } };
-        jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
-            ...task,
-            templates: [0],
-            stages: [],
-        });
-        expect(await taskController.findById(0)).toStrictEqual(expected);
-    });
-
     it("should update task", async () => {
         const expected = { success: 1 };
         const updated = { ...task, name: "updated task" };
-        expect(await taskController.update(0, updated)).toStrictEqual(expected);
+        expect(await taskController.update(0, new TaskDto(updated))).toStrictEqual(expected);
     });
 
     it("should get tasks with updated task", async () => {
         const updated = { ...task, name: "updated task" };
-        const expected = { success: 1, total: 1, tasks: [updated] };
-        jest.spyOn(taskService, "findAll").mockResolvedValue([updated]);
+        const expected = { success: 1, total: 1, tasks: [updated], all: 1 };
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[updated], 1]);
         expect(await taskController.findAll()).toStrictEqual(expected);
     });
 

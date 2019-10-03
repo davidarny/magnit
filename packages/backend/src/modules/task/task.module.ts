@@ -16,7 +16,7 @@ import { TaskDocument } from "./entities/task-document.entity";
 import { TaskStage } from "./entities/task-stage.entity";
 import { Task } from "./entities/task.entity";
 import { TemplateAssignment } from "./entities/tempalte-assignment.entity";
-import { TaskService } from "./services/task.service";
+import { TaskService, TTaskWithLastStageAndToken } from "./services/task.service";
 import { TaskStageSubscriber } from "./subscribers/task-stage.subscriber";
 import { TaskSubscriber } from "./subscribers/task.subscriber";
 import { TaskController } from "./task.controller";
@@ -43,11 +43,14 @@ import { TaskController } from "./task.controller";
     exports: [TaskService],
 })
 export class TaskModule {
+    private static NOTIFICATION_CHECK_JOB = "notification_check";
+    // every 5 minutes
+    private static NOTIFICATION_CHECK_CRON = "*/5 * * * *";
+
     private readonly logger = new Logger(TaskModule.name);
 
-    private static NOTIFICATION_CHECK_JOB = "notification_check";
-    // every 15 minutes
-    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
+    // local cache
+    private readonly cache = new Map<string, [Buffer, number]>();
 
     constructor(
         private readonly scheduleService: ScheduleService,
@@ -63,40 +66,58 @@ export class TaskModule {
 
     private async notifyAboutExpiringTasks(): Promise<boolean> {
         const tasks = await this.taskService.findTasksWithExpiringStages();
-        if (tasks && Array.isArray(tasks)) {
-            await Promise.all(
-                tasks
-                    .map(async task => {
-                        if (!task.token) {
-                            this.logger.warn(
-                                `Cannot send notification to "${task.title}" without token`,
-                            );
-                            return;
-                        }
-                        if (!task.stage) {
-                            this.logger.warn(
-                                `Cannot send notification to "${task.title}" without stage`,
-                            );
-                            return;
-                        }
-                        const channel = await this.amqpService.getAssertedChannelFor(
-                            AmqpService.PUSH_NOTIFICATION,
-                        );
-                        const friendlyDate = getFriendlyDate(new Date(task.stage.deadline));
-                        const pushMessage: IPushMessage = {
-                            token: task.token,
-                            message: {
-                                body: `Задание "${task.title}" заканчивается ${friendlyDate}`,
-                            },
-                        };
-                        await channel.sendToQueue(
-                            AmqpService.PUSH_NOTIFICATION,
-                            Buffer.from(JSON.stringify(pushMessage)),
-                        );
-                    })
-                    .filter(Boolean),
-            );
+        if (tasks.length) {
+            await Promise.all(tasks.map(this.sendPushToTask.bind(this)).filter(Boolean));
         }
-        return true;
+        return false;
+    }
+
+    private async sendPushToTask(task: TTaskWithLastStageAndToken) {
+        if (!task.tokens.length) {
+            this.logger.warn(`Cannot send push to "${task.title}" without tokens`);
+            return;
+        }
+        if (!task.stage) {
+            this.logger.warn(`Cannot send push to "${task.title}" without stage`);
+            return;
+        }
+        const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
+        const date = getFriendlyDate(new Date(task.stage.deadline));
+        await Promise.all(
+            task.tokens.map(token => {
+                const message: IPushMessage = {
+                    token,
+                    message: {
+                        body: `Этап "${task.stage.title}" задания "${task.title}" заканчивается ${date}`,
+                    },
+                };
+                const log = `task "${task.title}" for stage "${task.stage.title}" expiring at "${date}"`;
+                // set expiration date to tomorrow
+                const tomorrow = Date.now() + 1000 * 60 * 60 * 24;
+                const key = `${task.id}::${token}`;
+                if (!this.cache.has(key)) {
+                    this.logger.debug(`Cache not found, sending push to ${log}`);
+                    const content = Buffer.from(JSON.stringify(message));
+                    this.cache.set(key, [content, tomorrow]);
+                    return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
+                }
+                const [buffer, expiration] = this.cache.get(key);
+                const actual = Buffer.from(JSON.stringify({ ...message, ...task.stage }));
+                // push content is different
+                if (buffer.compare(actual) !== 0) {
+                    this.logger.debug(`Found cache with different content, sending push to ${log}`);
+                    const content = Buffer.from(JSON.stringify(message));
+                    this.cache.set(key, [actual, tomorrow]);
+                    return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
+                }
+                // push expired
+                if (expiration <= Date.now()) {
+                    this.logger.debug(`Found expired cache for ${log}`);
+                    this.cache.delete(key);
+                } else {
+                    this.logger.debug(`Found cache for ${log}`);
+                }
+            }),
+        );
     }
 }

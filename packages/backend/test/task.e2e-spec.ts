@@ -115,11 +115,11 @@ describe("TaskController (e2e)", () => {
     afterEach(async () => await app.close());
 
     it("should return empty list of tasks", async () => {
-        jest.spyOn(taskService, "findAll").mockResolvedValue([]);
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[], 0]);
         return request(app.getHttpServer())
             .get("/v1/tasks")
             .expect(200)
-            .expect({ success: 1, total: 0, tasks: [] });
+            .expect({ success: 1, total: 0, tasks: [], all: 0 });
     });
 
     it("should create task", async () => {
@@ -132,28 +132,23 @@ describe("TaskController (e2e)", () => {
     });
 
     it("should ensure task created", async () => {
-        jest.spyOn(taskService, "findAll").mockResolvedValue([task]);
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[task], 1]);
         return request(app.getHttpServer())
             .get("/v1/tasks")
             .expect(200)
             .then(response => {
-                const expected = { success: 1, total: 1, tasks: [task] };
+                const expected = { success: 1, total: 1, all: 1, tasks: [task] };
                 expect(response.body).toStrictEqual(expected);
             });
     });
 
     it("should get task by id", async () => {
         jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
-            ...task,
-            templates: [],
-            stages: [],
-        });
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)
             .then(response => {
-                const expected = { success: 1, task: { ...task, templates: [] } };
+                const expected = { success: 1, task };
                 expect(response.body).toStrictEqual(expected);
             });
     });
@@ -198,29 +193,24 @@ describe("TaskController (e2e)", () => {
 
     it("should ensure returns list with updated task", async () => {
         const updated = { ...task, name: "updated task" };
-        jest.spyOn(taskService, "findAll").mockResolvedValue([updated]);
+        jest.spyOn(taskService, "findAll").mockResolvedValue([[updated], 1]);
         return request(app.getHttpServer())
             .get("/v1/tasks")
             .expect(200)
             .then(response => {
-                const expected = { success: 1, total: 1, tasks: [updated] };
+                const expected = { success: 1, total: 1, all: 1, tasks: [updated] };
                 expect(response.body).toStrictEqual(expected);
             });
     });
 
     it("should ensure returns updated task", async () => {
         const updated = { ...task, name: "updated task" };
-        jest.spyOn(taskService, "findById").mockResolvedValue(task);
-        jest.spyOn(taskService, "findByIdWithTemplatesAndStages").mockResolvedValue({
-            ...updated,
-            templates: [],
-            stages: [],
-        });
+        jest.spyOn(taskService, "findById").mockResolvedValue(updated);
         return request(app.getHttpServer())
             .get("/v1/tasks/0")
             .expect(200)
             .then(response => {
-                const expected = { success: 1, task: { ...updated, templates: [] } };
+                const expected = { success: 1, task: updated };
                 expect(response.body).toStrictEqual(expected);
             });
     });

@@ -5,7 +5,7 @@ import { Comment } from "./comment.entity";
 import { Task } from "./task.entity";
 
 @Entity({ name: "template_assignment" })
-export class TemplateAssignment extends PrimaryBaseEntity<TemplateAssignment> {
+export class TemplateAssignment extends PrimaryBaseEntity {
     constructor(dto?: DeepPartial<TemplateAssignment>) {
         super();
         this.construct(this, dto);

@@ -1,10 +1,20 @@
 import { ApiModelPropertyOptional } from "@nestjs/swagger";
+import { DeepPartial } from "typeorm";
+import { ConstructableDto } from "../../../shared/dto/constructable.dto";
+import { TemplateDto } from "../dto/template.dto";
 
-export class FindAllQuery {
+export class FindAllQuery extends ConstructableDto {
+    constructor(dto?: DeepPartial<FindAllQuery>) {
+        super();
+        this.construct(this, dto);
+    }
+
     @ApiModelPropertyOptional({ default: 0, minimum: 0 }) readonly offset: number = 0;
     @ApiModelPropertyOptional({ default: 10, minimum: 0 })
     readonly limit: number = 10;
     @ApiModelPropertyOptional({ default: "ASC", enum: ["ASC", "DESC"] })
     readonly sort: "ASC" | "DESC" = "ASC";
+    @ApiModelPropertyOptional({ description: "TemplateDto keys", default: "title", type: String })
+    readonly sortBy?: keyof TemplateDto = "title";
     @ApiModelPropertyOptional({ description: "Query by name" }) readonly title?: string;
 }

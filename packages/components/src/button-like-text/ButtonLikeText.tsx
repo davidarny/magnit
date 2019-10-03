@@ -1,25 +1,27 @@
 /** @jsx jsx */
 
-import { Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
+import { Typography } from "@material-ui/core";
+import { LinkProps } from "@reach/router";
 import * as React from "react";
-import { Link } from "@reach/router";
 
 interface IButtonLikeTextProps {
-    component?: React.ReactNode;
+    // TODO: infer type
+    component?: any;
 
     onClick?(event: React.MouseEvent<HTMLElement, MouseEvent>): void;
 }
 
-type TButtonLikeTextProps = IButtonLikeTextProps &
-    React.ComponentProps<typeof Typography> &
-    React.ComponentProps<typeof Link>;
+type TButtonLikeTextProps = Omit<React.ComponentProps<typeof Typography>, "component"> &
+    Partial<LinkProps<{}>> &
+    IButtonLikeTextProps;
 
 export const ButtonLikeText: React.FC<TButtonLikeTextProps> = ({ children, ...props }) => {
     return (
         <Typography
             component={props.component || "span"}
             css={theme => ({
+                userSelect: "none",
                 display: "inline-block",
                 color: theme.colors.primary,
                 fontSize: theme.fontSize.sNormal,

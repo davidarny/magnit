@@ -40,6 +40,8 @@ interface ITableWrapperProps {
     selectable?: boolean;
     sort?: boolean;
 
+    renderMenuItems?(row: ITableDataItem, onMenuClose: () => void): React.ReactNode;
+
     onRowClick?(row: ITableDataItem): void;
 
     onSelectToggle?(selected: boolean): void;
@@ -68,6 +70,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
         onSelectToggle,
         onRequestSort,
         onChangePage,
+        renderMenuItems,
         ...rest
     } = props;
 
@@ -105,6 +108,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
                     onRequestSort={onRequestSortCallback}
                 />
                 <TableBodyWrapper
+                    renderMenuItems={renderMenuItems}
                     data={
                         // currently pagination work only in client side
                         // need to implement server side in future
