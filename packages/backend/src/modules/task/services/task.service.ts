@@ -49,7 +49,7 @@ export class TaskService {
         return await this.taskRepository.query(`
             SELECT
                 t.*,
-                json_agg(ts.*) ->> json_array_length(json_agg(ts.*)) - 1  AS stage,
+                json_agg(ts.*) -> json_array_length(json_agg(ts.*)) - 1  AS stage,
                 to_json(array_remove(array_agg(pt.token), NULL)) AS tokens
             FROM task_stage ts
             LEFT JOIN task t ON ts.id_task = t.id

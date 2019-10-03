@@ -45,7 +45,7 @@ import { TaskController } from "./task.controller";
 export class TaskModule {
     private static NOTIFICATION_CHECK_JOB = "notification_check";
     // every 15 minutes
-    private static NOTIFICATION_CHECK_CRON = "*/1 * * * *";
+    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
 
     private readonly logger = new Logger(TaskModule.name);
 
@@ -95,7 +95,7 @@ export class TaskModule {
             }),
         );
         this.logger.debug(
-            `Successfully sent push to task "${task.title}" with stage "${task.stage.title} ${task.stage.deadline}"`,
+            `Sent push to "${task.title}" for stage "${task.stage.title}" expiring at "${task.stage.deadline}"`,
         );
     }
 }
