@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectConnection } from "@nestjs/typeorm";
 import * as _ from "lodash";
 import { Connection, EntitySubscriberInterface, UpdateEvent } from "typeorm";
@@ -12,6 +12,8 @@ import { TaskService } from "../services/task.service";
 
 @Injectable()
 export class TaskSubscriber implements EntitySubscriberInterface<Task> {
+    private readonly logger = new Logger(TaskSubscriber.name);
+
     constructor(
         @InjectConnection() readonly connection: Connection,
         private readonly taskService: TaskService,
@@ -62,7 +64,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
             return;
         }
         const pushTokens = await this.pushTokenService.getTokensByUserId(task.id_assignee);
-        if (pushTokens) {
+        if (pushTokens.length) {
             const channel = await this.amqpService.getAssertedChannelFor(
                 AmqpService.PUSH_NOTIFICATION,
             );
@@ -78,7 +80,14 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
                         AmqpService.PUSH_NOTIFICATION,
                         Buffer.from(JSON.stringify(pushMessage)),
                     );
+                    this.logger.debug(
+                        `Successfully sent push to task task "${task.title}" in status "${task.status}"`,
+                    );
                 }),
+            );
+        } else {
+            this.logger.debug(
+                `Cannot send push to task "${task.title}" in status "${task.status}"`,
             );
         }
     }
