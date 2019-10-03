@@ -82,27 +82,27 @@ export class TaskModule {
             return;
         }
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
-        const friendlyDate = getFriendlyDate(new Date(task.stage.deadline));
+        const date = getFriendlyDate(new Date(task.stage.deadline));
         await Promise.all(
             task.tokens.map(token => {
                 const pushMessage: IPushMessage = {
                     token,
                     message: {
-                        body: `Задание "${task.title}" заканчивается ${friendlyDate}`,
+                        body: `Задание "${task.title}" заканчивается ${date}`,
                     },
                 };
                 const content = Buffer.from(JSON.stringify(pushMessage));
                 // set expiration date to tomorrow
-                const expiration = Date.now() + 1000 * 60 * 60 * 24;
+                const nextExpiration = Date.now() + 1000 * 60 * 60 * 24;
                 const key = `${task.id}::${token}`;
                 if (!this.cache.has(key)) {
-                    this.cache.set(key, [content, expiration]);
+                    this.cache.set(key, [content, nextExpiration]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
-                const [buffer, date] = this.cache.get(key);
-                const expired = date <= Date.now();
+                const [buffer, expiration] = this.cache.get(key);
+                const expired = expiration <= Date.now();
                 if (buffer.compare(content) !== 0) {
-                    this.cache.set(key, [content, expiration]);
+                    this.cache.set(key, [content, nextExpiration]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 } else if (expired) {
                     this.cache.delete(key);
@@ -110,7 +110,7 @@ export class TaskModule {
             }),
         );
         this.logger.debug(
-            `Sent push to "${task.title}" for stage "${task.stage.title}" expiring at "${task.stage.deadline}"`,
+            `Sending push to "${task.title}" for stage "${task.stage.title}" expiring at "${date}"`,
         );
     }
 }
