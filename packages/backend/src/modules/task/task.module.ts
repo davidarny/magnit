@@ -44,8 +44,8 @@ import { TaskController } from "./task.controller";
 })
 export class TaskModule {
     private static NOTIFICATION_CHECK_JOB = "notification_check";
-    // every 15 minutes
-    private static NOTIFICATION_CHECK_CRON = "*/15 * * * *";
+    // every 5 minutes
+    private static NOTIFICATION_CHECK_CRON = "*/5 * * * *";
 
     private readonly logger = new Logger(TaskModule.name);
 
@@ -74,11 +74,11 @@ export class TaskModule {
 
     private async sendPushToTask(task: TTaskWithLastStageAndToken) {
         if (!task.tokens.length) {
-            this.logger.warn(`Cannot send notification to "${task.title}" without tokens`);
+            this.logger.warn(`Cannot send push to "${task.title}" without tokens`);
             return;
         }
         if (!task.stage) {
-            this.logger.warn(`Cannot send notification to "${task.title}" without stage`);
+            this.logger.warn(`Cannot send push to "${task.title}" without stage`);
             return;
         }
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
@@ -96,16 +96,29 @@ export class TaskModule {
                 const nextExpiration = Date.now() + 1000 * 60 * 60 * 24;
                 const key = `${task.id}::${token}`;
                 if (!this.cache.has(key)) {
+                    this.logger.debug(
+                        `Cache not found, sending push to "${task.title}" expiring at "${date}"`,
+                    );
                     this.cache.set(key, [content, nextExpiration]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
                 const [buffer, expiration] = this.cache.get(key);
-                const expired = expiration <= Date.now();
+                // push content is different
                 if (buffer.compare(content) !== 0) {
+                    this.logger.debug(
+                        `Found cache with different content, sending push to "${task.title}" expiring at "${date}"`,
+                    );
                     this.cache.set(key, [content, nextExpiration]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
-                } else if (expired) {
+                }
+                // push expired
+                if (expiration <= Date.now()) {
+                    this.logger.debug(
+                        `Found expired cache for "${task.title}" expiring at "${date}"`,
+                    );
                     this.cache.delete(key);
+                } else {
+                    this.logger.debug(`Found cache for "${task.title}" expiring at "${date}"`);
                 }
             }),
         );
