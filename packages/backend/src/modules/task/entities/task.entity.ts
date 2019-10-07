@@ -36,9 +36,9 @@ export class Task extends PrimaryBaseEntity {
     @Column()
     id_owner: number;
 
-    @ManyToOne(type => User, owner => owner.ownerTasks, { onDelete: "CASCADE" })
-    @JoinColumn({ name: "id_owner" })
-    owner: User;
+    // @ManyToOne(type => User, owner => owner.ownerTasks, { onDelete: "CASCADE" })
+    // @JoinColumn({ name: "id_owner" })
+    // owner: User;
 
     @Index()
     @Column({ type: "int", nullable: true })

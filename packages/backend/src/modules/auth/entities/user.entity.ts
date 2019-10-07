@@ -69,6 +69,6 @@ export class User extends BaseEntity {
     @OneToMany(type => Comment, comment => comment.user)
     comments: Comment[];
 
-    @OneToMany(type => Task, task => task.owner)
-    ownerTasks: Task[];
+    // @OneToMany(type => Task, task => task.owner)
+    // ownerTasks: Task[];
 }
