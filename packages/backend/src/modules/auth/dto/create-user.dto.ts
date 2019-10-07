@@ -1,13 +1,11 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsString } from "class-validator";
-import { ConstructableDto } from "../../../shared/dto/constructable.dto";
 
-export class CreateUserDto extends ConstructableDto {
+export class CreateUserDto {
     @IsString()
     @ApiModelProperty()
     readonly password: string;
 
-    @IsString()
     @IsEmail()
     @ApiModelProperty()
     readonly email: string;

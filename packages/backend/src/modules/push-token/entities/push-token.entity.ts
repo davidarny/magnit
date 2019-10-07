@@ -12,8 +12,8 @@ export class PushToken extends BaseEntity {
     @Column()
     id: string;
 
-    @PrimaryColumn("varchar")
-    id_user: string;
+    @PrimaryColumn()
+    id_user: number;
 
     @PrimaryColumn("varchar")
     token: string;

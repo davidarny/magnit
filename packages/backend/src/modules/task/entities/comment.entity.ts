@@ -1,6 +1,7 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
+import { User } from "../../auth/entities/user.entity";
 
 @Entity()
 export class Comment extends PrimaryBaseEntity {
@@ -9,8 +10,13 @@ export class Comment extends PrimaryBaseEntity {
         this.construct(this, dto);
     }
 
-    @Column("varchar")
-    id_user: string;
+    @Index()
+    @Column()
+    id_user: number;
+
+    @OneToMany(type => User, user => user.comments)
+    @JoinColumn({ name: "id_user" })
+    user: User;
 
     @Column("text")
     text: string;

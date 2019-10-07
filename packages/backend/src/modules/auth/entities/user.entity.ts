@@ -7,11 +7,13 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
-    PrimaryColumn,
     Index,
+    OneToMany,
 } from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { UserRole } from "./user.role.entity";
+import { Comment } from "../../task/entities/comment.entity";
+import { Task } from "../../task/entities/task.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -25,8 +27,8 @@ export class User extends BaseEntity {
     password: string;
 
     @IsString()
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @IsEmail()
     @Column()
@@ -53,14 +55,20 @@ export class User extends BaseEntity {
     department: string;
 
     @Index()
-    @PrimaryColumn()
-    id_role: number = 0;
+    @Column("int")
+    id_role: number;
 
     @ManyToOne(() => UserRole, role => role.users)
-    @JoinColumn({ name: "id_role", referencedColumnName: "id" })
+    @JoinColumn({ name: "id_role" })
     role: UserRole;
 
     @IsNumber()
-    @Column({ type: "int" })
+    @Column({ type: "int", default: 1 })
     level: number = 1;
+
+    @OneToMany(type => Comment, comment => comment.user)
+    comments: Comment[];
+
+    @OneToMany(type => Task, task => task.owner)
+    ownerTasks: Task[];
 }

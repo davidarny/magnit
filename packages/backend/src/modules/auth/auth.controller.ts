@@ -6,7 +6,6 @@ import { ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { ValidationPipe } from "../../shared/pipes/validation.pipe";
 import { AuthResponse } from "./responses/user-register.response";
 import { Transactional } from "typeorm-transactional-cls-hooked";
-// import { try } from "bluebird";
 
 @ApiUseTags("auth")
 @Controller("auth")
@@ -23,6 +22,7 @@ export class AuthController {
 
     @Post("/login")
     @Transactional()
+    @UsePipes(ValidationPipe)
     @ApiOkResponse({ type: AuthResponse, description: "Login user" })
     async login(@Body() loginUserDto: LoginUserDto) {
         return this.authService.login(loginUserDto);

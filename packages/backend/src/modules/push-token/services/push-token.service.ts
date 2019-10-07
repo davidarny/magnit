@@ -24,7 +24,7 @@ export class PushTokenService {
         }
     }
 
-    async getTokensByUserId(id: string): Promise<PushToken[]> {
+    async getTokensByUserId(id: number): Promise<PushToken[]> {
         return this.pushTokenRepository.find({ where: { id_user: id } });
     }
 

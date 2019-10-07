@@ -31,8 +31,8 @@ export class AuthService {
         throw new UserUnauthorizedException("Cannot authorize user");
     }
 
-    async register(userDTO: CreateUserDto) {
-        const user = new User(userDTO);
+    async register(userDto: CreateUserDto) {
+        const user = new User(userDto);
         const token = this.getTokenFor(user);
         const savedUser = await this.createUser(user);
         return { success: 1, id: savedUser.id, token: token };

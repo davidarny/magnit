@@ -5,6 +5,7 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { TaskDocument } from "./task-document.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
+import { User } from "../../auth/entities/user.entity";
 
 export enum ETaskStatus {
     IN_PROGRESS = "in_progress",
@@ -32,12 +33,16 @@ export class Task extends PrimaryBaseEntity {
     @Column("varchar")
     status: ETaskStatus;
 
-    @Column({ type: "varchar", nullable: true })
-    id_owner: string;
+    @Column()
+    id_owner: number;
+
+    @ManyToOne(type => User, owner => owner.ownerTasks, { onDelete: "CASCADE" })
+    @JoinColumn({ name: "id_owner" })
+    owner: User;
 
     @Index()
-    @Column({ type: "varchar", nullable: true })
-    id_assignee: string;
+    @Column({ type: "int", nullable: true })
+    id_assignee: number | null;
 
     @Column({ type: "int", default: 3 })
     notify_before: number;

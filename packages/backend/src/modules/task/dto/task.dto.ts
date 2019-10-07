@@ -17,8 +17,8 @@ export class TaskDto extends PrimaryBaseDto {
 
     @ApiModelProperty() readonly title: string;
     @ApiModelPropertyOptional() readonly description: string;
-    @ApiModelPropertyOptional() readonly id_owner: string;
-    @ApiModelPropertyOptional() readonly id_assignee: string;
+    @ApiModelPropertyOptional() readonly id_owner: number;
+    @ApiModelPropertyOptional() readonly id_assignee: number;
     @ApiModelPropertyOptional() readonly id_marketplace: number;
     @ApiModelProperty({ default: 3 }) readonly notify_before: number;
     @ApiModelProperty({ enum: ["in_progress", "on_check", "draft", "completed", "expired"] })

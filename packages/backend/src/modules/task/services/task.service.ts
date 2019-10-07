@@ -534,7 +534,7 @@ export class TaskService {
     async addCommentToAssignment(
         taskId: number,
         templateId: number,
-        userId: string,
+        userId: number,
         text: string,
     ): Promise<void> {
         const assignment = await this.templateAssignmentRepository.findOne({
