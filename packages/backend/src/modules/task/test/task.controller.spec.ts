@@ -13,7 +13,6 @@ import { CreateUserDto } from "../../auth/dto/create-user.dto";
 
 describe("TaskController", () => {
     let taskController: TaskController;
-    let createUserDto = new CreateUserDto("password", "email", "firstName", "lastName");
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
@@ -28,7 +27,7 @@ describe("TaskController", () => {
         stages: [],
         answers: [],
         documents: [],
-        owner: new User(createUserDto),
+        owner: new User({ mail: "mail@mail.ru", password: "password", id: 1 }),
         marketplace: {
             id: 0,
             address: "",

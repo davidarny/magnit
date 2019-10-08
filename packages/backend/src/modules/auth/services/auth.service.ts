@@ -33,7 +33,8 @@ export class AuthService {
 
     async register(userDto: CreateUserDto) {
         const user = new User(userDto);
-        user.role = await this.userService.getDefaultRole();
+        const role = await this.userService.getDefaultRole();
+        user.id_role = role.id;
         const token = this.getTokenFor(user);
         const savedUser = await this.createUser(user);
         return { success: 1, id: savedUser.id, token: token };
@@ -60,7 +61,7 @@ export class AuthService {
         const payload = {
             email: user.email,
             id: user.id,
-            role: user.role,
+            id_role: user.role.id,
         };
         return this.tokenManager.encode(payload);
     }

@@ -32,8 +32,7 @@ export class UserService {
     }
 
     async create(user: User) {
-        const savedUser = await this.userRepository.save(user);
-        return savedUser;
+        return this.userRepository.save(user);
     }
 
     async findRole(roleId: number) {

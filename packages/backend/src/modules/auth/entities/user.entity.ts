@@ -58,10 +58,10 @@ export class User extends BaseEntity {
     @Column("int")
     id_role: number;
 
-    @ManyToOne(type => UserRole)
+    @ManyToOne(() => UserRole)
     @JoinColumn({ name: "id_role" })
     role: UserRole;
 
     @OneToMany(() => Task, task => task.owner)
-    ownerTasks: Task[];
+    tasks: Task[];
 }
