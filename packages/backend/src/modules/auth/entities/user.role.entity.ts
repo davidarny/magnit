@@ -12,7 +12,4 @@ export class UserRole extends PrimaryBaseEntity {
 
     @Column({ type: "text", nullable: true })
     description: string;
-
-    @OneToMany(() => User, user => user)
-    users: User[];
 }

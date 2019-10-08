@@ -5,7 +5,7 @@ export class UserExistException extends HttpException {
         super(
             {
                 errorCode: 15,
-                error: "User exist",
+                error: "Conflict",
                 message,
                 statusCode: HttpStatus.CONFLICT,
             },

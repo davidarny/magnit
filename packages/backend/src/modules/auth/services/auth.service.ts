@@ -33,6 +33,7 @@ export class AuthService {
 
     async register(userDto: CreateUserDto) {
         const user = new User(userDto);
+        user.role = await this.userService.getDefaultRole();
         const token = this.getTokenFor(user);
         const savedUser = await this.createUser(user);
         return { success: 1, id: savedUser.id, token: token };
@@ -49,7 +50,6 @@ export class AuthService {
         const existUser = await this.userService.findOneByEmail(user.email);
 
         if (existUser) {
-            console.log(existUser);
             throw new UserExistException("User exist");
         }
         user.password = crypthPassword;
@@ -60,7 +60,7 @@ export class AuthService {
         const payload = {
             email: user.email,
             id: user.id,
-            id_role: user.id_role,
+            role: user.role,
         };
         return this.tokenManager.encode(payload);
     }

@@ -58,17 +58,10 @@ export class User extends BaseEntity {
     @Column("int")
     id_role: number;
 
-    @ManyToOne(() => UserRole, role => role.users)
+    @ManyToOne(type => UserRole)
     @JoinColumn({ name: "id_role" })
     role: UserRole;
 
-    @IsNumber()
-    @Column({ type: "int", default: 1 })
-    level: number = 1;
-
-    @OneToMany(type => Comment, comment => comment.user)
-    comments: Comment[];
-
-    // @OneToMany(type => Task, task => task.owner)
-    // ownerTasks: Task[];
+    @OneToMany(() => Task, task => task.owner)
+    ownerTasks: Task[];
 }

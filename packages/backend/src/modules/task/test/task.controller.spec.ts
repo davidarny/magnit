@@ -8,10 +8,12 @@ import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskService } from "../services/task.service";
 import { TaskController } from "../task.controller";
+import { User } from "../../auth/entities/user.entity";
+import { CreateUserDto } from "../../auth/dto/create-user.dto";
 
 describe("TaskController", () => {
     let taskController: TaskController;
-
+    let createUserDto = new CreateUserDto("password", "email", "firstName", "lastName");
     const taskService = createMockFrom(TaskService.prototype);
     const templateService = createMockFrom(TemplateService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
@@ -26,6 +28,7 @@ describe("TaskController", () => {
         stages: [],
         answers: [],
         documents: [],
+        owner: new User(createUserDto),
         marketplace: {
             id: 0,
             address: "",

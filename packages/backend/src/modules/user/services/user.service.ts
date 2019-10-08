@@ -14,9 +14,11 @@ export class UserService {
     ) {}
 
     async findById(id: number) {
-        return this.userRepository.findOne({
+        const { id_role, ...user } = await this.userRepository.findOne({
             where: { id: id },
+            relations: ["role"],
         });
+        return user;
     }
 
     async findOneByEmail(email: string) {
@@ -30,8 +32,27 @@ export class UserService {
     }
 
     async create(user: User) {
-        console.log(user);
         const savedUser = await this.userRepository.save(user);
         return savedUser;
+    }
+
+    async findRole(roleId: number) {
+        return this.userRoleRepository.findOne({
+            where: { id: roleId },
+        });
+    }
+
+    async getDefaultRole() {
+        const defaultRoleId = 0;
+        const existRole = await this.findRole(defaultRoleId);
+
+        if (existRole) {
+            return existRole;
+        } else {
+            const savedRole = await this.userRoleRepository.query(
+                `INSERT INTO user_role ("created_at","updated_at","id","title","description") VALUES (DEFAULT,DEFAULT,'0','admine role','admine role')`,
+            );
+            return savedRole;
+        }
     }
 }

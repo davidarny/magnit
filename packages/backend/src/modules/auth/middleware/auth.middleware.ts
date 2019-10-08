@@ -1,4 +1,4 @@
-import { Inject, NestMiddleware, Injectable } from "@nestjs/common";
+import { NestMiddleware, Injectable } from "@nestjs/common";
 import { Response } from "express";
 import { TokenExpiredError } from "jsonwebtoken";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
@@ -8,7 +8,6 @@ import { User } from "../entities/user.entity";
 import { JWTTokenManager } from "../providers/jwt.token.manager";
 import { AuthService } from "../services/auth.service";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
-import { TokenManager } from "../providers/token.manager";
 import _ = require("lodash");
 
 @Injectable()
