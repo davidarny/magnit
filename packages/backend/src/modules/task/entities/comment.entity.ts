@@ -14,7 +14,7 @@ export class Comment extends PrimaryBaseEntity {
     @Column()
     id_user: number;
 
-    @OneToMany(type => User, user => user.comments)
+    @ManyToOne(() => User)
     @JoinColumn({ name: "id_user" })
     user: User;
 
