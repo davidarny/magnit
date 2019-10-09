@@ -1,4 +1,5 @@
 import { Injectable, Inject } from "@nestjs/common";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 
 import { User } from "../entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
@@ -13,24 +14,23 @@ import { UserExistException } from "../../../shared/exceptions/user-exist.except
 @Injectable()
 export class AuthService {
     constructor(
-        @Inject(UserService) private readonly userService: UserService,
-        @Inject(PasswordManager) private readonly passwordManager: PasswordManager,
+        private readonly userService: UserService,
+        private readonly passwordManager: PasswordManager,
         private readonly tokenManager: JWTTokenManager<object>,
     ) {}
 
     async validateUser(email: string, pass: string) {
         const user = await this.userService.findOneByEmail(email);
-
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
-
         if (pass == this.passwordManager.decode(user.password)) {
             return user;
         }
         throw new UserUnauthorizedException("Cannot authorize user");
     }
 
+    @Transactional()
     async register(userDto: CreateUserDto) {
         const user = new User(userDto);
         const role = await this.userService.getDefaultRole();
@@ -40,6 +40,7 @@ export class AuthService {
         return { success: 1, id: savedUser.id, token: token };
     }
 
+    @Transactional()
     async login(loginUserDto: LoginUserDto) {
         const user = await this.validateUser(loginUserDto.email, loginUserDto.password);
         const token = this.getTokenFor(user);

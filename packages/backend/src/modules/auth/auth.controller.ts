@@ -5,23 +5,20 @@ import { AuthService } from "./services/auth.service";
 import { ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { ValidationPipe } from "../../shared/pipes/validation.pipe";
 import { AuthResponse } from "./responses/user-register.response";
-import { Transactional } from "typeorm-transactional-cls-hooked";
 
 @ApiUseTags("auth")
 @Controller("auth")
 export class AuthController {
-    constructor(@Inject(AuthService) private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {}
 
     @Post("/register")
-    @Transactional()
     @UsePipes(ValidationPipe)
     @ApiOkResponse({ type: AuthResponse, description: "Register user" })
-    async register(@Body() userInfo: CreateUserDto) {
-        return this.authService.register(userInfo);
+    async register(@Body() createUserDto: CreateUserDto) {
+        return this.authService.register(createUserDto);
     }
 
     @Post("/login")
-    @Transactional()
     @UsePipes(ValidationPipe)
     @ApiOkResponse({ type: AuthResponse, description: "Login user" })
     async login(@Body() loginUserDto: LoginUserDto) {

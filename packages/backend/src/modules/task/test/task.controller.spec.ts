@@ -9,7 +9,6 @@ import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskService } from "../services/task.service";
 import { TaskController } from "../task.controller";
 import { User } from "../../auth/entities/user.entity";
-import { CreateUserDto } from "../../auth/dto/create-user.dto";
 
 describe("TaskController", () => {
     let taskController: TaskController;
@@ -27,7 +26,13 @@ describe("TaskController", () => {
         stages: [],
         answers: [],
         documents: [],
-        owner: new User({ mail: "mail@mail.ru", password: "password", id: 1 }),
+        owner: new User({
+            email: "mail@mail.ru",
+            password: "password",
+            id: 1,
+            firstName: "firstName",
+            lastName: "lastName",
+        }),
         marketplace: {
             id: 0,
             address: "",

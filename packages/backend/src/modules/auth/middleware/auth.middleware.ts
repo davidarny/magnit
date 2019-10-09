@@ -51,7 +51,7 @@ export class AuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
             res.header("X-Access-Token", this.tokenManager.encode(req.user));
             res.header("Access-Control-Expose-Headers", "X-Access-Token");
             // try to get push tokens
-            // await this.setPushTokenIfExists(req.user);
+            await this.setPushTokenIfExists(req.user);
             return next();
         }
         throw new UserUnauthorizedException("User unauthorized");

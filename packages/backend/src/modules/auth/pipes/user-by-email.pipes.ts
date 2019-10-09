@@ -1,19 +1,19 @@
 import { PipeTransform, Injectable, Inject, ArgumentMetadata } from "@nestjs/common";
+import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { LoginUserDto } from "../dto/login-user.dto";
 import { UserService } from "../../user/services/user.service";
-import { User } from "../entities/user.entity";
 
 @Injectable()
-export class UserByEmailPipe implements PipeTransform<LoginUserDto, Promise<User>> {
-    constructor(private readonly userService: UserService) {
-        console.log("pipe");
-    }
+export class UserByEmailPipe implements PipeTransform<any> {
+    constructor(private readonly userService: UserService) {}
 
-    async transform(loginUserDTO: LoginUserDto, metadata: ArgumentMetadata): Promise<User> {
-        console.log(loginUserDTO);
-        const res = await this.userService.findOneByEmail(loginUserDTO.email);
-        console.log("res= ");
-        console.log(res);
-        return res;
+    async transform(loginUserDTO: LoginUserDto, metadata: ArgumentMetadata): Promise<Boolean> {
+        const user = await this.userService.findOneByEmail(loginUserDTO.email);
+
+        if (user) {
+            return true;
+        } else {
+            throw new UserUnauthorizedException("User not found");
+        }
     }
 }

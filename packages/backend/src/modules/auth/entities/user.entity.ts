@@ -1,5 +1,4 @@
 import { Exclude } from "class-transformer";
-import { IsEmail, IsString, IsNumber } from "class-validator";
 import {
     Entity,
     DeepPartial,
@@ -12,7 +11,6 @@ import {
 } from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { UserRole } from "./user.role.entity";
-import { Comment } from "../../task/entities/comment.entity";
 import { Task } from "../../task/entities/task.entity";
 
 @Entity()
@@ -26,31 +24,24 @@ export class User extends BaseEntity {
     @Column()
     password: string;
 
-    @IsString()
     @PrimaryGeneratedColumn()
     id: number;
 
-    @IsEmail()
     @Column()
     email: string;
 
-    @IsString()
     @Column("varchar")
     firstName: string;
 
-    @IsString()
     @Column("varchar")
     lastName: string;
 
-    @IsString()
     @Column({ type: "varchar", nullable: true })
     patronymic: string;
 
-    @IsString()
     @Column({ type: "varchar", nullable: true })
     region: string;
 
-    @IsString()
     @Column({ type: "varchar", nullable: true })
     department: string;
 
