@@ -4,7 +4,7 @@ import { TokenExpiredError } from "jsonwebtoken";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { PushTokenService } from "../../push-token/services/push-token.service";
-import { User } from "../entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 import { JWTTokenManager } from "../providers/jwt.token.manager";
 import { AuthService } from "../services/auth.service";
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";

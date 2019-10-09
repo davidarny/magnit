@@ -5,7 +5,7 @@ import { TemplateAnswer } from "../../template/entities/template-answer.entity";
 import { TaskDocument } from "./task-document.entity";
 import { TaskStage } from "./task-stage.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
-import { User } from "../../auth/entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 
 export enum ETaskStatus {
     IN_PROGRESS = "in_progress",

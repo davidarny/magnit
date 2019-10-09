@@ -5,12 +5,11 @@ import { AuthService } from "./services/auth.service";
 import { UserService } from "../user/services/user.service";
 import { JWTTokenManager } from "./providers/jwt.token.manager";
 import { PasswordManager } from "./providers/password.manager";
-import { User } from "./entities/user.entity";
-import { UserRole } from "./entities/user.role.entity";
+import { User } from "../user/entities/user.entity";
+import { UserRole } from "../user/entities/user.role.entity";
 import { UserModule } from "../user/user.module";
 import { PushTokenModule } from "../push-token/push-token.module";
 import { AuthMiddleware } from "./middleware/auth.middleware";
-import { UserByEmailPipe } from "./pipes/user-by-email.pipes";
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, UserRole]), UserModule, PushTokenModule],

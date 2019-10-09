@@ -1,8 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../..//auth/entities/user.entity";
+import { User } from "../entities/user.entity";
 import { Repository, FindManyOptions } from "typeorm";
-import { UserRole } from "../../auth/entities/user.role.entity";
+import { UserRole } from "../entities/user.role.entity";
+import { RoleNotFoundException } from "../../../shared/exceptions/role-not-found.exception";
+import { CreateRoleDto } from "../dto/create-role.dto";
 
 @Injectable()
 export class UserService {
@@ -14,7 +16,7 @@ export class UserService {
     ) {}
 
     async findById(id: number) {
-        const { id_role, ...user } = await this.userRepository.findOne({
+        const user = await this.userRepository.findOne({
             where: { id: id },
             relations: ["role"],
         });
@@ -35,23 +37,28 @@ export class UserService {
         return this.userRepository.save(user);
     }
 
-    async findRole(roleId: number) {
+    async findRoleById(roleId: number) {
         return this.userRoleRepository.findOne({
             where: { id: roleId },
         });
     }
 
-    async getDefaultRole() {
-        const defaultRoleId = 0;
-        const existRole = await this.findRole(defaultRoleId);
+    async roleByIdExists(role: UserRole) {
+        return this.userRoleRepository.hasId(role);
+    }
 
-        if (existRole) {
-            return existRole;
+    async getAdminRole() {
+        const role = await this.userRoleRepository.findOne({
+            where: { isAdmin: true },
+        });
+        if (role) {
+            return role;
         } else {
-            const savedRole = await this.userRoleRepository.query(
-                `INSERT INTO user_role ("created_at","updated_at","id","title","description") VALUES (DEFAULT,DEFAULT,'0','admine role','admine role')`,
-            );
-            return savedRole;
+            throw new RoleNotFoundException("Admin role not found");
         }
+    }
+
+    async createRole(role: UserRole) {
+        return this.userRoleRepository.save(role);
     }
 }

@@ -8,7 +8,7 @@ import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus, Task } from "../entities/task.entity";
 import { TaskService } from "../services/task.service";
 import { TaskController } from "../task.controller";
-import { User } from "../../auth/entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 
 describe("TaskController", () => {
     let taskController: TaskController;

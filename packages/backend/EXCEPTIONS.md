@@ -20,3 +20,4 @@
 | 14         | 400              | Cannot parse location JSON                 |                                                      |
 | 15         | 409              | User already exist                         |                                                      |
 | 16         | 404              | User not found                             |                                                      |
+| 17         | 404              | Role not found                             |                                                      |

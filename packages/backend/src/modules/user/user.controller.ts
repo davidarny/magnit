@@ -10,9 +10,6 @@ import { UserService } from "./services/user.service";
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get("/")
-    async findAll(@Query() query?: FindUsersQuery) {}
-
     @Get("/:id")
     async findById(@Param("id", NumericIdPipe, UserByIdPipe) id: number) {
         const { password, ...user } = await this.userService.findById(id);

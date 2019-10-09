@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { User } from "../../modules/auth/entities/user.entity";
+import { User } from "../../modules/user/entities/user.entity";
 
 export interface IAuthRequest extends Request {
     user: User & {

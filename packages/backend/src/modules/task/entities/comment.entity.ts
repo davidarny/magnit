@@ -1,7 +1,7 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
-import { User } from "../../auth/entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Entity()
 export class Comment extends PrimaryBaseEntity {

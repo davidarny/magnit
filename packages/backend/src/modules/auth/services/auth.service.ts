@@ -1,7 +1,7 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { Transactional } from "typeorm-transactional-cls-hooked";
 
-import { User } from "../entities/user.entity";
+import { User } from "../../user/entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
 import { UserService } from "../../user/services/user.service";
@@ -33,10 +33,10 @@ export class AuthService {
     @Transactional()
     async register(userDto: CreateUserDto) {
         const user = new User(userDto);
-        const role = await this.userService.getDefaultRole();
+        const role = await this.userService.getAdminRole();
         user.id_role = role.id;
-        const token = this.getTokenFor(user);
         const savedUser = await this.createUser(user);
+        const token = this.getTokenFor(user);
         return { success: 1, id: savedUser.id, token: token };
     }
 
@@ -62,7 +62,7 @@ export class AuthService {
         const payload = {
             email: user.email,
             id: user.id,
-            id_role: user.role.id,
+            id_role: user.id_role,
         };
         return this.tokenManager.encode(payload);
     }
