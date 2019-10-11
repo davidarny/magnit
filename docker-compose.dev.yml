@@ -54,6 +54,9 @@ services:
             - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
             - FIREBASE_CLIENT_ID=${FIREBASE_CLIENT_ID}
             - FIREBASE_CLIENT_X509_CERT_URL=${FIREBASE_CLIENT_X509_CERT_URL}
+            - ADMIN_ROLE_DESCRIPTION=${ADMIN_ROLE_DESCRIPTION:-"Admin role"}
+            - ADMIN_ROLE_TITLE=${ADMIN_ROLE_TITLE:-"Admin"}
+            - ADMIN_ROLE_ID=${ADMIN_ROLE_ID:-0}
         restart: always
         networks:
             - magnit

@@ -7,9 +7,13 @@ export class UserByIdPipe implements PipeTransform<number, Promise<number>> {
     constructor(private readonly userService: UserService) {}
 
     async transform(id: number, metadata: ArgumentMetadata): Promise<number> {
-        if (!(await this.userService.findById(id))) {
+        if (!(await this.userExist(id))) {
             throw new UserNotFoundException(`User with id ${id} was not found`);
         }
         return id;
+    }
+
+    private async userExist(id: number) {
+        return this.userService.userExistById(id);
     }
 }

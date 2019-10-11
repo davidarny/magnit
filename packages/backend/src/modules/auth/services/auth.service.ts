@@ -1,6 +1,5 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { Transactional } from "typeorm-transactional-cls-hooked";
-
 import { User } from "../../user/entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { LoginUserDto } from "../dto/login-user.dto";
@@ -21,7 +20,7 @@ export class AuthService {
 
     async validateUser(email: string, pass: string) {
         const user = await this.userService.findOneByEmail(email);
-        if (user == null) {
+        if (!user) {
             throw new UserNotFoundException("User not found");
         }
         if (pass == this.passwordManager.decode(user.password)) {
@@ -37,14 +36,14 @@ export class AuthService {
         user.id_role = role.id;
         const savedUser = await this.createUser(user);
         const token = this.getTokenFor(user);
-        return { success: 1, id: savedUser.id, token: token };
+        return { success: 1, id: savedUser.id, token };
     }
 
     @Transactional()
     async login(loginUserDto: LoginUserDto) {
         const user = await this.validateUser(loginUserDto.email, loginUserDto.password);
         const token = this.getTokenFor(user);
-        return { success: 1, id: user.id, token: token };
+        return { success: 1, id: user.id, token };
     }
 
     private async createUser(user: User) {

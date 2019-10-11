@@ -4,7 +4,6 @@ import { User } from "../entities/user.entity";
 import { Repository, FindManyOptions } from "typeorm";
 import { UserRole } from "../entities/user.role.entity";
 import { RoleNotFoundException } from "../../../shared/exceptions/role-not-found.exception";
-import { CreateRoleDto } from "../dto/create-role.dto";
 
 @Injectable()
 export class UserService {
@@ -16,11 +15,10 @@ export class UserService {
     ) {}
 
     async findById(id: number) {
-        const user = await this.userRepository.findOne({
+        return this.userRepository.findOne({
             where: { id: id },
             relations: ["role"],
         });
-        return user;
     }
 
     async findOneByEmail(email: string) {
@@ -31,6 +29,10 @@ export class UserService {
         const options: FindManyOptions<User> = {};
         if (typeof role !== "undefined") {
         }
+    }
+
+    async userExistById(id: number) {
+        return (await this.findById(id)) ? true : false;
     }
 
     async create(user: User) {
@@ -49,13 +51,12 @@ export class UserService {
 
     async getAdminRole() {
         const role = await this.userRoleRepository.findOne({
-            where: { isAdmin: true },
+            where: { id: +process.env.ADMIN_ROLE_ID },
         });
         if (role) {
             return role;
-        } else {
-            throw new RoleNotFoundException("Admin role not found");
         }
+        throw new RoleNotFoundException("Admin role not found");
     }
 
     async createRole(role: UserRole) {

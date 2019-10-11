@@ -1,19 +1,19 @@
-import { IsString, IsBoolean, IsNumber } from "class-validator";
-import { PrimaryBaseDto } from "../../../shared/dto/primary-base.dto";
+import { IsString, IsNumber } from "class-validator";
+import { ConstructableDto } from "../../../shared/dto/constructable.dto";
+import { DeepPartial } from "typeorm";
 
-export class CreateRoleDto {
-    constructor(title: string, description: string, isAdmin: boolean) {
-        this.title = title;
-        this.description = description;
-        this.isAdmin = isAdmin;
+export class CreateRoleDto extends ConstructableDto {
+    constructor(dto?: DeepPartial<CreateRoleDto>) {
+        super();
+        this.construct(this, dto);
     }
+
+    @IsNumber()
+    readonly id: number;
 
     @IsString()
     readonly title: string;
 
     @IsString()
     readonly description: string;
-
-    @IsBoolean()
-    readonly isAdmin: boolean;
 }

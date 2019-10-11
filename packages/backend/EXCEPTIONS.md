@@ -21,3 +21,4 @@
 | 15         | 409              | User already exist                         |                                                      |
 | 16         | 404              | User not found                             |                                                      |
 | 17         | 404              | Role not found                             |                                                      |
+| 18         | 501              | Admin role not assign                      |                                                      |
