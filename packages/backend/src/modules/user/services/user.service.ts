@@ -60,6 +60,8 @@ export class UserService {
     }
 
     async createRole(role: UserRole) {
-        return this.userRoleRepository.save(role);
+        return this.userRoleRepository.query(
+            `INSERT INTO magnit.public.user_role ("created_at","updated_at","id","title","description") VALUES (DEFAULT,DEFAULT, '${role.id}','${role.title}','${role.description}')`,
+        );
     }
 }

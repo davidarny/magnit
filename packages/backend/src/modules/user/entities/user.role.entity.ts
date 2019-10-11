@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, DeepPartial } from "typeorm";
+import { Entity, PrimaryColumn, Column, DeepPartial } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 
 @Entity()
@@ -8,7 +8,7 @@ export class UserRole extends PrimaryBaseEntity {
         this.construct(this, dto);
     }
 
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: number;
 
     @Column("varchar")
