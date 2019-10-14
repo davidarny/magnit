@@ -4,9 +4,7 @@ import { UserService } from "./services/user.service";
 import { UserController } from "./user.controller";
 import { UserRole } from "./entities/user.role.entity";
 import { User } from "./entities/user.entity";
-import { CreateRoleDto } from "./dto/create-role.dto";
 import { RoleNotFoundException } from "../../shared/exceptions/role-not-found.exception";
-import { AdminRoleNotAssignException } from "../../shared/exceptions/admin-role-not-assign.exception";
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, UserRole])],
@@ -22,15 +20,23 @@ export class UserModule implements NestModule {
         const description = process.env.ADMIN_ROLE_DESCRIPTION;
         const adminId = process.env.ADMIN_ROLE_ID;
 
-        if (!adminTitle || !description || !adminId) {
-            throw new AdminRoleNotAssignException("Admin role not assign");
+        if (!adminTitle) {
+            throw new Error("Admin role title is undefined");
         }
-        const createRoleDto = new CreateRoleDto({
+
+        if (!description) {
+            throw new Error("Admin role description is undefined");
+        }
+
+        if (!adminId) {
+            throw new Error("Admin role id is undefined");
+        }
+
+        const role = new UserRole({
             id: +adminId,
             title: adminTitle,
             description: description,
         });
-        const role = new UserRole(createRoleDto);
 
         try {
             await this.userService.getAdminRole();
