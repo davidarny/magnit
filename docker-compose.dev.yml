@@ -6,7 +6,7 @@ services:
         volumes:
             - .:/devel
         working_dir: /devel/packages/frontend
-        command: npm run start
+        command: yarn start
         restart: always
         environment:
             - NODE_ENV=development
