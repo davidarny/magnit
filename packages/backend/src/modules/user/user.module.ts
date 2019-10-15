@@ -16,26 +16,26 @@ export class UserModule implements NestModule {
     constructor(private readonly userService: UserService) {}
 
     async configure(consumer: MiddlewareConsumer) {
-        const adminTitle = process.env.ADMIN_ROLE_TITLE;
-        const description = process.env.ADMIN_ROLE_DESCRIPTION;
-        const adminId = process.env.ADMIN_ROLE_ID;
+        const adminRoleTitle = process.env.ADMIN_ROLE_TITLE;
+        const adminRoleDescription = process.env.ADMIN_ROLE_DESCRIPTION;
+        const adminRoleId = process.env.ADMIN_ROLE_ID;
 
-        if (!adminTitle) {
+        if (!adminRoleTitle) {
             throw new Error("Admin role title is undefined");
         }
 
-        if (!description) {
+        if (!adminRoleDescription) {
             throw new Error("Admin role description is undefined");
         }
 
-        if (!adminId) {
+        if (!adminRoleId) {
             throw new Error("Admin role id is undefined");
         }
 
         const role = new UserRole({
-            id: +adminId,
-            title: adminTitle,
-            description: description,
+            id: +adminRoleId,
+            title: adminRoleTitle,
+            description: adminRoleDescription,
         });
 
         try {
