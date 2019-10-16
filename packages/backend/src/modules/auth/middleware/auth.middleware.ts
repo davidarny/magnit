@@ -27,7 +27,19 @@ export class AuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
             return next();
         }
 
-        if (token) {
+        if (authorization) {
+            const [email, password] = this.getCredentialsFromAuthorizationString(authorization);
+
+            req.user = await this.authService.validateUser(email, password);
+            if (!req.user) {
+                throw new UserUnauthorizedException("Cannot authorize user");
+            }
+            res.header("X-Access-Token", this.tokenManager.encode(req.user));
+            res.header("Access-Control-Expose-Headers", "X-Access-Token");
+            // try to get push tokens
+            await this.setPushTokenIfExists(req.user);
+            return next();
+        } else if (token) {
             try {
                 req.user = this.tokenManager.decode(token);
                 res.set("X-Access-Token", token);
@@ -41,19 +53,7 @@ export class AuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
                 }
                 throw new InvalidTokenException(message);
             }
-        } else if (authorization) {
-            const [email, password] = this.getCredentialsFromAuthorizationString(authorization);
-
-            req.user = await this.authService.validateUser(email, password);
-            if (!req.user) {
-                throw new UserUnauthorizedException("Cannot authorize user");
-            }
-            res.header("X-Access-Token", this.tokenManager.encode(req.user));
-            res.header("Access-Control-Expose-Headers", "X-Access-Token");
-            // try to get push tokens
-            await this.setPushTokenIfExists(req.user);
-            return next();
-        }
+        } 
         throw new UserUnauthorizedException("User unauthorized");
     }
 

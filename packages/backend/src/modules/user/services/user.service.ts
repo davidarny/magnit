@@ -27,7 +27,13 @@ export class UserService {
 
     async findAll(role?: number) {
         const options: FindManyOptions<User> = {};
-        if (typeof role !== "undefined") {
+        
+        if (role) {
+            return this.userRepository.find({
+                where: {id_role: role}
+            })
+        } else {
+            return this.userRepository.find();
         }
     }
 

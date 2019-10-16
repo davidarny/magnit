@@ -47,12 +47,12 @@ export class AuthService {
     }
 
     private async createUser(user: User) {
-        const crypthPassword = this.passwordManager.encode(user.password);
         const existUser = await this.userService.findOneByEmail(user.email);
 
         if (existUser) {
             throw new UserExistException("User exist");
         }
+        const crypthPassword = this.passwordManager.encode(user.password);
         user.password = crypthPassword;
         return this.userService.create(user);
     }
