@@ -47,13 +47,12 @@ export class AuthService {
     }
 
     private async createUser(user: User) {
-        const existUser = await this.userService.findOneByEmail(user.email);
-
-        if (existUser) {
-            throw new UserExistException("User exist");
+        const userExists = await this.userService.findOneByEmail(user.email);
+        if (userExists) {
+            throw new UserExistException("User already exist");
         }
-        const crypthPassword = this.passwordManager.encode(user.password);
-        user.password = crypthPassword;
+        const cryptPassword = this.passwordManager.encode(user.password);
+        user.password = cryptPassword;
         return this.userService.create(user);
     }
 

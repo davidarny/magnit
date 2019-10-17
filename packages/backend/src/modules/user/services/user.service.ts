@@ -27,7 +27,6 @@ export class UserService {
 
     async findAll(role?: number) {
         const options: FindManyOptions<User> = {};
-        
         if (role) {
             return this.userRepository.find({
                 where: {id_role: role}
@@ -67,7 +66,10 @@ export class UserService {
 
     async createRole(role: UserRole) {
         return this.userRoleRepository.query(
-            `INSERT INTO magnit.public.user_role ("created_at","updated_at","id","title","description") VALUES (DEFAULT,DEFAULT, '${role.id}','${role.title}','${role.description}')`,
+            `
+                 INSERT INTO user_role ("id","title","description") 
+                 VALUES ('${role.id}','${role.title}','${role.description}')
+             `,
         );
     }
 }

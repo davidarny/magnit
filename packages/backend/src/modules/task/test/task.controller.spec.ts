@@ -27,11 +27,11 @@ describe("TaskController", () => {
         answers: [],
         documents: [],
         owner: new User({
-            email: "mail@mail.ru",
-            password: "password",
-            id: 1,
-            firstName: "firstName",
-            lastName: "lastName",
+            email: "",
+            password: "",
+            id: 0,
+            firstName: "",
+            lastName: "",
         }),
         marketplace: {
             id: 0,
