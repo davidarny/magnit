@@ -9,8 +9,8 @@ export class AirwatchAuthController {
     constructor(private readonly airwatchAuthService: AirwatchAuthService) {}
 
     @Post("/")
-    @ApiOkResponse({ description: "Авторизация прошла успешно" })
-    @ApiUnauthorizedResponse({ description: "Ошибка авторизация пользователя" })
+    @ApiOkResponse({ description: "User successfully authorized" })
+    @ApiUnauthorizedResponse({ description: "User authorization error" })
     async auth(@Body() authDto: AuthDto) {
         await this.airwatchAuthService.validateUser(authDto.username, authDto.password);
     }
