@@ -47,7 +47,7 @@ export class Task extends PrimaryBaseEntity {
     id_marketplace: number | null;
 
     @ManyToOne(() => Marketplace)
-    @JoinColumn({ name: "id_marketplace", referencedColumnName: "id" })
+    @JoinColumn({ name: "id_marketplace" })
     marketplace: Marketplace;
 
     @OneToMany(() => TemplateAssignment, assignment => assignment.task)
