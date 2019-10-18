@@ -60,5 +60,5 @@ export class Task extends PrimaryBaseEntity {
     stages: TaskStage[];
 
     @OneToMany(() => TaskDocument, document => document.task)
-    documents: TaskStage[];
+    documents: TaskDocument[];
 }
