@@ -4,3 +4,6 @@ views/
 public/
 build/
 dist/
+docs/
+coverage/
+.git/

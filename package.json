@@ -19,7 +19,8 @@
         "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
         "start:frontend": "lerna run --scope @magnit/frontend start --stream",
         "update:deps": "yarn upgrade-interactive --latest",
-        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail"
+        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail",
+        "pretty": "concurrently -n ts,js,json,html,yml,md \"prettier --write ./**/*.ts\" \"prettier --write ./**/*.js\" \"prettier --write ./**/*.json\"  \"prettier --write ./**/*.html\"  \"prettier --write ./**/*.yml\" \"prettier --write ./**/*.md\""
     },
     "config": {
         "commitizen": {
