@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { TokenExpiredError } from "jsonwebtoken";
 import * as _ from "lodash";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
@@ -6,16 +6,14 @@ import { UserUnauthorizedException } from "../../../shared/exceptions/user-unaut
 import { IAuthRequest } from "../../../shared/interfaces/auth.request.interface";
 import { PushTokenService } from "../../push-token/services/push-token.service";
 import { User } from "../entities/user.entity";
-import { IAuthService } from "../interfaces/auth.service.interface";
-import { ITokenManager } from "../interfaces/token.manager.interface";
 import { JwtTokenManager } from "../providers/jwt.token.manager";
 import { AirwatchAuthService } from "../services/airwatch-auth.service";
 
 @Injectable()
 export class AirwatchAuthGuard implements CanActivate {
     constructor(
-        @Inject(AirwatchAuthService) private readonly authService: IAuthService,
-        @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<User>,
+        private readonly airwatchAuthService: AirwatchAuthService,
+        private readonly jwtTokenManager: JwtTokenManager<User>,
         private readonly pushTokenService: PushTokenService,
     ) {}
 
@@ -31,18 +29,18 @@ export class AirwatchAuthGuard implements CanActivate {
         const token = req.header("X-Access-Token");
         if (authorization) {
             const [username, password] = this.getCredentialsFromAuthorizationString(authorization);
-            req.user = await this.authService.validateUser(username, password);
+            req.user = await this.airwatchAuthService.validateUser(username, password);
             if (!req.user) {
                 throw new UserUnauthorizedException("Cannot authorize user");
             }
-            res.header("X-Access-Token", this.tokenManager.encode(req.user));
+            res.header("X-Access-Token", this.jwtTokenManager.encode(req.user));
             res.header("Access-Control-Expose-Headers", "X-Access-Token");
             // try to get push tokens
             await this.setPushTokenIfExists(req.user);
             return true;
         } else if (token) {
             try {
-                req.user = this.tokenManager.decode(token);
+                req.user = this.jwtTokenManager.decode(token);
                 res.set("X-Access-Token", token);
                 // try to get push tokens
                 await this.setPushTokenIfExists(req.user);
