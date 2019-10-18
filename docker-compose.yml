@@ -48,6 +48,10 @@ services:
             - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
             - FIREBASE_CLIENT_ID=${FIREBASE_CLIENT_ID}
             - FIREBASE_CLIENT_X509_CERT_URL=${FIREBASE_CLIENT_X509_CERT_URL}
+            - LDAP_BASE_DN=${LDAP_BASE_DN}
+            - LDAP_BASE_URL=${LDAP_BASE_URL}
+            - LDAP_USERNAME=${LDAP_USERNAME}
+            - LDAP_PASSWORD=${LDAP_PASSWORD}
         restart: always
         networks:
             - magnit

@@ -1,5 +1,4 @@
-import { Inject, NestMiddleware } from "@nestjs/common";
-import { Response } from "express";
+import { CanActivate, ExecutionContext, Inject, Injectable } from "@nestjs/common";
 import { TokenExpiredError } from "jsonwebtoken";
 import * as _ from "lodash";
 import { InvalidTokenException } from "../../../shared/exceptions/invalid-token.exception";
@@ -12,14 +11,19 @@ import { ITokenManager } from "../interfaces/token.manager.interface";
 import { JwtTokenManager } from "../providers/jwt.token.manager";
 import { AirwatchAuthService } from "../services/airwatch-auth.service";
 
-export class AirwatchAuthMiddleware implements NestMiddleware<IAuthRequest, Response> {
+@Injectable()
+export class AirwatchAuthGuard implements CanActivate {
     constructor(
         @Inject(AirwatchAuthService) private readonly authService: IAuthService,
         @Inject(JwtTokenManager) private readonly tokenManager: ITokenManager<User>,
         private readonly pushTokenService: PushTokenService,
     ) {}
 
-    async use(req: IAuthRequest, res: Response, next: () => void): Promise<void> {
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const httpArgumentsHost = context.switchToHttp();
+        const req = httpArgumentsHost.getRequest();
+        const res = httpArgumentsHost.getResponse();
+        const next = httpArgumentsHost.getNext();
         const authorization = req.header("Authorization");
         const token = req.header("X-Access-Token");
         if (authorization) {

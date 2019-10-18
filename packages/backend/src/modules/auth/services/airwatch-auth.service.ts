@@ -8,7 +8,6 @@ import { AirwatchUserService } from "./airwatch-user.service";
 export class AirwatchAuthService implements IAuthService {
     constructor(@Inject(AirwatchUserService) private readonly userService: IUserService) {}
 
-    // TODO: validate password
     async validateUser(username: string, password: string): Promise<User | undefined> {
         return this.userService.findOne(username);
     }
