@@ -6,6 +6,11 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
+import { AmqpService } from "../src/modules/amqp/services/amqp.service";
+import { AirwatchAuthModule } from "../src/modules/auth/airwatch.auth.module";
+import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
+import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
+import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { TemplateAnswerLocation } from "../src/modules/template/entities/template-answer-location.entity";
 import { TemplateAnswer } from "../src/modules/template/entities/template-answer.entity";
 import { Template } from "../src/modules/template/entities/template.entity";
@@ -19,9 +24,22 @@ describe("TemplateController (e2e)", () => {
     let app: NestApplication;
 
     const templateService = createMockFrom(TemplateService.prototype);
+    const amqpService = createMockFrom(AmqpService.prototype);
+    const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
+    const pushTokenService = createMockFrom(PushTokenService.prototype);
 
     initializeTransactionalContext();
     patchTypeORMRepositoryWithBaseRepository();
+
+    beforeAll(() => {
+        // disallow auth guard
+        process.env.ALLOW_AUTH = "false";
+    });
+
+    afterAll(() => {
+        // reset allowance
+        process.env.ALLOW_AUTH = undefined;
+    });
 
     beforeEach(async () => {
         const moduleFixture = await Test.createTestingModule({ imports: [TemplateModule] })
@@ -33,6 +51,14 @@ describe("TemplateController (e2e)", () => {
             .useValue(getMockRepository())
             .overrideProvider(TemplateService)
             .useValue(templateService)
+            .overrideProvider(AmqpService)
+            .useValue(amqpService)
+            .overrideGuard(AirwatchAuthService)
+            .useValue(airwatchAuthService)
+            .overrideProvider(PushTokenService)
+            .useValue(pushTokenService)
+            .overrideProvider(getRepositoryToken(PushToken))
+            .useValue(getMockRepository())
             .compile();
 
         app = moduleFixture.createNestApplication();

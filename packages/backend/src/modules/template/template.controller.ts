@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import {
     ApiBearerAuth,
     ApiCreatedResponse,
@@ -10,6 +10,7 @@ import {
 import { NumericIdPipe } from "../../shared/pipes/numeric-id.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
+import { AirwatchAuthGuard } from "../auth/guards/airwatch.auth.guard";
 import { TemplateDto } from "./dto/template.dto";
 import { Template } from "./entities/template.entity";
 import { TemplateByIdPipe } from "./pipes/template-by-id.pipe";
@@ -23,8 +24,9 @@ import {
 import { UpdateTemplateResponse } from "./responses/update-template.response";
 import { TemplateService } from "./services/template.service";
 
-@ApiUseTags("templates")
 @ApiBearerAuth()
+@UseGuards(AirwatchAuthGuard)
+@ApiUseTags("templates")
 @Controller("templates")
 export class TemplateController {
     constructor(private readonly templateService: TemplateService) {}

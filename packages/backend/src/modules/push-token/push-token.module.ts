@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import * as admin from "firebase-admin";
 import { AmqpModule } from "../amqp/amqp.module";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { AirwatchAuthModule } from "../auth/airwatch.auth.module";
 import { PushToken } from "./entities/push-token.entity";
 import { IPushMessage } from "./interfaces/push-message.interface";
 import { PushTokenController } from "./push-token.controller";
@@ -11,7 +12,7 @@ import { PushTokenService } from "./services/push-token.service";
 const config = require("../../../firebaseconfig.js");
 
 @Module({
-    imports: [TypeOrmModule.forFeature([PushToken]), AmqpModule],
+    imports: [TypeOrmModule.forFeature([PushToken]), AmqpModule, AirwatchAuthModule],
     controllers: [PushTokenController],
     providers: [PushTokenService],
     exports: [PushTokenService],

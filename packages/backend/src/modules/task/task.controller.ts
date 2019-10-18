@@ -11,6 +11,7 @@ import {
     Req,
     Res,
     UploadedFiles,
+    UseGuards,
     UseInterceptors,
     UsePipes,
 } from "@nestjs/common";
@@ -35,6 +36,7 @@ import { SplitPropPipe } from "../../shared/pipes/split-prop.pipe";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { AirwatchAuthGuard } from "../auth/guards/airwatch.auth.guard";
 import { IMailMessage } from "../mail/interfaces/mail-message.interface";
 import { IScheduleMessage } from "../mail/interfaces/schedule-message.interface";
 import { TemplateByIdPipe } from "../template/pipes/template-by-id.pipe";
@@ -61,8 +63,9 @@ import { GetTasksExtendedResponse } from "./responses/get-tasks-extended.respons
 import { GetTasksResponse } from "./responses/get-tasks.response";
 import { TaskService } from "./services/task.service";
 
-@ApiUseTags("tasks")
 @ApiBearerAuth()
+@UseGuards(AirwatchAuthGuard)
+@ApiUseTags("tasks")
 @Controller("tasks")
 export class TaskController {
     constructor(

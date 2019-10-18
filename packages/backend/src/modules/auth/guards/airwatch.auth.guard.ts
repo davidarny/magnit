@@ -20,10 +20,13 @@ export class AirwatchAuthGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
+        // skip auth if disabled
+        if (process.env.ALLOW_AUTH === "false") {
+            return true;
+        }
         const httpArgumentsHost = context.switchToHttp();
         const req = httpArgumentsHost.getRequest();
         const res = httpArgumentsHost.getResponse();
-        const next = httpArgumentsHost.getNext();
         const authorization = req.header("Authorization");
         const token = req.header("X-Access-Token");
         if (authorization) {
@@ -36,14 +39,14 @@ export class AirwatchAuthGuard implements CanActivate {
             res.header("Access-Control-Expose-Headers", "X-Access-Token");
             // try to get push tokens
             await this.setPushTokenIfExists(req.user);
-            return next();
+            return true;
         } else if (token) {
             try {
                 req.user = this.tokenManager.decode(token);
                 res.set("X-Access-Token", token);
                 // try to get push tokens
                 await this.setPushTokenIfExists(req.user);
-                return next();
+                return true;
             } catch (error) {
                 let message = 'Invalid "X-Access-Token"';
                 if (error instanceof TokenExpiredError) {

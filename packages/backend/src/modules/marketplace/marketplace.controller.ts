@@ -1,13 +1,15 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
+import { AirwatchAuthGuard } from "../auth/guards/airwatch.auth.guard";
 import { GetAddressesForFormatResponse } from "./responses/get-addresses-for-format.response";
 import { GetCitiesForRegionResponse } from "./responses/get-cities-for-region.response";
 import { GetFormatsForCityResponse } from "./responses/get-formats-for-city.response";
 import { GetRegionsResponse } from "./responses/get-regions.response";
 import { MarketplaceService } from "./services/marketplace.service";
 
-@ApiUseTags("marketplaces")
 @ApiBearerAuth()
+@UseGuards(AirwatchAuthGuard)
+@ApiUseTags("marketplaces")
 @Controller("marketplaces")
 export class MarketplaceController {
     constructor(private readonly marketplaceService: MarketplaceService) {}

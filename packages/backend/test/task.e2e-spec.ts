@@ -7,6 +7,8 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AmqpService } from "../src/modules/amqp/services/amqp.service";
+import { AirwatchAuthModule } from "../src/modules/auth/airwatch.auth.module";
+import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
 import { Marketplace } from "../src/modules/marketplace/entities/marketplace.entity";
 import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
@@ -38,11 +40,12 @@ describe("TaskController (e2e)", () => {
     const amqpService = createMockFrom(AmqpService.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
     const scheduleService = createMockFrom(ScheduleService.prototype);
+    const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
 
     const task: Task = {
         id: 0,
-        title: "title",
-        description: "description",
+        title: "",
+        description: "",
         status: ETaskStatus.IN_PROGRESS,
         assignments: [],
         stages: [],
@@ -67,6 +70,16 @@ describe("TaskController (e2e)", () => {
 
     initializeTransactionalContext();
     patchTypeORMRepositoryWithBaseRepository();
+
+    beforeAll(() => {
+        // disallow auth guard
+        process.env.ALLOW_AUTH = "false";
+    });
+
+    afterAll(() => {
+        // reset allowance
+        process.env.ALLOW_AUTH = undefined;
+    });
 
     beforeEach(async () => {
         const moduleFixture = await Test.createTestingModule({ imports: [TaskModule] })
@@ -106,6 +119,8 @@ describe("TaskController (e2e)", () => {
             .useValue(getMockRepository())
             .overrideProvider(getRepositoryToken(Marketplace))
             .useValue(getMockRepository())
+            .overrideProvider(AirwatchAuthService)
+            .useValue(airwatchAuthService)
             .compile();
 
         app = moduleFixture.createNestApplication();

@@ -1,4 +1,12 @@
-import { Controller, Delete, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import {
+    Controller,
+    Delete,
+    Param,
+    Post,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
+} from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
     ApiBearerAuth,
@@ -11,10 +19,12 @@ import {
 import { existsSync, unlinkSync } from "fs";
 import { AssetNotFoundException } from "../../shared/exceptions/asset-not-found.exception";
 import { BaseResponse } from "../../shared/responses/base.response";
+import { AirwatchAuthGuard } from "../auth/guards/airwatch.auth.guard";
 import { UploadFileResponse } from "./responses/upload-file.response";
 
-@ApiUseTags("assets")
 @ApiBearerAuth()
+@UseGuards(AirwatchAuthGuard)
+@ApiUseTags("assets")
 @Controller("assets")
 export class AssetController {
     @Post("/")

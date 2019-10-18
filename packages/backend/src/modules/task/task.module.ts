@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getFriendlyDate } from "../../utils/date";
 import { AmqpModule } from "../amqp/amqp.module";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { AirwatchAuthModule } from "../auth/airwatch.auth.module";
 import { MarketplaceModule } from "../marketplace/marketplace.module";
 import { IPushMessage } from "../push-token/interfaces/push-message.interface";
 import { PushTokenModule } from "../push-token/push-token.module";
@@ -39,6 +40,7 @@ import { TaskController } from "./task.controller";
         TemplateModule,
         ScheduleModule,
         MarketplaceModule,
+        AirwatchAuthModule,
     ],
     exports: [TaskService],
 })

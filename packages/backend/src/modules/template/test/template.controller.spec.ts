@@ -1,5 +1,9 @@
 import { Test } from "@nestjs/testing";
 import { createMockFrom } from "../../../utils/create-mock.util";
+import { AirwatchAuthModule } from "../../auth/airwatch.auth.module";
+import { JwtTokenManager } from "../../auth/providers/jwt.token.manager";
+import { AirwatchAuthService } from "../../auth/services/airwatch-auth.service";
+import { PushTokenService } from "../../push-token/services/push-token.service";
 import { TemplateService } from "../services/template.service";
 import { TemplateController } from "../template.controller";
 
@@ -9,6 +13,9 @@ describe("TemplateController", () => {
     let templateController: TemplateController;
 
     const templateService = createMockFrom(TemplateService.prototype);
+    const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
+    const jwtTokenManager = createMockFrom(JwtTokenManager.prototype);
+    const pushTokenService = createMockFrom(PushTokenService.prototype);
 
     beforeEach(async () => {
         const app = await Test.createTestingModule({
@@ -16,6 +23,18 @@ describe("TemplateController", () => {
                 {
                     provide: TemplateService,
                     useValue: templateService,
+                },
+                {
+                    provide: AirwatchAuthService,
+                    useValue: airwatchAuthService,
+                },
+                {
+                    provide: JwtTokenManager,
+                    useValue: jwtTokenManager,
+                },
+                {
+                    provide: PushTokenService,
+                    useValue: pushTokenService,
                 },
             ],
             controllers: [TemplateController],

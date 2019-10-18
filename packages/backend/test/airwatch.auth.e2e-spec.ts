@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
@@ -10,12 +10,14 @@ import {
 import { AmqpService } from "../src/modules/amqp/services/amqp.service";
 import { AirwatchAuthModule } from "../src/modules/auth/airwatch.auth.module";
 import { User } from "../src/modules/auth/entities/user.entity";
+import { AirwatchAuthGuard } from "../src/modules/auth/guards/airwatch.auth.guard";
 import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
 import { AirwatchUserService } from "../src/modules/auth/services/airwatch-user.service";
 import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
 
+@UseGuards(AirwatchAuthGuard)
 @Controller("mock")
 class ControllerMock {
     @Get("/")
@@ -34,7 +36,7 @@ describe("Airwatch Auth", () => {
     patchTypeORMRepositoryWithBaseRepository();
 
     beforeAll(() => {
-        // allow auth middleware
+        // allow auth guard
         process.env.ALLOW_AUTH = "true";
         process.env.AUTH_SECRET = "<test-32-characters-auth-secret>";
     });
@@ -49,6 +51,7 @@ describe("Airwatch Auth", () => {
         const moduleFixture = await Test.createTestingModule({
             imports: [AirwatchAuthModule],
             controllers: [ControllerMock],
+            providers: [PushTokenService],
         })
             .overrideProvider(AirwatchAuthService)
             .useValue(airwatchAuthService)

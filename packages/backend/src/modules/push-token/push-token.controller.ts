@@ -1,16 +1,18 @@
-import { Body, Controller, Post, Req } from "@nestjs/common";
+import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiImplicitBody, ApiOkResponse, ApiUseTags } from "@nestjs/swagger";
 import { CannotSendPushNotificationException } from "../../shared/exceptions/cannot-send-push-notification.exception";
 import { IAuthRequest } from "../../shared/interfaces/auth.request.interface";
 import { BaseResponse } from "../../shared/responses/base.response";
 import { AmqpService } from "../amqp/services/amqp.service";
+import { AirwatchAuthGuard } from "../auth/guards/airwatch.auth.guard";
 import { MessagePayloadDto } from "./dto/message-payload.dto";
 import { PushToken } from "./entities/push-token.entity";
 import { IPushMessage } from "./interfaces/push-message.interface";
 import { PushTokenService } from "./services/push-token.service";
 
-@ApiUseTags("push_token")
 @ApiBearerAuth()
+@UseGuards(AirwatchAuthGuard)
+@ApiUseTags("push_token")
 @Controller("push_token")
 export class PushTokenController {
     constructor(

@@ -1,6 +1,10 @@
 import { Test } from "@nestjs/testing";
 import { createMockFrom } from "../../../utils/create-mock.util";
 import { AmqpService } from "../../amqp/services/amqp.service";
+import { AirwatchAuthModule } from "../../auth/airwatch.auth.module";
+import { JwtTokenManager } from "../../auth/providers/jwt.token.manager";
+import { AirwatchAuthService } from "../../auth/services/airwatch-auth.service";
+import { PushTokenService } from "../../push-token/services/push-token.service";
 import { ScheduleService } from "../../schedule/services/schedule.service";
 import { TemplateService } from "../../template/services/template.service";
 import { TaskReportDto } from "../dto/task-report.dto";
@@ -16,11 +20,14 @@ describe("TaskController", () => {
     const templateService = createMockFrom(TemplateService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
     const scheduleService = createMockFrom(ScheduleService.prototype);
+    const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
+    const jwtTokenManager = createMockFrom(JwtTokenManager.prototype);
+    const pushTokenService = createMockFrom(PushTokenService.prototype);
 
     const task: Task = {
         id: 0,
-        title: "title",
-        description: "description",
+        title: "",
+        description: "",
         status: ETaskStatus.IN_PROGRESS,
         assignments: [],
         stages: [],
@@ -61,6 +68,18 @@ describe("TaskController", () => {
                 {
                     provide: ScheduleService,
                     useValue: scheduleService,
+                },
+                {
+                    provide: AirwatchAuthService,
+                    useValue: airwatchAuthService,
+                },
+                {
+                    provide: JwtTokenManager,
+                    useValue: jwtTokenManager,
+                },
+                {
+                    provide: PushTokenService,
+                    useValue: pushTokenService,
                 },
             ],
             controllers: [TaskController],
