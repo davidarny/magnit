@@ -24,6 +24,15 @@ services:
         volumes:
             - db:/var/lib/postgresql/data
 
+    ldap:
+        image: osixia/openldap
+        restart: always
+        networks:
+            - magnit
+        volumes:
+            - ldap-db:/var/lib/ldap
+            - ldap-etc:/etc/ldap/slapd.d
+
 volumes:
     amqp:
         external:
@@ -31,6 +40,12 @@ volumes:
     db:
         external:
             name: magnit-db
+    ldap-db:
+        external:
+            name: magnit-ldap-db
+    ldap-etc:
+        external:
+            name: magnit-ldap-etc
 
 networks:
     magnit:

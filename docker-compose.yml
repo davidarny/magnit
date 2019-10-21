@@ -52,6 +52,7 @@ services:
             - LDAP_BASE_URL=${LDAP_BASE_URL}
             - LDAP_USERNAME=${LDAP_USERNAME}
             - LDAP_PASSWORD=${LDAP_PASSWORD}
+            - LDAP_USER_ROLE=${LDAP_USER_ROLE}
         restart: always
         networks:
             - magnit

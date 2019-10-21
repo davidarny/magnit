@@ -15,15 +15,35 @@ export function Validate(Exception?: new (...args: any[]) => any) {
                 typeof result.then === "function";
             if (isPromise) {
                 const data = await result;
-                const errors = await validate(data, { validationError: { target: false } });
-                if (errors.length > 0) {
-                    throw new Exception(errors);
+                if (Array.isArray(data)) {
+                    for (const item of data) {
+                        const errors = await validate(item, { validationError: { target: false } });
+                        if (errors.length > 0) {
+                            throw new Exception(errors);
+                        }
+                    }
+                } else {
+                    const errors = await validate(data, { validationError: { target: false } });
+                    if (errors.length > 0) {
+                        throw new Exception(errors);
+                    }
                 }
                 return result;
             } else {
-                const errors = await validate(result, { validationError: { target: false } });
-                if (errors.length > 0) {
-                    throw new Exception(errors);
+                if (Array.isArray(result)) {
+                    for (const item of result) {
+                        const errors = await validate(item, {
+                            validationError: { target: false },
+                        });
+                        if (errors.length > 0) {
+                            throw new Exception(errors);
+                        }
+                    }
+                } else {
+                    const errors = await validate(result, { validationError: { target: false } });
+                    if (errors.length > 0) {
+                        throw new Exception(errors);
+                    }
                 }
                 return result;
             }

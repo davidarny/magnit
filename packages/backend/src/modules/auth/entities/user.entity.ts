@@ -1,3 +1,4 @@
+import { ApiModelProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { IsEmail, IsString } from "class-validator";
 import { DeepPartial } from "typeorm";
@@ -10,14 +11,17 @@ export class User extends ConstructableEntity {
     }
 
     @IsString()
+    @ApiModelProperty()
     username: string;
 
     @Exclude({ toPlainOnly: true })
     password: string;
 
     @IsString()
+    @ApiModelProperty()
     id: string;
 
     @IsEmail()
+    @ApiModelProperty()
     email: string;
 }

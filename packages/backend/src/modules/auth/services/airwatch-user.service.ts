@@ -1,10 +1,11 @@
-import { HttpService, Injectable } from "@nestjs/common";
+import { HttpService, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { TransformClassToPlain } from "class-transformer";
 import * as _ from "lodash";
+import { TransformArrayOfClassesToPlainArray } from "../../../shared/decorators/transform-array-of-classes-to-plain-array.decorator";
 import { Validate } from "../../../shared/decorators/validate.decorator";
-import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { User } from "../entities/user.entity";
 import { IUserService } from "../interfaces/user.service.interface";
+import { LdapService } from "./ldap.service";
 
 interface IAirWatchUser {
     UserName?: string;
@@ -27,24 +28,24 @@ export class AirwatchUserService implements IUserService {
         },
     };
 
-    constructor(private readonly httpService: HttpService) {
+    constructor(
+        private readonly httpService: HttpService,
+        private readonly ldapService: LdapService,
+    ) {
         if (process.env.NODE_ENV !== "testing" && !this.url) {
             throw new Error("Airwatch base url is undefined");
         }
     }
 
     @TransformClassToPlain()
-    @Validate(UserUnauthorizedException)
+    @Validate(InternalServerErrorException)
     async findOne(username: string): Promise<User | undefined> {
         const query = `username=${encodeURI(username)}`;
         const url = `${this.url}/api/system/users/search?${query}`;
         const response = await this.httpService.get(url, this.config).toPromise();
-        if (
-            response.data.Users &&
-            Array.isArray(response.data.Users) &&
-            response.data.Users.length > 0
-        ) {
-            const user = _.first<IAirWatchUser>(response.data.Users);
+        const users = response.data.Users;
+        if (users && Array.isArray(users) && users.length > 0) {
+            const user = _.first<IAirWatchUser>(users);
             return new User({
                 id: user.Uuid,
                 email: user.Email,
@@ -52,6 +53,28 @@ export class AirwatchUserService implements IUserService {
                 password: user.UserName,
             });
         }
-        throw new UserUnauthorizedException("Cannot authorize user");
+    }
+
+    @TransformArrayOfClassesToPlainArray()
+    @Validate(InternalServerErrorException)
+    async findAll(): Promise<User[]> {
+        const url = `${this.url}/api/system/users/search`;
+        const response = await this.httpService.get(url, this.config).toPromise();
+        const users = response.data.Users;
+        const ldap = await this.ldapService.findUsers();
+        if (users && Array.isArray(users) && users.length > 0) {
+            return users
+                .filter(user => ldap.includes(user.UserName))
+                .map(
+                    user =>
+                        new User({
+                            id: user.Uuid,
+                            email: user.Email,
+                            username: user.UserName,
+                            password: user.UserName,
+                        }),
+                );
+        }
+        return [];
     }
 }
