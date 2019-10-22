@@ -1,24 +1,25 @@
 /** @jsx jsx */
 
-import { css, Global, jsx } from "@emotion/core";
+import { jsx } from "@emotion/core";
 import { Grid } from "@material-ui/core";
 import { RouteComponentProps, Router } from "@reach/router";
+import { GlobalStyles } from "components/global-styles";
 import { Loading } from "components/loading";
+import { PrivateRoute } from "components/private-route";
 import { Sidebar } from "components/sidebar";
 import { Snackbar } from "components/snackbar";
 import { AppContext } from "context";
 import _ from "lodash";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import Loadable, { OptionsWithoutRender } from "react-loadable";
 import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware } from "services/api";
 import { JsonParseMiddleware } from "services/api/middlewares";
+import { NotFound } from "../../components/not-found";
 
-// ████████╗ █████╗ ███████╗██╗  ██╗███████╗
-// ╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝██╔════╝
-//    ██║   ███████║███████╗█████╔╝ ███████╗
-//    ██║   ██╔══██║╚════██║██╔═██╗ ╚════██║
-//    ██║   ██║  ██║███████║██║  ██╗███████║
-//    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
+const AsyncSplash = Loadable(({
+    loader: () => import("containers/splash").then(module => module.Splash),
+    loading: Loading,
+} as unknown) as OptionsWithoutRender<RouteComponentProps>);
 const AsyncTasksList = Loadable(({
     loader: () => import("containers/tasks").then(module => module.TasksList),
     loading: Loading,
@@ -39,13 +40,6 @@ const AsyncTaskReport = Loadable(({
     loader: () => import("containers/tasks").then(module => module.TaskReport),
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
-
-// ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
-// ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
-//    ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
-//    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
-//    ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
-//    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
 const AsyncTemplates = Loadable(({
     loader: () => import("containers/templates").then(module => module.TemplateList),
     loading: Loading,
@@ -59,7 +53,7 @@ const AsyncEditTemplate = Loadable(({
     loading: Loading,
 } as unknown) as OptionsWithoutRender<RouteComponentProps>);
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
     const context = useContext(AppContext);
     const [error, setError] = useState(false); // success/error snackbar state
     const [snackbar, setSnackbar] = useState({
@@ -70,12 +64,14 @@ const App: React.FC = () => {
     const [drawerWidth, setDrawerWidth] = useState(0);
     const [logoHeight, setLogoHeight] = useState(0);
 
-    const courier = useRef(
-        new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [
-            new JsonParseMiddleware(),
-            new CamelCaseMiddleware(),
-            new LoggerMiddleware(),
-        ]),
+    const courier = useMemo(
+        () =>
+            new FetchCourier(process.env.REACT_APP_BACKEND_URL, "v1", [
+                new JsonParseMiddleware(),
+                new CamelCaseMiddleware(),
+                new LoggerMiddleware(),
+            ]),
+        [],
     );
 
     useEffect(() => {
@@ -105,7 +101,7 @@ const App: React.FC = () => {
         setTimeout(() => setError(false), 100);
     }
 
-    context.courier = courier.current;
+    context.courier = courier;
     context.setSnackbarError = setError;
     context.setSnackbarState = setSnackbar;
     context.snackbar = snackbar;
@@ -127,42 +123,46 @@ const App: React.FC = () => {
             <Grid container>
                 <Grid item>
                     <Router primary={false}>
-                        <Sidebar path="*" />
+                        <PrivateRoute noRedirect path="*">
+                            {props => <Sidebar {...props} />}
+                        </PrivateRoute>
                     </Router>
                 </Grid>
                 <Grid
-                    css={css`
-                        margin-left: var(--section-left-margin);
-                        width: 100%;
-                    `}
+                    css={{
+                        marginLeft: "var(--section-left-margin)",
+                        width: "100%",
+                    }}
                 >
-                    <Router>
-                        {/*
-                            ████████╗ █████╗ ███████╗██╗  ██╗███████╗
-                            ╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝██╔════╝
-                               ██║   ███████║███████╗█████╔╝ ███████╗
-                               ██║   ██╔══██║╚════██║██╔═██╗ ╚════██║
-                               ██║   ██║  ██║███████║██║  ██╗███████║
-                               ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝
-                            */}
-                        <AsyncTasksList path="tasks/*" />
+                    <Router primary>
+                        <AsyncSplash path="login" />
+                        <PrivateRoute path="tasks/*">
+                            {props => <AsyncTasksList {...props} />}
+                        </PrivateRoute>
                         {process.env.REACT_APP_ALLOW_CREATE_TASK && (
-                            <AsyncCreateTask path="tasks/create" />
+                            <PrivateRoute path="tasks/create">
+                                {props => <AsyncCreateTask {...props} />}
+                            </PrivateRoute>
                         )}
-                        <AsyncViewTask path="tasks/view/:taskId" />
-                        <AsyncTaskHistory path="tasks/:taskId/history" />
-                        <AsyncTaskReport path="tasks/:taskId/report" />
-                        {/*
-                            ████████╗███████╗███╗   ███╗██████╗ ██╗      █████╗ ████████╗███████╗███████╗
-                            ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗██║     ██╔══██╗╚══██╔══╝██╔════╝██╔════╝
-                               ██║   █████╗  ██╔████╔██║██████╔╝██║     ███████║   ██║   █████╗  ███████╗
-                               ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║     ██╔══██║   ██║   ██╔══╝  ╚════██║
-                               ██║   ███████╗██║ ╚═╝ ██║██║     ███████╗██║  ██║   ██║   ███████╗███████║
-                               ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝
-                            */}
-                        <AsyncTemplates path="templates" />
-                        <AsyncCreateTemplate path="templates/create" />
-                        <AsyncEditTemplate path="templates/edit/:templateId" />
+                        <PrivateRoute path="tasks/view/:taskId">
+                            {props => <AsyncViewTask {...props} />}
+                        </PrivateRoute>
+                        <PrivateRoute path="tasks/:taskId/history">
+                            {props => <AsyncTaskHistory {...props} />}
+                        </PrivateRoute>
+                        <PrivateRoute path="tasks/:taskId/report">
+                            {props => <AsyncTaskReport {...props} />}
+                        </PrivateRoute>
+                        <PrivateRoute path="templates">
+                            {props => <AsyncTemplates {...props} />}
+                        </PrivateRoute>
+                        <PrivateRoute path="templates/create">
+                            {props => <AsyncCreateTemplate {...props} />}
+                        </PrivateRoute>
+                        <PrivateRoute path="templates/edit/:templateId">
+                            {props => <AsyncEditTemplate {...props} />}
+                        </PrivateRoute>
+                        <NotFound default to="tasks" />
                     </Router>
                 </Grid>
             </Grid>
@@ -170,33 +170,4 @@ const App: React.FC = () => {
     );
 };
 
-interface IGlobalStyleProps {
-    section: {
-        titleHeight: number;
-        leftMargin: number;
-    };
-}
-
-const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
-    return (
-        <Global
-            styles={theme => ({
-                ":root": {
-                    "--section-title-height": `${props.section.titleHeight}px`,
-                    "--section-left-margin": `${props.section.leftMargin}px`,
-                },
-                body: {
-                    fontFamily: '"Roboto", sans-serif',
-                    background: theme.colors.light,
-                },
-                "html, body": {
-                    margin: 0,
-                    height: "100%",
-                    width: "100%",
-                },
-            })}
-        />
-    );
-};
-
-export default App;
+App.displayName = "App";
