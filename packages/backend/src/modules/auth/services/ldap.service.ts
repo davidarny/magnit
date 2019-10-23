@@ -1,15 +1,11 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import ActiveDirectory from "activedirectory2";
 import * as _ from "lodash";
+import { LoggerFactory } from "../../../shared/providers/logger.factory";
 
 @Injectable()
 export class LdapService {
-    private readonly ad = new ActiveDirectory({
-        url: process.env.LDAP_BASE_URL,
-        baseDN: process.env.LDAP_BASE_DN,
-        username: process.env.LDAP_USERNAME,
-        password: process.env.LDAP_PASSWORD,
-    });
+    private readonly ad: ActiveDirectory;
 
     constructor() {
         if (
@@ -21,6 +17,15 @@ export class LdapService {
         ) {
             throw new Error("Malformed LDAP config");
         }
+
+        const props = {
+            url: process.env.LDAP_BASE_URL,
+            baseDN: process.env.LDAP_BASE_DN,
+            username: process.env.LDAP_USERNAME,
+            password: process.env.LDAP_PASSWORD,
+        };
+        _.set(props, "logging", LoggerFactory.getLogger());
+        this.ad = new ActiveDirectory(props);
     }
 
     async authenticate(username: string, password: string): Promise<boolean> {

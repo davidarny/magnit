@@ -61,8 +61,8 @@ export class AirwatchUserService implements IUserService {
         const url = `${this.url}/api/system/users/search`;
         const response = await this.httpService.get(url, this.config).toPromise();
         const users = response.data.Users;
-        const ldap = await this.ldapService.findUsers();
         if (users && Array.isArray(users) && users.length > 0) {
+            const ldap = await this.ldapService.findUsers();
             return users
                 .filter(user => ldap.includes(user.UserName))
                 .map(

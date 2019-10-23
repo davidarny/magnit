@@ -13,17 +13,12 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AppModule } from "./app.module";
+import { LoggerFactory } from "./shared/providers/logger.factory";
 
 const development = process.env.NODE_ENV === "development";
 
 const pino = require("pino");
-const logger = pino({
-    prettyPrint: development && {
-        colorize: true,
-        translateTime: true,
-        levelFirst: true,
-    },
-});
+const logger = LoggerFactory.getLogger();
 
 if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
     logger.info(`Master ${process.pid} is running`);
