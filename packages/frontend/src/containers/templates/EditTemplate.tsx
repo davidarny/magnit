@@ -14,7 +14,7 @@ import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { deleteFile, getTemplate, updateTemplate, uploadFile } from "services/api";
 
-interface IEditTemplateProps {
+export interface IEditTemplateProps {
     templateId: number;
 }
 

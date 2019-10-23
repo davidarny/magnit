@@ -3,8 +3,9 @@
 import { jsx } from "@emotion/core";
 import { CircularProgress, Grid } from "@material-ui/core";
 import * as React from "react";
+import { LoadingComponentProps } from "react-loadable";
 
-export const Loading: React.FC = () => {
+export const Loading: React.FC<LoadingComponentProps> = () => {
     return (
         <Grid
             container

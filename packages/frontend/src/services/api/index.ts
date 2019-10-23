@@ -5,4 +5,5 @@ export * from "./middlewares";
 export * from "./assets";
 export * from "./push-token";
 export * from "./marketplace";
+export * from "./auth";
 export * from "./FetchCourier";

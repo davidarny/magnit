@@ -1,1 +1,1 @@
-export * from "./CenteredSectionItem";
+export * from "./CenteredGrid";

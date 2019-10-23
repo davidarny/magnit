@@ -14,7 +14,7 @@ import * as React from "react";
 import { useContext, useEffect, useState } from "react";
 import { getStagesWithFullHistory, IStageResponse } from "services/api/tasks";
 
-interface ITaskHistoryProps {
+export interface ITaskHistoryProps {
     taskId: number;
 }
 

@@ -5,7 +5,7 @@ import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magn
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
-import { Link, Redirect } from "@reach/router";
+import { Link, Redirect, RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
@@ -33,7 +33,9 @@ interface IUpdateTemplateListOptions {
     title?: string;
 }
 
-export const TemplateList: React.FC = () => {
+export interface ITemplateListProps extends RouteComponentProps {}
+
+export const TemplateList: React.FC<ITemplateListProps> = () => {
     const context = useContext(AppContext);
 
     // full text search

@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { ApiOkResponse, ApiUnauthorizedResponse, ApiUseTags } from "@nestjs/swagger";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { User } from "./entities/user.entity";
+import { AirwatchAuthGuard } from "./guards/airwatch.auth.guard";
 import { LoginUserResponse } from "./reponses/login-user.response";
 import { AirwatchAuthService } from "./services/airwatch-auth.service";
 import { AirwatchUserService } from "./services/airwatch-user.service";
@@ -24,6 +25,7 @@ export class AirwatchAuthController {
     }
 
     @Get("/users")
+    @UseGuards(AirwatchAuthGuard)
     @ApiOkResponse({ description: "All Users", type: [User] })
     @ApiUnauthorizedResponse({ description: "Cannot authorize user", type: ErrorResponse })
     async getAllUsers() {

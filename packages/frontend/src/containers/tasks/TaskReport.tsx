@@ -18,7 +18,7 @@ import {
     sendReportToEmail,
 } from "services/api/tasks";
 
-interface ITaskReportProps {
+export interface ITaskReportProps {
     taskId: number;
 }
 

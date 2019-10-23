@@ -6,6 +6,7 @@ import { ETaskStatus, ITask, ITemplate } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { Grid, Typography } from "@material-ui/core";
+import { RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
@@ -23,7 +24,9 @@ import {
     getTemplates,
 } from "services/api";
 
-export const CreateTask: React.FC = () => {
+export interface ICreateTaskProps extends RouteComponentProps {}
+
+export const CreateTask: React.FC<ICreateTaskProps> = () => {
     const context = useContext(AppContext);
 
     // all templates

@@ -4,15 +4,15 @@ import { jsx } from "@emotion/core";
 import { Redirect, RouteComponentProps } from "@reach/router";
 import React from "react";
 
-interface IPrivateRouteProps {
+interface IPrivateRouteProps<P> extends RouteComponentProps {
     noRedirect?: boolean;
     authorized?: boolean;
     to?: string;
 
-    children(props: RouteComponentProps): React.ReactNode;
+    children(props: RouteComponentProps & P): React.ReactNode;
 }
 
-export const PrivateRoute: React.FC<IPrivateRouteProps & RouteComponentProps> = props => {
+export function PrivateRoute<P>(props: IPrivateRouteProps<P>) {
     const { authorized = false, noRedirect = false, to = "/login", children, ...rest } = props;
 
     if (!authorized) {
@@ -22,6 +22,6 @@ export const PrivateRoute: React.FC<IPrivateRouteProps & RouteComponentProps> = 
             return <Redirect to={to} noThrow />;
         }
     } else {
-        return <React.Fragment>{children(rest)}</React.Fragment>;
+        return <React.Fragment>{children(rest as RouteComponentProps & P)}</React.Fragment>;
     }
-};
+}

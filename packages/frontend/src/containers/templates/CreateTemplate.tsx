@@ -6,6 +6,7 @@ import { ETemplateType, ITemplate } from "@magnit/entities";
 import { CheckIcon } from "@magnit/icons";
 import { TemplateEditor } from "@magnit/template-editor";
 import { Grid, Typography } from "@material-ui/core";
+import { RouteComponentProps } from "@reach/router";
 import { SectionLayout } from "components/section-layout";
 import { SectionTitle } from "components/section-title";
 import { Snackbar } from "components/snackbar";
@@ -15,7 +16,9 @@ import { useContext, useState } from "react";
 import { deleteFile, uploadFile } from "services/api/assets";
 import { createTemplate } from "services/api/templates";
 
-export const CreateTemplate: React.FC = () => {
+export interface ICreateTemplateProps extends RouteComponentProps {}
+
+export const CreateTemplate: React.FC<ICreateTemplateProps> = () => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<ITemplate>({
         id: 0,

@@ -2,7 +2,7 @@
 
 import { Grid, Typography } from "@material-ui/core";
 import { jsx } from "@emotion/core";
-import { CenteredSectionItem } from "components/centered-section-item";
+import { CenteredGrid } from "components/centered-section-item";
 import * as React from "react";
 
 interface IEmptyListProps {
@@ -12,7 +12,7 @@ interface IEmptyListProps {
 
 export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, children }) => {
     return (
-        <CenteredSectionItem>
+        <CenteredGrid>
             <Grid container justify="center" alignContent="center" direction="column">
                 <Grid item css={theme => ({ marginBottom: theme.spacing(3) })}>
                     <Typography
@@ -45,7 +45,7 @@ export const EmptyList: React.FC<IEmptyListProps> = ({ title, button, children }
                     </Grid>
                 </Grid>
             </Grid>
-        </CenteredSectionItem>
+        </CenteredGrid>
     );
 };
 

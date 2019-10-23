@@ -45,7 +45,7 @@ import {
     updateTemplateAssignment,
 } from "services/api";
 
-interface IViewTaskProps {
+export interface IViewTaskProps {
     taskId: number;
 }
 
