@@ -1,6 +1,7 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import ActiveDirectory from "activedirectory2";
 import * as _ from "lodash";
+import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { LoggerFactory } from "../../../shared/providers/logger.factory";
 
 @Injectable()
@@ -32,10 +33,7 @@ export class LdapService {
         return new Promise((resolve, reject) => {
             this.ad.authenticate(username, password, (error, authenticated) => {
                 if (error) {
-                    return reject(error);
-                }
-                if (!authenticated) {
-                    return reject(new UnauthorizedException("Cannot authorize user"));
+                    return reject(new UserUnauthorizedException("User unauthorized"));
                 }
                 resolve(authenticated);
             });
@@ -46,7 +44,7 @@ export class LdapService {
         return new Promise((resolve, reject) => {
             this.ad.findUsers((error, users) => {
                 if (error) {
-                    return reject(error);
+                    return reject(new InternalServerErrorException("Cannot fetch users"));
                 }
                 resolve(users.map(user => _.get(user, "cn")));
             });
@@ -57,7 +55,9 @@ export class LdapService {
         return new Promise((resolve, reject) => {
             this.ad.getGroupMembershipForUser(username, (error, groups) => {
                 if (error) {
-                    return reject(error);
+                    return reject(
+                        new InternalServerErrorException("Cannot fetch membership for user"),
+                    );
                 }
                 return resolve(groups.map(group => _.get(group, "cn")));
             });

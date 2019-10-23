@@ -1,4 +1,4 @@
-import { NestFactory } from "@nestjs/core";
+import { HttpAdapterHost, NestFactory } from "@nestjs/core";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as cluster from "cluster";
@@ -13,6 +13,7 @@ import {
     patchTypeORMRepositoryWithBaseRepository,
 } from "typeorm-transactional-cls-hooked";
 import { AppModule } from "./app.module";
+import { AllExceptionsFilter } from "./shared/filters/all-exceptions.filter";
 import { LoggerFactory } from "./shared/providers/logger.factory";
 
 const development = process.env.NODE_ENV === "development";
@@ -37,6 +38,10 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
             closeSync(openSync(join(pathToLogs, "magnit.log"), "w"));
             closeSync(openSync(join(pathToLogs, "ormlogs.log"), "w"));
         }
+
+        // exceptions filter
+        const { httpAdapter } = app.get(HttpAdapterHost);
+        app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
 
         // controller prefix
         app.setGlobalPrefix("v1");

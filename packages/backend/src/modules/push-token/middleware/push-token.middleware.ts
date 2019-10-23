@@ -9,7 +9,10 @@ export class PushTokenMiddleware implements NestMiddleware {
 
     async use(req: IAuthRequest, res: Response, next: () => void) {
         // try to get push tokens
-        await this.setPushTokenIfExists(req.user);
+        if (req.user) {
+            await this.setPushTokenIfExists(req.user);
+        }
+        next();
     }
 
     private async setPushTokenIfExists(user: IAuthRequest["user"]): Promise<void> {

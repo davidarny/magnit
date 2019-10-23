@@ -67,7 +67,7 @@ export class TaskService {
                    to_json(m) AS marketplace,
                    to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages
             FROM task t
-                     LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                     LEFT JOIN marketplace m ON m.id = t.id_marketplace::integer
                      LEFT JOIN task_stage ts ON t.id = ts.id_task
             WHERE 1 = 1
         `;
@@ -111,7 +111,7 @@ export class TaskService {
                    ts.title AS stage_title,
                    ts.deadline
             FROM task t
-                     LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                     LEFT JOIN marketplace m ON m.id = t.id_marketplace::integer
                      LEFT JOIN
                      (
                         SELECT *
@@ -191,7 +191,7 @@ export class TaskService {
                        to_json(array_remove(array_agg(DISTINCT ts), NULL)) AS stages
                 FROM task t
                 LEFT JOIN task_stage ts ON ts.id_task = t.id AND ts.id_task = $1
-                LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                LEFT JOIN marketplace m ON m.id = t.id_marketplace::integer
                 WHERE t.id = $1
                 GROUP BY t.id, m.*;
         `,
@@ -224,7 +224,7 @@ export class TaskService {
                         FROM task_document td
                     ) td ON td.id_task = t.id AND td.id_task = $1
                 LEFT JOIN task_stage ts ON ts.id_task = t.id AND ts.id_task = $1
-                LEFT JOIN marketplace m ON m.id = t.id_marketplace
+                LEFT JOIN marketplace m ON m.id = t.id_marketplace::integer
                 WHERE t.id = $1
                 GROUP BY t.id, m.*;
         `,

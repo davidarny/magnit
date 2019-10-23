@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
-import { ApiOkResponse, ApiUnauthorizedResponse, ApiUseTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiUseTags } from "@nestjs/swagger";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { User } from "./entities/user.entity";
@@ -18,6 +18,7 @@ export class AirwatchAuthController {
 
     @Post("/login")
     @ApiOkResponse({ description: "User successfully authorized", type: LoginUserResponse })
+    @ApiUnauthorizedResponse({ description: "User unauthorized", type: ErrorResponse })
     @ApiUnauthorizedResponse({ description: "Cannot authorize user", type: ErrorResponse })
     async login(@Body() loginUserDto: LoginUserDto) {
         const token = await this.airwatchAuthService.login(loginUserDto);
@@ -25,8 +26,10 @@ export class AirwatchAuthController {
     }
 
     @Get("/users")
+    @ApiBearerAuth()
     @UseGuards(AirwatchAuthGuard)
     @ApiOkResponse({ description: "All Users", type: [User] })
+    @ApiUnauthorizedResponse({ description: "User unauthorized", type: ErrorResponse })
     @ApiUnauthorizedResponse({ description: "Cannot authorize user", type: ErrorResponse })
     async getAllUsers() {
         return this.airwatchUserService.findAll();

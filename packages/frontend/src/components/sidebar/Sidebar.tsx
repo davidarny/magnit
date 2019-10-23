@@ -6,7 +6,7 @@ import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@materia
 import { Link, RouteComponentProps } from "@reach/router";
 import _ from "lodash";
 import * as React from "react";
-import { MagnitIcon } from "./MagnitIcon";
+import { LogoIcon } from "./LogoIcon";
 
 export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
     return (
@@ -40,7 +40,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                 >
                     <Grid item css={({ spacing }) => ({ padding: `${spacing(2)} ${spacing()}` })}>
                         <Link to="/">
-                            <MagnitIcon />
+                            <LogoIcon />
                         </Link>
                     </Grid>
                 </Grid>
@@ -48,9 +48,9 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                     {[
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
-                        { text: "Объекты", icon: ObjectIcon, to: "/object" },
-                        { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
-                        { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
+                        // { text: "Объекты", icon: ObjectIcon, to: "/object" },
+                        // { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
+                        // { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
                     ].map(({ text, icon: Icon, to }) => {
                         const active = _.get(location, "pathname", "").indexOf(to) !== -1;
                         return (

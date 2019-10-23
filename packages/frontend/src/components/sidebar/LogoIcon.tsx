@@ -4,7 +4,7 @@ import { jsx } from "@emotion/core";
 import { SvgIcon } from "@material-ui/core";
 import * as React from "react";
 
-export const MagnitIcon: React.FC = props => {
+export const LogoIcon: React.FC = props => {
     return (
         <SvgIcon
             width={40}
@@ -27,4 +27,4 @@ export const MagnitIcon: React.FC = props => {
     );
 };
 
-MagnitIcon.displayName = "MagnitIcon";
+LogoIcon.displayName = "LogoIcon";

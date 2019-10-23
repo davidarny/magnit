@@ -445,7 +445,11 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
                                                     onChange={onRegionChangeCallback}
                                                 >
                                                     {(marketplaceRegions || []).map(region => (
-                                                        <MenuItem key={region} value={region}>
+                                                        <MenuItem
+                                                            dense={false}
+                                                            key={region}
+                                                            value={region}
+                                                        >
                                                             {region}
                                                         </MenuItem>
                                                     ))}

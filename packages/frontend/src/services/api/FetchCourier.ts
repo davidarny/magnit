@@ -4,7 +4,7 @@ import { IAuthObservable } from "./entities/IAuthObservable";
 import { IAuthObserver } from "./entities/IAuthObserver";
 
 export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
-    private handlers = new Set<(observer: IAuthObserver) => void>();
+    private observers = new Set<(observer: IAuthObserver) => void>();
 
     constructor(
         private readonly host: string | undefined,
@@ -38,7 +38,7 @@ export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
     }
 
     doOnTokenExpired(onTokenExpire: (observer: IAuthObserver) => void): void {
-        this.handlers.add(onTokenExpire);
+        this.observers.add(onTokenExpire);
     }
 
     setToken(token: string): void {
@@ -98,10 +98,11 @@ export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
             headers,
             body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null,
         });
-        // retry with Authorization header if X-Access-Token has expired
-        if (response.status === 401) {
-            for (const handler of this.handlers) {
-                await handler(this);
+        // retry if X-Access-Token has expired
+        // 9 stands for InvalidTokenException
+        if (response.errorCode === 9) {
+            for (const observer of this.observers) {
+                await observer(this);
             }
             return this.fetch(path, method, body);
         }

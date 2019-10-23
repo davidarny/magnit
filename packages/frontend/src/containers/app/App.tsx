@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Grid } from "@material-ui/core";
-import { Router } from "@reach/router";
+import { navigate, Router } from "@reach/router";
 import { GlobalStyles } from "components/global-styles";
 import { Loading } from "components/loading";
 import { NotFound } from "components/not-found";
@@ -86,6 +86,7 @@ export const App: React.FC = () => {
             setPassword(password);
             login(courier, username, password)
                 .then(response => setToken(response.token))
+                .then(() => navigate("tasks"))
                 .catch(() => {
                     setSnackbar({ open: true, message: "Не удалось авторизоваться" });
                     setError(true);
@@ -98,10 +99,7 @@ export const App: React.FC = () => {
         (observer: IAuthObserver) => {
             login(courier, username, password)
                 .then(response => observer.setToken(response.token))
-                .catch(() => {
-                    setSnackbar({ open: true, message: "Не удалось авторизоваться" });
-                    setError(true);
-                });
+                .catch(console.error);
         },
         [courier, password, username],
     );
@@ -127,7 +125,7 @@ export const App: React.FC = () => {
             return;
         }
         setLogoHeight(logo.clientHeight);
-    }, []);
+    }, [token]);
 
     function onSnackbarClose(event?: React.SyntheticEvent, reason?: string) {
         if (reason === "clickaway") {
@@ -142,6 +140,8 @@ export const App: React.FC = () => {
     context.setSnackbarError = setError;
     context.setSnackbarState = setSnackbar;
     context.snackbar = snackbar;
+
+    const authorized = !!token;
 
     return (
         <React.Fragment>
@@ -160,9 +160,12 @@ export const App: React.FC = () => {
             <Grid container>
                 <Grid item>
                     <Router primary={false}>
-                        <PrivateRoute noRedirect path="*">
-                            {props => <Sidebar {...props} />}
-                        </PrivateRoute>
+                        <PrivateRoute
+                            authorized={authorized}
+                            noRedirect
+                            path="*"
+                            render={props => <Sidebar {...props} />}
+                        />
                     </Router>
                 </Grid>
                 <Grid
@@ -173,32 +176,48 @@ export const App: React.FC = () => {
                 >
                     <Router primary>
                         <AsyncSplash path="login" onLogin={handleLogin} />
-                        <PrivateRoute path="tasks/*">
-                            {props => <AsyncTasksList {...props} />}
-                        </PrivateRoute>
+                        <PrivateRoute
+                            authorized={authorized}
+                            path="tasks/*"
+                            render={props => <AsyncTasksList {...props} />}
+                        />
                         {process.env.REACT_APP_ALLOW_CREATE_TASK && (
-                            <PrivateRoute path="tasks/create">
-                                {props => <AsyncCreateTask {...props} />}
-                            </PrivateRoute>
+                            <PrivateRoute
+                                authorized={authorized}
+                                path="tasks/create"
+                                render={props => <AsyncCreateTask {...props} />}
+                            />
                         )}
-                        <PrivateRoute<IViewTaskProps> path="tasks/view/:taskId">
-                            {props => <AsyncViewTask {...props} />}
-                        </PrivateRoute>
-                        <PrivateRoute<ITaskHistoryProps> path="tasks/:taskId/history">
-                            {props => <AsyncTaskHistory {...props} />}
-                        </PrivateRoute>
-                        <PrivateRoute<ITaskReportProps> path="tasks/:taskId/report">
-                            {props => <AsyncTaskReport {...props} />}
-                        </PrivateRoute>
-                        <PrivateRoute path="templates">
-                            {props => <AsyncTemplates {...props} />}
-                        </PrivateRoute>
-                        <PrivateRoute path="templates/create">
-                            {props => <AsyncCreateTemplate {...props} />}
-                        </PrivateRoute>
-                        <PrivateRoute<IEditTemplateProps> path="templates/edit/:templateId">
-                            {props => <AsyncEditTemplate {...props} />}
-                        </PrivateRoute>
+                        <PrivateRoute<IViewTaskProps>
+                            authorized={authorized}
+                            path="tasks/view/:taskId"
+                            render={props => <AsyncViewTask {...props} />}
+                        />
+                        <PrivateRoute<ITaskHistoryProps>
+                            authorized={authorized}
+                            path="tasks/:taskId/history"
+                            render={props => <AsyncTaskHistory {...props} />}
+                        />
+                        <PrivateRoute<ITaskReportProps>
+                            authorized={authorized}
+                            path="tasks/:taskId/report"
+                            render={props => <AsyncTaskReport {...props} />}
+                        />
+                        <PrivateRoute
+                            authorized={authorized}
+                            path="templates"
+                            render={props => <AsyncTemplates {...props} />}
+                        />
+                        <PrivateRoute
+                            authorized={authorized}
+                            path="templates/create"
+                            render={props => <AsyncCreateTemplate {...props} />}
+                        />
+                        <PrivateRoute<IEditTemplateProps>
+                            authorized={authorized}
+                            path="templates/edit/:templateId"
+                            render={props => <AsyncEditTemplate {...props} />}
+                        />
                         <NotFound default to="tasks" />
                     </Router>
                 </Grid>

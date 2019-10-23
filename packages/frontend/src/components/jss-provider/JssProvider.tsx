@@ -5,9 +5,11 @@ import { jssPreset, StylesProvider } from "@material-ui/styles";
 import { create } from "jss";
 import * as React from "react";
 
+const insertionPoint = document.getElementById("jss-insertion-point");
+
 const jss = create({
     ...jssPreset(),
-    insertionPoint: "jss-insertion-point",
+    insertionPoint: insertionPoint!,
 });
 
 export const JssProvider: React.FC = ({ children }) => {

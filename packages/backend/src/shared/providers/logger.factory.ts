@@ -13,10 +13,7 @@ export class LoggerFactory {
 
     static getLogger() {
         if (this.instance === null) {
-            this.instance = pino({
-                level: "trace",
-                prettyPrint: development && this.config,
-            });
+            this.instance = pino({ prettyPrint: development && this.config });
         }
         return this.instance;
     }

@@ -18,7 +18,7 @@ export class AirwatchAuthService implements IAuthService {
     async validateUser(username: string, password: string): Promise<User | undefined> {
         const authenticated = await this.ldapService.authenticate(username, password);
         if (!authenticated) {
-            throw new UserUnauthorizedException("Cannot authorize user");
+            throw new UserUnauthorizedException("User unauthorized");
         }
         return this.airwatchUserService.findOne(username);
     }
@@ -27,7 +27,7 @@ export class AirwatchAuthService implements IAuthService {
         const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
         const groups = await this.ldapService.getGroupMembershipForUser(loginUserDto.username);
         if (!user || (process.env.LDAP_USER_ROLE && !groups.includes(process.env.LDAP_USER_ROLE))) {
-            throw new UserUnauthorizedException("Cannot authorize user");
+            throw new UserUnauthorizedException("User unauthorized");
         }
         return this.jwtTokenManager.encode(user);
     }

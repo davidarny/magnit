@@ -9,11 +9,11 @@ interface IPrivateRouteProps<P> extends RouteComponentProps {
     authorized?: boolean;
     to?: string;
 
-    children(props: RouteComponentProps & P): React.ReactNode;
+    render(props: RouteComponentProps & P): React.ReactNode;
 }
 
 export function PrivateRoute<P>(props: IPrivateRouteProps<P>) {
-    const { authorized = false, noRedirect = false, to = "/login", children, ...rest } = props;
+    const { authorized = false, noRedirect = false, to = "/login", render, ...rest } = props;
 
     if (!authorized) {
         if (noRedirect) {
@@ -22,6 +22,6 @@ export function PrivateRoute<P>(props: IPrivateRouteProps<P>) {
             return <Redirect to={to} noThrow />;
         }
     } else {
-        return <React.Fragment>{children(rest as RouteComponentProps & P)}</React.Fragment>;
+        return <React.Fragment>{render(rest as RouteComponentProps & P)}</React.Fragment>;
     }
 }

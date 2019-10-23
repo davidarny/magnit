@@ -12,7 +12,7 @@
 | 6          | 400              | Cannot Save Duplicate Answers              |                                                      |
 | 7          | 404              | File Not Found                             |                                                      |
 | 8          | 401              | User Unauthorized                          |                                                      |
-| 9          | 401              | Invalid Token                              |                                                      |
+| 9          | 410              | Invalid Token                              |                                                      |
 | 10         | 409              | Cannot send Push Notification              |                                                      |
 | 11         | 400              | Incorrect Task status when setting Answers |                                                      |
 | 12         | 400              | Cannot save Answers partially              |                                                      |

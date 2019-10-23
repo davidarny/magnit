@@ -26,6 +26,12 @@ export const GlobalStyles: React.FC<IGlobalStyleProps> = props => {
                     height: "100%",
                     width: "100%",
                 },
+                // fix Material UI update
+                "@media(min-width: 600px)": {
+                    ".MuiMenuItem-root": {
+                        minHeight: theme.spacing(6),
+                    },
+                },
             })}
         />
     );
