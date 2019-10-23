@@ -3,6 +3,7 @@ import { createMockFrom } from "../../../utils/create-mock.util";
 import { AirwatchAuthModule } from "../../auth/airwatch.auth.module";
 import { JwtTokenManager } from "../../auth/providers/jwt.token.manager";
 import { AirwatchAuthService } from "../../auth/services/airwatch-auth.service";
+import { LdapService } from "../../auth/services/ldap.service";
 import { PushTokenService } from "../../push-token/services/push-token.service";
 import { TemplateService } from "../services/template.service";
 import { TemplateController } from "../template.controller";
@@ -16,6 +17,7 @@ describe("TemplateController", () => {
     const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
     const jwtTokenManager = createMockFrom(JwtTokenManager.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
+    const ldapService = createMockFrom(LdapService.prototype);
 
     beforeEach(async () => {
         const app = await Test.createTestingModule({
@@ -35,6 +37,10 @@ describe("TemplateController", () => {
                 {
                     provide: PushTokenService,
                     useValue: pushTokenService,
+                },
+                {
+                    provide: LdapService,
+                    useValue: ldapService,
                 },
             ],
             controllers: [TemplateController],

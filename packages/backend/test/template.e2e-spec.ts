@@ -1,7 +1,7 @@
 import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import * as request from "supertest";
+import request from "supertest";
 import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,

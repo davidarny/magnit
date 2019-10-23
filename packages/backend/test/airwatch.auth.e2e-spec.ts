@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards } from "@nestjs/common";
 import { NestApplication } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import * as request from "supertest";
+import request from "supertest";
 import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
@@ -13,6 +13,7 @@ import { User } from "../src/modules/auth/entities/user.entity";
 import { AirwatchAuthGuard } from "../src/modules/auth/guards/airwatch.auth.guard";
 import { AirwatchAuthService } from "../src/modules/auth/services/airwatch-auth.service";
 import { AirwatchUserService } from "../src/modules/auth/services/airwatch-user.service";
+import { LdapService } from "../src/modules/auth/services/ldap.service";
 import { PushToken } from "../src/modules/push-token/entities/push-token.entity";
 import { PushTokenService } from "../src/modules/push-token/services/push-token.service";
 import { createMockFrom, getMockRepository } from "../src/utils/create-mock.util";
@@ -31,6 +32,7 @@ describe("Airwatch Auth", () => {
     const airwatchAuthService = createMockFrom(AirwatchAuthService.prototype);
     const amqpService = createMockFrom(AmqpService.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
+    const ldapService = createMockFrom(LdapService.prototype);
 
     initializeTransactionalContext();
     patchTypeORMRepositoryWithBaseRepository();
@@ -61,6 +63,8 @@ describe("Airwatch Auth", () => {
             .useValue(amqpService)
             .overrideProvider(PushTokenService)
             .useValue(pushTokenService)
+            .overrideProvider(LdapService)
+            .useValue(ldapService)
             .overrideProvider(getRepositoryToken(PushToken))
             .useValue(getMockRepository())
             .compile();

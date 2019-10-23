@@ -4,6 +4,7 @@ import { AmqpService } from "../../amqp/services/amqp.service";
 import { AirwatchAuthModule } from "../../auth/airwatch.auth.module";
 import { JwtTokenManager } from "../../auth/providers/jwt.token.manager";
 import { AirwatchAuthService } from "../../auth/services/airwatch-auth.service";
+import { LdapService } from "../../auth/services/ldap.service";
 import { PushTokenService } from "../../push-token/services/push-token.service";
 import { ScheduleService } from "../../schedule/services/schedule.service";
 import { TemplateService } from "../../template/services/template.service";
@@ -23,6 +24,7 @@ describe("TaskController", () => {
     const airwatchAuthService = createMockFrom(AirwatchAuthModule.prototype);
     const jwtTokenManager = createMockFrom(JwtTokenManager.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
+    const ldapService = createMockFrom(LdapService.prototype);
 
     const task: Task = {
         id: 0,
@@ -80,6 +82,10 @@ describe("TaskController", () => {
                 {
                     provide: PushTokenService,
                     useValue: pushTokenService,
+                },
+                {
+                    provide: LdapService,
+                    useValue: ldapService,
                 },
             ],
             controllers: [TaskController],
