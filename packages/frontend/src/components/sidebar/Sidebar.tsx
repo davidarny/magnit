@@ -48,9 +48,9 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                     {[
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
-                        // { text: "Объекты", icon: ObjectIcon, to: "/object" },
-                        // { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
-                        // { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
+                        { text: "Объекты", icon: ObjectIcon, to: "/object" },
+                        { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
+                        { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
                     ].map(({ text, icon: Icon, to }) => {
                         const active = _.get(location, "pathname", "").indexOf(to) !== -1;
                         return (

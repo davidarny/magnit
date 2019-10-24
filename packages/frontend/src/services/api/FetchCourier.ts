@@ -1,7 +1,5 @@
 import _ from "lodash";
-import { ICourier, IMiddleware, TMethod } from "./entities";
-import { IAuthObservable } from "./entities/IAuthObservable";
-import { IAuthObserver } from "./entities/IAuthObserver";
+import { IAuthObservable, IAuthObserver, ICourier, IMiddleware, TMethod } from "./entities";
 
 export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
     private observers = new Set<(observer: IAuthObserver) => void>();

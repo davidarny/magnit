@@ -1,11 +1,12 @@
 import React from "react";
 import { ICourier } from "services/api";
+import { ISnackbarState } from "hooks";
 
 export interface IAppContext {
     snackbar: { open: boolean; message: string };
     courier: ICourier;
 
-    setSnackbarState(options: { message: string; open: boolean }): void;
+    setSnackbarState(options: ISnackbarState): void;
 
     setSnackbarError(error: boolean): void;
 }
