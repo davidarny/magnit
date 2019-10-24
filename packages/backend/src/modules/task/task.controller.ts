@@ -86,7 +86,8 @@ export class TaskController {
         )
         query?: FindAllQuery,
     ) {
-        const [tasks, all] = await this.taskService.findAll(new FindAllQuery(query), req.user.id);
+        const userId = req && req.user ? req.user.id : undefined;
+        const [tasks, all] = await this.taskService.findAll(new FindAllQuery(query), userId);
         return { success: 1, total: tasks.length, all, tasks };
     }
 
@@ -105,9 +106,10 @@ export class TaskController {
         )
         query?: FindAllQueryExtended,
     ) {
+        const userId = req && req.user ? req.user.id : undefined;
         const [tasks, all] = await this.taskService.findAllExtended(
             new FindAllQueryExtended(query),
-            req.user.id,
+            userId,
         );
         return { success: 1, total: tasks.length, tasks, all };
     }

@@ -1,15 +1,9 @@
 import { ApiModelPropertyOptional } from "@nestjs/swagger";
-import { DeepPartial } from "typeorm";
 import { ConstructableDto } from "../../../shared/dto/constructable.dto";
 import { TaskDto } from "../dto/task.dto";
 import { ETaskStatus } from "../entities/task.entity";
 
 export class FindAllQuery<T extends TaskDto = TaskDto> extends ConstructableDto {
-    constructor(dto?: DeepPartial<FindAllQuery>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @ApiModelPropertyOptional({ description: "Ignore current user if true" })
     readonly all?: boolean = false;
 

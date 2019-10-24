@@ -1,14 +1,8 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from "@nestjs/swagger";
-import { DeepPartial } from "typeorm";
 import { BaseResponse } from "../../../shared/responses/base.response";
 import { TaskDto } from "../dto/task.dto";
 
 export class TaskExtendedDto extends TaskDto {
-    constructor(dto?: DeepPartial<TaskExtendedDto>) {
-        super();
-        this.construct(this, dto);
-    }
-
     // marketplace
     @ApiModelPropertyOptional() readonly address: string | null;
     @ApiModelPropertyOptional() readonly city: string | null;
