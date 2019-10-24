@@ -58,6 +58,8 @@ services:
             - LDAP_BASE_URL=${LDAP_BASE_URL}
             - LDAP_USERNAME=${LDAP_USERNAME}
             - LDAP_PASSWORD=${LDAP_PASSWORD}
+            - PUSH_CLIENT=${PUSH_CLIENT:-airwatch}
+            - AIRWATCH_APP_NAME=${AIRWATCH_APP_NAME:-Magnit}
         restart: always
         networks:
             - magnit

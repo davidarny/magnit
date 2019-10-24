@@ -1,11 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { resolve } from "path";
 import { ConnectionOptionsReader } from "typeorm";
 import { AssetModule } from "./modules/asset/asset.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { MarketplaceModule } from "./modules/marketplace/marketplace.module";
-import { PushTokenMiddleware } from "./modules/push-token/middleware/push-token.middleware";
 import { PushTokenModule } from "./modules/push-token/push-token.module";
 import { TaskModule } from "./modules/task/task.module";
 import { TemplateModule } from "./modules/template/template.module";
@@ -32,8 +31,4 @@ const reader = new ConnectionOptionsReader({ root: resolve(__dirname, "..") });
         MarketplaceModule,
     ],
 })
-export class AppModule implements NestModule {
-    configure(consumer: MiddlewareConsumer) {
-        consumer.apply(PushTokenMiddleware).forRoutes({ path: "*", method: RequestMethod.ALL });
-    }
-}
+export class AppModule {}

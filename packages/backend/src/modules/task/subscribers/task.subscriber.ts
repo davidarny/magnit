@@ -72,9 +72,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
                 pushTokens.map(async pushToken => {
                     const pushMessage: IPushMessage = {
                         token: pushToken.token,
-                        message: {
-                            body: `Задание "${task.title}" теперь имеет статут "В работе"`,
-                        },
+                        message: `Задание "${task.title}" теперь имеет статут "В работе"`,
                     };
                     await channel.sendToQueue(
                         AmqpService.PUSH_NOTIFICATION,

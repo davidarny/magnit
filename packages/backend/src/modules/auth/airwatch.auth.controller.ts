@@ -2,7 +2,6 @@ import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOkResponse, ApiUnauthorizedResponse, ApiUseTags } from "@nestjs/swagger";
 import { ErrorResponse } from "../../shared/responses/error.response";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { User } from "./entities/user.entity";
 import { AirwatchAuthGuard } from "./guards/airwatch.auth.guard";
 import { GetAllUsersResponse } from "./reponses/get-all-users.response";
 import { LoginUserResponse } from "./reponses/login-user.response";

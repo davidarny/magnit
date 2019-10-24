@@ -1,3 +1,0 @@
-interface Response {
-    errorCode: number;
-}

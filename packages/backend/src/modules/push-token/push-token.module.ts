@@ -1,33 +1,40 @@
-import { Logger, Module } from "@nestjs/common";
+import { HttpService, Logger, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import * as admin from "firebase-admin";
 import { AmqpModule } from "../amqp/amqp.module";
 import { AmqpService } from "../amqp/services/amqp.service";
 import { AirwatchAuthModule } from "../auth/airwatch.auth.module";
+import { AirwatchHttpModule } from "../http/http.module";
 import { PushToken } from "./entities/push-token.entity";
 import { IPushMessage } from "./interfaces/push-message.interface";
+import { IPushServiceFactory } from "./interfaces/push.service.factory.interface";
+import { IPushService } from "./interfaces/push.service.interface";
 import { PushTokenController } from "./push-token.controller";
+import { AirwatchPushService } from "./services/airwatch-push.service";
+import { FirebasePushService } from "./services/firebase-push.service";
 import { PushTokenService } from "./services/push-token.service";
 
-const config = require("../../../firebaseconfig.js");
-
 @Module({
-    imports: [TypeOrmModule.forFeature([PushToken]), AmqpModule, AirwatchAuthModule],
+    imports: [
+        TypeOrmModule.forFeature([PushToken]),
+        AirwatchHttpModule,
+        AmqpModule,
+        AirwatchAuthModule,
+    ],
     controllers: [PushTokenController],
     providers: [PushTokenService],
     exports: [PushTokenService],
 })
-export class PushTokenModule {
+export class PushTokenModule implements IPushServiceFactory {
     private readonly logger = new Logger(PushTokenModule.name);
+    private readonly client = this.createPushClient();
 
-    constructor(private readonly amqpService: AmqpService) {
+    constructor(
+        private readonly amqpService: AmqpService,
+        private readonly httpService: HttpService,
+    ) {
         if (process.env.NODE_ENV === "testing") {
             return;
         }
-        if (!config || !config.account) {
-            throw new Error("Cannot initialize Firebase without account config");
-        }
-        admin.initializeApp({ credential: admin.credential.cert(config.account) });
         this.consumePushNotifications().catch(this.logger.error);
     }
 
@@ -37,9 +44,7 @@ export class PushTokenModule {
             const body = await this.amqpService.decodeMessageContent<IPushMessage>(message);
             if (body.token && body.message) {
                 try {
-                    await admin
-                        .messaging()
-                        .sendToDevice(body.token, { notification: body.message }, body.options);
+                    await this.client.sendToDevice(body.token, body.message, body.options);
                     const safeToLogToken =
                         body.token.slice(0, 8) +
                         "..." +
@@ -51,5 +56,14 @@ export class PushTokenModule {
             }
             channel.ack(message);
         });
+    }
+
+    createPushClient(): IPushService {
+        if (process.env.PUSH_CLIENT === "firebase") {
+            return new FirebasePushService();
+        } else if (process.env.PUSH_CLIENT === "airwatch") {
+            return new AirwatchPushService(this.httpService);
+        }
+        throw new Error("Not supported push client type");
     }
 }

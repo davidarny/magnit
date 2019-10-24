@@ -87,11 +87,9 @@ export class TaskModule {
         const date = getFriendlyDate(new Date(task.stage.deadline));
         await Promise.all(
             task.tokens.map(token => {
-                const message: IPushMessage = {
+                const pushMessage: IPushMessage = {
                     token,
-                    message: {
-                        body: `Этап "${task.stage.title}" задания "${task.title}" заканчивается ${date}`,
-                    },
+                    message: `Этап "${task.stage.title}" задания "${task.title}" заканчивается ${date}`,
                 };
                 const log = `task "${task.title}" for stage "${task.stage.title}" expiring at "${date}"`;
                 // set expiration date to tomorrow
@@ -99,16 +97,16 @@ export class TaskModule {
                 const key = `${task.id}::${token}`;
                 if (!this.cache.has(key)) {
                     this.logger.debug(`Cache not found, sending push to ${log}`);
-                    const content = Buffer.from(JSON.stringify(message));
+                    const content = Buffer.from(JSON.stringify(pushMessage));
                     this.cache.set(key, [content, tomorrow]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }
                 const [buffer, expiration] = this.cache.get(key);
-                const actual = Buffer.from(JSON.stringify({ ...message, ...task.stage }));
+                const actual = Buffer.from(JSON.stringify({ ...pushMessage, ...task.stage }));
                 // push content is different
                 if (buffer.compare(actual) !== 0) {
                     this.logger.debug(`Found cache with different content, sending push to ${log}`);
-                    const content = Buffer.from(JSON.stringify(message));
+                    const content = Buffer.from(JSON.stringify(pushMessage));
                     this.cache.set(key, [actual, tomorrow]);
                     return channel.sendToQueue(AmqpService.PUSH_NOTIFICATION, content);
                 }

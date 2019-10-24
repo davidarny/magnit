@@ -7,8 +7,17 @@ export function useCredentials(
     courier: ICourier,
     token: string,
     setToken: Dispatch<SetStateAction<string>>,
-): [string, (username: string, password: string) => void, (observer: IAuthObserver) => void] {
-    const namespace = "auth::token";
+): [
+    string,
+    (username: string, password: string) => void,
+    (observer: IAuthObserver) => Promise<void>,
+] {
+    const namespace = "auth::";
+    const keys = {
+        token: `${namespace}token`,
+        username: `${namespace}username`,
+        password: `${namespace}password`,
+    };
 
     const context = useContext(AppContext);
 
@@ -16,21 +25,33 @@ export function useCredentials(
     const [password, setPassword] = useState("");
 
     useEffect(() => {
-        const local = localStorage.getItem(namespace);
-        if (local) {
-            setToken(local);
+        const local = {
+            token: localStorage.getItem(keys.token),
+            username: localStorage.getItem(keys.username),
+            password: localStorage.getItem(keys.password),
+        };
+        if (local.username) {
+            setUsername(local.username);
+        }
+        if (local.password) {
+            setPassword(local.password);
+        }
+        if (local.token) {
+            setToken(local.token);
             navigate("tasks").catch(console.error);
         }
-    }, [setToken]);
+    }, [keys.password, keys.token, keys.username, setToken]);
 
     const handleLogin = useCallback(
         (username: string, password: string) => {
             setUsername(username);
             setPassword(password);
+            localStorage.setItem(keys.username, username);
+            localStorage.setItem(keys.password, password);
             login(courier, username, password)
                 .then(response => {
                     setToken(response.token);
-                    localStorage.setItem(namespace, response.token);
+                    localStorage.setItem(keys.token, response.token);
                 })
                 .then(() => navigate("tasks"))
                 .catch(() => {
@@ -38,17 +59,18 @@ export function useCredentials(
                     context.setSnackbarError(true);
                 });
         },
-        [context, courier, setToken],
+        [context, courier, keys.password, keys.token, keys.username, setToken],
     );
 
     const handleTokenExpiration = useCallback(
-        (observer: IAuthObserver) => {
-            login(courier, username, password)
-                .then(response => {
-                    observer.setToken(response.token);
-                    localStorage.setItem(namespace, response.token);
-                })
-                .catch(console.error);
+        async (observer: IAuthObserver) => {
+            try {
+                const response = await login(courier, username, password);
+                observer.setToken(response.token);
+                localStorage.setItem(namespace, response.token);
+            } catch (error) {
+                console.error(error);
+            }
         },
         [courier, password, username],
     );

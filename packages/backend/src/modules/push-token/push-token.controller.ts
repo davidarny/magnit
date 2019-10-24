@@ -33,14 +33,15 @@ export class PushTokenController {
     @ApiOkResponse({ type: BaseResponse })
     async send(@Body() messagePayloadDto: MessagePayloadDto, @Req() req: IAuthRequest) {
         const channel = await this.amqpService.getAssertedChannelFor(AmqpService.PUSH_NOTIFICATION);
-        if (!req.user.tokens) {
+        const pushTokens = await this.pushTokenService.findByUserId(req.user.id);
+        if (!pushTokens) {
             throw new CannotSendPushNotificationException("User has no push tokens");
         }
         await Promise.all(
-            req.user.tokens.map(async token => {
+            pushTokens.map(async pushToken => {
                 const pushMessage: IPushMessage = {
-                    token,
-                    message: messagePayloadDto,
+                    token: pushToken.token,
+                    message: messagePayloadDto.body,
                 };
                 await channel.sendToQueue(
                     AmqpService.PUSH_NOTIFICATION,

@@ -17,32 +17,16 @@ interface IAirWatchUser {
 
 @Injectable()
 export class AirwatchUserService implements IUserService {
-    private readonly url = process.env.AIRWATCH_BASE_URL;
-    private readonly config = {
-        headers: {
-            common: {
-                Authorization: `Basic ${process.env.AIRWATCH_AUTH}`,
-                "aw-tenant-code": process.env.AIRWATCH_TENANT_CODE,
-                "Content-Type": "application/json",
-            },
-        },
-    };
-
     constructor(
         private readonly httpService: HttpService,
         private readonly ldapService: LdapService,
-    ) {
-        if (process.env.NODE_ENV !== "testing" && !this.url) {
-            throw new Error("Airwatch base url is undefined");
-        }
-    }
+    ) {}
 
     @TransformClassToPlain()
     @Validate(InternalServerErrorException)
     async findOne(username: string): Promise<User | undefined> {
         const query = `username=${encodeURI(username)}`;
-        const url = `${this.url}/api/system/users/search?${query}`;
-        const response = await this.httpService.get(url, this.config).toPromise();
+        const response = await this.httpService.get(`system/users/search?${query}`).toPromise();
         const users = response.data.Users;
         if (users && Array.isArray(users) && users.length > 0) {
             const user = _.first<IAirWatchUser>(users);
@@ -58,8 +42,7 @@ export class AirwatchUserService implements IUserService {
     @TransformArrayOfClassesToPlainArray()
     @Validate(InternalServerErrorException)
     async findAll(): Promise<User[]> {
-        const url = `${this.url}/api/system/users/search`;
-        const response = await this.httpService.get(url, this.config).toPromise();
+        const response = await this.httpService.get("system/users/search").toPromise();
         const users = response.data.Users;
         if (users && Array.isArray(users) && users.length > 0) {
             const ldap = await this.ldapService.findUsers();

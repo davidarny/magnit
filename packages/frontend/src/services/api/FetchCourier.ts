@@ -2,7 +2,7 @@ import _ from "lodash";
 import { IAuthObservable, IAuthObserver, ICourier, IMiddleware, TMethod } from "./entities";
 
 export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
-    private observers = new Set<(observer: IAuthObserver) => void>();
+    private observers = new Set<(observer: IAuthObserver) => Promise<void>>();
 
     constructor(
         private readonly host: string | undefined,
@@ -35,7 +35,7 @@ export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
         return this.fetch(path, "GET");
     }
 
-    doOnTokenExpired(onTokenExpire: (observer: IAuthObserver) => void): void {
+    doOnTokenExpired(onTokenExpire: (observer: IAuthObserver) => Promise<void>): void {
         this.observers.add(onTokenExpire);
     }
 
@@ -98,7 +98,8 @@ export class FetchCourier implements ICourier, IAuthObservable, IAuthObserver {
         });
         // retry if X-Access-Token has expired
         // 9 stands for InvalidTokenException
-        if (response.errorCode === 9) {
+        const json = await response.clone().json();
+        if (response.status === 401 && json && json.errorCode === 9) {
             for (const observer of this.observers) {
                 await observer(this);
             }
