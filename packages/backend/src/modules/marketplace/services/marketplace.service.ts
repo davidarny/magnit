@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import { Transactional } from "typeorm-transactional-cls-hooked";
 import { Marketplace } from "../entities/marketplace.entity";
 
 interface IRegionDto {
@@ -26,7 +27,8 @@ export class MarketplaceService {
         private readonly marketplaceRepository: Repository<Marketplace>,
     ) {}
 
-    async getAllRegions(): Promise<string[]> {
+    @Transactional()
+    async findAll(): Promise<string[]> {
         const results = await this.marketplaceRepository.query(`
             SELECT m.region AS region
             FROM marketplace m
@@ -39,7 +41,8 @@ export class MarketplaceService {
         return this.toArray<IRegionDto, string>(results, curr => curr.region);
     }
 
-    async getCitiesForRegion(region: string): Promise<string[]> {
+    @Transactional()
+    async findCitiesForRegion(region: string): Promise<string[]> {
         const results = await this.marketplaceRepository.query(
             `
             SELECT m.city AS city
@@ -56,7 +59,8 @@ export class MarketplaceService {
         return this.toArray<ICityDto, string>(results, curr => curr.city);
     }
 
-    async getFormatForCity(region: string, city: string): Promise<string[]> {
+    @Transactional()
+    async findFormatForCity(region: string, city: string): Promise<string[]> {
         const results = await this.marketplaceRepository.query(
             `
             SELECT m.format AS format
@@ -73,7 +77,8 @@ export class MarketplaceService {
         return this.toArray<IFormatDto, string>(results, curr => curr.format);
     }
 
-    async getAddressForFormat(region: string, city: string, format: string): Promise<string[]> {
+    @Transactional()
+    async findAddressForFormat(region: string, city: string, format: string): Promise<string[]> {
         const results = await this.marketplaceRepository.query(
             `
             SELECT m.address AS address
@@ -90,7 +95,8 @@ export class MarketplaceService {
         return this.toArray<IAddressDto, string>(results, curr => curr.address);
     }
 
-    async findByPrimaries(
+    @Transactional()
+    async findOne(
         region: string,
         city: string,
         format: string,

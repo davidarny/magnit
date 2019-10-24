@@ -16,7 +16,7 @@ export class PushTokenMiddleware implements NestMiddleware {
     }
 
     private async setPushTokenIfExists(user: IAuthRequest["user"]): Promise<void> {
-        const pushTokens = await this.pushTokenService.getTokensByUserId(user.id);
+        const pushTokens = await this.pushTokenService.findByUserId(user.id);
         if (pushTokens) {
             user.tokens = pushTokens.map(pushToken => pushToken.token);
         }

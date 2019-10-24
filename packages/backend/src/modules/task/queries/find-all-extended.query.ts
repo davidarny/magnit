@@ -10,5 +10,6 @@ export class FindAllQueryExtended extends FindAllQuery<TaskExtendedDto> {
     }
 
     @ApiModelPropertyOptional() readonly region?: string;
+
     @ApiModelPropertyOptional() readonly city?: string;
 }

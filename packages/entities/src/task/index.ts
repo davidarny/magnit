@@ -17,6 +17,8 @@ export interface IBaseTask {
     notifyBefore?: number;
     updatedAt?: string;
     createdAt?: string;
+    idOwner?: string;
+    idAssignee?: string;
 }
 
 export interface ITemplateDocument extends ITemplate {

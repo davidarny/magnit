@@ -12,6 +12,7 @@ import {
     ITask,
     ITemplate,
     ITemplateDocument,
+    IUser,
     IVirtualTemplateDocument,
 } from "@magnit/entities";
 import { CommentsIcon, QuestionIcon, TrashIcon } from "@magnit/icons";
@@ -28,6 +29,7 @@ type TAnyTask = ITask | IExtendedTask;
 type TDocumentWithAnswers = ITemplateDocument & IExtendedDocument;
 
 interface ITaskEditorProps<T extends TAnyTask> {
+    users: IUser[];
     task: T;
     templates: T extends IExtendedTask ? TDocumentWithAnswers[] : ITemplateDocument[];
     variant: "create" | "view";
@@ -54,6 +56,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 
 export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
     const {
+        users,
         templates,
         task,
         variant,
@@ -416,6 +419,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             {editable && <EditorToolbar top={toolbarTopPosition} items={[...editorToolbarItems]} />}
             {isCreateMode(task) && (
                 <CreateTask
+                    users={users}
                     cities={cities}
                     regions={regions}
                     formats={formats}
@@ -434,6 +438,7 @@ export const TaskEditor = <T extends TAnyTask>(props: ITaskEditorProps<T>) => {
             )}
             {isViewMode(task) && (
                 <ViewTask
+                    users={users}
                     cities={cities}
                     regions={regions}
                     formats={formats}

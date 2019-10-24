@@ -80,7 +80,7 @@ export class TemplateController {
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Template not found" })
     async deleteById(@Param("id", NumericIdPipe, TemplateByIdPipe) id: number) {
-        await this.templateService.deleteById(id);
+        await this.templateService.delete(id);
         return { success: 1 };
     }
 }

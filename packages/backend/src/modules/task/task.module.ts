@@ -67,7 +67,7 @@ export class TaskModule {
     }
 
     private async notifyAboutExpiringTasks(): Promise<boolean> {
-        const tasks = await this.taskService.findTasksWithExpiringStages();
+        const tasks = await this.taskService.findExpiring();
         if (tasks.length) {
             await Promise.all(tasks.map(this.sendPushToTask.bind(this)).filter(Boolean));
         }

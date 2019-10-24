@@ -1,4 +1,13 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import {
+    Column,
+    DeepPartial,
+    Entity,
+    Index,
+    JoinColumn,
+    ManyToOne,
+    OneToMany,
+    RelationId,
+} from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { Marketplace } from "../../marketplace/entities/marketplace.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
@@ -43,6 +52,7 @@ export class Task extends PrimaryBaseEntity {
     notify_before: number;
 
     @Index()
+    @RelationId((task: Task) => task.marketplace)
     @Column({ nullable: true })
     id_marketplace: number | null;
 

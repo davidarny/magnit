@@ -79,13 +79,14 @@ export class TaskController {
     @ApiOkResponse({ type: GetTasksResponse, description: "Get all Tasks" })
     @ApiBadRequestResponse({ description: "Found non compatible props" })
     async findAll(
+        @Req() req: IAuthRequest,
         @Query(
             new NonCompatiblePropsPipe<FindAllQuery>(["status", "statuses"]),
             new SplitPropPipe<FindAllQuery>("statuses"),
         )
         query?: FindAllQuery,
     ) {
-        const [tasks, all] = await this.taskService.findAll(new FindAllQuery(query));
+        const [tasks, all] = await this.taskService.findAll(new FindAllQuery(query), req.user.id);
         return { success: 1, total: tasks.length, all, tasks };
     }
 
@@ -97,6 +98,7 @@ export class TaskController {
     })
     @ApiBadRequestResponse({ description: "Found non compatible props" })
     async findAllExtended(
+        @Req() req: IAuthRequest,
         @Query(
             new NonCompatiblePropsPipe<FindAllQueryExtended>(["status", "statuses"]),
             new SplitPropPipe<FindAllQueryExtended>("statuses"),
@@ -105,6 +107,7 @@ export class TaskController {
     ) {
         const [tasks, all] = await this.taskService.findAllExtended(
             new FindAllQueryExtended(query),
+            req.user.id,
         );
         return { success: 1, total: tasks.length, tasks, all };
     }
@@ -155,7 +158,7 @@ export class TaskController {
         @Param("id", NumericIdPipe, TaskByIdPipe) taskId: number,
         @Body("templates", NumericIdPipe, TemplatesByIdsPipe) templateIds: number[],
     ) {
-        await this.taskService.setTemplateAssignments(taskId, templateIds);
+        await this.taskService.assignTemplates(taskId, templateIds);
         return { success: 1 };
     }
 
@@ -168,7 +171,7 @@ export class TaskController {
         @Param("template_id", NumericIdPipe, TemplateByIdPipe) templateId: number,
         @Body() templateAssignmentDto: TemplateAssignmentDto,
     ) {
-        await this.taskService.updateTemplateAssignment(taskId, templateId, templateAssignmentDto);
+        await this.taskService.updateAssignment(taskId, templateId, templateAssignmentDto);
         return { success: 1 };
     }
 
@@ -180,7 +183,7 @@ export class TaskController {
         @Param("id", NumericIdPipe, TaskByIdPipe) id: number,
         @Body("stages") stageDtoArray: TaskStageDto[],
     ) {
-        await this.taskService.addTaskStages(id, stageDtoArray);
+        await this.taskService.addStages(id, stageDtoArray);
         return { success: 1 };
     }
 
@@ -188,7 +191,7 @@ export class TaskController {
     @ApiOkResponse({ type: BaseResponse, description: "OK response" })
     @ApiNotFoundResponse({ type: ErrorResponse, description: "Task not found" })
     async deleteById(@Param("id", NumericIdPipe, TaskByIdPipe) id: number) {
-        await this.taskService.deleteById(id);
+        await this.taskService.delete(id);
         return { success: 1 };
     }
 
@@ -209,7 +212,7 @@ export class TaskController {
     async getStagesWithFullHistory(
         @Param("id", NumericIdPipe, TaskByIdPipe, TaskExpiredPipe) id: number,
     ) {
-        const task = await this.taskService.getTaskStagesWithHistory(id);
+        const task = await this.taskService.findWithHistory(id);
         return { success: 1, stages: task.stages };
     }
 
@@ -237,7 +240,7 @@ export class TaskController {
             ...(files || []).map(file => file.fieldname),
             ...Object.keys(body),
         ].filter(key => key !== "location");
-        await this.taskService.setTaskAnswers(id, templateIds, files, body);
+        await this.taskService.setAnswers(id, templateIds, files, body);
         return { success: 1 };
     }
 
@@ -331,7 +334,7 @@ export class TaskController {
             filename: file.filename,
             original_name: file.originalname,
         });
-        await this.taskService.addTaskDocument(document);
+        await this.taskService.addDocument(document);
         return { success: 1 };
     }
 
@@ -343,7 +346,7 @@ export class TaskController {
         @Param("task_id", NumericIdPipe, TaskByIdPipe) taskId: number,
         @Param("document_id", NumericIdPipe, DocumentByIdPipe) documentId: number,
     ) {
-        await this.taskService.deleteDocumentById(taskId, documentId);
+        await this.taskService.deleteDocument(taskId, documentId);
         return { success: 1 };
     }
 

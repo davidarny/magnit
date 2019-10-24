@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { Button } from "@magnit/components";
-import { ETaskStatus, ITask, ITemplate } from "@magnit/entities";
+import { ETaskStatus, ITask, ITemplate, IUser } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
 import { Grid, Typography } from "@material-ui/core";
@@ -24,15 +24,21 @@ import {
     getTemplates,
 } from "services/api";
 
-export interface ICreateTaskProps extends RouteComponentProps {}
+export interface ICreateTaskProps extends RouteComponentProps {
+    username: string;
+    users: IUser[];
+}
 
-export const CreateTask: React.FC<ICreateTaskProps> = () => {
+export const CreateTask: React.FC<ICreateTaskProps> = props => {
+    const { users, username } = props;
+
     const context = useContext(AppContext);
 
     // all templates
     const [templates, setTemplates] = useState<ITemplate[]>([]);
 
     // task state
+    const owner = users.find(user => user.username === username);
     const [task, setTask] = useState<ITask>({
         id: 0,
         title: "",
@@ -45,6 +51,7 @@ export const CreateTask: React.FC<ICreateTaskProps> = () => {
             region: "",
         },
         status: ETaskStatus.DRAFT,
+        idOwner: owner ? owner.id : "",
     });
 
     // snackbar
@@ -171,6 +178,7 @@ export const CreateTask: React.FC<ICreateTaskProps> = () => {
                 })}
             >
                 <TaskEditor<ITask>
+                    users={users}
                     variant="create"
                     task={task}
                     templates={templates}

@@ -35,7 +35,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         });
         const prevStatus = prevTask.status;
         const nextStatus = currentTask.status;
-        const description = this.taskService.getDescriptionByTransition(prevStatus, nextStatus);
+        const description = this.taskService.getDescriptionByStatus(prevStatus, nextStatus);
         // find non-finished stage
         // it means it's active
         // usually there should be only one non-finished stage
@@ -63,7 +63,7 @@ export class TaskSubscriber implements EntitySubscriberInterface<Task> {
         if (!task.id_assignee) {
             return;
         }
-        const pushTokens = await this.pushTokenService.getTokensByUserId(task.id_assignee);
+        const pushTokens = await this.pushTokenService.findByUserId(task.id_assignee);
         if (pushTokens.length) {
             const channel = await this.amqpService.getAssertedChannelFor(
                 AmqpService.PUSH_NOTIFICATION,

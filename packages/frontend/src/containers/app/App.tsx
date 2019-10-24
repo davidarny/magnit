@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
+import { IUser } from "@magnit/entities";
 import { Grid } from "@material-ui/core";
 import { navigate, Router } from "@reach/router";
 import { GlobalStyles } from "components/global-styles";
@@ -15,7 +16,13 @@ import { AppContext } from "context";
 import _ from "lodash";
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import Loadable from "react-loadable";
-import { CamelCaseMiddleware, FetchCourier, LoggerMiddleware, login } from "services/api";
+import {
+    CamelCaseMiddleware,
+    FetchCourier,
+    getAllUsers,
+    LoggerMiddleware,
+    login,
+} from "services/api";
 import { JsonParseMiddleware } from "services/api/middlewares";
 import { IAuthObserver } from "../../services/api/entities/IAuthObserver";
 
@@ -68,6 +75,8 @@ export const App: React.FC = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [users, setUsers] = useState<IUser[]>([]);
+
     const [token, setToken] = useState(""); // auth token
 
     const courier = useMemo(
@@ -103,6 +112,15 @@ export const App: React.FC = () => {
         },
         [courier, password, username],
     );
+
+    useEffect(() => {
+        if (!token) {
+            return;
+        }
+        getAllUsers(courier)
+            .then(response => setUsers(response.users))
+            .catch(console.error);
+    }, [courier, token]);
 
     useEffect(() => {
         courier.doOnTokenExpired(handleTokenExpiration);
@@ -185,13 +203,15 @@ export const App: React.FC = () => {
                             <PrivateRoute
                                 authorized={authorized}
                                 path="tasks/create"
-                                render={props => <AsyncCreateTask {...props} />}
+                                render={props => (
+                                    <AsyncCreateTask username={username} users={users} {...props} />
+                                )}
                             />
                         )}
                         <PrivateRoute<IViewTaskProps>
                             authorized={authorized}
                             path="tasks/view/:taskId"
-                            render={props => <AsyncViewTask {...props} />}
+                            render={props => <AsyncViewTask users={users} {...props} />}
                         />
                         <PrivateRoute<ITaskHistoryProps>
                             authorized={authorized}

@@ -16,6 +16,9 @@ import { AppModule } from "./app.module";
 import { AllExceptionsFilter } from "./shared/filters/all-exceptions.filter";
 import { LoggerFactory } from "./shared/providers/logger.factory";
 
+initializeTransactionalContext();
+patchTypeORMRepositoryWithBaseRepository();
+
 const development = process.env.NODE_ENV === "development";
 
 const pino = require("pino");
@@ -82,9 +85,6 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
             .build();
         const document = SwaggerModule.createDocument(app, config);
         SwaggerModule.setup("api", app, document);
-
-        initializeTransactionalContext();
-        patchTypeORMRepositoryWithBaseRepository();
 
         // listen port
         await app.listen(process.env.BACKEND_PORT || 1337);

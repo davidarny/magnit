@@ -63,7 +63,9 @@ interface IUpdateTaskListOptions {
 
 type TSelectChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
+export interface ITaskListProps extends RouteComponentProps<TRouteProps> {}
+
+export const TasksList: React.FC<ITaskListProps> = props => {
     const tab = props["*"]!;
 
     const context = useContext(AppContext);
@@ -316,6 +318,10 @@ export const TasksList: React.FC<RouteComponentProps<TRouteProps>> = props => {
             const value = event.target.value as string;
             setSelectedRegion(value);
             setSelectedCity("");
+            // empty cities if selected nothing
+            if (!value) {
+                setRegionCities([]);
+            }
             updateTaskListDebounced({
                 title: searchQuery,
                 region: value,

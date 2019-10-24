@@ -22,12 +22,14 @@ export class TemplateService {
         private readonly templateAnswerLocationRepository: Repository<TemplateAnswerLocation>,
     ) {}
 
+    @Transactional()
     async findByPuzzleId(taskId: number, puzzleId: string): Promise<TemplateAnswer> {
         return this.templateAnswerRepository.findOne({
             where: { id_task: taskId, id_puzzle: puzzleId },
         });
     }
 
+    @Transactional()
     async findAll(query: DeepPartial<FindAllQuery> = {}, extended: boolean = false) {
         let sql = `
             SELECT
@@ -63,13 +65,13 @@ export class TemplateService {
         return [templates, all];
     }
 
-    // TODO: remove this one and handle 404 more accurately
-    /** @deprecated */
-    async findOneOrFail(id: number) {
-        return this.templateRepository.findOneOrFail({ where: { id } });
+    @Transactional()
+    async findOneOrFail(templateId: number) {
+        return this.templateRepository.findOneOrFail({ where: { id: templateId } });
     }
 
-    async findTemplateAssignmentByIdExtended(id: number) {
+    @Transactional()
+    async findAssignmentExtended(taskId: number) {
         return this.templateRepository.query(
             `
             SELECT
@@ -92,7 +94,7 @@ export class TemplateService {
             GROUP BY t.id, tas.id
             ORDER BY t.id, tas.id
         `,
-            [id],
+            [taskId],
         );
     }
 
@@ -128,7 +130,7 @@ export class TemplateService {
     }
 
     @Transactional()
-    async update(id: number, template: Template) {
+    async update(templateId: number, template: Template) {
         // tricky update
         // need this only for jsonb_strip_nulls()
         const builder = await this.templateRepository.createQueryBuilder("template").update();
@@ -146,33 +148,37 @@ export class TemplateService {
             values.sections = () =>
                 `to_jsonb(json_strip_nulls('${JSON.stringify(template.sections)}'))`;
         }
-        builder.set(values).where("id = :id", { id });
+        builder.set(values).where("id = :id", { id: templateId });
         await builder.execute();
-        return await this.templateRepository.findOne({ id });
+        return await this.templateRepository.findOne({ id: templateId });
     }
 
-    async findById(id: number) {
-        return this.templateRepository.findOne({ where: { id } });
+    @Transactional()
+    async findById(templateId: number) {
+        return this.templateRepository.findOne({ where: { id: templateId } });
     }
 
-    async deleteById(id: number) {
-        await this.templateRepository.delete(id);
+    @Transactional()
+    async delete(templateId: number) {
+        await this.templateRepository.delete(templateId);
     }
 
+    @Transactional()
     async saveAnswerBulk(answers: TemplateAnswer[]) {
         return this.templateAnswerRepository.save(answers);
     }
 
-    async saveTemplateLocation(templateAnswerLocation: TemplateAnswerLocation) {
+    @Transactional()
+    async saveLocation(templateAnswerLocation: TemplateAnswerLocation) {
         return this.templateAnswerLocationRepository.save(templateAnswerLocation);
     }
 
-    async findPuzzlesByIds(template: Template, puzzleIds: string[]): Promise<Map<string, IPuzzle>> {
+    async findPuzzles(template: Template, puzzleIds: string[]): Promise<Map<string, IPuzzle>> {
         const result = new Map<string, IPuzzle>();
         const rest = [...puzzleIds];
         // find all puzzles from set of ids
         await this.traverse(template.sections as object[], value => {
-            if (this.isPuzzle(value) && rest.includes(value.id)) {
+            if (isPuzzle(value) && rest.includes(value.id)) {
                 const indexToRemove = rest.findIndex(restId => restId === value.id);
                 if (indexToRemove !== -1) {
                     rest.splice(indexToRemove, 1);
@@ -187,10 +193,6 @@ export class TemplateService {
             throw new PuzzleNotFoundException(`Puzzle(s) ${rest.join(", ")} not found`);
         }
         return result;
-    }
-
-    private isPuzzle(value: object): value is IPuzzle {
-        return _.has(value, "id") && _.has(value, "puzzles");
     }
 
     private async traverse(array: object[], predicate: (value: object) => boolean) {
@@ -211,4 +213,8 @@ export class TemplateService {
             resolve();
         });
     }
+}
+
+function isPuzzle(value: object): value is IPuzzle {
+    return _.has(value, "id") && _.has(value, "puzzles");
 }

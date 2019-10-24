@@ -2,7 +2,7 @@
 
 import { jsx } from "@emotion/core";
 import { DateField, InputField, SelectableBlockWrapper, SelectField } from "@magnit/components";
-import { IExtendedTask } from "@magnit/entities";
+import { IExtendedTask, IUser } from "@magnit/entities";
 import { getFriendlyDate, IEditorService } from "@magnit/services";
 import { Grid, MenuItem, Typography } from "@material-ui/core";
 import { TaskFieldContainer } from "components/task-field-container";
@@ -11,6 +11,7 @@ import * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface IDraftViewProps {
+    users: IUser[];
     service: IEditorService;
     task: Partial<IExtendedTask>;
     focusedPuzzleId?: string;
@@ -30,6 +31,7 @@ type TSelectChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
 export const DraftView: React.FC<IDraftViewProps> = props => {
     const {
+        users,
         focusedPuzzleId,
         service,
         task,
@@ -219,6 +221,15 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
         [onTaskChange, task],
     );
 
+    const onChangeAssignee = useCallback(
+        (event: TSelectChangeEvent) => {
+            if (onTaskChange) {
+                onTaskChange({ ...task, idAssignee: event.target.value as string });
+            }
+        },
+        [onTaskChange, task],
+    );
+
     return (
         <SelectableBlockWrapper
             css={theme => ({
@@ -349,7 +360,18 @@ export const DraftView: React.FC<IDraftViewProps> = props => {
                 </TaskFieldContainer>
                 <TaskFieldContainer label="Исполнитель">
                     <Grid item xs={4}>
-                        <SelectField placeholder="Выберите исполнителя" fullWidth />
+                        <SelectField
+                            value={task.idAssignee}
+                            fullWidth
+                            placeholder="Выберите исполнителя"
+                            onChange={onChangeAssignee}
+                        >
+                            {users.map(user => (
+                                <MenuItem key={user.id} value={user.id}>
+                                    {user.username}
+                                </MenuItem>
+                            ))}
+                        </SelectField>
                     </Grid>
                 </TaskFieldContainer>
             </Grid>

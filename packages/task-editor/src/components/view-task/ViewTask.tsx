@@ -17,6 +17,7 @@ import {
     IStageStep,
     ITemplate,
     ITemplateDocument,
+    IUser,
     IVirtualTemplateDocument,
 } from "@magnit/entities";
 import { AddIcon, CheckIcon } from "@magnit/icons";
@@ -38,6 +39,7 @@ type TSelectChangeEvent = React.ChangeEvent<{
 }>;
 
 interface IViewTaskProps {
+    users: IUser[];
     task: Partial<IExtendedTask>;
     service: IEditorService;
     documents: IVirtualTemplateDocument[];
@@ -74,6 +76,7 @@ interface IViewTaskProps {
 
 export const ViewTask: React.FC<IViewTaskProps> = props => {
     const {
+        users,
         service,
         task,
         pendingComments,
@@ -101,7 +104,17 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
 
+    const [selectedAssignee, setSelectedAssignee] = useState<string | undefined>("");
+
     const input = useRef<HTMLInputElement>(null);
+
+    const prevSelectedAssignee = useRef(selectedAssignee);
+    useEffect(() => {
+        if (prevSelectedAssignee.current !== task.idAssignee) {
+            prevSelectedAssignee.current = task.idAssignee;
+            setSelectedAssignee(task.idAssignee);
+        }
+    }, [task.idAssignee]);
 
     function onAddAssetTrigger() {
         if (input.current) {
@@ -150,12 +163,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         setOpen(false);
     }
 
-    function onAssigneeChange(): void {
+    function onAssigneeStartChanging(): void {
         setOpen(true);
-    }
-
-    function onAssigneeChangeComplete(): void {
-        setOpen(false);
     }
 
     const onAddStageCallback = useCallback((): void => {
@@ -250,6 +259,17 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         [onTaskChange, task],
     );
 
+    function onChangeAssignee(event: TSelectChangeEvent) {
+        setSelectedAssignee(event.target.value as string);
+    }
+
+    const onSaveAssignee = useCallback(() => {
+        if (onTaskChange) {
+            onTaskChange({ ...task, idAssignee: selectedAssignee });
+        }
+        setOpen(false);
+    }, [selectedAssignee, onTaskChange, task]);
+
     const getTaskId = useCallback(() => _.get(task, "id", uuid()).toString(), [task]);
 
     const showNewStageButton = editable && (task.stages || []).every(step => !step.editable);
@@ -295,6 +315,10 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         task.status === ETaskStatus.IN_PROGRESS || task.status === ETaskStatus.COMPLETED;
 
     const taskHasDocuments = task.documents && task.documents.length > 0;
+
+    const owner = users.find(user => user.id === task.idOwner);
+    const assignee = users.find(user => user.id === task.idAssignee);
+
     return (
         <React.Fragment>
             <Menu
@@ -339,22 +363,23 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <SelectField fullWidth placeholder="Выберите исполнителя">
-                            <MenuItem>Гончар Семён Платонович</MenuItem>
-                            <MenuItem>Маслов Гарри Валерьевич</MenuItem>
-                            <MenuItem>Буров Юлиан Данилович</MenuItem>
-                            <MenuItem>Воронов Юрий Виталиевич</MenuItem>
-                            <MenuItem>Лановой Устин Иванович</MenuItem>
+                        <SelectField
+                            value={selectedAssignee}
+                            fullWidth
+                            placeholder="Выберите исполнителя"
+                            onChange={onChangeAssignee}
+                        >
+                            {users.map(user => (
+                                <MenuItem key={user.id} value={user.id}>
+                                    {user.username}
+                                </MenuItem>
+                            ))}
                         </SelectField>
                     </Grid>
                     <Grid item css={theme => ({ paddingTop: `${theme.spacing(5)} !important` })}>
                         <Grid container justify="center" alignItems="center">
                             <Grid item>
-                                <Button
-                                    variant="contained"
-                                    scheme="blue"
-                                    onClick={onAssigneeChangeComplete}
-                                >
+                                <Button variant="contained" scheme="blue" onClick={onSaveAssignee}>
                                     <CheckIcon />
                                     <Typography>Сохранить</Typography>
                                 </Button>
@@ -365,6 +390,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
             </Dialog>
             {task.status === ETaskStatus.DRAFT && (
                 <DraftView
+                    users={users}
                     cities={cities}
                     regions={regions}
                     formats={formats}
@@ -428,16 +454,15 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
                     <Grid container spacing={2}>
                         <Grid item xs={7} css={theme => ({ marginTop: theme.spacing(4) })}>
                             <Grid spacing={2} container direction="row">
-                                <InfoField
-                                    title="Администратор"
-                                    value="Барановский Прохор Артёмович"
-                                />
+                                {owner && (
+                                    <InfoField value={owner.username} title="Администратор" />
+                                )}
                                 <InfoField
                                     title="Исполнитель"
-                                    value="Рукастый Иннокентий Петрович"
+                                    value={assignee ? assignee.username : ""}
                                     editable={editable}
                                     label="Изменить исполнителя"
-                                    onEditableClick={onAssigneeChange}
+                                    onEditableClick={onAssigneeStartChanging}
                                 />
                             </Grid>
                             <Grid

@@ -38,8 +38,9 @@ export async function getTasksExtended(
         title: `${title ? `&title=${title}` : ""}`,
         region: `${region ? `&region=${region}` : ""}`,
         city: `${city ? `&city=${city}` : ""}`,
+        all: "&all=true",
     };
     return courier.get<IGetTasksExtendedResponse>(
-        `tasks/extended${query.limit}${query.status}${query.sort}${query.sortBy}${query.title}${query.region}${query.city}`,
+        `tasks/extended${query.limit}${query.status}${query.sort}${query.sortBy}${query.title}${query.region}${query.city}${query.all}`,
     );
 }

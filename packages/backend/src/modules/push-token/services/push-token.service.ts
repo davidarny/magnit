@@ -10,24 +10,26 @@ export class PushTokenService {
 
     @Transactional()
     async createUniqueToken(token: PushToken): Promise<PushToken> {
-        await this.deletePreviousRecordsForToken(token);
+        await this.deletePrevRecords(token);
         return this.save(token);
     }
 
     @Transactional()
-    async deletePreviousRecordsForToken(tokenToInsert: PushToken): Promise<void> {
+    async deletePrevRecords(pushToken: PushToken): Promise<void> {
         const tokens = await this.pushTokenRepository.find({
-            where: { token: tokenToInsert.token },
+            where: { token: pushToken.token },
         });
-        if (tokens.some(foundToken => foundToken.id_user !== tokenToInsert.id_user)) {
+        if (tokens.some(foundToken => foundToken.id_user !== pushToken.id_user)) {
             await this.pushTokenRepository.remove(tokens);
         }
     }
 
-    async getTokensByUserId(id: string): Promise<PushToken[]> {
-        return this.pushTokenRepository.find({ where: { id_user: id } });
+    @Transactional()
+    async findByUserId(userId: string): Promise<PushToken[]> {
+        return this.pushTokenRepository.find({ where: { id_user: userId } });
     }
 
+    @Transactional()
     async save(token: PushToken): Promise<PushToken> {
         return this.pushTokenRepository.save(token);
     }

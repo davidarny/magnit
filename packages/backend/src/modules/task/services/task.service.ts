@@ -45,7 +45,8 @@ export class TaskService {
         private readonly taskDocumentRepository: Repository<TaskDocument>,
     ) {}
 
-    async findTasksWithExpiringStages(): Promise<TTaskWithLastStageAndToken[]> {
+    @Transactional()
+    async findExpiring(): Promise<TTaskWithLastStageAndToken[]> {
         return await this.taskRepository.query(`
             SELECT
                 t.*,
@@ -61,7 +62,8 @@ export class TaskService {
         `);
     }
 
-    async findAll(query: DeepPartial<FindAllQuery> = {}) {
+    @Transactional()
+    async findAll(query: DeepPartial<FindAllQuery> = {}, userId?: string) {
         let sql = `
             SELECT t.*,
                    to_json(m) AS marketplace,
@@ -84,6 +86,10 @@ export class TaskService {
             params.push(`%${query.title.toLowerCase()}%`);
             sql += ` AND lower(t.title) LIKE $${params.length} `;
         }
+        if (!query.all) {
+            params.push(userId);
+            sql += ` AND t.id_assignee = $${params.length} `;
+        }
         sql += "GROUP BY t.id, m.*";
         if (!_.isNil(query.sort)) {
             sql += ` ORDER BY t.${query.sortBy || "title"} ${query.sort} `;
@@ -97,11 +103,17 @@ export class TaskService {
             sql += ` OFFSET $${params.length} `;
         }
         const tasks = await this.taskRepository.query(sql, params);
-        const all = await this.taskRepository.count();
+        const all = await this.taskRepository.count(
+            !query.all ? { where: { id_assignee: userId } } : {},
+        );
         return [tasks, all];
     }
 
-    async findAllExtended(query: DeepWriteable<DeepPartial<FindAllQueryExtended>> = {}) {
+    @Transactional()
+    async findAllExtended(
+        query: DeepWriteable<DeepPartial<FindAllQueryExtended>> = {},
+        userId: string,
+    ) {
         let sql = `
             SELECT t.*,
                    m.address,
@@ -143,6 +155,10 @@ export class TaskService {
             params.push(`%${query.city.toLowerCase()}%`);
             sql += ` AND lower(m.city) LIKE $${params.length} `;
         }
+        if (!query.all) {
+            params.push(userId);
+            sql += ` AND t.id_assignee = $${params.length} `;
+        }
         sql += "GROUP BY t.id, m.address, m.format, m.city, m.region, ts.title, ts.deadline";
         if (!_.isNil(query.sort)) {
             const stage = ["stage_title", "deadline"];
@@ -169,7 +185,9 @@ export class TaskService {
             sql += ` OFFSET $${params.length} `;
         }
         const tasks = await this.taskRepository.query(sql, params);
-        const all = await this.taskRepository.count();
+        const all = await this.taskRepository.count(
+            !query.all ? { where: { id_assignee: userId } } : {},
+        );
         return [tasks, all];
     }
 
@@ -183,7 +201,8 @@ export class TaskService {
         return _.first(ids).id;
     }
 
-    async findById(id: number) {
+    @Transactional()
+    async findById(taskId: number) {
         const tasks = await this.taskRepository.query(
             `
                 SELECT t.*,
@@ -195,17 +214,17 @@ export class TaskService {
                 WHERE t.id = $1
                 GROUP BY t.id, m.*;
         `,
-            [id],
+            [taskId],
         );
         const task = _.first<Task>(tasks);
         if (!task) {
-            throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
+            throw new InternalServerErrorException(`Cannot fetch task "${taskId}"`);
         }
         return { ...task };
     }
 
     @Transactional()
-    async findByIdExtended(id: number) {
+    async findByIdExtended(taskId: number) {
         const tasks = await this.taskRepository.query(
             `
                 SELECT t.*,
@@ -228,39 +247,47 @@ export class TaskService {
                 WHERE t.id = $1
                 GROUP BY t.id, m.*;
         `,
-            [id],
+            [taskId],
         );
         const task = _.first<Task>(tasks);
         if (!task) {
-            throw new InternalServerErrorException(`Cannot fetch task "${id}"`);
+            throw new InternalServerErrorException(`Cannot fetch task "${taskId}"`);
         }
-        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
+        const templates = await this.templateService.findAssignmentExtended(task.id);
         return { ...task, templates };
     }
 
-    async getTaskStagesWithHistory(id: number): Promise<Task> {
+    @Transactional()
+    async findWithHistory(taskId: number): Promise<Task> {
         return this.taskRepository
             .createQueryBuilder("task")
-            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
+            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id: taskId })
             .leftJoinAndSelect("stage.history", "history", "history.id_stage = stage.id")
-            .where("task.id = :id", { id })
+            .where("task.id = :id", { id: taskId })
             .orderBy("stage.created_at", "ASC")
             .addOrderBy("history.created_at", "ASC")
             .getOne();
     }
 
-    async deleteById(id: number) {
-        await this.taskRepository.delete(id);
+    @Transactional()
+    async delete(taskId: number) {
+        await this.taskRepository.delete(taskId);
     }
 
     @Transactional()
-    async update(id: number, task: DeepPartial<Task>): Promise<void> {
+    async update(taskId: number, task: DeepPartial<Task>): Promise<void> {
         await this.appendMarketplaceIfExists(task);
-        await this.taskRepository.save({ id, ...task });
+        // this bug happens
+        // https://github.com/typeorm/typeorm/issues/2651
+        if (!task.marketplace && !task.id_marketplace) {
+            delete task.marketplace;
+            delete task.id_marketplace;
+        }
+        await this.taskRepository.save({ id: taskId, ...task });
     }
 
     @Transactional()
-    async setTemplateAssignments(taskId: number, templateIds: number[]): Promise<void> {
+    async assignTemplates(taskId: number, templateIds: number[]): Promise<void> {
         const prevAssignments = await this.templateAssignmentRepository.find({
             where: { id_task: taskId },
         });
@@ -298,7 +325,8 @@ export class TaskService {
         await this.templateAssignmentRepository.remove(prevAssignments);
     }
 
-    async updateTemplateAssignment(
+    @Transactional()
+    async updateAssignment(
         taskId: number,
         templateId: number,
         templateAssignmentDto: TemplateAssignmentDto,
@@ -310,13 +338,13 @@ export class TaskService {
     }
 
     @Transactional()
-    async setTaskAnswers(
-        id: number,
+    async setAnswers(
+        taskId: number,
         keys: string[],
         files: Express.Multer.File[],
         body: { [key: string]: string },
     ) {
-        const task = await this.taskRepository.findOne(id);
+        const task = await this.taskRepository.findOne(taskId);
         // check if task has IN_PROGRESS status
         // if not, throw error
         if (task.status !== ETaskStatus.IN_PROGRESS) {
@@ -334,19 +362,19 @@ export class TaskService {
             throw new CannotParseLocationException("Cannot parse location JSON");
         }
         const location = new TemplateAnswerLocation(templateAnswerLocationDto);
-        await this.templateService.saveTemplateLocation(location);
+        await this.templateService.saveLocation(location);
         // get all template ids in keys
         const groupedTemplateIds = this.groupKeysBy(keys, key =>
-            this.getTemplateIdFromMultipartKey(key),
+            getTemplateIdFromMultipartKey(key),
         ).map(templateId => Number(templateId));
         await Promise.all(
             groupedTemplateIds
                 .map(async templateId => {
                     // group all key with array index suffix
                     const puzzleIds = this.groupKeysBy(keys, key =>
-                        this.getPuzzleIdFromMultipartKey(key),
+                        getPuzzleIdFromMultipartKey(key),
                     );
-                    await this.ensurePuzzlesSettled(id, puzzleIds);
+                    await this.ensurePuzzlesSettled(taskId, puzzleIds);
                     // remove id of comment suffix
                     // cause we don't store that separately
                     const templatePuzzleIds = this.getTemplatePuzzleIdsWithoutComments(
@@ -357,18 +385,15 @@ export class TaskService {
                     if (!template) {
                         throw new TemplateNotFoundException(`Template "${templateId}" not found`);
                     }
-                    const puzzles = await this.templateService.findPuzzlesByIds(
-                        template,
-                        puzzleIds,
-                    );
+                    const puzzles = await this.templateService.findPuzzles(template, puzzleIds);
                     // collect answers
                     const answers = templatePuzzleIds
                         .map(templatePuzzleId => {
-                            const puzzleId = this.getPuzzleIdFromMultipartKey(templatePuzzleId);
+                            const puzzleId = getPuzzleIdFromMultipartKey(templatePuzzleId);
                             const puzzle = puzzles.get(puzzleId);
                             if (puzzle) {
                                 // trying to get puzzle_type
-                                const type = this.getPuzzleType(puzzle);
+                                const type = getPuzzleType(puzzle);
                                 const file = this.getFileByTemplateId(files, templatePuzzleId);
                                 if (file) {
                                     file.filename = `${process.env.BACKEND_HOST}/${file.filename}?originalname=${file.originalname}`;
@@ -399,10 +424,7 @@ export class TaskService {
         await this.taskRepository.save(task);
     }
 
-    getDescriptionByTransition(
-        prevStatus: ETaskStatus,
-        nextStatus: ETaskStatus,
-    ): string | undefined {
+    getDescriptionByStatus(prevStatus: ETaskStatus, nextStatus: ETaskStatus): string | undefined {
         // little state machine with possible transitions
         // between statuses
         return _.get(
@@ -428,16 +450,18 @@ export class TaskService {
     }
 
     @Transactional()
-    async getReport(id: number): Promise<[Task, TaskReportDto]> {
+    async getReport(taskId: number): Promise<[Task, TaskReportDto]> {
         const task = await this.taskRepository
             .createQueryBuilder("task")
-            .leftJoinAndSelect("task.assignments", "assignment", "assignment.id_task = :id", { id })
-            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id })
-            .where("task.id = :id", { id })
+            .leftJoinAndSelect("task.assignments", "assignment", "assignment.id_task = :id", {
+                id: taskId,
+            })
+            .leftJoinAndSelect("task.stages", "stage", "stage.id_task = :id", { id: taskId })
+            .where("task.id = :id", { id: taskId })
             .orderBy("assignment.created_at", "ASC")
             .addOrderBy("stage.created_at", "ASC")
             .getOne();
-        const templates = await this.templateService.findTemplateAssignmentByIdExtended(task.id);
+        const templates = await this.templateService.findAssignmentExtended(task.id);
         const report = new TaskReportDto({
             ..._.omit(task, "assignments"),
             stages: task.stages.map(stage => {
@@ -464,16 +488,18 @@ export class TaskService {
         return [task, report];
     }
 
-    async addTaskDocument(document: TaskDocument): Promise<TaskDocument> {
+    @Transactional()
+    async addDocument(document: TaskDocument): Promise<TaskDocument> {
         return this.taskDocumentRepository.save(document);
     }
 
-    async documentByIdExists(id: number): Promise<boolean> {
-        return !!(await this.taskDocumentRepository.findOne(id));
+    @Transactional()
+    async documentExists(taskId: number): Promise<boolean> {
+        return !!(await this.taskDocumentRepository.findOne(taskId));
     }
 
     @Transactional()
-    async deleteDocumentById(taskId: number, documentId: number): Promise<void> {
+    async deleteDocument(taskId: number, documentId: number): Promise<void> {
         const document = await this.taskDocumentRepository.findOne(documentId);
         await this.taskDocumentRepository.delete({ id_task: taskId, id: documentId });
         const pathToFile = process.cwd() + `/public/${document.filename}`;
@@ -483,7 +509,8 @@ export class TaskService {
         unlinkSync(pathToFile);
     }
 
-    async addTaskStages(taskId: number, stageDtoArray: TaskStageDto[]) {
+    @Transactional()
+    async addStages(taskId: number, stageDtoArray: TaskStageDto[]) {
         const stages = stageDtoArray.map(
             taskStageDto =>
                 new TaskStage({
@@ -515,17 +542,19 @@ export class TaskService {
         return XLSX.write(wb, { type: "buffer" });
     }
 
-    async setAllAssignmentsNonEditable(id: number): Promise<void> {
+    @Transactional()
+    async setAllAssignmentsNonEditable(taskId: number): Promise<void> {
         const assignments = await this.templateAssignmentRepository.find({
-            where: { id_task: id },
+            where: { id_task: taskId },
         });
         assignments.forEach(assignment => (assignment.editable = false));
         await this.templateAssignmentRepository.save(assignments);
     }
 
-    async findActiveStage(id: number): Promise<TaskStage | undefined> {
+    @Transactional()
+    async findActiveStage(taskId: number): Promise<TaskStage | undefined> {
         return this.taskStageRepository.findOne({
-            where: { id_task: id, finished: false },
+            where: { id_task: taskId, finished: false },
             order: { created_at: "ASC" },
         });
     }
@@ -548,26 +577,27 @@ export class TaskService {
         await this.commentRepository.save(comment);
     }
 
+    @Transactional()
     async removeAssignmentComment(commentId: number): Promise<void> {
         await this.commentRepository.delete(commentId);
     }
 
+    @Transactional()
     async commentExists(commentId: number): Promise<boolean> {
         return !!(await this.commentRepository.findOne(commentId));
     }
 
+    @Transactional()
     private async appendMarketplaceIfExists(task: DeepPartial<Task>) {
         if (task.marketplace) {
             const { city, region, address, format } = task.marketplace;
-            const marketplace = await this.marketplaceService.findByPrimaries(
+            const marketplace = await this.marketplaceService.findOne(
                 region,
                 city,
                 format,
                 address,
             );
-            if (marketplace) {
-                task.marketplace = marketplace;
-            }
+            task.marketplace = marketplace || null;
         }
     }
 
@@ -581,22 +611,11 @@ export class TaskService {
         return files.find(file => file.fieldname === templatePuzzleId);
     }
 
-    private getPuzzleType(puzzle: IPuzzle): string | null {
-        return (_.first(puzzle.puzzles) || { puzzle_type: null }).puzzle_type;
-    }
-
-    private getTemplateIdFromMultipartKey(id: string): string | undefined {
-        return _.first(id.split("_"));
-    }
-
-    private getPuzzleIdFromMultipartKey(id: string): string | undefined {
-        return _.nth(id.split("_"), 1);
-    }
-
     private getTemplatePuzzleIdsWithoutComments(keys: string[], templateId: number): string[] {
         return keys.filter(id => id.startsWith(templateId.toString()) && !id.includes("comment"));
     }
 
+    @Transactional()
     private async ensurePuzzlesSettled(taskId: number, puzzleIds: string[]): Promise<void> {
         // validating here cause pipe cannot get access
         // to file array and it's keys
@@ -628,4 +647,16 @@ export class TaskService {
             return [...prev, predicate(curr)];
         }, []);
     }
+}
+
+function getPuzzleType(puzzle: IPuzzle): string | null {
+    return (_.first(puzzle.puzzles) || { puzzle_type: null }).puzzle_type;
+}
+
+function getTemplateIdFromMultipartKey(id: string): string | undefined {
+    return _.first(id.split("_"));
+}
+
+function getPuzzleIdFromMultipartKey(id: string): string | undefined {
+    return _.nth(id.split("_"), 1);
 }

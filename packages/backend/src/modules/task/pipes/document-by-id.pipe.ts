@@ -7,7 +7,7 @@ export class DocumentByIdPipe implements PipeTransform<number, Promise<number>> 
     constructor(private readonly taskService: TaskService) {}
 
     async transform(id: number, metadata: ArgumentMetadata): Promise<number> {
-        const exists = await this.taskService.documentByIdExists(id);
+        const exists = await this.taskService.documentExists(id);
         if (!exists) {
             throw new TaskNotFoundException(`Document with id ${id} was not found`);
         }

@@ -10,6 +10,7 @@ import {
     IStage,
     ITemplate,
     ITemplateDocument,
+    IUser,
 } from "@magnit/entities";
 import { SendIcon } from "@magnit/icons";
 import { TaskEditor } from "@magnit/task-editor";
@@ -47,6 +48,7 @@ import {
 
 export interface IViewTaskProps {
     taskId: number;
+    users: IUser[];
 }
 
 interface IEditableTemplate extends ITemplate {
@@ -55,7 +57,9 @@ interface IEditableTemplate extends ITemplate {
 
 type TDocumentWithAnswers = ITemplateDocument & IExtendedDocument;
 
-export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
+export const ViewTask: React.FC<IViewTaskProps> = props => {
+    const { taskId, users } = props;
+
     const context = useContext(AppContext);
 
     // dot menu
@@ -83,7 +87,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
         status: ETaskStatus.DRAFT,
     });
 
-    // redirects
+    // redirect
     const [redirect, setRedirect] = useState({
         trigger: false,
         to: "",
@@ -539,6 +543,7 @@ export const ViewTask: React.FC<IViewTaskProps> = ({ taskId }) => {
                 })}
             >
                 <TaskEditor<IExtendedTask>
+                    users={users}
                     task={task}
                     regions={marketplaceRegions}
                     cities={regionCities}

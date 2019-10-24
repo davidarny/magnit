@@ -17,7 +17,7 @@ export class MarketplaceController {
     @Get("/regions")
     @ApiOkResponse({ type: GetRegionsResponse, description: "List of regions" })
     async getAllRegions() {
-        const regions = await this.marketplaceService.getAllRegions();
+        const regions = await this.marketplaceService.findAll();
         return { success: 1, regions };
     }
 
@@ -27,7 +27,7 @@ export class MarketplaceController {
         description: "List of cities of current region",
     })
     async getCitiesForRegion(@Param("region") region: string) {
-        const cities = await this.marketplaceService.getCitiesForRegion(region);
+        const cities = await this.marketplaceService.findCitiesForRegion(region);
         return { success: 1, cities };
     }
 
@@ -37,7 +37,7 @@ export class MarketplaceController {
         description: "Get formats for current city",
     })
     async getFormatsForCity(@Param("region") region: string, @Param("city") city: string) {
-        const formats = await this.marketplaceService.getFormatForCity(region, city);
+        const formats = await this.marketplaceService.findFormatForCity(region, city);
         return { success: 1, formats };
     }
 
@@ -51,7 +51,7 @@ export class MarketplaceController {
         @Param("city") city: string,
         @Param("format") format: string,
     ) {
-        const addresses = await this.marketplaceService.getAddressForFormat(region, city, format);
+        const addresses = await this.marketplaceService.findAddressForFormat(region, city, format);
         return { success: 1, addresses };
     }
 }
