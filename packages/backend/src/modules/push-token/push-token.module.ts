@@ -63,6 +63,15 @@ export class PushTokenModule implements IPushServiceFactory {
             return new FirebasePushService();
         } else if (process.env.PUSH_CLIENT === "airwatch") {
             return new AirwatchPushService(this.httpService);
+        } else if (process.env.NODE_ENV === "testing") {
+            // stub service
+            return new (class implements IPushService {
+                async sendToDevice(
+                    deviceId: string,
+                    message: string,
+                    options: object,
+                ): Promise<void> {}
+            })();
         }
         throw new Error("Not supported push client type");
     }
