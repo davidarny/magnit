@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IColumn, TableWrapper } from "@magnit/components";
+import { IColumn, Table } from "@magnit/components";
 import { getFriendlyDate } from "@magnit/services";
 import { Typography } from "@material-ui/core";
 import * as React from "react";
@@ -49,7 +49,7 @@ export const ReportStage: React.FC<ITaskStageProps> = props => {
             >
                 <span css={{ fontWeight: 500 }}>Исполнитель:</span> Рукастый Иннокентий Петрович
             </div>
-            <TableWrapper
+            <Table
                 hover={false}
                 pagination={false}
                 columns={columns}

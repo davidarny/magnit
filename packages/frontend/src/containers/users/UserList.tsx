@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IColumn, TableWrapper } from "@magnit/components";
+import { IColumn, Table } from "@magnit/components";
 import { Grid, Paper } from "@material-ui/core";
 import { RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
@@ -43,7 +43,7 @@ export const UserList: React.FC<IUserListProps> = () => {
                         css={theme => ({ marginTop: theme.spacing(2) })}
                     >
                         <Grid xs={12} item css={theme => ({ padding: theme.spacing(3) })}>
-                            <TableWrapper
+                            <Table
                                 columns={columns}
                                 data={users.map(user => ({
                                     ...user,

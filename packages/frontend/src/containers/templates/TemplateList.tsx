@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { Button, IColumn, InputField, ITableDataItem, TableWrapper } from "@magnit/components";
+import { Button, IColumn, InputField, ITableDataItem, Table } from "@magnit/components";
 import { AddIcon } from "@magnit/icons";
 import { getFriendlyDate } from "@magnit/services";
 import { Grid, MenuItem, Paper, Typography } from "@material-ui/core";
@@ -223,7 +223,7 @@ export const TemplateList: React.FC<ITemplateListProps> = () => {
                                 </Grid>
                             </Grid>
                             <Grid item css={theme => ({ padding: theme.spacing(3) })}>
-                                <TableWrapper
+                                <Table
                                     page={page}
                                     order={order}
                                     orderBy={orderBy}

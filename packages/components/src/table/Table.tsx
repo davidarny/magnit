@@ -2,20 +2,16 @@
 
 import { jsx } from "@emotion/core";
 import {
-    Grid,
-    IconButton,
-    Table,
+    Table as MaterialTable,
     TablePagination as MaterialTablePagination,
 } from "@material-ui/core";
-import {
-    KeyboardArrowLeft as LeftArrowIcon,
-    KeyboardArrowRight as RightArrowIcon,
-} from "@material-ui/icons";
-import * as _ from "lodash";
 import * as React from "react";
 import { useCallback } from "react";
-import { TableBodyWrapper } from "./TableBodyWrapper";
+import { PaginationLabel } from "./PaginationLabel";
+import { TableBody } from "./TableBody";
 import { TableHeader } from "./TableHeader";
+import { TablePagination } from "./TablePagination";
+import { getSortedData, getSortingNumber } from "./utils";
 
 export interface ITableDataItem {
     [key: string]: any;
@@ -53,7 +49,7 @@ interface ITableWrapperProps {
     onChangePage?(nextPage: number): void;
 }
 
-export const TableWrapper: React.FC<ITableWrapperProps> = props => {
+export const Table: React.FC<ITableWrapperProps> = props => {
     const {
         columns,
         data,
@@ -96,7 +92,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
 
     return (
         <React.Fragment>
-            <Table {...rest}>
+            <MaterialTable {...rest}>
                 <TableHeader
                     numSelected={data.filter(item => item.selected).length}
                     rowCount={data.length}
@@ -107,7 +103,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
                     onSelectToggle={onSelectToggle}
                     onRequestSort={onRequestSortCallback}
                 />
-                <TableBodyWrapper
+                <TableBody
                     renderMenuItems={renderMenuItems}
                     data={
                         // currently pagination work only in client side
@@ -127,7 +123,7 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
                     onRowClick={onRowClick}
                     onRowSelectToggle={onRowSelectToggle}
                 />
-            </Table>
+            </MaterialTable>
             {pagination && (
                 <MaterialTablePagination
                     component="div"
@@ -198,169 +194,4 @@ export const TableWrapper: React.FC<ITableWrapperProps> = props => {
     );
 };
 
-TableWrapper.displayName = "TableWrapper";
-
-interface ITablePaginationProps {
-    count: number;
-    page: number;
-    rowsPerPage: number;
-
-    onChangePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number): void;
-}
-
-const TablePagination: React.FC<ITablePaginationProps> = props => {
-    const { count, page, rowsPerPage, onChangePage } = props;
-
-    // some stuff to correctly calculate
-    // left & right offsets when changing page
-    const range = {
-        offsets: {
-            start: 1,
-            end: 2,
-        },
-
-        get start() {
-            if (page === Math.ceil(count / rowsPerPage) - 1) {
-                this.offsets.start++;
-            }
-            return Math.max(0, page - this.offsets.start);
-        },
-
-        get end() {
-            if (page === 0) {
-                this.offsets.end++;
-            }
-            return Math.max(0, Math.min(page + this.offsets.end, Math.ceil(count / rowsPerPage)));
-        },
-    };
-
-    function onBackButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        onChangePage(event, page - 1);
-    }
-
-    function onNextButtonClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        onChangePage(event, page + 1);
-    }
-
-    function onActionButtonClick(
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        page: number,
-    ) {
-        onChangePage(event, page);
-    }
-
-    return (
-        <Grid
-            container
-            alignItems="center"
-            css={{
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
-                right: 0,
-                width: "auto",
-            }}
-        >
-            <Grid item>
-                <IconButton
-                    onClick={onBackButtonClick}
-                    disabled={page === 0}
-                    css={theme => ({
-                        width: theme.spacing(4),
-                        height: theme.spacing(4),
-                        marginLeft: theme.spacing(2),
-                        svg: {
-                            width: theme.spacing(3),
-                            height: theme.spacing(3),
-                        },
-                    })}
-                >
-                    <LeftArrowIcon />
-                </IconButton>
-            </Grid>
-            {_.range(range.start, range.end).map((action, index) => (
-                <Grid item key={index}>
-                    <IconButton
-                        onClick={event => onActionButtonClick(event, action)}
-                        disabled={action === page}
-                        css={theme => ({
-                            width: theme.spacing(4),
-                            height: theme.spacing(4),
-                            fontSize: theme.fontSize.normal,
-                            color:
-                                (action === page ? theme.colors.white : theme.colors.secondary) +
-                                " !important",
-                            background:
-                                (action === page ? theme.colors.primary : theme.colors.white) +
-                                " !important",
-                        })}
-                    >
-                        {action + 1}
-                    </IconButton>
-                </Grid>
-            ))}
-            <Grid item>
-                <IconButton
-                    onClick={onNextButtonClick}
-                    disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                    css={theme => ({
-                        width: theme.spacing(4),
-                        height: theme.spacing(4),
-                        marginRight: theme.spacing(2),
-                        svg: {
-                            width: theme.spacing(3),
-                            height: theme.spacing(3),
-                        },
-                    })}
-                >
-                    <RightArrowIcon />
-                </IconButton>
-            </Grid>
-        </Grid>
-    );
-};
-
-TablePagination.displayName = "TablePagination";
-
-interface IPaginationLabelProps {
-    from: number;
-    to: number;
-    count: number;
-    page: number;
-}
-
-const PaginationLabel: React.FC<IPaginationLabelProps> = ({ from, count, to }) => {
-    return <span>{`${from} - ${to} из ${count}`}</span>;
-};
-
-PaginationLabel.displayName = "PaginationLabel";
-
-// these function can be used
-// if server side sorting is not available
-
-function desc<T>(a: T, b: T, orderBy: keyof T) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
-
-function getSortedData<T>(array: T[], cmp: (a: T, b: T) => number) {
-    const stabilized = array.map((el, index) => [el, index] as [T, number]);
-    stabilized.sort((a, b) => {
-        const order = cmp(a[0], b[0]);
-        if (order !== 0) return order;
-        return a[1] - b[1];
-    });
-    return stabilized.map(el => el[0]);
-}
-
-function getSortingNumber<K extends string>(
-    order: "asc" | "desc",
-    orderBy: K,
-): (a: { [key in K]: number | string }, b: { [key in K]: number | string }) => number {
-    return order === "desc" ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
+Table.displayName = "Table";

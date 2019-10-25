@@ -8,7 +8,7 @@ import {
     InputField,
     ITab,
     SelectField,
-    TableWrapper,
+    Table,
     TabsWrapper,
 } from "@magnit/components";
 import { ETaskStatus } from "@magnit/entities";
@@ -483,7 +483,7 @@ export const TasksList: React.FC<ITaskListProps> = props => {
                                             paddingRight: 0,
                                         })}
                                     >
-                                        <TableWrapper
+                                        <Table
                                             css={theme => ({
                                                 marginLeft: theme.spacing(-2),
                                                 width: `calc(100% + ${theme.spacing(4)})`,

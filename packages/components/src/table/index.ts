@@ -1,1 +1,1 @@
-export * from "./TableWrapper";
+export * from "./Table";

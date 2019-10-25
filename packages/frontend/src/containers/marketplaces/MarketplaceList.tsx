@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { IColumn, TableWrapper } from "@magnit/components";
+import { IColumn, Table } from "@magnit/components";
 import { Grid, Paper } from "@material-ui/core";
 import { RouteComponentProps } from "@reach/router";
 import { EmptyList } from "components/list";
@@ -45,7 +45,7 @@ export const MarketplaceList: React.FC<IMarketplaceListProps> = () => {
                         css={theme => ({ marginTop: theme.spacing(2) })}
                     >
                         <Grid xs={12} item css={theme => ({ padding: theme.spacing(3) })}>
-                            <TableWrapper columns={columns} data={marketplaces} />
+                            <Table columns={columns} data={marketplaces} />
                         </Grid>
                     </Grid>
                 </Paper>
