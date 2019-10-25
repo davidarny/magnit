@@ -1,11 +1,4 @@
-import {
-    Column,
-    DeepPartial,
-    Entity,
-    OneToMany,
-    PrimaryGeneratedColumn,
-    VersionColumn,
-} from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, VersionColumn } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAssignment } from "../../task/entities/tempalte-assignment.entity";
 import { TemplateAnswer } from "./template-answer.entity";
@@ -20,11 +13,6 @@ export interface IPuzzle {
 
 @Entity()
 export class Template extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<Template>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @PrimaryGeneratedColumn()
     id: number;
 

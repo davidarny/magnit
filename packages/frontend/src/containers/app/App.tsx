@@ -58,6 +58,12 @@ const AsyncEditTemplate = Loadable({
     loading: Loading,
 });
 
+// users
+const AsyncUserList = Loadable({
+    loader: async () => import("containers/users").then(module => module.UserList),
+    loading: Loading,
+});
+
 export const App: React.FC = () => {
     const context = useContext(AppContext);
 
@@ -162,6 +168,15 @@ export const App: React.FC = () => {
                             path="templates/edit/:templateId"
                             render={props => <AsyncEditTemplate {...props} />}
                         />
+
+                        {/* users */}
+                        <PrivateRoute
+                            authorized={authorized}
+                            path="users"
+                            render={props => <AsyncUserList {...props} />}
+                        />
+
+                        {/* not found */}
                         <NotFound default to="tasks" />
                     </Router>
                 </Grid>

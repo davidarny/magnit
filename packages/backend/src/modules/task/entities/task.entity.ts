@@ -1,13 +1,4 @@
-import {
-    Column,
-    DeepPartial,
-    Entity,
-    Index,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-    RelationId,
-} from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, RelationId } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { Marketplace } from "../../marketplace/entities/marketplace.entity";
 import { TemplateAnswer } from "../../template/entities/template-answer.entity";
@@ -25,11 +16,6 @@ export enum ETaskStatus {
 
 @Entity()
 export class Task extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<Task>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @Index()
     @Column("varchar")
     title: string;

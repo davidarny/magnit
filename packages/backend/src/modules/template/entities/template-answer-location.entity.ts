@@ -1,4 +1,4 @@
-import { Column, DeepPartial, Entity, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAnswer } from "./template-answer.entity";
 
@@ -11,11 +11,6 @@ export enum ENoLocationReason {
 
 @Entity("template_answer_location")
 export class TemplateAnswerLocation extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<TemplateAnswerLocation>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @OneToMany(() => TemplateAnswer, template_answer => template_answer.location)
     answers: TemplateAnswer[];
 

@@ -1,13 +1,4 @@
-import {
-    Column,
-    DeepPartial,
-    Entity,
-    Generated,
-    Index,
-    JoinColumn,
-    ManyToOne,
-    PrimaryColumn,
-} from "typeorm";
+import { Column, Entity, Generated, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { BaseEntity } from "../../../shared/entities/base.entity";
 import { Task } from "../../task/entities/task.entity";
 import { TemplateAnswerLocation } from "./template-answer-location.entity";
@@ -15,11 +6,6 @@ import { Template } from "./template.entity";
 
 @Entity("template_answer")
 export class TemplateAnswer extends BaseEntity {
-    constructor(dto?: DeepPartial<TemplateAnswer>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @Column({ unique: true })
     @Generated("rowid")
     id: number;

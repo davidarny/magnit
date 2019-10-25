@@ -1,14 +1,9 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { TemplateAssignment } from "./tempalte-assignment.entity";
 
 @Entity()
 export class Comment extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<Comment>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @Column("varchar")
     id_user: string;
 

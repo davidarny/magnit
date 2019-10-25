@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { ExecutorIcon, ObjectIcon, ReportsIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
+import { ExecutorIcon, ObjectIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
 import _ from "lodash";
@@ -48,9 +48,8 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                     {[
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
-                        { text: "Объекты", icon: ObjectIcon, to: "/object" },
-                        { text: "Исполнители", icon: ExecutorIcon, to: "/executor" },
-                        { text: "Отчёты", icon: ReportsIcon, to: "/reports" },
+                        { text: "Объекты", icon: ObjectIcon, to: "/marketplaces" },
+                        { text: "Исполнители", icon: ExecutorIcon, to: "/users" },
                     ].map(({ text, icon: Icon, to }) => {
                         const active = _.get(location, "pathname", "").indexOf(to) !== -1;
                         return (

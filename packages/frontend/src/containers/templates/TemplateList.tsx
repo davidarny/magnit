@@ -179,9 +179,9 @@ export const TemplateList: React.FC<ITemplateListProps> = () => {
             {!empty && (
                 <Paper
                     square={true}
-                    css={({ colors, spacing }) => ({
+                    css={({ spacing, boxShadow }) => ({
                         margin: spacing(3),
-                        boxShadow: `0 0 ${spacing(2)} ${colors.lightGray} !important`,
+                        boxShadow: boxShadow.paper,
                     })}
                 >
                     <Grid

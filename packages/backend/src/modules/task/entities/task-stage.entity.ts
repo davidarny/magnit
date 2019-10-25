@@ -1,4 +1,4 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { StageHistory } from "./stage-history.entity";
 import { Task } from "./task.entity";
@@ -6,11 +6,6 @@ import { Task } from "./task.entity";
 @Entity("task_stage")
 @Index((stage: TaskStage) => [stage.id_task, stage.created_at, stage.finished, stage.deadline])
 export class TaskStage extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<TaskStage>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @Index()
     @Column()
     id_task: number;

@@ -9,6 +9,8 @@ import { LdapService } from "./ldap.service";
 
 interface IAirWatchUser {
     UserName?: string;
+    FirstName?: string;
+    LastName?: string;
     Email?: string;
     Status?: boolean;
     Role?: string;
@@ -34,7 +36,8 @@ export class AirwatchUserService implements IUserService {
                 id: user.Uuid,
                 email: user.Email,
                 username: user.UserName,
-                password: user.UserName,
+                firstName: user.FirstName,
+                lastName: user.LastName,
             });
         }
     }
@@ -54,7 +57,8 @@ export class AirwatchUserService implements IUserService {
                             id: user.Uuid,
                             email: user.Email,
                             username: user.UserName,
-                            password: user.UserName,
+                            firstName: user.FirstName,
+                            lastName: user.LastName,
                         }),
                 );
         }

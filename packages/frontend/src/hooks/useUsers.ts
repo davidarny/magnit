@@ -2,7 +2,7 @@ import { IUser } from "@magnit/entities";
 import { useEffect, useState } from "react";
 import { getAllUsers, ICourier } from "services/api";
 
-export function useUsers(courier: ICourier, authorized: boolean): IUser[] {
+export function useUsers(courier: ICourier, authorized: boolean = true): IUser[] {
     const [users, setUsers] = useState<IUser[]>([]);
 
     useEffect(() => {

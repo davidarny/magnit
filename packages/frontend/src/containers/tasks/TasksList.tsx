@@ -401,9 +401,9 @@ export const TasksList: React.FC<ITaskListProps> = props => {
             {!empty && (
                 <Paper
                     square={true}
-                    css={({ spacing, colors }) => ({
+                    css={({ spacing, boxShadow }) => ({
                         margin: spacing(3),
-                        boxShadow: `0 0 ${spacing(2)} ${colors.lightGray} !important`,
+                        boxShadow: boxShadow.paper,
                     })}
                 >
                     <Grid container direction="row" css={theme => ({ padding: theme.spacing(2) })}>
@@ -422,14 +422,14 @@ export const TasksList: React.FC<ITaskListProps> = props => {
                                                     fullWidth
                                                     value={searchQuery}
                                                     onChange={onSearchQueryChangeCallback}
-                                                    css={({ spacing, ...theme }) => ({
-                                                        borderRadius: theme.radius(5),
-                                                        background: theme.colors.white,
-                                                        border: `1px solid ${theme.colors.lightGray}`,
+                                                    css={({ spacing, radius, colors }) => ({
+                                                        borderRadius: radius(5),
+                                                        background: colors.white,
+                                                        border: `1px solid ${colors.lightGray}`,
                                                         transition: "border 0.25s ease-in-out",
                                                         cursor: "pointer",
                                                         ":hover, :active": {
-                                                            border: `1px solid ${theme.colors.primary}`,
+                                                            border: `1px solid ${colors.primary}`,
                                                         },
                                                         div: {
                                                             ":before, :after": {
@@ -451,11 +451,7 @@ export const TasksList: React.FC<ITaskListProps> = props => {
                                                     onChange={onRegionChangeCallback}
                                                 >
                                                     {(marketplaceRegions || []).map(region => (
-                                                        <MenuItem
-                                                            dense={false}
-                                                            key={region}
-                                                            value={region}
-                                                        >
+                                                        <MenuItem key={region} value={region}>
                                                             {region}
                                                         </MenuItem>
                                                     ))}

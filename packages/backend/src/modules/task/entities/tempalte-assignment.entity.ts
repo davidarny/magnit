@@ -1,4 +1,4 @@
-import { Column, DeepPartial, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 import { Template } from "../../template/entities/template.entity";
 import { Comment } from "./comment.entity";
@@ -6,11 +6,6 @@ import { Task } from "./task.entity";
 
 @Entity({ name: "template_assignment" })
 export class TemplateAssignment extends PrimaryBaseEntity {
-    constructor(dto?: DeepPartial<TemplateAssignment>) {
-        super();
-        this.construct(this, dto);
-    }
-
     @Column({ type: "boolean", default: true })
     editable: boolean;
 
