@@ -64,6 +64,12 @@ const AsyncUserList = Loadable({
     loading: Loading,
 });
 
+// marketplaces
+const AsyncMarketplaceList = Loadable({
+    loader: async () => import("containers/marketplaces").then(module => module.MarketplaceList),
+    loading: Loading,
+});
+
 export const App: React.FC = () => {
     const context = useContext(AppContext);
 
@@ -174,6 +180,13 @@ export const App: React.FC = () => {
                             authorized={authorized}
                             path="users"
                             render={props => <AsyncUserList {...props} />}
+                        />
+
+                        {/* marketplaces */}
+                        <PrivateRoute
+                            authorized={authorized}
+                            path="marketplaces"
+                            render={props => <AsyncMarketplaceList {...props} />}
                         />
 
                         {/* not found */}

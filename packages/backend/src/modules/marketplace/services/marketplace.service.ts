@@ -28,7 +28,12 @@ export class MarketplaceService {
     ) {}
 
     @Transactional()
-    async findAll(): Promise<string[]> {
+    async findAll() {
+        return this.marketplaceRepository.find();
+    }
+
+    @Transactional()
+    async findAllRegions(): Promise<string[]> {
         const results = await this.marketplaceRepository.query(`
             SELECT m.region AS region
             FROM marketplace m
