@@ -1,5 +1,6 @@
 import { navigate } from "@reach/router";
 import { AppContext } from "context";
+import _ from "lodash";
 import { Dispatch, SetStateAction, useCallback, useContext, useEffect, useState } from "react";
 import { IAuthObserver, ICourier, login } from "services/api";
 
@@ -10,6 +11,7 @@ export function useCredentials(
 ): [
     string,
     (username: string, password: string) => void,
+    () => void,
     (observer: IAuthObserver) => Promise<void>,
 ] {
     const namespace = "auth::";
@@ -62,6 +64,15 @@ export function useCredentials(
         [context, courier, keys.password, keys.token, keys.username, setToken],
     );
 
+    const handleLogout = useCallback(() => {
+        setUsername("");
+        setPassword("");
+        setToken("");
+        for (const entry of Object.entries(keys)) {
+            localStorage.removeItem(_.last(entry)!);
+        }
+    }, [keys, setToken]);
+
     const handleTokenExpiration = useCallback(
         async (observer: IAuthObserver) => {
             try {
@@ -75,5 +86,5 @@ export function useCredentials(
         [courier, password, username],
     );
 
-    return [username, handleLogin, handleTokenExpiration];
+    return [username, handleLogin, handleLogout, handleTokenExpiration];
 }

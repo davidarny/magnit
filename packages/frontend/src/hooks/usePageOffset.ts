@@ -6,6 +6,11 @@ export function usePageOffset(authorized: boolean): [number, number] {
     const [logoHeight, setLogoHeight] = useState(0);
 
     useEffect(() => {
+        if (!authorized) {
+            setDrawerWidth(0);
+            setLogoHeight(0);
+        }
+
         const drawer = document.getElementById("drawer");
         if (!drawer) {
             return;

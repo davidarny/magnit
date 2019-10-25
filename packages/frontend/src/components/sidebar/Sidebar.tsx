@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/core";
-import { ExecutorIcon, ObjectIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
+import { ExecutorIcon, LogoutIcon, ObjectIcon, TasksIcon, TemplatesIcon } from "@magnit/icons";
 import { Drawer, Grid, List, ListItem, ListItemIcon, Typography } from "@material-ui/core";
 import { Link, RouteComponentProps } from "@reach/router";
 import _ from "lodash";
@@ -14,10 +14,10 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
             variant="permanent"
             open={true}
             id="drawer"
-            css={({ spacing, colors }) => ({
+            css={({ boxShadow }) => ({
                 ".paper": {
                     border: "none",
-                    boxShadow: `${spacing(0.5)} 0 ${spacing(2)} ${colors.gray}40`,
+                    boxShadow: boxShadow.sidebar,
                 },
             })}
             classes={{ paper: "paper" }}
@@ -26,6 +26,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                 css={theme => ({
                     boxShadow: "none",
                     width: theme.spacing(11),
+                    height: "100%",
                 })}
             >
                 <Grid
@@ -44,13 +45,20 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                         </Link>
                     </Grid>
                 </Grid>
-                <List>
+                <List
+                    css={theme => ({
+                        height: `calc(100% - ${theme.spacing(14)})`,
+                        display: "flex",
+                        flexDirection: "column",
+                    })}
+                >
                     {[
                         { text: "Задания", icon: TasksIcon, to: "/tasks" },
                         { text: "Шаблоны", icon: TemplatesIcon, to: "/templates" },
                         { text: "Объекты", icon: ObjectIcon, to: "/marketplaces" },
                         { text: "Исполнители", icon: ExecutorIcon, to: "/users" },
-                    ].map(({ text, icon: Icon, to }) => {
+                        { text: "Выйти", icon: LogoutIcon, to: "/logout" },
+                    ].map(({ text, icon: Icon, to }, index, array) => {
                         const active = _.get(location, "pathname", "").indexOf(to) !== -1;
                         return (
                             <ListItem
@@ -61,6 +69,7 @@ export const Sidebar: React.FC<RouteComponentProps> = ({ location }) => {
                                     position: "relative",
                                     padding: `${spacing(3)} 0`,
                                     display: "block",
+                                    flex: index === array.length - 2 ? 10 : 1,
                                     ":visited": { color: colors.blue },
                                     ":hover, :active": { color: colors.black },
                                 })}

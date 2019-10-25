@@ -56,6 +56,7 @@ const theme = {
     },
 
     boxShadow: {
+        sidebar: "4px 0 16px rgba(170, 180, 190, 0.4)",
         secondary: "0 0 16px rgba(192, 201, 211, 0.8)",
         indicator: "1px 0 3px rgba(47, 151, 255, 0.4)",
         paper: "0 0 16px rgba(222, 229, 239, 0.4) !important",

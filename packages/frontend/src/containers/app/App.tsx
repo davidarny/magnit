@@ -79,7 +79,11 @@ export const App: React.FC = () => {
 
     const courier = useFetchCourier(token);
     const users = useUsers(courier, authorized);
-    const [username, handleLogin, handleTokenExpiration] = useCredentials(courier, token, setToken);
+    const [username, handleLogin, handleLogout, handleTokenExpiration] = useCredentials(
+        courier,
+        token,
+        setToken,
+    );
     const [drawerWidth, logoHeight] = usePageOffset(authorized);
     const [error, snackbar, setSnackbarError, setSnackbarState, onSnackbarClose] = useSnackbar();
 
@@ -190,7 +194,7 @@ export const App: React.FC = () => {
                         />
 
                         {/* not found */}
-                        <NotFound default to="tasks" />
+                        <NotFound default to="tasks" onLogout={handleLogout} />
                     </Router>
                 </Grid>
             </Grid>
