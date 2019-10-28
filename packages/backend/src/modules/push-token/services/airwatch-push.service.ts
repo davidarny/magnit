@@ -9,9 +9,11 @@ export class AirwatchPushService implements IPushService {
     }
 
     async sendToDevice(deviceId: string, message: string, options: object): Promise<void> {
-        await this.httpService.post(`mdm/devices/messages/${deviceId}/message`, {
-            MessageBody: message,
-            ApplicationName: process.env.AIRWATCH_APP_NAME,
-        });
+        await this.httpService
+            .post(`mdm/devices/messages/message?searchby=DeviceId&id=${deviceId}`, {
+                MessageBody: message,
+                ApplicationName: process.env.AIRWATCH_APP_NAME,
+            })
+            .toPromise();
     }
 }
