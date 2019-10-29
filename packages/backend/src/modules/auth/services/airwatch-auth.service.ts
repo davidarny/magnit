@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { UserUnauthorizedException } from "../../../shared/exceptions/user-unauthorized.exception";
 import { LoginUserDto } from "../dto/login-user.dto";
 import { User } from "../entities/user.entity";
@@ -9,6 +9,8 @@ import { LdapService } from "./ldap.service";
 
 @Injectable()
 export class AirwatchAuthService implements IAuthService {
+    private readonly logger = new Logger(AirwatchAuthService.name);
+
     constructor(
         private readonly ldapService: LdapService,
         private readonly airwatchUserService: AirwatchUserService,
@@ -16,7 +18,13 @@ export class AirwatchAuthService implements IAuthService {
     ) {}
 
     async validateUser(username: string, password: string): Promise<User | undefined> {
-        const authenticated = await this.ldapService.authenticate(username, password);
+        let authenticated = false;
+        try {
+            authenticated = await this.ldapService.authenticate(username, password);
+        } catch (error) {
+            this.logger.debug("Authentication failed");
+            this.logger.error(error);
+        }
         if (!authenticated) {
             throw new UserUnauthorizedException("User unauthorized");
         }
@@ -24,9 +32,25 @@ export class AirwatchAuthService implements IAuthService {
     }
 
     async login(loginUserDto: LoginUserDto): Promise<string> {
-        const user = await this.validateUser(loginUserDto.username, loginUserDto.password);
-        const groups = await this.ldapService.getGroupMembershipForUser(loginUserDto.username);
-        if (!user || (process.env.LDAP_USER_ROLE && !groups.includes(process.env.LDAP_USER_ROLE))) {
+        let user: User | null = null;
+        try {
+            user = await this.validateUser(loginUserDto.username, loginUserDto.password);
+        } catch (error) {
+            this.logger.debug("User not found");
+            this.logger.error(error);
+        }
+        let groups: string[] = [];
+        try {
+            groups = await this.ldapService.getGroupMembershipForUser(loginUserDto.username);
+        } catch (error) {
+            this.logger.debug("Group membership for user failed");
+            this.logger.error(error);
+        }
+        if (
+            !user ||
+            !groups ||
+            (process.env.LDAP_USER_ROLE && !groups.includes(process.env.LDAP_USER_ROLE))
+        ) {
             throw new UserUnauthorizedException("User unauthorized");
         }
         return this.jwtTokenManager.encode(user);
