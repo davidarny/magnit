@@ -1,3 +1,6 @@
+import httpMocks from "node-mocks-http";
+import { IAuthRequest } from "../shared/interfaces/auth.request.interface";
+
 export function createMockFrom<T>(value: T): T {
     const initialValue = value;
     const excludedProps = Object.getOwnPropertyNames(Object.prototype);
@@ -19,6 +22,11 @@ export function createMockFrom<T>(value: T): T {
     }
 
     return result as T;
+}
+
+export function createRequestMock(): IAuthRequest {
+    const user = { user: { id: 0 } };
+    return httpMocks.createRequest<IAuthRequest>(user);
 }
 
 export function getMockRepository() {

@@ -61,6 +61,7 @@
         "multer": "^1.4.2",
         "nest-schedule": "^0.6.3",
         "nestjs-amqp": "^0.1.9",
+        "node-mocks-http": "^1.8.0",
         "pg": "^7.12.1",
         "pino": "^5.13.5",
         "pino-pretty": "^3.2.2",

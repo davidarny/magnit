@@ -1,5 +1,5 @@
 import { Test } from "@nestjs/testing";
-import { createMockFrom } from "../../../utils/create-mock.util";
+import { createMockFrom, createRequestMock } from "../../../utils/create-mock.util";
 import { AmqpService } from "../../amqp/services/amqp.service";
 import { AirwatchAuthModule } from "../../auth/airwatch.auth.module";
 import { JwtTokenManager } from "../../auth/providers/jwt.token.manager";
@@ -25,6 +25,7 @@ describe("TaskController", () => {
     const jwtTokenManager = createMockFrom(JwtTokenManager.prototype);
     const pushTokenService = createMockFrom(PushTokenService.prototype);
     const ldapService = createMockFrom(LdapService.prototype);
+    const req = createRequestMock();
 
     const task: Task = {
         id: 0,
@@ -97,7 +98,7 @@ describe("TaskController", () => {
     it("should return empty list of tasks", async () => {
         const expected = { success: 1, total: 0, tasks: [], all: 0 };
         jest.spyOn(taskService, "findAll").mockResolvedValue([[], 0]);
-        expect(await taskController.findAll()).toStrictEqual(expected);
+        expect(await taskController.findAll(req)).toStrictEqual(expected);
     });
 
     it("should create task", async () => {
@@ -115,7 +116,7 @@ describe("TaskController", () => {
     it("should return list of task with created task", async () => {
         const expected = { success: 1, total: 1, tasks: [task], all: 1 };
         jest.spyOn(taskService, "findAll").mockResolvedValue([[task], 1]);
-        expect(await taskController.findAll()).toStrictEqual(expected);
+        expect(await taskController.findAll(req)).toStrictEqual(expected);
     });
 
     it("should add template to task", async () => {
@@ -134,7 +135,7 @@ describe("TaskController", () => {
         const updated = { ...task, name: "updated task" };
         const expected = { success: 1, total: 1, tasks: [updated], all: 1 };
         jest.spyOn(taskService, "findAll").mockResolvedValue([[updated], 1]);
-        expect(await taskController.findAll()).toStrictEqual(expected);
+        expect(await taskController.findAll(req)).toStrictEqual(expected);
     });
 
     it("should delete task", async () => {
