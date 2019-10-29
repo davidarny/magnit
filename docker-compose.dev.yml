@@ -9,7 +9,7 @@ services:
         command: npm run start
         restart: always
         environment:
-            - NODE_ENV=development
+            - NODE_ENV=${NODE_ENV:-development}
             - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
         networks:
             - magnit
@@ -30,7 +30,7 @@ services:
             - AIRWATCH_TENANT_CODE=${AIRWATCH_TENANT_CODE}
             - AUTH_EXPIRES_IN=${AUTH_EXPIRES_IN:-1h}
             - AUTH_SECRET=${AUTH_SECRET}
-            - NODE_ENV=development
+            - NODE_ENV=${NODE_ENV:-development}
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - BACKEND_HOST=${BACKEND_HOST:-http://localhost:1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}

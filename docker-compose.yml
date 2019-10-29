@@ -9,7 +9,7 @@ services:
         networks:
             - magnit
         environment:
-            - NODE_ENV=production
+            - NODE_ENV=${NODE_ENV:-production}
             - REACT_APP_BACKEND_URL=http://${REACT_APP_BACKEND_URL:-localhost}:${BACKEND_PORT:-1337}
         ports:
             - ${FRONTEND_PORT:-80}:80
@@ -24,7 +24,7 @@ services:
             - AIRWATCH_TENANT_CODE=${AIRWATCH_TENANT_CODE}
             - AUTH_EXPIRES_IN=${AUTH_EXPIRES_IN:-1h}
             - AUTH_SECRET=${AUTH_SECRET}
-            - NODE_ENV=production
+            - NODE_ENV=${NODE_ENV:-production}
             - BACKEND_PORT=${BACKEND_PORT:-1337}
             - BACKEND_HOST=${BACKEND_HOST:-http://localhost:1337}
             - POSTGRES_PORT=${POSTGRES_PORT:-5432}
