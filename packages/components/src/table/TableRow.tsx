@@ -108,8 +108,9 @@ export const TableRow: React.FC<ITableRowProps> = props => {
             })}
             <TableCell
                 align="right"
-                css={({ colors }) => ({
+                css={({ colors, spacing }) => ({
                     padding: 0,
+                    paddingRight: spacing(),
                     borderBottomColor: colors.light,
                     color: colors.black,
                     cursor: hover ? "pointer" : "inherit",
