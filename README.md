@@ -143,9 +143,9 @@ This will run tests in all packages that have `test` script in `package.json`
 
 All the necessary documentation for architecture can be found [here](./docs)
 
-Backend documentation is available [here (compodoc)](http://91.144.161.208:1337/)
+Backend documentation is available [here (compodoc)](http://91.144.161.208:1336/)
 
-REST API documentations is available [here (swagger)](http://91.144.161.208:1337/api)
+REST API documentations is available [here (swagger)](http://91.144.161.208:1336/api)
 
 ### Contributing
 
