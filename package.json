@@ -15,12 +15,12 @@
         "deploy:no-lib": "lerna run --scope @magnit/frontend build:no-lib --stream --no-prefix && gh-pages -d packages/frontend/build -b release/frontend",
         "docs:build": "lerna run docs:build --stream",
         "lint": "eslint . --fix",
+        "pretty": "concurrently -n ts,js,json,html,yml,md \"prettier --write ./**/*.ts\" \"prettier --write ./**/*.js\" \"prettier --write ./**/*.json\"  \"prettier --write ./**/*.html\"  \"prettier --write ./**/*.yml\" \"prettier --write ./**/*.md\"",
         "start": "concurrently -n backend,frontend \"yarn start:backend\" \"yarn build:frontend && serve -s packages/frontend/build -p 80\"",
         "start:backend": "lerna run --scope @magnit/backend start:prod --stream",
         "start:frontend": "lerna run --scope @magnit/frontend start --stream",
         "update:deps": "yarn upgrade-interactive --latest",
-        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail",
-        "pretty": "concurrently -n ts,js,json,html,yml,md \"prettier --write ./**/*.ts\" \"prettier --write ./**/*.js\" \"prettier --write ./**/*.json\"  \"prettier --write ./**/*.html\"  \"prettier --write ./**/*.yml\" \"prettier --write ./**/*.md\""
+        "watch:lib": "lerna run watch:lib --stream --parallel --no-bail"
     },
     "config": {
         "commitizen": {
@@ -43,6 +43,7 @@
         "eslint-plugin-react": "^7.16.0",
         "eslint-plugin-react-hooks": "^2.1.2",
         "lerna": "^3.18.1",
+        "pm2": "^4.1.2",
         "rimraf": "^3.0.0",
         "serve": "^11.2.0"
     },
