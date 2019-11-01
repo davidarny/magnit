@@ -71,14 +71,16 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
         // favicon
         const pathToFavicon = join(__dirname, "..", "assets");
         app.useStaticAssets(pathToFavicon);
+        
+        const port = process.env.BACKEND_PORT || 1337;
 
         // api docs
         const config = new DocumentBuilder()
             .setTitle("Templates API")
             .setHost(
                 process.env.NODE_ENV === "production"
-                    ? "91.144.161.208:1336/v1"
-                    : "localhost:1337/v1",
+                    ? `91.144.161.208:${port}/v1`
+                    : `localhost:${port}/v1`,
             )
             .setVersion("1.0")
             .addBearerAuth("basic", "header", "basic")
@@ -87,7 +89,7 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
         SwaggerModule.setup("api", app, document);
 
         // listen port
-        await app.listen(process.env.BACKEND_PORT || 1337);
+        await app.listen(port);
     }
 
     process.on(
