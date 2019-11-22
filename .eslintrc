@@ -1,6 +1,12 @@
 {
     "root": true,
-    "extends": ["react-app", "plugin:prettier/recommended"],
+    "parser": "@@typescript-eslint/parser",
+    "extends": [
+        "react-app",
+        "plugin:@typescript-eslint/recommended",
+        "prettier/@typescript-eslint",
+        "plugin:prettier/recommended"
+    ],
     "plugins": ["prettier"],
     "rules": {
         "prettier/prettier": "error"
