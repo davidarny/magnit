@@ -18,7 +18,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
-      run: yarn install --frozen-lockfile
+      run: yarn install --non-interactive --no-progress --skip-integrity-check --frozen-lockfile
     - name: Run libs build
       run: yarn build:lib
     - name: Run CRA build
