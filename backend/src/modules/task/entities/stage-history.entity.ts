@@ -5,7 +5,11 @@ import { TaskStage } from "./task-stage.entity";
 @Entity({ name: "stage_history" })
 export class StageHistory extends PrimaryBaseEntity {
     @Index()
-    @ManyToOne(() => TaskStage, stage => stage.history, { onDelete: "CASCADE" })
+    @ManyToOne(
+        () => TaskStage,
+        stage => stage.history,
+        { onDelete: "CASCADE" },
+    )
     @JoinColumn({ name: "id_stage" })
     stage: TaskStage;
 

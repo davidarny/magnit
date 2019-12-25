@@ -11,7 +11,10 @@ export enum ENoLocationReason {
 
 @Entity("template_answer_location")
 export class TemplateAnswerLocation extends PrimaryBaseEntity {
-    @OneToMany(() => TemplateAnswer, template_answer => template_answer.location)
+    @OneToMany(
+        () => TemplateAnswer,
+        template_answer => template_answer.location,
+    )
     answers: TemplateAnswer[];
 
     @Column({ type: "varchar", nullable: true })

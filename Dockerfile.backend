@@ -3,19 +3,18 @@ FROM node:10-alpine AS build
 
 WORKDIR /devel
 
-COPY yarn.lock .
-COPY packages/backend/package.json package.json
+COPY backend/package.json package.json
 
 RUN yarn install --non-interactive --frozen-lockfile
 
-COPY packages/backend/src src
-COPY packages/backend/assets assets
-COPY packages/backend/tsconfig.json tsconfig.json
-COPY packages/backend/tsconfig.build.json tsconfig.build.json
-COPY packages/backend/ormconfig.js ormconfig.js
-COPY packages/backend/firebaseconfig.js firebaseconfig.js
-COPY packages/backend/amqpconfig.js amqpconfig.js
-COPY packages/backend/mailconfig.js mailconfig.js
+COPY backend/src src
+COPY backend/assets assets
+COPY backend/tsconfig.json tsconfig.json
+COPY backend/tsconfig.build.json tsconfig.build.json
+COPY backend/ormconfig.js ormconfig.js
+COPY backend/firebaseconfig.js firebaseconfig.js
+COPY backend/amqpconfig.js amqpconfig.js
+COPY backend/mailconfig.js mailconfig.js
 
 RUN yarn build && yarn docs:build
 

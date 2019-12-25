@@ -86,12 +86,12 @@ $ yarn workspaces info
 yarn workspaces v1.16.0
 {
   "@magnit/backend": {
-    "location": "packages/backend",
+    "location": "backend",
     "workspaceDependencies": [],
     "mismatchedWorkspaceDependencies": []
   },
   "@magnit/frontend": {
-    "location": "packages/frontend",
+    "location": "frontend",
     "workspaceDependencies": [],
     "mismatchedWorkspaceDependencies": []
   }

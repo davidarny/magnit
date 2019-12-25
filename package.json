@@ -3,7 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "frontend"
     ],
     "scripts": {
         "build:backend": "lerna run --scope @magnit/backend build --stream --no-prefix",

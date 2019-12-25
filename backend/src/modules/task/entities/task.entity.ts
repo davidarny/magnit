@@ -46,15 +46,27 @@ export class Task extends PrimaryBaseEntity {
     @JoinColumn({ name: "id_marketplace" })
     marketplace: Marketplace;
 
-    @OneToMany(() => TemplateAssignment, assignment => assignment.task)
+    @OneToMany(
+        () => TemplateAssignment,
+        assignment => assignment.task,
+    )
     assignments: TemplateAssignment[];
 
-    @OneToMany(() => TemplateAnswer, answer => answer.task)
+    @OneToMany(
+        () => TemplateAnswer,
+        answer => answer.task,
+    )
     answers: TemplateAnswer[];
 
-    @OneToMany(() => TaskStage, stage => stage.task)
+    @OneToMany(
+        () => TaskStage,
+        stage => stage.task,
+    )
     stages: TaskStage[];
 
-    @OneToMany(() => TaskDocument, document => document.task)
+    @OneToMany(
+        () => TaskDocument,
+        document => document.task,
+    )
     documents: TaskDocument[];
 }

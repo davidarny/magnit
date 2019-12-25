@@ -14,7 +14,11 @@ export class TemplateAnswer extends BaseEntity {
     @PrimaryColumn()
     id_template: number;
 
-    @ManyToOne(() => Template, template => template.answers, { onDelete: "CASCADE" })
+    @ManyToOne(
+        () => Template,
+        template => template.answers,
+        { onDelete: "CASCADE" },
+    )
     @JoinColumn({ name: "id_template" })
     template: Template;
 
@@ -22,7 +26,11 @@ export class TemplateAnswer extends BaseEntity {
     @PrimaryColumn()
     id_task: number;
 
-    @ManyToOne(() => Task, task => task.answers, { onDelete: "CASCADE" })
+    @ManyToOne(
+        () => Task,
+        task => task.answers,
+        { onDelete: "CASCADE" },
+    )
     @JoinColumn({ name: "id_task" })
     task: Task;
 

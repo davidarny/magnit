@@ -25,10 +25,16 @@ export class Template extends PrimaryBaseEntity {
     @Column({ type: "jsonb", default: [] })
     sections: object;
 
-    @OneToMany(() => TemplateAssignment, assignment => assignment.template)
+    @OneToMany(
+        () => TemplateAssignment,
+        assignment => assignment.template,
+    )
     assignments: TemplateAssignment[];
 
-    @OneToMany(() => TemplateAnswer, answer => answer.template)
+    @OneToMany(
+        () => TemplateAnswer,
+        answer => answer.template,
+    )
     answers: TemplateAnswer[];
 
     @Column({ type: "varchar", default: "light" })
