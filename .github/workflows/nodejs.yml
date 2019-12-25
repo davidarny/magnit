@@ -16,18 +16,21 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
-            - name: Install dependencies
+            - name: Install frontend dependencies
               run: yarn install --non-interactive --no-progress --skip-integrity-check --frozen-lockfile
             - name: Run libs build
               run: yarn build:lib
             - name: Run CRA build
               working-directory: ./frontend
               run: yarn build:no-lib
+            - name: Install backend dependencies
+              working-directory: ./backend
+              run: yarn install --non-interactive --no-progress --skip-integrity-check --frozen-lockfile
             - name: Run backend unit tests with coverage
               working-directory: ./backend
               run: yarn test:cov
             - name: Run backend e2e tests
-              working-directory: ./end
+              working-directory: ./backend
               run: yarn test:e2e
               env:
                   CI: true
