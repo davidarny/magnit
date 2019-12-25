@@ -1,5 +1,5 @@
 # build step
-FROM node:10-alpine AS build
+FROM node:12-alpine AS build
 
 WORKDIR /devel
 
@@ -19,7 +19,7 @@ COPY backend/mailconfig.js mailconfig.js
 RUN yarn build && yarn docs:build
 
 # serve step
-FROM node:10-alpine AS serve
+FROM node:12-alpine AS serve
 
 RUN apk update && apk add logrotate
 
