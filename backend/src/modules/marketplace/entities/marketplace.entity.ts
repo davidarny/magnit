@@ -1,25 +1,22 @@
-import { Column, DeepPartial, Entity, Generated, Index, PrimaryColumn } from "typeorm";
-import { BaseEntity } from "../../../shared/entities/base.entity";
+import { Column, Entity, Index } from "typeorm";
+import { PrimaryBaseEntity } from "../../../shared/entities/primary-base.entity";
 
 @Entity()
-export class Marketplace extends BaseEntity {
-    @Column({ unique: true })
-    @Generated("rowid")
-    id: number;
-
+@Index(["region", "city", "format", "address"], { unique: true })
+export class Marketplace extends PrimaryBaseEntity {
     @Index()
-    @PrimaryColumn("varchar")
+    @Column("varchar")
     region: string;
 
     @Index()
-    @PrimaryColumn("varchar")
+    @Column("varchar")
     city: string;
 
     @Index()
-    @PrimaryColumn("varchar")
+    @Column("varchar")
     format: string;
 
     @Index()
-    @PrimaryColumn("varchar")
+    @Column("varchar")
     address: string;
 }

@@ -277,12 +277,6 @@ export class TaskService {
     @Transactional()
     async update(taskId: number, task: DeepPartial<Task>): Promise<void> {
         await this.appendMarketplaceIfExists(task);
-        // this bug happens
-        // https://github.com/typeorm/typeorm/issues/2651
-        if (!task.marketplace && !task.id_marketplace) {
-            delete task.marketplace;
-            delete task.id_marketplace;
-        }
         await this.taskRepository.save({ id: taskId, ...task });
     }
 
