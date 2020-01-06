@@ -1,6 +1,6 @@
 # Environment
 
-| Environemnt Variable          | Description                        |
+| Environment Variable          | Description                        |
 | ----------------------------- | ---------------------------------- |
 | AIRWATCH_APP_NAME             |                                    |
 | AIRWATCH_AUTH                 | Base64 string `<login>:<password>` |
