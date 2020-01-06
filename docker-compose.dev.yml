@@ -2,10 +2,10 @@ version: "3.3"
 
 services:
     frontend:
-        image: node:10-alpine
+        image: node:12-alpine
         volumes:
             - .:/devel
-        working_dir: /devel/packages/frontend
+        working_dir: /devel/frontend
         command: npm run start
         restart: always
         environment:
@@ -19,10 +19,10 @@ services:
             - ${FRONTEND_PORT:-3100}:3000
 
     backend:
-        image: node:10-alpine
+        image: node:12-alpine
         volumes:
             - .:/devel
-        working_dir: /devel/packages/backend
+        working_dir: /devel/backend
         command: npm run start:dev
         environment:
             - AIRWATCH_AUTH=${AIRWATCH_AUTH}

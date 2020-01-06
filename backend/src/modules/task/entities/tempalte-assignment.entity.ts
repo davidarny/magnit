@@ -25,6 +25,9 @@ export class TemplateAssignment extends PrimaryBaseEntity {
     @JoinColumn({ name: "id_template" })
     template: Template;
 
-    @OneToMany(() => Comment, comment => comment.assignment)
+    @OneToMany(
+        () => Comment,
+        comment => comment.assignment,
+    )
     comments: Comment[];
 }

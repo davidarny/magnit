@@ -71,7 +71,7 @@ if (process.env.ALLOW_CLUSTER_MODE && cluster.isMaster) {
         // favicon
         const pathToFavicon = join(__dirname, "..", "assets");
         app.useStaticAssets(pathToFavicon);
-        
+
         const port = process.env.BACKEND_PORT || 1337;
 
         // api docs

@@ -8,7 +8,11 @@ export class TaskDocument extends PrimaryBaseEntity {
     @Column()
     id_task: number;
 
-    @ManyToOne(() => Task, task => task.stages, { onDelete: "CASCADE" })
+    @ManyToOne(
+        () => Task,
+        task => task.stages,
+        { onDelete: "CASCADE" },
+    )
     @JoinColumn({ name: "id_task" })
     task: Task;
 

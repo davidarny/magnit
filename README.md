@@ -1,7 +1,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/DavidArutiunian/magnit">
-    <img src="packages/frontend/src/assets/logo.png" alt="Logo" width="100" height="100">
+    <img src="frontend/src/assets/logo.png" alt="Logo" width="100" height="100">
   </a>
 
   <h3 align="center">Магнит "Опросный Лист"</h3>
@@ -86,12 +86,12 @@ $ yarn workspaces info
 yarn workspaces v1.16.0
 {
   "@magnit/backend": {
-    "location": "packages/backend",
+    "location": "backend",
     "workspaceDependencies": [],
     "mismatchedWorkspaceDependencies": []
   },
   "@magnit/frontend": {
-    "location": "packages/frontend",
+    "location": "frontend",
     "workspaceDependencies": [],
     "mismatchedWorkspaceDependencies": []
   }

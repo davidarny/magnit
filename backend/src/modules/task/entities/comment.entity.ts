@@ -14,7 +14,11 @@ export class Comment extends PrimaryBaseEntity {
     @Column()
     id_assignment: number;
 
-    @ManyToOne(() => TemplateAssignment, assignment => assignment.comments, { onDelete: "CASCADE" })
+    @ManyToOne(
+        () => TemplateAssignment,
+        assignment => assignment.comments,
+        { onDelete: "CASCADE" },
+    )
     @JoinColumn({ name: "id_assignment" })
     assignment: TemplateAssignment;
 }
