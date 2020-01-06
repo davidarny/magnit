@@ -1,3 +1,3 @@
-# Task ER diagram
+# Complete ER diagram
 
 <img width="500" src="schema.png" alt="schema"/>
