@@ -83,20 +83,64 @@ It should give use something like this
 
 ```
 $ yarn workspaces info
-yarn workspaces v1.16.0
+yarn workspaces v1.21.1
 {
-  "@magnit/backend": {
-    "location": "backend",
+  "@magnit/components": {
+    "location": "packages/components",
+    "workspaceDependencies": [
+      "@magnit/icons"
+    ],
+    "mismatchedWorkspaceDependencies": []
+  },
+  "@magnit/entities": {
+    "location": "packages/entities",
     "workspaceDependencies": [],
+    "mismatchedWorkspaceDependencies": []
+  },
+  "@magnit/icons": {
+    "location": "packages/icons",
+    "workspaceDependencies": [],
+    "mismatchedWorkspaceDependencies": []
+  },
+  "@magnit/services": {
+    "location": "packages/services",
+    "workspaceDependencies": [],
+    "mismatchedWorkspaceDependencies": []
+  },
+  "@magnit/task-editor": {
+    "location": "packages/task-editor",
+    "workspaceDependencies": [
+      "@magnit/components",
+      "@magnit/entities",
+      "@magnit/icons",
+      "@magnit/services"
+    ],
+    "mismatchedWorkspaceDependencies": []
+  },
+  "@magnit/template-editor": {
+    "location": "packages/template-editor",
+    "workspaceDependencies": [
+      "@magnit/components",
+      "@magnit/entities",
+      "@magnit/icons",
+      "@magnit/services"
+    ],
     "mismatchedWorkspaceDependencies": []
   },
   "@magnit/frontend": {
     "location": "frontend",
-    "workspaceDependencies": [],
+    "workspaceDependencies": [
+      "@magnit/components",
+      "@magnit/entities",
+      "@magnit/icons",
+      "@magnit/services",
+      "@magnit/task-editor",
+      "@magnit/template-editor"
+    ],
     "mismatchedWorkspaceDependencies": []
   }
 }
-Done in 0.11s.
+Done in 0.14s.
 ```
 
 More info about `yarn workspaces` can be found [here](https://yarnpkg.com/en/docs/cli/workspaces)
