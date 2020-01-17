@@ -18,6 +18,14 @@
 </p>
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/DavidArutiunian/magnit.svg)
+[![TLOC](https://tokei.rs/b1/github/DavidArutiunian/magnit)](https://github.com/DavidArutiunian/magnit)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/DavidArutiunian/magnit.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/DavidArutiunian/magnit.svg)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat)](https://github.com/prettier/prettier)
+![GitHub top language](https://img.shields.io/github/languages/top/DavidArutiunian/magnit.svg)
+[![GitHub license](https://img.shields.io/github/license/DavidArutiunian/magnit.svg)](https://github.com/DavidArutiunian/magnit/blob/master/LICENSE)
+[![David](https://img.shields.io/david/DavidArutiunian/magnit.svg)](https://github.com/DavidArutiunian/magnit)
 
 ## Table of Contents
 
