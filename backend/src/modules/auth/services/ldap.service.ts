@@ -31,7 +31,8 @@ export class LdapService {
 
     async authenticate(username: string, password: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            this.ad.authenticate(username, password, (error, authenticated) => {
+            const postfix = process.env.LDAP_USER_POSTFIX ?? "";
+            this.ad.authenticate(username + postfix, password, (error, authenticated) => {
                 if (error) {
                     this.logger.error(error);
                     return reject(new UserUnauthorizedException("User unauthorized"));

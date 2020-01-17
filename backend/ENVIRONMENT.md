@@ -23,6 +23,7 @@
 | LDAP_BASE_URL                 |                                    |
 | LDAP_PASSWORD                 |                                    |
 | LDAP_USER_ROLE                | Role to filter users by            |
+| LDAP_USER_POSTFIX             | The postfix added to LDAP username |
 | LDAP_USERNAME                 |                                    |
 | NODE_ENV                      |                                    |
 | POSTGRES_HOST                 |                                    |
