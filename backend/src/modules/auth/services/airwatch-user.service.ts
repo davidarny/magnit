@@ -20,7 +20,7 @@ export class AirwatchUserService implements IUserService {
 
     @TransformClassToPlain()
     @Validate(InternalServerErrorException)
-    async findOne(username: string): Promise<User | undefined> {
+    async UNSAFE_findOne(username: string): Promise<User | undefined> {
         const query = `username=${encodeURI(username)}`;
         let response: AxiosResponse<AirwatchAPI.System.Users.Search.IResponse> | null = null;
         try {
@@ -44,6 +44,31 @@ export class AirwatchUserService implements IUserService {
                 lastName: user.LastName,
             });
         }
+    }
+
+    @TransformClassToPlain()
+    @Validate(InternalServerErrorException)
+    async findOne(username: string): Promise<User | undefined> {
+        return await this.findDeviceByUserName(username)
+            .then(async devices => {
+                if (!devices) {
+                    return;
+                }
+                const device = _.first(devices);
+                return this.findUserByDevice(device);
+            })
+            .then(user => {
+                if (!user) {
+                    return;
+                }
+                return new User({
+                    id: user.Uuid,
+                    email: user.Email,
+                    username: user.UserName,
+                    firstName: user.FirstName,
+                    lastName: user.LastName,
+                });
+            });
     }
 
     /** @deprecated */
@@ -85,29 +110,11 @@ export class AirwatchUserService implements IUserService {
     @TransformArrayOfClassesToPlainArray()
     @Validate(InternalServerErrorException)
     async findAll() {
-        type TDeviceSearchResponse = AirwatchAPI.MDM.Devices.Search.IResponse;
-        type TUserDetailsResponse = AirwatchAPI.MDM.Devices.User.IResponse;
-
         const users = await this.ldapService.findUsers();
         const responses = await Promise.all(
             users
                 // find all devices that match given common name (cn)
-                .map(async cn => {
-                    let response: AxiosResponse<TDeviceSearchResponse> | null = null;
-                    try {
-                        const url = `mdm/devices/search?user=${cn}`;
-                        this.logger.debug(url, "AirwatchAPI");
-                        response = await this.httpService
-                            .get<TDeviceSearchResponse>(url)
-                            .toPromise();
-                    } catch (error) {
-                        this.logger.error("Failed to fetch device details", error);
-                    }
-                    if (!response) {
-                        return false;
-                    }
-                    return response.data.Devices;
-                })
+                .map(async cn => this.findDeviceByUserName(cn))
                 // get user details of device
                 .map(async promise => {
                     const devices = await promise;
@@ -115,20 +122,10 @@ export class AirwatchUserService implements IUserService {
                         return false;
                     }
                     const device = _.first(devices);
-                    let response: AxiosResponse<TUserDetailsResponse> | null = null;
-                    try {
-                        const url = `mdm/devices/${device.Id.Value}/user`;
-                        this.logger.debug(url, "AirwatchAPI");
-                        response = await this.httpService
-                            .get<TUserDetailsResponse>(url)
-                            .toPromise();
-                    } catch (error) {
-                        this.logger.error("Failed to fetch user details", error);
-                    }
-                    if (!response) {
+                    const user = await this.findUserByDevice(device);
+                    if (!user) {
                         return false;
                     }
-                    const user = response.data.DeviceUser;
                     return new User({
                         id: user.Uuid,
                         email: user.Email,
@@ -139,5 +136,41 @@ export class AirwatchUserService implements IUserService {
                 }),
         );
         return responses.filter(response => response) as User[];
+    }
+
+    private async findUserByDevice(device: AirwatchAPI.MDM.Devices.IDevice) {
+        type TUserDetailsResponse = AirwatchAPI.MDM.Devices.User.IResponse;
+
+        let response: AxiosResponse<TUserDetailsResponse> | null = null;
+        try {
+            const url = `mdm/devices/${device.Id.Value}/user`;
+            this.logger.debug(url, "AirwatchAPI");
+            response = await this.httpService.get<TUserDetailsResponse>(url).toPromise();
+        } catch (error) {
+            this.logger.error("Failed to fetch user details", error);
+        }
+        if (!response) {
+            return;
+        }
+
+        return response.data.DeviceUser;
+    }
+
+    private async findDeviceByUserName(cn: string) {
+        type TDeviceSearchResponse = AirwatchAPI.MDM.Devices.Search.IResponse;
+
+        let response: AxiosResponse<TDeviceSearchResponse> | null = null;
+        try {
+            const url = `mdm/devices/search?user=${cn}`;
+            this.logger.debug(url, "AirwatchAPI");
+            response = await this.httpService.get<TDeviceSearchResponse>(url).toPromise();
+        } catch (error) {
+            this.logger.error("Failed to fetch device details", error);
+        }
+        if (!response) {
+            return;
+        }
+
+        return response.data.Devices;
     }
 }
