@@ -17,6 +17,8 @@
   </p>
 </p>
 
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
 ## Table of Contents
 
 -   [Table of Contents](#Table-of-Contents)

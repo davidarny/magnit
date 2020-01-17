@@ -1,5 +1,6 @@
 import { ITokenManager } from "../interfaces/token.manager.interface";
 import * as crypto from "crypto";
+import * as jwt from "jsonwebtoken";
 
 export abstract class TokenManagerImpl<T> implements ITokenManager<T> {
     // for AES, this is always 16
@@ -7,7 +8,8 @@ export abstract class TokenManagerImpl<T> implements ITokenManager<T> {
 
     // must be 256 bits (32 characters)
     protected readonly secret = process.env.AUTH_SECRET;
-    protected readonly algorithm = process.env.AUTH_ALGORITHM || "HS256";
+    protected readonly algorithm: jwt.Algorithm =
+        ((process.env.AUTH_ALGORITHM as unknown) as jwt.Algorithm) || "HS256";
     protected readonly expires = process.env.AUTH_EXPIRES_IN || "1h";
 
     constructor() {
