@@ -7,6 +7,7 @@
     "typings": "dist/index.d.ts",
     "scripts": {
         "build:lib": "concurrently -n webpack,tsc \"cross-env NODE_ENV=production webpack --mode production\" \"tsc --emitDeclarationOnly -p tsconfig.json\"",
+        "build:dev": "concurrently -n webpack,tsc \"cross-env NODE_ENV=development webpack --mode development\" \"tsc --emitDeclarationOnly -p tsconfig.json\"",
         "clean": "rimraf dist ./node_modules/.cache",
         "watch:lib": "concurrently -n webpack,tsc \"webpack --mode development --watch\" \"tsc --emitDeclarationOnly -p tsconfig.json -w\""
     },
