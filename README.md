@@ -5,9 +5,7 @@
   </a>
 
   <h3 align="center">Магнит "Опросный Лист"</h3>
-
   <h4 align="center">Monorepo for internal Omega-R project Магнит "Опросный Лист"</h4>
-
   <p align="center">
     <a href="http://magnit-omega-r.herokuapp.com/">View Demo</a>
     ·
@@ -72,7 +70,7 @@
 
 This project consists of 2 main parts
 
--   [@magnit/backend](./packages/backend) - REST API server built on top of [Nest.JS](https://nestjs.com/)
+-   [@magnit/backend](./packages/backend) - REST API server built on top of [NestJS](https://nestjs.com/)
 -   [@magnit/frontend](./packages/frontend) - SPA application build on top of [React](https://reactjs.org/)
 
 ### Installation
