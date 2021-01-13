@@ -27,18 +27,18 @@
 
 ## Table of Contents
 
--   [Table of Contents](#Table-of-Contents)
-    -   [Technologies](#Technologies)
-    -   [Requirements](#Requirements)
-    -   [Project structure](#Project-structure)
-    -   [Installation](#Installation)
-    -   [Running](#Running)
-        -   [Frontend](#Frontend)
-        -   [Backend](#Backend)
-        -   [Libraries](#Libraries)
-    -   [Testing](#Testing)
-    -   [Documentation](#Documentation)
-    -   [Contributing](#Contributing)
+-   [Table of Contents](#table-of-contents)
+    -   [Requirements](#requirements)
+    -   [Technologies](#technologies)
+    -   [Project structure](#project-structure)
+    -   [Installation](#installation)
+    -   [Running](#running)
+        -   [Frontend](#frontend)
+        -   [Backend](#backend)
+        -   [Libraries](#libraries)
+    -   [Testing](#testing)
+    -   [Documentation](#documentation)
+    -   [Contributing](#contributing)
 
 ### Requirements
 
@@ -76,7 +76,7 @@ This project consists of 2 main parts
 ### Installation
 
 ```bash
-$ lerna bootstrap
+$ yarn lerna bootstrap
 ```
 
 This will install all packages using `yarn install` command
@@ -176,7 +176,7 @@ $ yarn start:backend
 It's recommended to build all libraries before starting project
 
 ```bash
-lerna run build:lib
+$ yarn lerna run build:lib
 ```
 
 Also if you're developing a library, provide a `build:lib` script, which will package and bundle your library
