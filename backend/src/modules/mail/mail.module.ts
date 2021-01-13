@@ -99,7 +99,7 @@ export class MailModule {
                 options.attachments = [
                     {
                         filename: body.filename,
-                        content: Buffer.from(body.buffer.data),
+                        contents: Buffer.from(body.buffer.data),
                     },
                 ];
             }

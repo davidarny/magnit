@@ -19,10 +19,10 @@ export class ReferenceAssetFactory implements IPuzzleFactory {
                 addAssetButton={addAssetButton}
                 onAddAsset={onAddAnswerPuzzle}
                 onDeleteAssetPuzzle={onDeleteAnswerPuzzle}
-                onUploadAsset={context.onUploadAsset}
-                onDeleteAsset={context.onDeleteAsset}
                 {...rest}
                 {...props}
+                onUploadAsset={context.onUploadAsset}
+                onDeleteAsset={context.onDeleteAsset}
             />
         );
     }

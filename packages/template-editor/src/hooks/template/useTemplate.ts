@@ -304,8 +304,8 @@ export function useTemplate(
                 // re-calculate order
                 puzzle.puzzles = puzzle.puzzles.map((element, index) => {
                     return {
-                        order: index,
                         ...element,
+                        order: index,
                     };
                 });
                 return true;
@@ -332,8 +332,8 @@ export function useTemplate(
                     // re-calculate order
                     puzzle.puzzles = puzzle.puzzles.map((element, index) => {
                         return {
-                            order: index,
                             ...element,
+                            order: index,
                         };
                     });
                     // update focused puzzle chain
@@ -360,8 +360,8 @@ export function useTemplate(
                     // re-calculate order
                     puzzle.sections = puzzle.sections.map((element, index) => {
                         return {
-                            order: index,
                             ...element,
+                            order: index,
                         };
                     });
                     // update focused puzzle chain
