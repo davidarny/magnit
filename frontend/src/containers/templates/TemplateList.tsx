@@ -33,9 +33,9 @@ interface IUpdateTemplateListOptions {
     title?: string;
 }
 
-export interface ITemplateListProps extends RouteComponentProps {}
+export type ITemplateListProps = RouteComponentProps;
 
-export const TemplateList: React.FC<ITemplateListProps> = () => {
+const TemplateList: React.FC<ITemplateListProps> = () => {
     const context = useContext(AppContext);
 
     // full text search
@@ -242,3 +242,5 @@ export const TemplateList: React.FC<ITemplateListProps> = () => {
         </SectionLayout>
     );
 };
+
+export default TemplateList;

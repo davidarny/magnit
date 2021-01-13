@@ -29,7 +29,7 @@ export interface ICreateTaskProps extends RouteComponentProps {
     users: IUser[];
 }
 
-export const CreateTask: React.FC<ICreateTaskProps> = props => {
+const CreateTask: React.FC<ICreateTaskProps> = props => {
     const { users, username } = props;
 
     const context = useContext(AppContext);
@@ -198,3 +198,5 @@ export const CreateTask: React.FC<ICreateTaskProps> = props => {
         </SectionLayout>
     );
 };
+
+export default CreateTask;

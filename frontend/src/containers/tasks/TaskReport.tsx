@@ -22,7 +22,7 @@ export interface ITaskReportProps {
     taskId: number;
 }
 
-export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
+const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
     const context = useContext(AppContext);
 
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
@@ -158,3 +158,5 @@ export const TaskReport: React.FC<ITaskReportProps> = ({ taskId }) => {
         </SectionLayout>
     );
 };
+
+export default TaskReport;

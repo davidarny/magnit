@@ -57,7 +57,7 @@ interface IEditableTemplate extends ITemplate {
 
 type TDocumentWithAnswers = ITemplateDocument & IExtendedDocument;
 
-export const ViewTask: React.FC<IViewTaskProps> = props => {
+const ViewTask: React.FC<IViewTaskProps> = props => {
     const { taskId, users } = props;
 
     const context = useContext(AppContext);
@@ -66,7 +66,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     const [menuAnchorElement, setMenuAnchorElement] = useState<null | HTMLElement>(null);
 
     // all templates
-    const [templates, setTemplates] = useState<IEditableTemplate[]>([]);
+    const [templates, setTemplates] = useState<ITemplate[]>([]);
 
     // modal
     const [messageModalOpen, setMessageModalOpen] = useState(false);
@@ -156,7 +156,7 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
     );
 
     function setTemplateState(response: IGetTemplatesResponse, nextTask: IExtendedTask) {
-        const buffer: any[] = [];
+        const buffer: ITemplate[] = [];
         response.templates.forEach(template => buffer.push(template));
         buffer.forEach((data, index, array) => {
             const template = nextTask.templates.find(template => template.id === data.id);
@@ -561,6 +561,8 @@ export const ViewTask: React.FC<IViewTaskProps> = props => {
         </SectionLayout>
     );
 };
+
+export default ViewTask;
 
 function getTaskPayload(task: IExtendedTask) {
     return _.omit(task, ["id", "templates", "stages", "documents"]);

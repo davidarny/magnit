@@ -18,55 +18,55 @@ import Loadable from "react-loadable";
 
 // splash
 const AsyncSplash = Loadable({
-    loader: async () => import("containers/splash").then(module => module.Splash),
+    loader: () => import("containers/splash"),
     loading: Loading,
 });
 
 // tasks
 const AsyncTasksList = Loadable({
-    loader: async () => import("containers/tasks").then(module => module.TasksList),
+    loader: async () => import("containers/tasks/TasksList"),
     loading: Loading,
 });
 const AsyncViewTask = Loadable({
-    loader: async () => import("containers/tasks").then(module => module.ViewTask),
+    loader: async () => import("containers/tasks/ViewTask"),
     loading: Loading,
 });
 const AsyncCreateTask = Loadable({
-    loader: async () => import("containers/tasks").then(module => module.CreateTask),
+    loader: async () => import("containers/tasks/CreateTask"),
     loading: Loading,
 });
 const AsyncTaskHistory = Loadable({
-    loader: async () => import("containers/tasks").then(module => module.TaskHistory),
+    loader: async () => import("containers/tasks/TaskHistory"),
     loading: Loading,
 });
 const AsyncTaskReport = Loadable({
-    loader: async () => import("containers/tasks").then(module => module.TaskReport),
+    loader: async () => import("containers/tasks/TaskReport"),
     loading: Loading,
 });
 
 // templates
 const AsyncTemplates = Loadable({
-    loader: async () => import("containers/templates").then(module => module.TemplateList),
+    loader: async () => import("containers/templates/TemplateList"),
     loading: Loading,
 });
 const AsyncCreateTemplate = Loadable({
-    loader: async () => import("containers/templates").then(module => module.CreateTemplate),
+    loader: async () => import("containers/templates/CreateTemplate"),
     loading: Loading,
 });
 const AsyncEditTemplate = Loadable({
-    loader: async () => import("containers/templates").then(module => module.EditTemplate),
+    loader: async () => import("containers/templates/EditTemplate"),
     loading: Loading,
 });
 
 // users
 const AsyncUserList = Loadable({
-    loader: async () => import("containers/users").then(module => module.UserList),
+    loader: async () => import("containers/users"),
     loading: Loading,
 });
 
 // marketplaces
 const AsyncMarketplaceList = Loadable({
-    loader: async () => import("containers/marketplaces").then(module => module.MarketplaceList),
+    loader: async () => import("containers/marketplaces"),
     loading: Loading,
 });
 
@@ -149,7 +149,7 @@ export const App: React.FC = () => {
                         <PrivateRoute<IViewTaskProps>
                             authorized={authorized}
                             path="tasks/view/:taskId"
-                            render={props => <AsyncViewTask users={users} {...props} />}
+                            render={props => <AsyncViewTask {...props} users={users} />}
                         />
                         <PrivateRoute<ITaskHistoryProps>
                             authorized={authorized}

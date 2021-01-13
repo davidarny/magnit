@@ -18,7 +18,7 @@ export interface ITaskHistoryProps {
     taskId: number;
 }
 
-export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
+const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
     const [stages, setStages] = useState<IStageResponse[]>([]);
     const [focusedBlockId, setFocusedBlockId] = useState(-1);
     const context = useContext(AppContext);
@@ -155,3 +155,5 @@ export const TaskHistory: React.FC<ITaskHistoryProps> = ({ taskId }) => {
         </SectionLayout>
     );
 };
+
+export default TaskHistory;

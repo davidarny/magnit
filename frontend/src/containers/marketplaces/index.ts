@@ -1,1 +1,1 @@
-export * from "./MarketplaceList";
+export { MarketplaceList as default } from "./MarketplaceList";

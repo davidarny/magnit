@@ -18,7 +18,7 @@ export interface IEditTemplateProps {
     templateId: number;
 }
 
-export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
+const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<ITemplate>({
         id: 0,
@@ -112,3 +112,5 @@ export const EditTemplate: React.FC<IEditTemplateProps> = ({ templateId }) => {
         </SectionLayout>
     );
 };
+
+export default EditTemplate;

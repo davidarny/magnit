@@ -16,9 +16,9 @@ import { useContext, useState } from "react";
 import { deleteFile, uploadFile } from "services/api/assets";
 import { createTemplate } from "services/api/templates";
 
-export interface ICreateTemplateProps extends RouteComponentProps {}
+export type ICreateTemplateProps = RouteComponentProps;
 
-export const CreateTemplate: React.FC<ICreateTemplateProps> = () => {
+const CreateTemplate: React.FC<ICreateTemplateProps> = () => {
     const context = useContext(AppContext);
     const [template, setTemplate] = useState<ITemplate>({
         id: 0,
@@ -108,3 +108,5 @@ export const CreateTemplate: React.FC<ICreateTemplateProps> = () => {
         </SectionLayout>
     );
 };
+
+export default CreateTemplate;

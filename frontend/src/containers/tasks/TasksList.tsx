@@ -63,9 +63,9 @@ interface IUpdateTaskListOptions {
 
 type TSelectChangeEvent = React.ChangeEvent<{ name?: string; value: unknown }>;
 
-export interface ITaskListProps extends RouteComponentProps<TRouteProps> {}
+export type ITaskListProps = RouteComponentProps<TRouteProps>;
 
-export const TasksList: React.FC<ITaskListProps> = props => {
+const TasksList: React.FC<ITaskListProps> = props => {
     const tab = props["*"]!;
 
     const context = useContext(AppContext);
@@ -537,6 +537,8 @@ export const TasksList: React.FC<ITaskListProps> = props => {
 };
 
 TasksList.displayName = "TasksList";
+
+export default TasksList;
 
 function getTaskStatusByTab(tab?: string): ETaskStatus {
     if (!tab) {
