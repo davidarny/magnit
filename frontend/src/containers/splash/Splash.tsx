@@ -63,7 +63,11 @@ export const Splash: React.FC<ISplashProps> = props => {
                     alignItems="center"
                 >
                     <Grid item css={{ display: "flex" }} xs={8}>
-                        <img css={{ width: "100%" }} src={splash} alt="splash" />
+                        <img
+                            css={{ width: "100%", maxHeight: "100vh" }}
+                            src={splash}
+                            alt="splash"
+                        />
                     </Grid>
                     <Grid item xs={4}>
                         <Grid container justify="space-around">
