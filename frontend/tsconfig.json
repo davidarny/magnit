@@ -17,7 +17,7 @@
         "jsx": "preserve",
         "sourceMap": true,
         "jsxFactory": "jsx",
-        "incremental": true,
+        "incremental": false,
         "downlevelIteration": true
     },
     "include": ["src"],
