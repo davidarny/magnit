@@ -58,7 +58,7 @@
         "firebase-admin": "^8.9.1",
         "helmet": "^3.21.2",
         "jsonwebtoken": "^8.5.1",
-        "lodash": "^4.17.19",
+        "lodash": "^4.17.21",
         "multer": "^1.4.2",
         "nest-schedule": "^0.6.4",
         "nestjs-amqp": "^0.1.9",
