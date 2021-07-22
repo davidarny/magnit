@@ -72,7 +72,7 @@
         "typeorm": "^0.2.20",
         "typeorm-transactional-cls-hooked": "^0.1.8",
         "typescript": "^3.7.5",
-        "xlsx": "^0.15.2"
+        "xlsx": "^0.17.0"
     },
     "devDependencies": {
         "@compodoc/compodoc": "^1.1.11",
