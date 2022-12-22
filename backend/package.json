@@ -57,7 +57,7 @@
         "express-pino-logger": "^4.0.0",
         "firebase-admin": "^8.9.1",
         "helmet": "^3.21.2",
-        "jsonwebtoken": "^8.5.1",
+        "jsonwebtoken": "^9.0.0",
         "lodash": "^4.17.19",
         "multer": "^1.4.2",
         "nest-schedule": "^0.6.4",
